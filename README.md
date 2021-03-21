@@ -12,8 +12,15 @@
 
 From here you can work in a modern ruby development environment:
 
-- Add a `Gemfile` and/or `config.ru` file
-- Set your `install` and `start` attributes in `glitch.json` to `bundle` or `rackup` commands.
+- For `install` in `glitch.json`:
+  - Create a `Gemfile`
+  - Run `bundle update`
+  - Set `install` to `bundle install`
+
+- For `start` in `glitch.json` either:
+  - Create a `config.ru` and use a `rackup` or
+  - Run any command after `bundle exec`
+  
 
 ## A note on rails:
 
