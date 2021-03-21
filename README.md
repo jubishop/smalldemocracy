@@ -25,8 +25,7 @@ From here you can work in a modern ruby development environment:
 
 ## Ruby on Rails:
 
-Using modern rails is tricky, you will need a Boosted because by default you need `node`.
-However you can get around this with the `--skip-javascript` option.
+To use modern rails you will need a Boosted server to deal with the filesystem usage.
 Here's the steps to set this up from here:
 
 - Install rails:
@@ -42,7 +41,7 @@ ln -s /app/.local/gems/bin/* bin
 ```
 
 - Close your terminal and open a new one.
-- Create a new rails app, plugging in any name for `<app_name>`:
+- Create a new rails app. (We pass `--skip-javascript` because otherwise it will expect `node`):
 
 ```
 rails new <app_name> --skip-javascript
