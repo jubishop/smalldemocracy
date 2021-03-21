@@ -1,9 +1,15 @@
 #!/usr/bin/env ruby
 
-dir = ''
-
-if ARGV.first
-  if File.file?(ARGV.first)
-    print `du -sch 
-
-print `du -sch #{dir}.[!.]* #{dir}* | sort -rh`
+ARGV.push('./') if ARGV.empty?
+ARGV.each { |path|
+  if File.file?(path)
+    print `du -sch #{path}`
+  else
+    if (Dir.empty?(path))
+      puts "No files found in #{path}"
+    else
+      path += '/' unless path.end_with?('/')
+      print `du -sch #{path}.[!.]* #{path}* | sort -rh`
+    end
+  end
+}
