@@ -20,7 +20,7 @@ From here you can work in a modern ruby development environment:
 
 - For `start` in `glitch.json` either:
 
-  - Create a `config.ru` and use a `rackup` command, or
+  - Create a `config.ru` and use a `bundle exec rackup` command, or
   - Run any command after `bundle exec`
 
 ## Ruby on Rails:
