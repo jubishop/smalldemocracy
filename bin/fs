@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+dir = ARGV.first || ''
+print `du -sch #{dir}.[!.]* #{dir}* | sort -rh`
