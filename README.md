@@ -1,3 +1,5 @@
-# JubiGems
+# Ruby 3
 
-A place for Jubi's Gems.
+First step from here:
+
+`gem update --system`
