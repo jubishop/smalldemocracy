@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
 
-dir = ARGV.first || ''
+dir = ''
+
+if ARGV.first
+  if File.file?(ARGV.first)
+    print `du -sch 
+
 print `du -sch #{dir}.[!.]* #{dir}* | sort -rh`
