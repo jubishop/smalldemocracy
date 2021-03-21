@@ -37,7 +37,7 @@ gem install rails
 - Symlink your gem binaries (which now includes rails) into `bin/`:
 
 ```
-ln -s /app/.local/gems/bin/* bin
+ln -s /app/.local/gems/bin/* /app/bin
 ```
 
 - Close your terminal and open a new one.
