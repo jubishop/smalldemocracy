@@ -1,3 +1,3 @@
-# Get Started!
+# JubiGems
 
-Add files and start typing 🎉
+A place for Jubi's Gems.
