@@ -44,7 +44,7 @@ ln -s /app/.local/gems/bin/* bin
 - Create a new rails app. (We pass `--skip-javascript` because otherwise it will expect `node`):
 
 ```
-rails new <app_name> --skip-javascript
+rails new app_name --skip-javascript
 ```
 
-- Put `cd /app/<app_name>; bin/rails server` in `start` in your `glitch.json`
+- Put `cd /app/app_name; bin/rails server` in `start` in your `glitch.json`
