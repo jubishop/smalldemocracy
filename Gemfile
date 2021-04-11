@@ -2,8 +2,6 @@ ruby '>= 3'
 
 source 'https://rubygems.org'
 
-gem 'omniauth'
-gem 'omniauth-google-oauth2'
 gem 'puma'
 gem 'rack-ssl-enforcer'
 gem 'sinatra'
