@@ -1,3 +1,5 @@
+require 'omniauth'
+require 'omniauth-google-oauth2'
 require 'rack/ssl-enforcer'
 
 require_relative 'lib/jubivote'

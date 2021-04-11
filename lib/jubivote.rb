@@ -7,8 +7,11 @@ module JubiVote
     helpers Sinatra::ContentFor
     register Sinatra::Static
 
+    set(public_folder: 'public')
+    set(views: 'views')
+
     get('/') {
-      'hello world'
+      erb :index
     }
 
     not_found {
