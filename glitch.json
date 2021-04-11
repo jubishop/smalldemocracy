@@ -1,6 +1,6 @@
 {
   "install": "bundle update; bundle install",
-  "start": "bundler exec rackup -p $PORT",
+  "start": "bundle exec rackup -p $PORT",
   "watch": {
     "install": {
       "include": ["^glitch\\.json$", "^Gemfile", "^\\.env$"],
@@ -13,4 +13,3 @@
     "throttle": 1000
   }
 }
-

@@ -2,7 +2,10 @@ ruby '>= 3'
 
 source 'https://rubygems.org'
 
+gem 'puma'
+gem 'rack-ssl-enforcer'
 gem 'sinatra'
+gem 'sinatra-contrib'
 
 # defaults
 gem 'rake'
