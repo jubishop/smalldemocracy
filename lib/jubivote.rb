@@ -14,8 +14,31 @@ module JubiVote
       erb :index
     }
 
-    not_found {
-      'This is nowhere to be found.'
-    }
+    post '/auth/:provider/callback' do
+      content_type 'text/plain'
+      begin
+        request.env['omniauth.auth'].to_hash.inspect
+      rescue StandardError
+        'No Data'
+      end
+    end
+
+    get '/auth/:provider/callback' do
+      content_type 'text/plain'
+      begin
+        request.env['omniauth.auth'].to_hash.inspect
+      rescue StandardError
+        'No Data'
+      end
+    end
+
+    get '/auth/failure' do
+      content_type 'text/plain'
+      begin
+        request.env['omniauth.auth'].to_hash.inspect
+      rescue StandardError
+        'No Data'
+      end
+    end
   end
 end
