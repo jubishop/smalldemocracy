@@ -6,5 +6,4 @@ RSpec::Core::RakeTask.new(:spec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
 }
 
-task default: %w[rubocop spec]
-
+task default: %w[rubocop:auto_correct spec]
