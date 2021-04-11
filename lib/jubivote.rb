@@ -13,5 +13,9 @@ module JubiVote
     get('/') {
       erb :index
     }
+
+    get('/admin') {
+      erb :admin
+    }
   end
 end
