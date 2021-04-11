@@ -1,0 +1,16 @@
+{
+  "install": "bundle update; bundle install",
+  "start": "bundler exec rackup -p $PORT",
+  "watch": {
+    "install": {
+      "include": ["^glitch\\.json$", "^Gemfile", "^\\.env$"],
+      "exclude": []
+    },
+    "restart": {
+      "include": ["\\.rb$", "^config\\.ru$", "^public\\/"],
+      "exclude": []
+    },
+    "throttle": 1000
+  }
+}
+
