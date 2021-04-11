@@ -11,8 +11,8 @@ module JubiVote
       'hello world'
     }
 
-    not_found do
+    not_found {
       'This is nowhere to be found.'
-    end
+    }
   end
 end
