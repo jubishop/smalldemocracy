@@ -13,6 +13,7 @@ end
 
 # defaults
 gem 'rake'
+gem 'rspec'
 gem 'rubocop'
 gem 'rubocop-performance'
 gem 'rubocop-rake'
