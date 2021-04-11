@@ -17,5 +17,13 @@ module JubiVote
     get('/admin') {
       erb :admin
     }
+
+    get('/admin/create_poll') {
+      erb :create_poll
+    }
+
+    post('/admin/create_poll') {
+      puts 'posting creation of poll'
+    }
   end
 end
