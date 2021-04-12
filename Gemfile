@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 
 gem 'puma'
 gem 'rack-ssl-enforcer'
+gem 'sendgrid-ruby'
 gem 'sinatra'
 gem 'sinatra-contrib'
 
