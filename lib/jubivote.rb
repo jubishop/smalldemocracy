@@ -1,3 +1,4 @@
+require 'sendgrid-ruby'
 require 'sinatra'
 require 'sinatra/content_for'
 require 'sinatra/static'
@@ -6,6 +7,8 @@ module JubiVote
   class App < Sinatra::Base
     helpers Sinatra::ContentFor
     register Sinatra::Static
+
+    include SendGrid
 
     set(public_folder: 'public')
     set(views: 'views')
@@ -23,9 +26,6 @@ module JubiVote
     }
 
     post('/admin/create_poll') {
-      require 'sendgrid-ruby'
-      include SendGrid
-
       from = SendGrid::Email.new(email: 'jubivote@jubishop.com')
       to = SendGrid::Email.new(email: 'jubi@hey.com')
       subject = 'Sending with Twilio SendGrid is Fun'
