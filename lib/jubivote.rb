@@ -1,20 +1,29 @@
-require 'sendgrid-ruby'
+require 'sequel'
 require 'sinatra'
 require 'sinatra/content_for'
 require 'sinatra/static'
+
+module JubiVote
+  DB = Sequel.sqlite(ENV.fetch('JUBIVOTE_DATABASE_FILE'))
+  public_constant :DB
+
+  Sequel.extension(:migration)
+  Sequel::Migrator.check_current(DB, 'db/migrations')
+end
+
+require_relative 'admin'
 
 module JubiVote
   class App < Sinatra::Base
     helpers Sinatra::ContentFor
     register Sinatra::Static
 
-    include SendGrid
-
     set(public_folder: 'public')
     set(views: 'views')
 
     get('/') {
       erb :index
+      puts DB[:polls].count
     }
 
     get('/admin') {
@@ -26,18 +35,8 @@ module JubiVote
     }
 
     post('/admin/create_poll') {
-      from = SendGrid::Email.new(email: 'jubivote@jubishop.com')
-      to = SendGrid::Email.new(email: 'jubi@hey.com')
-      subject = 'Sending with Twilio SendGrid is Fun'
-      content = SendGrid::Content.new(type: 'text/plain',
-                                      value: 'and easy to do anywhere')
-      mail = SendGrid::Mail.new(from, subject, to, content)
-
-      sg = SendGrid::API.new(api_key: ENV.fetch('SENDGRID_API_KEY'))
-      response = sg.client.mail._('send').post(request_body: mail.to_json)
-      puts response.status_code
-      puts response.body
-      puts response.headers
+      Admin.create_poll('test title')
+      return 'poll created'
     }
   end
 end

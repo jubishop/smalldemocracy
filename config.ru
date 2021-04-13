@@ -1,6 +1,6 @@
 require 'rack/ssl-enforcer'
 
-require_relative 'lib/admin_auth'
+require_relative 'lib/rack/admin_auth'
 require_relative 'lib/jubivote'
 
 use Rack::SslEnforcer unless Socket.gethostname.end_with?('local')
