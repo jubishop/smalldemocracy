@@ -17,7 +17,6 @@ class JubiVote < Sinatra::Base
   set(views: 'views')
 
   get('/') {
-    puts DB[:polls].count
     erb :index
   }
 
