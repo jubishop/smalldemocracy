@@ -11,4 +11,4 @@ use(AdminOnlyAuth, 'jubivote') { |_, password|
   Rack::Utils.secure_compare(ENV.fetch('JUBIVOTE_PASSWORD'), password)
 }
 
-run JubiVote::App
+run JubiVote
