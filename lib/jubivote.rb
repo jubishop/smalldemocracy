@@ -39,7 +39,8 @@ class JubiVote < Sinatra::Base
   post('/admin/create_poll') {
     poll_id = Admin.create_poll(
         title: params[:title],
-        choices: params[:choices].strip.split(/\s*,\s*/))
+        choices: params[:choices].strip.split(/\s*,\s*/),
+        responders: params[:responders].strip.split(/\s*,\s*/))
     redirect "/poll/#{poll_id}"
   }
 end
