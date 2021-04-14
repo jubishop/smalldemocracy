@@ -11,7 +11,6 @@ gem 'sinatra-contrib'
 gem 'sqlite3'
 
 source 'https://www.jubigems.org' do
-  gem 'core'
   gem 'sinatra-static'
 end
 
