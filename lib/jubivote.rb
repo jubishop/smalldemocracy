@@ -3,7 +3,7 @@ require 'sinatra'
 require 'sinatra/content_for'
 require 'sinatra/static'
 
-DB = Sequel.sqlite(ENV.fetch('JUBIVOTE_DATABASE_FILE'))
+DB = Sequel.sqlite('.data/db.sqlite')
 Sequel.extension(:migration)
 Sequel::Migrator.check_current(DB, 'db/migrations')
 
