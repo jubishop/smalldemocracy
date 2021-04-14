@@ -1,0 +1,7 @@
+<%= poll.title %>
+
+<ul>
+  <% poll.choices.each { |choice| %>
+    <li><%= choice.text %>
+  <% } %>
+</ul>

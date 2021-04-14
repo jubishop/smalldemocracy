@@ -22,8 +22,7 @@ class JubiVote < Sinatra::Base
   }
 
   get('/poll/:poll_id') {
-    poll = Poll[params[:poll_id]]
-    return poll.title
+    erb :poll, locals: { poll: Poll[params[:poll_id]] }
   }
 
   #####################################
