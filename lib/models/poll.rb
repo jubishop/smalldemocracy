@@ -2,6 +2,7 @@ require 'securerandom'
 
 class Poll < Sequel::Model
   unrestrict_primary_key
+  one_to_many :choices
 
   def initialize(**args)
     args[:id] = SecureRandom.alphanumeric(16)
