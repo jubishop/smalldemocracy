@@ -11,8 +11,8 @@ class Poll < Sequel::Model
 
   one_to_many :responders
 
-  def initialize(**args)
-    args[:id] = SecureRandom.alphanumeric(16)
-    super(args)
+  def before_create
+    super
+    self.id = SecureRandom.alphanumeric(16)
   end
 end

@@ -2,7 +2,7 @@ require_relative 'models/poll'
 
 module Admin
   def self.create_poll(title:, choices:, responders:)
-    poll = Poll.new(title: title).save
+    poll = Poll.create(title: title)
     choices.each { |choice|
       poll.add_choice(text: choice)
     }
