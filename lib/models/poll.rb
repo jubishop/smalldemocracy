@@ -1,5 +1,7 @@
 require 'securerandom'
 
+require_relative 'choice'
+
 class Poll < Sequel::Model
   unrestrict_primary_key
   one_to_many :choices

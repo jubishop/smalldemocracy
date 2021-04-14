@@ -8,6 +8,7 @@ Sequel.extension(:migration)
 Sequel::Migrator.check_current(DB, 'db/migrations')
 
 require_relative 'admin'
+require_relative 'models/poll'
 
 class JubiVote < Sinatra::Base
   helpers Sinatra::ContentFor
@@ -20,6 +21,14 @@ class JubiVote < Sinatra::Base
     erb :index
   }
 
+  get('/poll/:poll_id') {
+    poll = Poll[params[:poll_id]]
+    return poll.title
+  }
+
+  #####################################
+  # ADMIN
+  #####################################
   get('/admin') {
     erb :admin
   }
@@ -29,7 +38,9 @@ class JubiVote < Sinatra::Base
   }
 
   post('/admin/create_poll') {
-    Admin.create_poll(title: params['title'])
-    return 'poll created'
+    poll_id = Admin.create_poll(
+        title: params[:title],
+        choices: params[:choices].strip.split(/\s*,\s*/))
+    redirect "/poll/#{poll_id}"
   }
 end

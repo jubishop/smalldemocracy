@@ -1,7 +1,11 @@
 require_relative 'models/poll'
 
 module Admin
-  def self.create_poll(title:)
-    Poll.new(title: title).save
+  def self.create_poll(title:, choices:)
+    poll = Poll.new(title: title).save
+    choices.each { |choice|
+      poll.add_choice(choice: choice)
+    }
+    return poll.id
   end
 end
