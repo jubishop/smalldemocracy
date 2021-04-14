@@ -29,7 +29,7 @@ class JubiVote < Sinatra::Base
   }
 
   post('/admin/create_poll') {
-    Admin.create_poll('test title')
+    Admin.create_poll(title: params['title'])
     return 'poll created'
   }
 end
