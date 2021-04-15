@@ -11,8 +11,7 @@ Slim::Engine.set_options(
       # rubocop:disable Style/StringHashKeys
       '#' => { attr: 'id' },
       '.' => { attr: 'class' },
-      '&' => { attr: 'role' },
-      '@' => { attr: 'href' }
+      '&' => { attr: 'role' }
       # rubocop:enable Style/StringHashKeys
     })
 
