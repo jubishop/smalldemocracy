@@ -8,10 +8,12 @@ Sequel.extension(:migration)
 Sequel::Migrator.check_current(DB, 'db/migrations')
 
 require_relative 'admin'
+require_relative 'helpers/head_tags'
 require_relative 'models/poll'
 
 class JubiVote < Sinatra::Base
   helpers Sinatra::ContentFor
+  helpers Sinatra::HeadTags
   register Sinatra::Static
 
   set(public_folder: 'public')
