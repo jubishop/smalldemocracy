@@ -5,16 +5,16 @@
 h1 Create Poll
 
 form action="/admin/create_poll" method="post"
-  label for="poll_name" Poll Name:
-  input type="text" id="title" name="title"
+  label for="title" Title:
+  input name="title" type="text"
   br
 
   label for="choices" Choices:
-  textarea id="choices" name="choices"
+  textarea name="choices"
   br
 
   label for="responders" Responders:
-  textarea id="responders" name="responders"
+  textarea name="responders"
   br
 
-  input type="submit" value="Submit"
+  input value="Submit" type="submit"
