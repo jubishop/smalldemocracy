@@ -1,0 +1,9 @@
+- content_for :head
+  title =poll.title
+  ==stylesheet_link_tag :poll
+
+h1 =poll.title
+
+ul
+  - poll.choices.each do |choice|
+    li =choice.text

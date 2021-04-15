@@ -1,0 +1,20 @@
+- content_for :head
+  title Create Poll
+  ==stylesheet_link_tag :create_poll
+
+h1 Create Poll
+
+form action="/admin/create_poll" method="post"
+  label for="poll_name" Poll Name:
+  input type="text" id="title" name="title"
+  br
+
+  label for="choices" Choices:
+  textarea id="choices" name="choices"
+  br
+
+  label for="responders" Responders:
+  textarea id="responders" name="responders"
+  br
+
+  input type="submit" value="Submit"

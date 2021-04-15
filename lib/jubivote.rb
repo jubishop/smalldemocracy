@@ -18,22 +18,22 @@ class JubiVote < Sinatra::Base
   set(views: 'views')
 
   get('/') {
-    erb :index
+    slim :index
   }
 
   get('/poll/:poll_id') {
-    erb :poll, locals: { poll: Poll[params[:poll_id]] }
+    slim :poll, locals: { poll: Poll[params[:poll_id]] }
   }
 
   #####################################
   # ADMIN
   #####################################
   get('/admin') {
-    erb :admin
+    slim :admin
   }
 
   get('/admin/create_poll') {
-    erb :create_poll
+    slim :create_poll
   }
 
   post('/admin/create_poll') {

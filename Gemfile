@@ -8,6 +8,7 @@ gem 'sendgrid-ruby'
 gem 'sequel'
 gem 'sinatra'
 gem 'sinatra-contrib'
+gem 'slim'
 gem 'sqlite3'
 
 source 'https://www.jubigems.org' do
