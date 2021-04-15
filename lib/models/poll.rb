@@ -16,7 +16,7 @@ class Poll < Sequel::Model
     self.id = SecureRandom.alphanumeric(16)
   end
 
-  def responder(hash)
-    return responders_dataset.where(hash: hash).first
+  def responder(**options)
+    return responders_dataset.where(**options).first
   end
 end

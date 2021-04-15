@@ -41,7 +41,7 @@ class JubiVote < Sinatra::Base
 
     return slim(:email, locals: { poll: poll }) unless params.key?(:responder)
 
-    responder = poll.responder(params.fetch(:responder))
+    responder = poll.responder(hash: params.fetch(:responder))
     return not_found unless responder
 
     return slim(:poll, locals: { poll: poll, responder: responder })
