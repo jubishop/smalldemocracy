@@ -45,11 +45,11 @@ class JubiVote < Sinatra::Base
   # ADMIN
   #####################################
   get('/admin') {
-    slim :admin
+    slim_admin :admin
   }
 
   get('/admin/create_poll') {
-    slim :create_poll
+    slim_admin :create_poll
   }
 
   post('/admin/create_poll') {
@@ -59,4 +59,10 @@ class JubiVote < Sinatra::Base
         responders: params[:responders].strip.split(/\s*,\s*/))
     redirect "/poll/#{poll_id}"
   }
+
+  private
+
+  def slim_admin(template, **options)
+    slim(template, **options.merge(views: 'views/admin', layout: :'../layout'))
+  end
 end
