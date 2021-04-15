@@ -1,8 +1,8 @@
 require 'sendgrid-ruby'
 
 module Email
-  def send_email
-    from = SendGrid::Email.new(email: 'jubivote@jubishop.com')
+  def self.send_email
+    from = SendGrid::Email.new(name: 'JubiVote', email: 'support@jubivote.com')
     to = SendGrid::Email.new(email: 'jubi@hey.com')
     subject = 'Sending with Twilio SendGrid is Fun'
     content = SendGrid::Content.new(type: 'text/plain',
