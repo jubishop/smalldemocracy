@@ -2,6 +2,19 @@ require 'sequel'
 require 'sinatra'
 require 'sinatra/content_for'
 require 'sinatra/static'
+require 'slim'
+
+Slim::Engine.set_options(
+    tabsize: 2,
+    pretty: true,
+    shortcut: {
+      # rubocop:disable Style/StringHashKeys
+      '#' => { attr: 'id' },
+      '.' => { attr: 'class' },
+      '&' => { attr: 'role' },
+      '@' => { attr: 'href' }
+      # rubocop:enable Style/StringHashKeys
+    })
 
 DB = Sequel.sqlite('.data/db.sqlite')
 Sequel.extension(:migration)
