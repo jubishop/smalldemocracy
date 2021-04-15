@@ -23,6 +23,9 @@ class JubiVote < Sinatra::Base
     slim :index
   }
 
+  #####################################
+  # POLL
+  #####################################
   get('/poll/:poll_id') {
     slim :poll, locals: { poll: Poll[params[:poll_id]] }
   }
