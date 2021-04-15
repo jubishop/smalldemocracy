@@ -14,6 +14,7 @@ Sequel::Migrator.check_current(DB, 'db/migrations')
 
 require_relative 'admin'
 require_relative 'models/poll'
+require_relative 'models/responder'
 
 class JubiVote < Sinatra::Base
   helpers Sinatra::ContentFor
@@ -26,11 +27,25 @@ class JubiVote < Sinatra::Base
     slim :index
   }
 
+  not_found {
+    status 404
+    slim :not_found
+  }
+
   #####################################
   # POLL
   #####################################
   get('/poll/:poll_id') {
-    slim :poll, locals: { poll: Poll[params[:poll_id]] }
+    poll = Poll[params[:poll_id]]
+
+    if params.key?(:responder)
+      puts "Responder is: #{params[:responder]}"
+      responder = Responder.where(poll: poll,
+                                  hash: params.fetch(:responder)).first
+      return responder ? slim(:poll, locals: { poll: poll }) : not_found
+    end
+
+    return 'Need to get email'
   }
 
   #####################################
