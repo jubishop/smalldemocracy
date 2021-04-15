@@ -37,15 +37,14 @@ class JubiVote < Sinatra::Base
   #####################################
   get('/poll/:poll_id') {
     poll = Poll[params[:poll_id]]
+    return not_found unless poll
 
-    if params.key?(:responder)
-      puts "Responder is: #{params[:responder]}"
-      responder = Responder.where(poll: poll,
-                                  hash: params.fetch(:responder)).first
-      return responder ? slim(:poll, locals: { poll: poll }) : not_found
-    end
+    return slim(:email, locals: { poll: poll }) unless params.key?(:responder)
 
-    return 'Need to get email'
+    responder = poll.responder(params.fetch(:responder))
+    return not_found unless responder
+
+    return slim(:poll, locals: { poll: poll, responder: responder })
   }
 
   #####################################
