@@ -15,6 +15,7 @@ Sequel::Migrator.check_current(DB, 'db/migrations')
 require_relative 'admin'
 require_relative 'models/poll'
 require_relative 'models/responder'
+require_relative 'utils/email'
 
 class JubiVote < Sinatra::Base
   helpers Sinatra::ContentFor
@@ -43,10 +44,10 @@ class JubiVote < Sinatra::Base
       return slim_email(:get_email, locals: { poll: poll })
     end
 
-    responder = poll.responder(hash: params.fetch(:responder))
+    responder = poll.responder(salt: params.fetch(:responder))
     return slim_email(:get_email, locals: { poll: poll }) unless responder
 
-    return slim(:poll, locals: { poll: poll, responder: responder })
+    return slim_poll(:poll, locals: { poll: poll, responder: responder })
   }
 
   post('/send_email') {
@@ -56,7 +57,8 @@ class JubiVote < Sinatra::Base
     responder = poll.responder(email: params.fetch(:email))
     return slim_email(:not_found) unless responder
 
-    return 'Found the email!'
+    Email.send_email(poll, responder)
+    return slim_email(:sent_email)
   }
 
   #####################################
@@ -93,5 +95,9 @@ class JubiVote < Sinatra::Base
 
   def slim_email(template, **options)
     slim(template, **options.merge(views: 'views/email', layout: :'../layout'))
+  end
+
+  def slim_poll(template, **options)
+    slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
   end
 end

@@ -7,6 +7,6 @@ class Responder < Sequel::Model
 
   def before_create
     super
-    self.hash = SecureRandom.urlsafe_base64(8)
+    self.salt = SecureRandom.urlsafe_base64(8)
   end
 end

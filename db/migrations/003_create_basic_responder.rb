@@ -7,9 +7,9 @@ Sequel.migration {
       String :email, null: false, index: true
       unique %i[poll_id email]
 
-      String :hash, null: false, index: true
-      unique %i[poll_id hash]
-      constraint(:hash_min_length) { Sequel.char_length(hash) >= 8 }
+      String :salt, null: false, index: true
+      unique %i[poll_id salt]
+      constraint(:salt_min_length) { Sequel.char_length(salt) >= 8 }
     }
   }
 }
