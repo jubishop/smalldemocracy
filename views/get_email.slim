@@ -1,0 +1,16 @@
+- content_for :head
+  title Need Email
+
+h1 Need Email
+
+p
+  | Please provide your email address to take this survey.
+
+form action="/send_email" method="post"
+  input name="poll" type="hidden" value="#{poll.id}"
+
+  label for="email" Email:
+  input name="email" type="text"
+  br
+
+  input value="Submit" type="submit"

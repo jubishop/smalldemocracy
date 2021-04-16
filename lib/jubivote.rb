@@ -39,12 +39,18 @@ class JubiVote < Sinatra::Base
     poll = Poll[params[:poll_id]]
     return not_found unless poll
 
-    return slim(:email, locals: { poll: poll }) unless params.key?(:responder)
+    unless params.key?(:responder)
+      return slim(:get_email, locals: { poll: poll })
+    end
 
     responder = poll.responder(hash: params.fetch(:responder))
-    return slim(:email, locals: { poll: poll }) unless responder
+    return slim(:get_email, locals: { poll: poll }) unless responder
 
     return slim(:poll, locals: { poll: poll, responder: responder })
+  }
+
+  post('/send_email') {
+    puts params
   }
 
   #####################################
