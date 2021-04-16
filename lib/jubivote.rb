@@ -6,7 +6,7 @@ require 'slim'
 
 Slim::Engine.set_options(
     tabsize: 2,
-    pretty: true)
+    pretty: ENV.fetch('APP_ENV') == 'development')
 
 DB = Sequel.sqlite('.data/db.sqlite')
 Sequel.extension(:migration)
@@ -42,7 +42,7 @@ class JubiVote < Sinatra::Base
     return slim(:email, locals: { poll: poll }) unless params.key?(:responder)
 
     responder = poll.responder(hash: params.fetch(:responder))
-    return not_found unless responder
+    return slim(:email, locals: { poll: poll }) unless responder
 
     return slim(:poll, locals: { poll: poll, responder: responder })
   }
@@ -59,11 +59,11 @@ class JubiVote < Sinatra::Base
   }
 
   post('/admin/create_poll') {
-    poll_id = Admin.create_poll(
+    poll = Admin.create_poll(
         title: params[:title],
         choices: params[:choices].strip.split(/\s*,\s*/),
         responders: params[:responders].strip.split(/\s*,\s*/))
-    redirect "/poll/#{poll_id}"
+    slim_admin :poll, locals: { poll: poll }
   }
 
   private

@@ -13,7 +13,7 @@ class Poll < Sequel::Model
 
   def before_create
     super
-    self.id = SecureRandom.alphanumeric(16)
+    self.id = SecureRandom.urlsafe_base64(16)
   end
 
   def responder(**options)

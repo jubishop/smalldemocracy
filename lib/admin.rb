@@ -9,6 +9,6 @@ module Admin
     responders.each { |responder|
       poll.add_responder(email: responder)
     }
-    return poll.id
+    return poll
   end
 end

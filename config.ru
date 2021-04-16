@@ -7,8 +7,8 @@ use Rack::SslEnforcer unless ENV.fetch('RACK_ENV') == 'development'
 use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
 use Rack::Protection
 
-use(AdminOnlyAuth, 'jubivote') { |_, password|
-  Rack::Utils.secure_compare(ENV.fetch('JUBIVOTE_PASSWORD'), password)
+use(AdminOnlyAuth, 'jubivote', ENV.fetch('JUBIVOTE_MD5_SALT')) {
+  ENV.fetch('JUBIVOTE_PASSWORD')
 }
 
 run JubiVote

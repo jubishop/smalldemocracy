@@ -1,0 +1,13 @@
+- content_for :head
+  title =poll.title
+  ==stylesheet_link_tag :poll
+
+h1 ="Administering #{poll.title}"
+
+p ="Poll ID: #{poll.id}"
+
+a href="/poll/#{poll.id}" Poll
+
+ul
+  - poll.choices.each do |choice|
+    li =choice.text
