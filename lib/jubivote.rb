@@ -15,7 +15,6 @@ Sequel::Migrator.check_current(DB, 'db/migrations')
 
 require_relative 'models/poll'
 require_relative 'models/responder'
-require_relative 'utils/admin'
 require_relative 'utils/email'
 
 class JubiVote < Sinatra::Base
@@ -89,7 +88,7 @@ class JubiVote < Sinatra::Base
   }
 
   post('/admin/new_poll') {
-    poll = Admin.create_poll(
+    poll = Poll.create_poll(
         title: params.fetch(:title),
         choices: params.fetch(:choices).strip.split(/\s*,\s*/),
         responders: params.fetch(:responders).strip.split(/\s*,\s*/))
