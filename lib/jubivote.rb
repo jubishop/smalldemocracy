@@ -38,7 +38,7 @@ class JubiVote < Sinatra::Base
   # POLL
   #####################################
   get('/poll/:poll_id') {
-    poll = Poll[params[:poll_id]]
+    poll = Poll[params.fetch(:poll_id)]
     return poll_not_found unless poll
 
     unless params.key?(:responder)
@@ -52,7 +52,7 @@ class JubiVote < Sinatra::Base
   }
 
   post('/send_email') {
-    poll = Poll[params[:poll_id]]
+    poll = Poll[params.fetch(:poll_id)]
     return poll_not_found unless poll
 
     responder = poll.responder(email: params.fetch(:email))
@@ -62,10 +62,19 @@ class JubiVote < Sinatra::Base
     return slim_email(:sent_email)
   }
 
-  post('/answer_poll') {
+  post('/poll_response') {
     params = JSON.parse(request.body.read).symbolize_keys
-    puts params
-    redirect '/'
+    poll = Poll[params.fetch(:poll_id)]
+    return status(404) unless poll
+
+    responder = poll.responder(salt: params.fetch(:responder))
+    return status(404) unless responder
+
+    params.fetch(:responses).each_with_index { |choice_id, rank|
+      responder.add_response(choice_id: choice_id, rank: rank)
+    }
+
+    return status(201)
   }
 
   #####################################
@@ -79,16 +88,16 @@ class JubiVote < Sinatra::Base
     slim_admin :create_poll
   }
 
-  post('/admin/create_poll') {
+  post('/admin/new_poll') {
     poll = Admin.create_poll(
-        title: params[:title],
-        choices: params[:choices].strip.split(/\s*,\s*/),
-        responders: params[:responders].strip.split(/\s*,\s*/))
+        title: params.fetch(:title),
+        choices: params.fetch(:choices).strip.split(/\s*,\s*/),
+        responders: params.fetch(:responders).strip.split(/\s*,\s*/))
     redirect "/admin/poll/#{poll.id}"
   }
 
   get('/admin/poll/:poll_id') {
-    poll = Poll[params[:poll_id]]
+    poll = Poll[params.fetch(:poll_id)]
     return poll_not_found unless poll
 
     slim_admin :poll, locals: { poll: poll }
