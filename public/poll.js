@@ -8,15 +8,15 @@ window.addEventListener('DOMContentLoaded', () => {
   const responderSalt = choicesElement.getAttribute('responder_salt');
 
   document.getElementById('submit').addEventListener('click', () => {
-    fetch("/poll_response", {
-      method: "POST",
+    fetch('/poll_response', {
+      method: 'POST',
       body: JSON.stringify({
         poll_id: pollID,
         responder: responderSalt,
         responses: sortable.toArray()
       })
     }).then(res => {
-      console.log("Request complete! response:", res);
+      console.log('Request complete! response:', res);
     });
   })
 });
