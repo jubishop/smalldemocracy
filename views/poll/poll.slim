@@ -1,17 +1,14 @@
 - content_for :head
   title =poll.title
+  ==font_awesome :'9c18181028'
   ==stylesheet_link_tag :poll
-  ==javascript_include_tag 'https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/sortable.js'
-  javascript:
-    window.addEventListener("DOMContentLoaded", () => {
-      const sortable = new Sortable.default(document.querySelectorAll('ul.StackedList'), {
-        draggable: 'li.StackedListItem'
-      });
-    });
+  ==javascript_include_tag "https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"
+  ==javascript_include_tag :poll
 
 h1 =poll.title
 
-ul.StackedList
+ul#choices
   - poll.choices.each do |choice|
-    li.StackedListItem
-      div =choice.text
+    li
+      i.sort-handle.fas.fa-bars
+      p =choice.text
