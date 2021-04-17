@@ -5,12 +5,8 @@ require_relative 'responder'
 
 class Poll < Sequel::Model
   unrestrict_primary_key
-
   one_to_many :choices
-  eager :choices
-
   one_to_many :responders
-  eager :responders
 
   def before_create
     super
