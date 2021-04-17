@@ -9,5 +9,10 @@ p ="Poll ID: #{poll.id}"
 a href="/poll/#{poll.id}" Poll
 
 ul
+  - poll.responders.each do |responder|
+    li
+      a href="/poll/#{poll.id}?responder=#{responder.salt}" =responder.email
+
+ul
   - poll.choices.each do |choice|
     li =choice.text

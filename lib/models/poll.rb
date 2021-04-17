@@ -10,6 +10,7 @@ class Poll < Sequel::Model
   eager :choices
 
   one_to_many :responders
+  eager :responders
 
   def before_create
     super

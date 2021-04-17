@@ -12,9 +12,9 @@ DB = Sequel.sqlite('.data/db.sqlite')
 Sequel.extension(:migration)
 Sequel::Migrator.check_current(DB, 'db/migrations')
 
-require_relative 'admin'
 require_relative 'models/poll'
 require_relative 'models/responder'
+require_relative 'utils/admin'
 require_relative 'utils/email'
 
 class JubiVote < Sinatra::Base

@@ -1,9 +1,17 @@
 - content_for :head
   title =poll.title
   ==stylesheet_link_tag :poll
+  ==javascript_include_tag 'https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/sortable.js'
+  javascript:
+    window.addEventListener("DOMContentLoaded", () => {
+      const sortable = new Sortable.default(document.querySelectorAll('ul.StackedList'), {
+        draggable: 'li.StackedListItem'
+      });
+    });
 
 h1 =poll.title
 
-ul
+ul.StackedList
   - poll.choices.each do |choice|
-    li =choice.text
+    li.StackedListItem
+      div =choice.text

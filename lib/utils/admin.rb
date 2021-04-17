@@ -1,4 +1,4 @@
-require_relative 'models/poll'
+require_relative '../models/poll'
 
 module Admin
   def self.create_poll(title:, choices:, responders:)
