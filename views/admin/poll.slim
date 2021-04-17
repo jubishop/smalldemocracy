@@ -13,6 +13,4 @@ ul
     li
       a href="/poll/#{poll.id}?responder=#{responder.salt}" =responder.email
 
-ul
-  - poll.choices.each do |choice|
-    li =choice.text
+include :poll

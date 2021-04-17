@@ -7,7 +7,12 @@ window.addEventListener('DOMContentLoaded', () => {
   const pollID = choicesElement.getAttribute('poll_id');
   const responderSalt = choicesElement.getAttribute('responder_salt');
 
-  document.getElementById('submit').addEventListener('click', () => {
+  submitButton = document.getElementById('submit');
+  submitButton.addEventListener('click', () => {
+    message = document.createElement('p');
+    message.textContent = 'Now submitting...';
+    submitButton.parentNode.replaceChild(message, submitButton);
+
     fetch('/poll_response', {
       method: 'POST',
       body: JSON.stringify({

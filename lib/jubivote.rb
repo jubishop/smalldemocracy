@@ -4,9 +4,13 @@ require 'sinatra'
 require 'sinatra/content_for'
 require 'sinatra/static'
 require 'slim'
+require 'slim/include'
+
+puts Dir.pwd
 
 Slim::Engine.set_options(
     tabsize: 2,
+    include_dirs: ["#{Dir.pwd}/views/partials"],
     pretty: ENV.fetch('APP_ENV') == 'development')
 
 DB = Sequel.sqlite('.data/db.sqlite')
@@ -41,13 +45,14 @@ class JubiVote < Sinatra::Base
     return poll_not_found unless poll
 
     unless params.key?(:responder)
-      return slim_email(:get_email, locals: { poll: poll })
+      return slim_email(:get, locals: { poll: poll })
     end
 
     responder = poll.responder(salt: params.fetch(:responder))
-    return slim_email(:get_email, locals: { poll: poll }) unless responder
+    return slim_email(:get, locals: { poll: poll }) unless responder
 
-    return slim_poll(:poll, locals: { poll: poll, responder: responder })
+    template = responder.responses.empty? ? :poll : :created
+    slim_poll(template, locals: { poll: poll, responder: responder })
   }
 
   post('/send_email') {
@@ -58,10 +63,11 @@ class JubiVote < Sinatra::Base
     return email_not_found unless responder
 
     Email.send_email(poll, responder)
-    return slim_email(:sent_email)
+    return slim_email(:sent)
   }
 
   post('/poll_response') {
+    sleep 10
     params = JSON.parse(request.body.read).symbolize_keys
     poll = Poll[params.fetch(:poll_id)]
     return status(404) unless poll

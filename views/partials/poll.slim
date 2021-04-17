@@ -1,0 +1,5 @@
+ul#choices poll_id=poll.id responder_salt=locals[:responder]&.salt
+  - poll.choices.each do |choice|
+    li data-id=choice.id
+      i.sort-handle.fas.fa-bars
+      p =choice.text
