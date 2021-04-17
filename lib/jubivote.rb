@@ -69,9 +69,13 @@ class JubiVote < Sinatra::Base
     responder = poll.responder(salt: params.fetch(:responder))
     return status(404) unless responder
 
-    params.fetch(:responses).each_with_index { |choice_id, rank|
-      responder.add_response(choice_id: choice_id, rank: rank)
-    }
+    begin
+      params.fetch(:responses).each_with_index { |choice_id, rank|
+        responder.add_response(choice_id: choice_id, rank: rank)
+      }
+    rescue Sequel::UniqueConstraintViolation
+      return status(409)
+    end
 
     return status(201)
   }

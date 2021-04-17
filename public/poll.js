@@ -16,7 +16,11 @@ window.addEventListener('DOMContentLoaded', () => {
         responses: sortable.toArray()
       })
     }).then(res => {
-      console.log('Request complete! response:', res);
+      if (res.status == 201) {
+        location.reload();
+      } else {
+        alert('Something went wrong :(');
+      }
     });
   })
 });
