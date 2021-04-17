@@ -7,8 +7,10 @@
 
 h1 =poll.title
 
-ul#choices
+ul#choices poll_id=poll.id responder_salt=responder.salt
   - poll.choices.each do |choice|
-    li
+    li data-id=choice.id
       i.sort-handle.fas.fa-bars
       p =choice.text
+
+button#submit type="submit" Submit Choices

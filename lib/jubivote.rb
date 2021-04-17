@@ -1,3 +1,4 @@
+require 'core'
 require 'sequel'
 require 'sinatra'
 require 'sinatra/content_for'
@@ -59,6 +60,11 @@ class JubiVote < Sinatra::Base
 
     Email.send_email(poll, responder)
     return slim_email(:sent_email)
+  }
+
+  post('/answer_poll') {
+    puts JSON.parse(request.body.read).symbolize_keys
+    redirect '/'
   }
 
   #####################################

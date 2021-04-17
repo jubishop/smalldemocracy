@@ -12,6 +12,7 @@ gem 'slim'
 gem 'sqlite3'
 
 source 'https://www.jubigems.org' do
+  gem 'core'
   gem 'sinatra-static'
 end
 
