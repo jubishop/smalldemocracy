@@ -67,7 +67,6 @@ class JubiVote < Sinatra::Base
   }
 
   post('/poll_response') {
-    sleep 10
     params = JSON.parse(request.body.read).symbolize_keys
     poll = Poll[params.fetch(:poll_id)]
     return status(404) unless poll
