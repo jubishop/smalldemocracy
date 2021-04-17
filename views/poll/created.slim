@@ -9,3 +9,7 @@ p ="Thanks #{responder.email}!"
 
 p
   | Here's your recorded responses.
+
+ul
+  - responder.responses.sort_by(&:rank).each do |response|
+    li ="#{(response.rank + 1).ordinal}: #{response.choice.text}"

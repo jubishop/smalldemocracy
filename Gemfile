@@ -2,6 +2,7 @@ ruby '>= 3'
 
 source 'https://rubygems.org'
 
+gem 'linguistics'
 gem 'puma'
 gem 'rack-ssl-enforcer'
 gem 'sendgrid-ruby'
