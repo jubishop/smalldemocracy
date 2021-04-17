@@ -12,4 +12,4 @@ p
 
 ul
   - responder.responses.sort_by(&:rank).each do |response|
-    li ="#{(response.rank + 1).ordinal}: #{response.choice.text}"
+    li ="#{(response.rank + 1).en.ordinal}: #{response.choice.text}"

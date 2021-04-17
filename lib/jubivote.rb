@@ -7,7 +7,7 @@ require 'sinatra/static'
 require 'slim'
 require 'slim/include'
 
-Linguistics.use( :en, monkeypatch: true )
+Linguistics.use(:en)
 Slim::Engine.set_options(
     tabsize: 2,
     include_dirs: ["#{Dir.pwd}/views/partials"],
