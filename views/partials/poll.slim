@@ -1,5 +1,9 @@
+- content_for :head
+  ==font_awesome :'9c18181028'
+  ==stylesheet_link_tag :'partials/poll'
+
 ul#choices poll_id=poll.id responder_salt=locals[:responder]&.salt
   - poll.choices.each do |choice|
-    li data-id=choice.id
-      i.sort-handle.fas.fa-bars
+    li.choice data-id=choice.id
+      i.grip.fas.fa-grip-lines
       p =choice.text

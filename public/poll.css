@@ -1,0 +1,7 @@
+li.choice:hover {
+  border: solid #80bfff 1px; /* dodgerblue 75% */
+}
+
+li.choice:active, .sortable-ghost {
+  background-color: #004080; /* dodgerblue 25% */
+}

@@ -1,0 +1,24 @@
+ul#choices {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li.choice {
+  align-items: center;
+  border: solid white 1px;
+  cursor: grab;
+  display: flex;
+  margin: 0.5em 0;
+  padding: 0.5em 0;
+  width: 20em;
+}
+
+li.choice .grip {
+  font-size: 2em;
+  margin: 0 0.5em;
+}
+
+li.choice p {
+  margin: 0;
+}

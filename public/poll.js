@@ -1,7 +1,7 @@
 window.addEventListener('DOMContentLoaded', () => {
   const choicesElement = document.getElementById('choices');
   const sortable = Sortable.create(choicesElement, {
-    handle: '.sort-handle'
+    animation: 100,
   });
 
   const pollID = choicesElement.getAttribute('poll_id');

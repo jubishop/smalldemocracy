@@ -2,4 +2,10 @@ body {
   background-color: black;
   color: white;
   font-family: 'Fira Sans', sans-serif;
+  font-size: 1.5em;
+  padding: 0 1em;
+}
+
+h1 {
+  text-align: center;
 }
