@@ -39,7 +39,7 @@ class JubiVote < Sinatra::Base
   #####################################
   get('/poll/:poll_id') {
     poll = Poll[params[:poll_id]]
-    return not_found unless poll
+    return poll_not_found unless poll
 
     unless params.key?(:responder)
       return slim_email(:get_email, locals: { poll: poll })
@@ -53,17 +53,18 @@ class JubiVote < Sinatra::Base
 
   post('/send_email') {
     poll = Poll[params[:poll_id]]
-    return not_found unless poll
+    return poll_not_found unless poll
 
     responder = poll.responder(email: params.fetch(:email))
-    return slim_email(:not_found) unless responder
+    return email_not_found unless responder
 
     Email.send_email(poll, responder)
     return slim_email(:sent_email)
   }
 
   post('/answer_poll') {
-    puts JSON.parse(request.body.read).symbolize_keys
+    params = JSON.parse(request.body.read).symbolize_keys
+    puts params
     redirect '/'
   }
 
@@ -88,12 +89,22 @@ class JubiVote < Sinatra::Base
 
   get('/admin/poll/:poll_id') {
     poll = Poll[params[:poll_id]]
-    return not_found unless poll
+    return poll_not_found unless poll
 
     slim_admin :poll, locals: { poll: poll }
   }
 
   private
+
+  def email_not_found
+    status(404)
+    slim_email(:not_found)
+  end
+
+  def poll_not_found
+    status(404)
+    slim_poll(:not_found)
+  end
 
   def slim_admin(template, **options)
     slim(template, **options.merge(views: 'views/admin', layout: :'../layout'))
