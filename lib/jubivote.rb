@@ -99,6 +99,7 @@ class JubiVote < Sinatra::Base
   post('/admin/new_poll') {
     poll = Poll.create_poll(
         title: params.fetch(:title),
+        expiration: params.fetch(:expiration),
         choices: params.fetch(:choices).strip.split(/\s*,\s*/),
         responders: params.fetch(:responders).strip.split(/\s*,\s*/))
     redirect "/admin/poll/#{poll.id}"
@@ -110,6 +111,10 @@ class JubiVote < Sinatra::Base
 
     slim_admin :poll, locals: { poll: poll }
   }
+
+  #####################################
+  # PRIVATE
+  #####################################
 
   private
 

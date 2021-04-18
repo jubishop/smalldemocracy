@@ -14,6 +14,7 @@ gem 'sqlite3'
 
 source 'https://www.jubigems.org' do
   gem 'core'
+  gem 'duration'
   gem 'sinatra-static'
 end
 

@@ -7,7 +7,6 @@ ul#choices {
 li.choice {
   align-items: center;
   border: solid white 1px;
-  cursor: grab;
   display: flex;
   margin: 0.5em 0;
   padding: 0.5em 0;

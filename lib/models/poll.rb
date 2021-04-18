@@ -8,8 +8,8 @@ class Poll < Sequel::Model
   one_to_many :choices
   one_to_many :responders
 
-  def self.create_poll(title:, choices:, responders:)
-    poll = create(title: title)
+  def self.create_poll(title:, expiration:, choices:, responders:)
+    poll = create(title: title, expiration: expiration)
     choices.each { |choice|
       poll.add_choice(text: choice)
     }

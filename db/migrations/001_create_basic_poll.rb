@@ -5,6 +5,7 @@ Sequel.migration {
       constraint(:id_min_length) { Sequel.char_length(id) >= 16 }
 
       String :title, null: false
+      Integer :expiration, null: false
     }
   }
 }
