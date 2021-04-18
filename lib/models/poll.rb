@@ -43,6 +43,6 @@ class Poll < Sequel::Model
       choices_hash[response.choice_id].score += score
     }
 
-    return choices_hash.values.sort_by { |result| -result.score }
+    return choices_hash.values.sort_by(&:score).reverse!
   end
 end
