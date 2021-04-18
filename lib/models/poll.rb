@@ -8,6 +8,9 @@ class Poll < Sequel::Model
   one_to_many :choices
   one_to_many :responders
 
+  Result = Struct.new(:text, :score, keyword_init: true)
+  private_constant :Result
+
   def self.create_poll(title:, expiration:, choices:, responders:)
     poll = create(title: title, expiration: expiration)
     choices.each { |choice|
@@ -26,5 +29,20 @@ class Poll < Sequel::Model
 
   def responder(**options)
     return responders_dataset.where(**options).first
+  end
+
+  def results
+    return if Time.at(expiration) > Time.now
+
+    choices_hash = choices.to_h { |choice|
+      [choice.id, Result.new(text: choice.text, score: 0)]
+    }
+
+    Response.where(responder: responders).each { |response|
+      score = choices.length - response.rank - 1
+      choices_hash[response.choice_id].score += score
+    }
+
+    return choices_hash.values.sort_by { |result| -result.score }
   end
 end

@@ -1,0 +1,10 @@
+- content_for :head
+  title Poll Finished
+
+p ="Poll: #{poll.title}, is finished!"
+
+p Results:
+
+ol
+  - results.each do |result|
+    li ="#{result.text} (score: #{result.score})"

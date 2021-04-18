@@ -1,13 +1,11 @@
 - content_for :head
-  title =poll.title
-  ==font_awesome :'9c18181028'
+  title Poll Completed
 
 h1 ="#{poll.title} Completed"
 
 p ="Thanks #{responder.email}!"
 
-p
-  | Here's your recorded responses.
+p Here's your recorded responses.
 
 ul
   - responder.responses.sort_by(&:rank).each do |response|

@@ -44,14 +44,14 @@ class JubiVote < Sinatra::Base
     poll = Poll[params.fetch(:poll_id)]
     return poll_not_found unless poll
 
-    unless params.key?(:responder)
-      return slim_email(:get, locals: { poll: poll })
+    if (results = poll.results)
+      return slim_poll(:finished, locals: { poll: poll, results: results })
     end
 
-    responder = poll.responder(salt: params.fetch(:responder))
+    responder = poll.responder(salt: params.fetch(:responder, '^_^'))
     return slim_email(:get, locals: { poll: poll }) unless responder
 
-    template = responder.responses.empty? ? :poll : :created
+    template = responder.responses.empty? ? :poll : :responded
     slim_poll(template, locals: { poll: poll, responder: responder })
   }
 
