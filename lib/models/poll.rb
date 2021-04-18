@@ -34,7 +34,11 @@ class Poll < Sequel::Model
   def results
     return if Time.at(expiration) > Time.now
 
-    @@results[id] ||= compute_results
+    return @@results[id] ||= compute_results
+  end
+
+  def score(response)
+    return choices.length - response.rank - 1
   end
 
   private
@@ -47,8 +51,7 @@ class Poll < Sequel::Model
     }
 
     Response.where(responder: responders).each { |response|
-      score = choices.length - response.rank - 1
-      choices_hash[response.choice_id].score += score
+      choices_hash[response.choice_id].score += score(response)
     }
 
     return choices_hash.values.sort_by(&:score).reverse!

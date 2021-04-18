@@ -1,5 +1,4 @@
 require 'core'
-require 'linguistics'
 require 'sequel'
 require 'sinatra'
 require 'sinatra/content_for'
@@ -7,7 +6,6 @@ require 'sinatra/static'
 require 'slim'
 require 'slim/include'
 
-Linguistics.use(:en)
 Slim::Engine.set_options(
     tabsize: 2,
     include_dirs: ["#{Dir.pwd}/views/partials"],

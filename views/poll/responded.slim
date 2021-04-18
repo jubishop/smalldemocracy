@@ -7,6 +7,6 @@ p ="Thanks #{responder.email}!"
 
 p Here's your recorded responses.
 
-ul
+ol
   - responder.responses.sort_by(&:rank).each do |response|
-    li ="#{(response.rank + 1).en.ordinal}: #{response.choice.text}"
+    li ="#{response.choice.text} (#{poll.score(response)} points)."
