@@ -48,9 +48,7 @@ class JubiVote < Sinatra::Base
       return slim_poll(:finished, locals: { poll: poll, results: results })
     end
 
-    responder = poll.responder(salt: params.fetch(:responder, '^_^'))
-    return slim_email(:get, locals: { poll: poll }) unless responder
-
+    responder = fetch_responder(poll)
     template = responder.responses.empty? ? :poll : :responded
     slim_poll(template, locals: { poll: poll, responder: responder })
   }
@@ -139,11 +137,30 @@ class JubiVote < Sinatra::Base
     slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
   end
 
+  def fetch_responder(poll)
+    if params.key?(:responder)
+      responder = poll.responder(salt: params.fetch(:responder))
+      halt(slim_email(:get, locals: { poll: poll })) unless responder
+
+      store_cookie(:email, responder.email)
+    else
+      email = fetch_cookie(:email)
+      halt(slim_email(:get, locals: { poll: poll })) unless email
+
+      responder = poll.responder(email: email)
+      halt(slim_email(:get, locals: { poll: poll })) unless responder
+    end
+
+    return responder
+  end
+
   def store_cookie(key, value)
     cookies[key] = Crypt.en(value)
   end
 
   def fetch_cookie(key)
-    return Crypt.de(cookies[key])
+    return unless cookies.key?(key)
+
+    return Crypt.de(cookies.fetch(key))
   end
 end
