@@ -30,7 +30,13 @@ class JubiVote < Sinatra::Base
   set(views: 'views')
 
   get('/') {
-    slim :index
+    slim :index, locals: { email: fetch_email }
+  }
+
+  get('/create_poll') {
+    raise Sinatra::NotFound unless fetch_email
+
+    slim_admin :create_poll
   }
 
   error(Sinatra::NotFound) {
@@ -48,7 +54,19 @@ class JubiVote < Sinatra::Base
       return slim_poll(:finished, locals: { poll: poll, results: results })
     end
 
-    responder = fetch_responder(poll)
+    if params.key?(:responder)
+      responder = poll.responder(salt: params.fetch(:responder))
+      halt(slim_email(:get, locals: { poll: poll })) unless responder
+
+      store_cookie(:email, responder.email)
+    else
+      email = fetch_email
+      halt(slim_email(:get, locals: { poll: poll })) unless email
+
+      responder = poll.responder(email: email)
+      halt(slim_email(:get, locals: { poll: poll })) unless responder
+    end
+
     template = responder.responses.empty? ? :poll : :responded
     slim_poll(template, locals: { poll: poll, responder: responder })
   }
@@ -137,21 +155,9 @@ class JubiVote < Sinatra::Base
     slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
   end
 
-  def fetch_responder(poll)
-    if params.key?(:responder)
-      responder = poll.responder(salt: params.fetch(:responder))
-      halt(slim_email(:get, locals: { poll: poll })) unless responder
-
-      store_cookie(:email, responder.email)
-    else
-      email = fetch_cookie(:email)
-      halt(slim_email(:get, locals: { poll: poll })) unless email
-
-      responder = poll.responder(email: email)
-      halt(slim_email(:get, locals: { poll: poll })) unless responder
-    end
-
-    return responder
+  def fetch_email
+    email = fetch_cookie(:email)
+    return URI::MailTo::EMAIL_REGEXP.match?(email) ? email : false
   end
 
   def store_cookie(key, value)

@@ -15,5 +15,7 @@ module Crypt
     decipher.iv = ENV.fetch('JUBIVOTE_CIPHER_IV')
     decipher.key = ENV.fetch('JUBIVOTE_CIPHER_KEY')
     return decipher.update(value) + decipher.final
+  rescue OpenSSL::Cipher::CipherError
+    return
   end
 end
