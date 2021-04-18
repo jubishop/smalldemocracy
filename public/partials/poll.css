@@ -10,7 +10,7 @@ li.choice {
   display: flex;
   margin: 0.5em 0;
   padding: 0.5em 0;
-  width: 20em;
+  max-width: 20em;
 }
 
 li.choice .grip {
