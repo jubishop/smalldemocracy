@@ -34,9 +34,18 @@ class JubiVote < Sinatra::Base
   }
 
   get('/create_poll') {
-    raise Sinatra::NotFound unless fetch_email
+    require_email
+    slim :create_poll
+  }
 
-    slim_admin :create_poll
+  post('/new_poll') {
+    require_email
+    poll = Poll.create_poll(
+        title: params.fetch(:title),
+        expiration: params.fetch(:expiration),
+        choices: params.fetch(:choices).strip.split(/\s*,\s*/),
+        responders: params.fetch(:responders).strip.split(/\s*,\s*/))
+    redirect "/poll/#{poll.id}"
   }
 
   error(Sinatra::NotFound) {
@@ -153,6 +162,10 @@ class JubiVote < Sinatra::Base
 
   def slim_poll(template, **options)
     slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
+  end
+
+  def require_email
+    raise Sinatra::NotFound unless fetch_email
   end
 
   def fetch_email
