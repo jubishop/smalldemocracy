@@ -32,8 +32,7 @@ class JubiVote < Sinatra::Base
     slim :index
   }
 
-  not_found {
-    status 404
+  error(Sinatra::NotFound) {
     slim :not_found
   }
 
@@ -42,7 +41,7 @@ class JubiVote < Sinatra::Base
   #####################################
   get('/poll/:poll_id') {
     poll = Poll[params.fetch(:poll_id)]
-    return poll_not_found unless poll
+    poll_not_found unless poll
 
     if (results = poll.results)
       return slim_poll(:finished, locals: { poll: poll, results: results })
@@ -57,10 +56,10 @@ class JubiVote < Sinatra::Base
 
   post('/send_email') {
     poll = Poll[params.fetch(:poll_id)]
-    return poll_not_found unless poll
+    poll_not_found unless poll
 
     responder = poll.responder(email: params.fetch(:email))
-    return email_not_found unless responder
+    email_not_found unless responder
 
     Email.send_email(poll, responder)
     return slim_email(:sent)
@@ -68,21 +67,22 @@ class JubiVote < Sinatra::Base
 
   post('/poll_response') {
     params = JSON.parse(request.body.read).symbolize_keys
+
     poll = Poll[params.fetch(:poll_id)]
-    return status(404) unless poll
+    halt(404, 'Poll not found') unless poll
 
     responder = poll.responder(salt: params.fetch(:responder))
-    return status(404) unless responder
+    halt(404, 'Responder not found') unless responder
 
     begin
       params.fetch(:responses).each_with_index { |choice_id, rank|
         responder.add_response(choice_id: choice_id, rank: rank)
       }
     rescue Sequel::UniqueConstraintViolation
-      return status(409)
+      halt(409, 'Response already exists')
     end
 
-    return status(201)
+    return 201, 'Poll created'
   }
 
   #####################################
@@ -107,7 +107,7 @@ class JubiVote < Sinatra::Base
 
   get('/admin/poll/:poll_id') {
     poll = Poll[params.fetch(:poll_id)]
-    return poll_not_found unless poll
+    poll_not_found unless poll
 
     slim_admin :poll, locals: { poll: poll }
   }
@@ -119,13 +119,11 @@ class JubiVote < Sinatra::Base
   private
 
   def email_not_found
-    status(404)
-    slim_email(:not_found)
+    halt(404, slim_email(:not_found))
   end
 
   def poll_not_found
-    status(404)
-    slim_poll(:not_found)
+    halt(404, slim_poll(:not_found))
   end
 
   def slim_admin(template, **options)

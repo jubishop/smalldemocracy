@@ -34,6 +34,14 @@ class Poll < Sequel::Model
   def results
     return if Time.at(expiration) > Time.now
 
+    @@results[id] ||= compute_results
+  end
+
+  private
+
+  @@results = {}
+
+  def compute_results
     choices_hash = choices.to_h { |choice|
       [choice.id, Result.new(text: choice.text, score: 0)]
     }
