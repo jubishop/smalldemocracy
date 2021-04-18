@@ -2,6 +2,7 @@ require 'core'
 require 'sequel'
 require 'sinatra'
 require 'sinatra/content_for'
+require 'sinatra/cookies'
 require 'sinatra/static'
 require 'slim'
 require 'slim/include'
@@ -17,10 +18,12 @@ Sequel::Migrator.check_current(DB, 'db/migrations')
 
 require_relative 'models/poll'
 require_relative 'models/responder'
+require_relative 'utils/crypt'
 require_relative 'utils/email'
 
 class JubiVote < Sinatra::Base
   helpers Sinatra::ContentFor
+  helpers Sinatra::Cookies
   register Sinatra::Static
 
   set(public_folder: 'public')
@@ -134,5 +137,13 @@ class JubiVote < Sinatra::Base
 
   def slim_poll(template, **options)
     slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
+  end
+
+  def store_cookie(key, value)
+    cookies[key] = Crypt.en(value)
+  end
+
+  def fetch_cookie(key)
+    return Crypt.de(cookies[key])
   end
 end
