@@ -40,11 +40,7 @@ class JubiVote < Sinatra::Base
 
   post('/new_poll') {
     require_email
-    poll = Poll.create_poll(
-        title: params.fetch(:title),
-        expiration: params.fetch(:expiration),
-        choices: params.fetch(:choices).strip.split(/\s*,\s*/),
-        responders: params.fetch(:responders).strip.split(/\s*,\s*/))
+    poll = Poll.create_poll(**params.to_h.symbolize_keys)
     redirect "/poll/#{poll.id}"
   }
 
@@ -121,11 +117,7 @@ class JubiVote < Sinatra::Base
   }
 
   post('/admin/new_poll') {
-    poll = Poll.create_poll(
-        title: params.fetch(:title),
-        expiration: params.fetch(:expiration),
-        choices: params.fetch(:choices).strip.split(/\s*,\s*/),
-        responders: params.fetch(:responders).strip.split(/\s*,\s*/))
+    poll = Poll.create_poll(**params.to_h.symbolize_keys)
     redirect "/admin/poll/#{poll.id}"
   }
 

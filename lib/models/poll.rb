@@ -11,14 +11,19 @@ class Poll < Sequel::Model
   Result = Struct.new(:text, :score, keyword_init: true)
   private_constant :Result
 
-  def self.create_poll(title:, expiration:, choices:, responders:)
-    poll = create(title: title, expiration: expiration)
+  def self.create_poll(title:, question:, expiration:, choices:, responders:)
+    poll = create(title: title, question: question, expiration: expiration)
+
+    choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)
     choices.each { |choice|
       poll.add_choice(text: choice)
     }
+
+    responders = responders.strip.split(/\s*,\s*/) if responders.is_a?(String)
     responders.each { |responder|
       poll.add_responder(email: responder)
     }
+
     return poll
   end
 
