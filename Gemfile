@@ -2,6 +2,7 @@ ruby '>= 3'
 
 source 'https://rubygems.org'
 
+gem 'base64'
 gem 'linguistics'
 gem 'openssl'
 gem 'puma'
