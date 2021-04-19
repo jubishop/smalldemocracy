@@ -1,3 +1,4 @@
+require 'base64'
 require 'openssl'
 
 module Crypt
@@ -6,7 +7,7 @@ module Crypt
     cipher.encrypt
     cipher.iv = ENV.fetch('JUBIVOTE_CIPHER_IV')
     cipher.key = ENV.fetch('JUBIVOTE_CIPHER_KEY')
-    return cipher.update(value) + cipher.final
+    return Base64.strict_encode64(cipher.update(value) + cipher.final)
   end
 
   def self.de(value)
@@ -14,7 +15,7 @@ module Crypt
     decipher.decrypt
     decipher.iv = ENV.fetch('JUBIVOTE_CIPHER_IV')
     decipher.key = ENV.fetch('JUBIVOTE_CIPHER_KEY')
-    return decipher.update(value) + decipher.final
+    return decipher.update(Base64.strict_decode64(value)) + decipher.final
   rescue OpenSSL::Cipher::CipherError
     return
   end
