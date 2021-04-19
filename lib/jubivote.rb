@@ -32,6 +32,12 @@ class JubiVote < Sinatra::Base
   set(public_folder: 'public')
   set(views: 'views')
 
+  before {
+    if settings.production? && !request.secure?
+      redirect request.url.sub('http', 'https'), 301
+    end
+  }
+
   get('/') {
     slim :index, locals: { email: fetch_email }
   }
