@@ -11,4 +11,5 @@ p Here's your recorded responses.
 
 ol
   - responder.responses.sort_by(&:rank).each do |response|
-    li ="#{response.choice.text} (#{poll.score(response)} points)."
+    - score = poll.score(response)
+    li ="#{response.choice.text} (#{score} #{"point".en.plural(score)})."

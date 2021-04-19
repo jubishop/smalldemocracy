@@ -7,4 +7,4 @@ p Results:
 
 ol
   - results.each do |result|
-    li ="#{result.text} (score: #{result.score})"
+    li ="#{result.text} (#{result.score} #{"point".en.plural(result.score)})"

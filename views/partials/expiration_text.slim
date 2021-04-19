@@ -1,3 +1,4 @@
+- require 'duration'
 - expiration = Time.at(poll.expiration)
 - remaining = Duration.new(expiration - Time.now)
 p ="This poll ends on #{expiration.strftime('%b %d, at %I:%M %p')}.  In #{remaining.format(precision: Duration::MINUTES)}."
