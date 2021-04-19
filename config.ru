@@ -12,7 +12,7 @@ use Rack::Protection
 use(AdminOnlyAuth) { |_, password|
   Rack::Utils.secure_compare(
       Base64.strict_encode64(OpenSSL::Digest.new('SHA256').digest(password)),
-      ENV.fetch('JUBIVOTE_HASHED_PASSWORD'))g
+      ENV.fetch('JUBIVOTE_HASHED_PASSWORD'))
 }
 
 run JubiVote
