@@ -1,9 +1,11 @@
 - content_for :head
   title Poll Completed
 
-h1 ="#{poll.title} Completed"
+h1 #{poll.title} Completed
 
-p ="Thanks #{responder.email}!"
+p Thanks #{responder.email}!
+
+include :expiration_text
 
 p Here's your recorded responses.
 

@@ -1,9 +1,9 @@
 - content_for :head
   title =poll.title
 
-h1 ="Administering #{poll.title}"
+h1 Administering #{poll.title}
 
-p ="Poll ID: #{poll.id}"
+p Poll ID: #{poll.id}
 
 a href="/poll/#{poll.id}" Poll
 
@@ -12,4 +12,4 @@ ul
     li
       a href="/poll/#{poll.id}?responder=#{responder.salt}" =responder.email
 
-include :poll
+include :poll_ul

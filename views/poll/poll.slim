@@ -8,12 +8,12 @@
 
 h1 =poll.title
 
-- expiration = Time.at(poll.expiration)
-- remaining = Duration.new(expiration - Time.now)
-p ="This poll ends on #{expiration.strftime('%b %d, at %I:%M %p')}.  In #{remaining.format(precision: Duration::MINUTES)}."
+p Welcome #{responder.email}
+
+include :expiration_text
 
 p Drag and drop to rank your choices.
 
-include :poll
+include :poll_ul
 
 button#submit type="submit" Submit Choices
