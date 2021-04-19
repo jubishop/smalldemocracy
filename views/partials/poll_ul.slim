@@ -1,5 +1,5 @@
 - content_for :head
-  ==stylesheet_link_tag :'partials/poll'
+  ==stylesheet_link_tag :'partials/poll_ul'
 
 ul#choices poll_id=poll.id responder_salt=locals[:responder]&.salt
   - poll.choices.each do |choice|
