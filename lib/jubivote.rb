@@ -135,12 +135,11 @@ class JubiVote < Sinatra::Base
     slim_admin :poll, locals: { poll: poll }
   }
 
-  #####################################
-  # PRIVATE
-  #####################################
-
   private
 
+  #####################################
+  # SLIM TEMPLATES
+  #####################################
   def slim_admin(template, **options)
     slim(template, **options.merge(views: 'views/admin', layout: :'../layout'))
   end
@@ -153,6 +152,9 @@ class JubiVote < Sinatra::Base
     slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
   end
 
+  #####################################
+  # REQUIRE GUARDS
+  #####################################
   def require_poll
     poll = Poll[params.fetch(:poll_id)]
     halt(404, slim_poll(:not_found)) unless poll
@@ -165,6 +167,9 @@ class JubiVote < Sinatra::Base
     return email
   end
 
+  #####################################
+  # COOKIES
+  #####################################
   def fetch_email
     email = fetch_cookie(:email)
     return URI::MailTo::EMAIL_REGEXP.match?(email) ? email : false
