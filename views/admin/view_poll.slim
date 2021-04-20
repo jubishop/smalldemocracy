@@ -5,12 +5,17 @@ h1 Administering #{poll.title}
 
 p Poll ID: #{poll.id}
 
+include :expiration_text
+
 a href="/poll/view/#{poll.id}" Poll
 
+p View poll as:
 ul
-  - poll.responders.each do |r|
+  - poll.responders.each do |responder|
+    - salt = responder.salt
+    - email = responder.email
     li
-      a href="/poll/view/#{poll.id}?responder=#{r.salt}" =r.email
+      a href="/poll/view/#{poll.id}?responder=#{salt}" =email
 
 include :poll_ul
 
