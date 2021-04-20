@@ -13,7 +13,7 @@ window.addEventListener('DOMContentLoaded', () => {
     message.textContent = 'Now submitting...';
     submitButton.parentNode.replaceChild(message, submitButton);
 
-    fetch('/poll_response', {
+    fetch('/poll/respond', {
       method: 'POST',
       body: JSON.stringify({
         poll_id: pollID,

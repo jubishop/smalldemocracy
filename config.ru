@@ -18,7 +18,8 @@ Sequel.extension(:migration)
 Sequel::Migrator.check_current(DB, 'db/migrations')
 
 require_relative 'lib/admin'
-require_relative 'lib/jubivote'
+require_relative 'lib/main'
+require_relative 'lib/poll'
 
 use Rack::SslEnforcer unless ENV.fetch('RACK_ENV') == 'development'
 use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
@@ -26,7 +27,8 @@ use Rack::Protection
 
 # rubocop:disable Style/StringHashKeys
 run Rack::URLMap.new({
-  '/' => JubiVote,
+  '/' => Main,
+  '/poll' => Poll,
   '/admin' => Rack::Builder.app {
     use(Rack::Auth::Basic) { |_, pw|
       Rack::Utils.secure_compare(

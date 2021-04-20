@@ -12,29 +12,29 @@ class Admin < Base
     slim_admin :admin
   }
 
-  get('/create_poll') {
+  get('/poll/create') {
     slim_admin :create_poll
   }
 
-  post('/new_poll') {
-    poll = Poll.create_poll(**params.to_h.symbolize_keys)
-    redirect "/admin/poll/#{poll.id}"
+  post('/poll/create') {
+    poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
+    redirect "/admin/poll/view/#{poll.id}"
   }
 
-  get('/poll/:poll_id') {
+  get('/poll/view/:poll_id') {
     poll = require_poll
 
-    slim_admin(:poll, locals: { poll: poll })
+    slim_admin(:view_poll, locals: { poll: poll })
   }
 
-  get('/mass_email') {
+  get('/poll/blast') {
     poll = require_poll
 
     poll.responders.each { |responder|
       logger.info("Now emailing: #{responder.email}")
-      Utils::Email.send_email(poll, responder)
+      Utils::Email.email(poll, responder)
     }
 
-    slim_admin(:mass_emails_sent, locals: { poll: poll })
+    slim_admin(:blast_emails_sent, locals: { poll: poll })
   }
 end

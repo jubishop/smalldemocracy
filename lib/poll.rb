@@ -4,34 +4,19 @@ require_relative 'base'
 require_relative 'models/poll'
 require_relative 'utils/email'
 
-class JubiVote < Base
-  get('/') {
-    slim :index, locals: { email: fetch_email }
-  }
-
-  get('/logout') {
-    cookies.delete(:email)
-    redirect params.fetch(:r, '/')
-  }
-
-  #####################################
-  # POLL CREATION
-  #####################################
-  get('/create_poll') {
+class Poll < Base
+  get('/create') {
     require_email
-    slim :create_poll
+    slim_poll(:create)
   }
 
-  post('/new_poll') {
+  post('/create') {
     require_email
-    poll = Poll.create_poll(**params.to_h.symbolize_keys)
-    redirect "/poll/#{poll.id}"
+    poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
+    redirect "/poll/view/#{poll.id}"
   }
 
-  #####################################
-  # POLL ANSWERING
-  #####################################
-  get('/poll/:poll_id') {
+  get('/view/:poll_id') {
     poll = require_poll
 
     if (results = poll.results)
@@ -51,25 +36,25 @@ class JubiVote < Base
       halt(slim_email(:get, locals: { poll: poll })) unless responder
     end
 
-    template = responder.responses.empty? ? :poll : :responded
+    template = responder.responses.empty? ? :view : :responded
     slim_poll(template, locals: { poll: poll, responder: responder })
   }
 
-  post('/send_email') {
+  post('/send') {
     poll = require_poll
 
     responder = poll.responder(email: params.fetch(:email))
-    halt(404, slim_poll(:email_not_found)) unless responder
+    halt(404, slim_email(:responder_not_found)) unless responder
 
     logger.info("Now emailing: #{responder.email}")
-    Utils::Email.send_email(poll, responder)
+    Utils::Email.email(poll, responder)
     return slim_email(:sent)
   }
 
-  post('/poll_response') {
+  post('/respond') {
     params = JSON.parse(request.body.read).symbolize_keys
 
-    poll = Poll[params.fetch(:poll_id)]
+    poll = Models::Poll[params.fetch(:poll_id)]
     halt(404, 'Poll not found') unless poll
 
     responder = poll.responder(salt: params.fetch(:responder))

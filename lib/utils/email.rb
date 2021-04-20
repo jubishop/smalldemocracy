@@ -4,15 +4,14 @@ require_relative 'async'
 
 module Utils
   module Email
-    def self.send_email(poll, responder)
+    def self.email(poll, responder)
       from = SendGrid::Email.new(name: 'JubiVote',
                                  email: 'support@jubivote.com')
       to = SendGrid::Email.new(email: responder.email)
       subject = "Poll: #{poll.title}"
 
-      url = %(
-        https://www.jubivote.com/poll/#{poll.id}?responder=#{responder.salt}
-      %)
+      path = 'https://www.jubivote.com/poll/view'
+      url = "#{path}/#{poll.id}?responder=#{responder.salt}"
       body = %(
         Please <a href="#{url}">click here</a> to answer the poll:
         <b>#{poll.title}</b>: #{poll.question}.

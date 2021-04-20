@@ -5,7 +5,7 @@ module Helpers
     include Cookie
 
     def require_poll
-      poll = Poll[params.fetch(:poll_id)]
+      poll = Models::Poll[params.fetch(:poll_id)]
       halt(404, slim_poll(:not_found)) unless poll
       return poll
     end

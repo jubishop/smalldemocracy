@@ -1,0 +1,17 @@
+- content_for :head
+  title =poll.title
+
+h1 Administering #{poll.title}
+
+p Poll ID: #{poll.id}
+
+a href="/poll/view/#{poll.id}" Poll
+
+ul
+  - poll.responders.each do |r|
+    li
+      a href="/poll/view/#{poll.id}?responder=#{r.salt}" =r.email
+
+include :poll_ul
+
+a href="/admin/poll/blast?poll_id=#{poll.id}" Mass Email
