@@ -31,6 +31,7 @@ class JubiVote < Sinatra::Base
 
   set(public_folder: 'public')
   set(views: 'views')
+  set(:cookie_options, expires: Time.at(2**31 - 1))
 
   get('/') {
     slim :index, locals: { email: fetch_email }
