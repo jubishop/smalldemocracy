@@ -34,13 +34,4 @@ class Admin < Base
 
     slim_admin(:mass_emails_sent, locals: { poll: poll })
   }
-
-  private
-
-  #####################################
-  # SLIM TEMPLATES
-  #####################################
-  def slim_admin(template, **options)
-    slim(template, **options.merge(views: 'views/admin', layout: :'../layout'))
-  end
 end

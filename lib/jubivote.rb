@@ -86,17 +86,4 @@ class JubiVote < Base
 
     return 201, 'Poll created'
   }
-
-  private
-
-  #####################################
-  # SLIM TEMPLATES
-  #####################################
-  def slim_email(template, **options)
-    slim(template, **options.merge(views: 'views/email', layout: :'../layout'))
-  end
-
-  def slim_poll(template, **options)
-    slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
-  end
 end

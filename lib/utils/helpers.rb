@@ -1,11 +1,9 @@
-require_relative 'utils/crypt'
+require_relative '../models/poll'
+require_relative 'crypt'
 
 module Helpers
   private
 
-  #####################################
-  # REQUIRE GUARDS
-  #####################################
   def require_poll
     poll = Poll[params.fetch(:poll_id)]
     halt(404, slim_poll(:not_found)) unless poll
@@ -18,9 +16,6 @@ module Helpers
     return email
   end
 
-  #####################################
-  # COOKIES
-  #####################################
   def fetch_email
     email = fetch_cookie(:email)
     return URI::MailTo::EMAIL_REGEXP.match?(email) ? email : false
