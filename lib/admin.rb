@@ -8,7 +8,7 @@ require_relative 'utils/email'
 class Admin < Base
   include AdminHelpers::Slim
 
-  get('') {
+  get('/') {
     slim_admin :admin
   }
 

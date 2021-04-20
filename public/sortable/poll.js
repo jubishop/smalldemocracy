@@ -1,8 +1,13 @@
 window.addEventListener('DOMContentLoaded', () => {
   const choicesElement = document.getElementById('choices');
-  const sortable = Sortable.create(choicesElement, {
+
+  const options = {
     animation: 100,
-  });
+  }
+  if(window.matchMedia("(pointer: coarse)").matches) {
+    options.handle = '.grip';
+  }
+  const sortable = Sortable.create(choicesElement, options);
 
   const pollID = choicesElement.getAttribute('poll_id');
   const responderSalt = choicesElement.getAttribute('responder_salt');
