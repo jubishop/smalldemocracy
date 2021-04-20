@@ -6,8 +6,7 @@ module Helpers
     end
 
     def slim_poll(template, **options)
-      slim(template, **options.merge(views: 'views/poll',
-                                     layout: :'../layout'))
+      slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
     end
   end
 end
