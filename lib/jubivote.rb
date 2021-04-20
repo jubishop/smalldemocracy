@@ -1,42 +1,10 @@
 require 'core'
-require 'linguistics'
-require 'sequel'
-require 'sinatra'
-require 'sinatra/content_for'
-require 'sinatra/cookies'
-require 'sinatra/static'
-require 'slim'
-require 'slim/include'
 
-Linguistics.use(:en)
-
-Slim::Engine.set_options(
-    tabsize: 2,
-    include_dirs: ["#{Dir.pwd}/views/partials"],
-    pretty: ENV.fetch('APP_ENV') == 'development')
-
-DB = Sequel.sqlite('.data/db.sqlite')
-Sequel.extension(:migration)
-Sequel::Migrator.check_current(DB, 'db/migrations')
-
+require_relative 'base'
 require_relative 'models/poll'
-require_relative 'models/responder'
-require_relative 'utils/crypt'
 require_relative 'utils/email'
 
-class JubiVote < Sinatra::Base
-  helpers Sinatra::ContentFor
-  helpers Sinatra::Cookies
-  register Sinatra::Static
-
-  set(public_folder: 'public')
-  set(views: 'views')
-  set(:cookie_options, expires: Time.at(2**31 - 1))
-
-  configure(:production, :development) {
-    enable :logging
-  }
-
+class JubiVote < Base
   get('/') {
     slim :index, locals: { email: fetch_email }
   }
@@ -119,86 +87,16 @@ class JubiVote < Sinatra::Base
     return 201, 'Poll created'
   }
 
-  #####################################
-  # ADMIN
-  #####################################
-  get('/admin') {
-    slim_admin :admin
-  }
-
-  get('/admin/create_poll') {
-    slim_admin :create_poll
-  }
-
-  post('/admin/new_poll') {
-    poll = Poll.create_poll(**params.to_h.symbolize_keys)
-    redirect "/admin/poll/#{poll.id}"
-  }
-
-  get('/admin/poll/:poll_id') {
-    poll = require_poll
-
-    slim_admin :poll, locals: { poll: poll }
-  }
-
-  get('/admin/mass_email') {
-    poll = require_poll
-
-    poll.responders.each { |responder|
-      logger.info("Now emailing: #{responder.email}")
-      Email.send_email(poll, responder)
-    }
-
-    slim_admin(:mass_emails_sent, locals: { poll: poll })
-  }
-
   private
 
   #####################################
   # SLIM TEMPLATES
   #####################################
-  def slim_admin(template, **options)
-    slim(template, **options.merge(views: 'views/admin', layout: :'../layout'))
-  end
-
   def slim_email(template, **options)
     slim(template, **options.merge(views: 'views/email', layout: :'../layout'))
   end
 
   def slim_poll(template, **options)
     slim(template, **options.merge(views: 'views/poll', layout: :'../layout'))
-  end
-
-  #####################################
-  # REQUIRE GUARDS
-  #####################################
-  def require_poll
-    poll = Poll[params.fetch(:poll_id)]
-    halt(404, slim_poll(:not_found)) unless poll
-    return poll
-  end
-
-  def require_email
-    email = fetch_email
-    halt(404, slim_email(:not_found)) unless email
-    return email
-  end
-
-  #####################################
-  # COOKIES
-  #####################################
-  def fetch_email
-    email = fetch_cookie(:email)
-    return URI::MailTo::EMAIL_REGEXP.match?(email) ? email : false
-  end
-
-  def store_cookie(key, value)
-    cookies[key] = Crypt.en(value)
-  end
-
-  def fetch_cookie(key)
-    return unless cookies.key?(key)
-
-    return Crypt.de(cookies.fetch(key))
   end
 end
