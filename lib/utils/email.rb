@@ -2,22 +2,30 @@ require 'sendgrid-ruby'
 
 require_relative 'async'
 
-module Email
-  def self.send_email(poll, responder)
-    from = SendGrid::Email.new(name: 'JubiVote', email: 'support@jubivote.com')
-    to = SendGrid::Email.new(email: responder.email)
-    subject = "Poll: #{poll.title}"
+module Utils
+  module Email
+    def self.send_email(poll, responder)
+      from = SendGrid::Email.new(name: 'JubiVote',
+                                 email: 'support@jubivote.com')
+      to = SendGrid::Email.new(email: responder.email)
+      subject = "Poll: #{poll.title}"
 
-    url = "https://www.jubivote.com/poll/#{poll.id}?responder=#{responder.salt}"
-    body = %(
-      Please <a href="#{url}">click here</a> to answer the poll:
-      <b>#{poll.title}</b>: #{poll.question}.
-    )
-    content = SendGrid::Content.new(type: 'text/html', value: body)
-    mail = SendGrid::Mail.new(from, subject, to, content)
+      url = %(
+        https://www.jubivote.com/poll/#{poll.id}?responder=#{responder.salt}
+      %)
+      body = %(
+        Please <a href="#{url}">click here</a> to answer the poll:
+        <b>#{poll.title}</b>: #{poll.question}.
+      )
 
-    sg = SendGrid::API.new(api_key: ENV.fetch('SENDGRID_API_KEY'))
+      content = SendGrid::Content.new(type: 'text/html', value: body)
+      mail = SendGrid::Mail.new(from, subject, to, content)
 
-    Async.run { sg.client.mail._('send').post(request_body: mail.to_json) }
+      sg = SendGrid::API.new(api_key: ENV.fetch('SENDGRID_API_KEY'))
+
+      Async.run {
+        sg.client.mail._('send').post(request_body: mail.to_json)
+      }
+    end
   end
 end

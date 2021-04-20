@@ -8,13 +8,13 @@ module Helpers
     end
 
     def store_cookie(key, value)
-      cookies[key] = Crypt.en(value)
+      cookies[key] = Utils::Crypt.en(value)
     end
 
     def fetch_cookie(key)
       return unless cookies.key?(key)
 
-      return Crypt.de(cookies.fetch(key))
+      return Utils::Crypt.de(cookies.fetch(key))
     end
   end
 end

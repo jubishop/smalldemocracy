@@ -29,7 +29,7 @@ class Admin < Base
 
     poll.responders.each { |responder|
       logger.info("Now emailing: #{responder.email}")
-      Email.send_email(poll, responder)
+      Utils::Email.send_email(poll, responder)
     }
 
     slim_admin(:mass_emails_sent, locals: { poll: poll })

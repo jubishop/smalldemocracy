@@ -60,7 +60,7 @@ class JubiVote < Base
     halt(404, slim_poll(:email_not_found)) unless responder
 
     logger.info("Now emailing: #{responder.email}")
-    Email.send_email(poll, responder)
+    Utils::Email.send_email(poll, responder)
     return slim_email(:sent)
   }
 
