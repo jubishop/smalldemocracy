@@ -21,8 +21,7 @@ require_relative 'lib/admin'
 require_relative 'lib/jubivote'
 
 use Rack::SslEnforcer unless ENV.fetch('RACK_ENV') == 'development'
-use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET'),
-                           expires: Time.at(2**31 - 1)
+use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
 use Rack::Protection
 
 # rubocop:disable Style/StringHashKeys

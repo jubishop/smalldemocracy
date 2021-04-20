@@ -21,10 +21,11 @@ source 'https://www.jubigems.org' do
   gem 'sinatra-static'
 end
 
-# defaults
-gem 'rake'
-gem 'rspec'
-gem 'rubocop'
-gem 'rubocop-performance'
-gem 'rubocop-rake'
-gem 'rubocop-rspec'
+group :development do
+  gem 'rake'
+  gem 'rspec'
+  gem 'rubocop'
+  gem 'rubocop-performance'
+  gem 'rubocop-rake'
+  gem 'rubocop-rspec'
+end
