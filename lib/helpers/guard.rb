@@ -4,8 +4,6 @@ module Helpers
   module Guard
     include Cookie
 
-    private
-
     def require_poll
       poll = Poll[params.fetch(:poll_id)]
       halt(404, slim_poll(:not_found)) unless poll

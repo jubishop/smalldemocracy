@@ -1,10 +1,13 @@
 require 'core'
 
 require_relative 'base'
+require_relative 'helpers/admin/slim'
 require_relative 'models/poll'
 require_relative 'utils/email'
 
 class Admin < Base
+  include AdminHelpers::Slim
+
   get('') {
     slim_admin :admin
   }
