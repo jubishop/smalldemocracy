@@ -6,7 +6,11 @@
 
 h1 =poll.title
 
-p Welcome #{responder.email}
+p
+  | Welcome #{responder.email} (
+  a href="/logout?r=/poll/#{poll.id}" Logout
+  | )
+  br
 
 h2 =poll.question
 

@@ -48,6 +48,11 @@ class JubiVote < Sinatra::Base
     redirect "/poll/#{poll.id}"
   }
 
+  get('/logout') {
+    cookies.delete(:email)
+    redirect params.fetch(:r, '/')
+  }
+
   error(Sinatra::NotFound) {
     slim :not_found
   }
