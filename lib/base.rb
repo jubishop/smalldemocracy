@@ -3,7 +3,7 @@ require 'sinatra/content_for'
 require 'sinatra/cookies'
 require 'sinatra/static'
 
-require_relative 'helpers'
+require_relative 'utils/helpers'
 
 class Base < Sinatra::Base
   include Helpers
