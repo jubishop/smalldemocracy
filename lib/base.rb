@@ -3,10 +3,12 @@ require 'sinatra/content_for'
 require 'sinatra/cookies'
 require 'sinatra/static'
 
-require_relative 'utils/helpers'
+require_relative 'helpers/cookie'
+require_relative 'helpers/guard'
 
 class Base < Sinatra::Base
-  include Helpers
+  include Helpers::Cookie
+  include Helpers::Guard
 
   helpers Sinatra::ContentFor
   helpers Sinatra::Cookies

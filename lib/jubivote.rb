@@ -29,9 +29,6 @@ class JubiVote < Base
     slim :not_found
   }
 
-  #####################################
-  # POLL
-  #####################################
   get('/poll/:poll_id') {
     poll = require_poll
 
