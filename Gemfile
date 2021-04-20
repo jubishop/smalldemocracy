@@ -13,6 +13,7 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'slim'
 gem 'sqlite3'
+gem 'tzinfo'
 
 source 'https://www.jubigems.org' do
   gem 'core'

@@ -1,4 +1,8 @@
 - require 'duration'
-- expiration = Time.at(poll.expiration)
+- require 'tzinfo'
+
+- expiration = Time.at(poll.expiration, in: TZInfo::Timezone.get('US/Pacific'))
 - remaining = Duration.new(expiration - Time.now)
-p ="This poll ends on #{expiration.strftime('%b %d, at %I:%M %p')}.  In #{remaining.format(precision: Duration::MINUTES)}."
+p
+  | This poll ends on #{expiration.strftime('%b %d, at %I:%M %p %Z')}.
+  |  (#{remaining.format(precision: Duration::MINUTES)} from now).
