@@ -3,7 +3,10 @@
 
 h1 #{poll.title} Completed
 
-p Thanks #{responder.email}!
+p
+  | Thanks #{responder.email}! (
+  a href="/logout?r=/poll/#{poll.id}" Logout
+  | )
 
 include :expiration_text
 
