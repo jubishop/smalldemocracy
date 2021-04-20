@@ -9,6 +9,14 @@ class JubiVote < Base
     slim :index, locals: { email: fetch_email }
   }
 
+  get('/logout') {
+    cookies.delete(:email)
+    redirect params.fetch(:r, '/')
+  }
+
+  #####################################
+  # POLL CREATION
+  #####################################
   get('/create_poll') {
     require_email
     slim :create_poll
@@ -20,15 +28,9 @@ class JubiVote < Base
     redirect "/poll/#{poll.id}"
   }
 
-  get('/logout') {
-    cookies.delete(:email)
-    redirect params.fetch(:r, '/')
-  }
-
-  error(Sinatra::NotFound) {
-    slim :not_found
-  }
-
+  #####################################
+  # POLL ANSWERING
+  #####################################
   get('/poll/:poll_id') {
     poll = require_poll
 

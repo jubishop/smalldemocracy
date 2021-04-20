@@ -23,4 +23,8 @@ class Base < Sinatra::Base
   configure(:production, :development) {
     enable :logging
   }
+
+  error(Sinatra::NotFound) {
+    slim :not_found
+  }
 end
