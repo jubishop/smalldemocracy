@@ -1,0 +1,12 @@
+- content_for :head
+  title Mass Emails Sent
+
+h1 Emails blasted
+
+Emails sent to:
+
+ul
+  - poll.responders.each do |responder|
+    li =responder.email
+
+a href="/admin/poll/#{poll.id}" Return to poll.

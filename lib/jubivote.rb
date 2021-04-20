@@ -33,6 +33,10 @@ class JubiVote < Sinatra::Base
   set(views: 'views')
   set(:cookie_options, expires: Time.at(2**31 - 1))
 
+  configure(:production, :development) {
+    enable :logging
+  }
+
   get('/') {
     slim :index, locals: { email: fetch_email }
   }
@@ -90,6 +94,7 @@ class JubiVote < Sinatra::Base
     responder = poll.responder(email: params.fetch(:email))
     halt(404, slim_poll(:email_not_found)) unless responder
 
+    logger.info("Now emailing: #{responder.email}")
     Email.send_email(poll, responder)
     return slim_email(:sent)
   }
@@ -134,6 +139,17 @@ class JubiVote < Sinatra::Base
     poll = require_poll
 
     slim_admin :poll, locals: { poll: poll }
+  }
+
+  get('/admin/mass_email') {
+    poll = require_poll
+
+    poll.responders.each { |responder|
+      logger.info("Now emailing: #{responder.email}")
+      Email.send_email(poll, responder)
+    }
+
+    slim_admin(:mass_emails_sent, locals: { poll: poll })
   }
 
   private

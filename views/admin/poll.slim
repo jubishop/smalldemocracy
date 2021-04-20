@@ -13,3 +13,5 @@ ul
       a href="/poll/#{poll.id}?responder=#{responder.salt}" =responder.email
 
 include :poll_ul
+
+a href="/admin/mass_email?poll_id=#{poll.id}" Mass Email
