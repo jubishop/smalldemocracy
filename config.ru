@@ -11,17 +11,26 @@ Linguistics.use(:en)
 Slim::Engine.set_options(
     tabsize: 2,
     include_dirs: ["#{Dir.pwd}/views/partials"],
-    pretty: ENV.fetch('APP_ENV') == 'development')
+    pretty: ENV.fetch('APP_ENV') != 'production')
 
-DB = Sequel.sqlite('.data/db.sqlite')
+DB = if ENV.fetch('APP_ENV') == 'test'
+       Sequel.sqlite
+     else
+       Sequel.sqlite('.data/db.sqlite')
+     end
+
 Sequel.extension(:migration)
-Sequel::Migrator.check_current(DB, 'db/migrations')
+if ENV.fetch('APP_ENV') == 'test'
+  Sequel::Migrator.run(DB, 'db/migrations')
+else
+  Sequel::Migrator.check_current(DB, 'db/migrations')
+end
 
 require_relative 'lib/admin'
 require_relative 'lib/main'
 require_relative 'lib/poll'
 
-use Rack::SslEnforcer unless ENV.fetch('RACK_ENV') == 'development'
+use Rack::SslEnforcer if ENV.fetch('RACK_ENV') == 'production'
 use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
 use Rack::Protection
 

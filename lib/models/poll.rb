@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'sequel'
 
 require_relative 'choice'
 require_relative 'responder'
