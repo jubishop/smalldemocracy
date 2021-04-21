@@ -1,11 +1,4 @@
-require_relative '../setup'
-require_relative '../lib/poll'
-
-Capybara.register_driver(:rack_test) {
-  Capybara::RackTest::Driver.new(Setup.url_map)
-}
-
-RSpec.describe(Poll, type: :feature) {
+RSpec.describe('/poll', type: :feature) {
   context('/create') {
     it('makes a poll') {
       email = fake_email_cookie

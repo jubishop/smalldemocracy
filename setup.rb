@@ -32,7 +32,7 @@ require_relative 'lib/poll'
 module Setup
   def self.url_map
     # rubocop:disable Style/StringHashKeys
-    return Rack::URLMap.new({
+    return {
       '/' => Main,
       '/poll' => Poll,
       '/admin' => Rack::Builder.app {
@@ -43,7 +43,7 @@ module Setup
         }
         run(Admin)
       }
-    })
+    }
     # rubocop:enable Style/StringHashKeys
   end
 end

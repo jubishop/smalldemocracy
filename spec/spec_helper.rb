@@ -1,4 +1,5 @@
 require 'capybara/rspec'
+require 'rack'
 require 'rack/test'
 
 # Basic ENV vars
@@ -9,7 +10,27 @@ ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
 ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 
-# See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+RSpec.shared_context(:rack_app) do
+  include(Rack::Test::Methods)
+  include(Capybara::RSpecMatchers)
+
+  require_relative '../setup'
+  full_stack_app = Rack::Builder.parse_file('config.ru').first
+
+  let(:app) { full_stack_app }
+
+  Capybara.server = :puma
+  Capybara.app = full_stack_app
+  Capybara.register_driver(:rack_test) { |app|
+    Capybara::RackTest::Driver.new(app)
+  }
+
+  before(:each) {
+    ENV['RACK_ENV'] = 'test'
+    ENV['APP_ENV'] = 'test'
+  }
+end
+
 RSpec.configure do |config|
   config.expect_with(:rspec) do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -27,13 +48,7 @@ RSpec.configure do |config|
   config.order = :random
   Kernel.srand(config.seed)
 
-  config.before(:each) {
-    ENV['RACK_ENV'] = 'test'
-    ENV['APP_ENV'] = 'test'
-  }
-
-  config.include(Rack::Test::Methods)
-  config.include(Capybara::RSpecMatchers)
+  config.include_context(:rack_app)
 end
 
 # Basic Helpers

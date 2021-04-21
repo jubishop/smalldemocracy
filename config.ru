@@ -13,4 +13,4 @@ use Rack::SslEnforcer, only_environments: 'production'
 use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
 use Rack::Protection
 
-run Setup.url_map
+run Rack::URLMap.new(Setup.url_map)
