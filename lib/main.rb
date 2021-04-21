@@ -6,16 +6,7 @@ require_relative 'utils/email'
 
 class Main < Base
   get('/') {
-    puts request.host
-    puts request.host_authority
-    puts request.authority
-    puts request.forwarded_authority
-    puts request.forwarded_port
-    puts request.hostname
-    puts request.port
-    puts request.server_authority
-    puts request.scheme
-    request.each_header { |h| puts h }
+    puts request.get_header('rack.url_scheme')
     slim :index, locals: { email: fetch_email }
   }
 
