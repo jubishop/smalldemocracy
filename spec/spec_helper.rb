@@ -2,6 +2,8 @@ require 'capybara/rspec'
 require 'rack/test'
 
 # Basic ENV vars
+ENV['RACK_ENV'] = 'test'
+ENV['APP_ENV'] = 'test'
 ENV['JUBIVOTE_COOKIE_SECRET'] = 'U3v96K59yMnjmnb97CeSNDp4'
 ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
