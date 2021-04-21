@@ -1,3 +1,11 @@
+# Set ENV vars
+ENV['RACK_ENV'] = 'test'
+ENV['APP_ENV'] = 'test'
+ENV['JUBIVOTE_COOKIE_SECRET'] = 'U3v96K59yMnjmnb97CeSNDp4'
+ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
+ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
+ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.expect_with(:rspec) do |expectations|
