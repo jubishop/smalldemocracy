@@ -10,7 +10,7 @@ ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
 ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 
-# Context setting up everything for Rack Testing
+# Rack Testing Context
 RSpec.shared_context(:rack_app) do
   include(Rack::Test::Methods)
   include(Capybara::RSpecMatchers)
