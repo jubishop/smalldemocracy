@@ -8,14 +8,6 @@ html lang="en"
     ==favicon_link_tag
     ==stylesheet_link_tag :main
     ==yield_content :head
-    javascript:
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-        location.replace("https://" +
-          location.hostname +
-          location.pathname +
-          location.search +
-          location.hash);
-      }
 
   body
     ==yield
