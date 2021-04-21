@@ -1,3 +1,6 @@
+require 'capybara/rspec'
+require 'rack/test'
+
 ENV['JUBIVOTE_COOKIE_SECRET'] = 'U3v96K59yMnjmnb97CeSNDp4'
 ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
@@ -25,4 +28,7 @@ RSpec.configure do |config|
     ENV['RACK_ENV'] = 'test'
     ENV['APP_ENV'] = 'test'
   }
+
+  config.include(Rack::Test::Methods)
+  config.include(Capybara::RSpecMatchers)
 end

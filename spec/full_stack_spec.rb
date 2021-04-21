@@ -1,9 +1,6 @@
 require 'rack'
-require 'rack/test'
 
 RSpec.describe('Full stack config.ru') {
-  include Rack::Test::Methods
-
   let(:app) { Rack::Builder.parse_file('config.ru').first }
 
   context('/') {

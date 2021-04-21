@@ -1,17 +1,14 @@
-require 'rack/test'
-
 require_relative '../setup'
 require_relative '../lib/main'
 
 RSpec.describe(Main) {
-  include Rack::Test::Methods
-
   let(:app) { Main }
 
   context('/') {
     it('responds to / with OK status') {
       get '/'
       expect(last_response.ok?).to(be(true))
+      expect(last_response.body).to(have_no_link(href: '/logout'))
     }
 
     it('does not delete the email cookie') {
@@ -27,6 +24,7 @@ RSpec.describe(Main) {
           receive(:fetch_email).and_return(email))
       get '/'
       expect(last_response.body).to(include(email))
+      expect(last_response.body).to(have_link(href: '/logout'))
     }
   }
 
