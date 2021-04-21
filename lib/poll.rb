@@ -7,13 +7,13 @@ require_relative 'utils/email'
 class Poll < Base
   get('/create') {
     require_email
-    slim_poll(:create)
+    return slim_poll(:create)
   }
 
   post('/create') {
     require_email
     poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
-    redirect "/poll/view/#{poll.id}"
+    return redirect("/poll/view/#{poll.id}")
   }
 
   get('/view/:poll_id') {
@@ -28,16 +28,17 @@ class Poll < Base
       halt(slim_email(:get, locals: { poll: poll })) unless responder
 
       store_cookie(:email, responder.email)
-    else
-      email = fetch_email
-      halt(slim_email(:get, locals: { poll: poll })) unless email
-
-      responder = poll.responder(email: email)
-      halt(slim_email(:get, locals: { poll: poll })) unless responder
+      return redirect("/poll/view/#{poll.id}")
     end
 
+    email = fetch_email
+    halt(slim_email(:get, locals: { poll: poll })) unless email
+
+    responder = poll.responder(email: email)
+    halt(slim_email(:get, locals: { poll: poll })) unless responder
+
     template = responder.responses.empty? ? :view : :responded
-    slim_poll(template, locals: { poll: poll, responder: responder })
+    return slim_poll(template, locals: { poll: poll, responder: responder })
   }
 
   post('/send') {
