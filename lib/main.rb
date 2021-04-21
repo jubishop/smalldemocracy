@@ -6,6 +6,7 @@ require_relative 'utils/email'
 
 class Main < Base
   get('/') {
+    puts request.scheme
     slim :index, locals: { email: fetch_email }
   }
 
