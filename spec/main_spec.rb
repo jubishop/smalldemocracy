@@ -18,10 +18,7 @@ RSpec.describe(Main) {
     }
 
     it('welcomes user when they have email cookie') {
-      email = 'jubi@hey.com'
-      require_relative '../lib/helpers/cookie'
-      allow_any_instance_of(Helpers::Cookie).to(
-          receive(:fetch_email).and_return(email))
+      email = fake_email_cookie
       get '/'
       expect(last_response.body).to(include(email))
       expect(last_response.body).to(have_link(href: '/logout'))

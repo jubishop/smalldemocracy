@@ -1,6 +1,7 @@
 require 'capybara/rspec'
 require 'rack/test'
 
+# Basic ENV vars
 ENV['JUBIVOTE_COOKIE_SECRET'] = 'U3v96K59yMnjmnb97CeSNDp4'
 ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
@@ -31,4 +32,13 @@ RSpec.configure do |config|
 
   config.include(Rack::Test::Methods)
   config.include(Capybara::RSpecMatchers)
+end
+
+# Basic Helpers
+def fake_email_cookie
+  email = 'test@example.com'
+  require_relative '../lib/helpers/cookie'
+  allow_any_instance_of(Helpers::Cookie).to(
+      receive(:fetch_email).and_return(email))
+  return email
 end
