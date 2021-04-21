@@ -22,6 +22,7 @@ source 'https://www.jubigems.org' do
 end
 
 group :development do
+  gem 'capybara/rspec'
   gem 'rack-test'
   gem 'rake'
   gem 'rspec'
