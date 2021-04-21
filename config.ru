@@ -8,7 +8,9 @@ require_relative 'lib/admin'
 require_relative 'lib/main'
 require_relative 'lib/poll'
 
-use Rack::SslEnforcer if ENV.fetch('RACK_ENV') == 'production'
+if ENV.fetch('RACK_ENV') == 'production'
+  use Rack::SslEnforcer, http_port: ENV['PORT']
+end
 use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
 use Rack::Protection
 
