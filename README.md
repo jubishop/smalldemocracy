@@ -8,7 +8,7 @@ JubiVote can be viewed online at [JubiVote.com](https://jubivote.com).
 
 JubiVote currently supports:
 
-- Ranked Choice Voting (Borda Count).
+- Ranked Choice Voting ([Borda Count](https://en.wikipedia.org/wiki/Borda_count)).
 
 ## Creating a poll
 
