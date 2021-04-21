@@ -1,13 +1,13 @@
 require_relative '../setup'
 require_relative '../lib/poll'
 
-RSpec.describe(Poll, type: :feature) {
-  # rubocop:disable Style/StringHashKeys
-  Capybara.register_driver(:rack_test) {
-    Capybara::RackTest::Driver.new(Rack::URLMap.new({ '/poll' => Poll }))
-  }
-  # rubocop:enable Style/StringHashKeys
+# rubocop:disable Style/StringHashKeys
+Capybara.register_driver(:rack_test) {
+  Capybara::RackTest::Driver.new(Rack::URLMap.new({ '/poll' => Poll }))
+}
+# rubocop:enable Style/StringHashKeys
 
+RSpec.describe(Poll, type: :feature) {
   context('/create') {
     it('makes a poll') {
       email = fake_email_cookie
