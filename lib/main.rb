@@ -15,6 +15,7 @@ class Main < Base
     puts request.port
     puts request.server_authority
     puts request.scheme
+    request.each_header { |h| puts h }
     slim :index, locals: { email: fetch_email }
   }
 
