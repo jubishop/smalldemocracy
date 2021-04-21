@@ -1,11 +1,9 @@
 require_relative '../setup'
 require_relative '../lib/poll'
 
-# rubocop:disable Style/StringHashKeys
 Capybara.register_driver(:rack_test) {
-  Capybara::RackTest::Driver.new(Rack::URLMap.new({ '/poll' => Poll }))
+  Capybara::RackTest::Driver.new(Setup.url_map)
 }
-# rubocop:enable Style/StringHashKeys
 
 RSpec.describe(Poll, type: :feature) {
   context('/create') {

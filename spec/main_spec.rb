@@ -1,8 +1,8 @@
 require_relative '../setup'
 require_relative '../lib/main'
 
-RSpec.describe(Main) {
-  let(:app) { Main }
+RSpec.describe('/') {
+  let(:app) { Setup.url_map }
 
   context('/') {
     it('responds to / with OK status') {

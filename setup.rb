@@ -1,4 +1,6 @@
+require 'base64'
 require 'linguistics'
+require 'openssl'
 require 'sequel'
 require 'slim'
 require 'slim/include'
@@ -21,4 +23,27 @@ if ENV.fetch('APP_ENV') == 'test'
   Sequel::Migrator.run(DB, 'db/migrations')
 else
   Sequel::Migrator.check_current(DB, 'db/migrations')
+end
+
+require_relative 'lib/admin'
+require_relative 'lib/main'
+require_relative 'lib/poll'
+
+module Setup
+  def self.url_map
+    # rubocop:disable Style/StringHashKeys
+    return Rack::URLMap.new({
+      '/' => Main,
+      '/poll' => Poll,
+      '/admin' => Rack::Builder.app {
+        use(Rack::Auth::Basic) { |_, pw|
+          Rack::Utils.secure_compare(
+              Base64.strict_encode64(OpenSSL::Digest.new('SHA256').digest(pw)),
+              ENV.fetch('JUBIVOTE_HASHED_PASSWORD'))
+        }
+        run(Admin)
+      }
+    })
+    # rubocop:enable Style/StringHashKeys
+  end
 end
