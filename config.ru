@@ -8,15 +8,14 @@ require_relative 'lib/admin'
 require_relative 'lib/main'
 require_relative 'lib/poll'
 
-if ENV.fetch('RACK_ENV') == 'production'
-  class Enforcer < Rack::SslEnforcer
+module Rack
+  class SslEnforcer
     def current_scheme
       return @request.env['HTTP_FLY_FORWARDED_PROTO']
     end
   end
-  use Enforcer
 end
-
+use Rack::SslEnforcer, only_environments: 'production'
 use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
 use Rack::Protection
 
