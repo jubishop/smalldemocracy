@@ -35,8 +35,7 @@ RSpec.configure do |config|
 end
 
 # Basic Helpers
-def fake_email_cookie
-  email = 'test@example.com'
+def fake_email_cookie(email = 'test@example.com')
   require_relative '../lib/helpers/cookie'
   allow_any_instance_of(Helpers::Cookie).to(
       receive(:fetch_email).and_return(email))
