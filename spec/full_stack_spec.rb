@@ -10,4 +10,10 @@ RSpec.describe('Full stack config.ru') {
     get '/'
     expect(last_response.ok?).to(be(true))
   }
+
+  it('redirects to https in production only') {
+    ENV['RACK_ENV'] = 'production'
+    get '/', nil, { FLY_FORWARDED_PROTO: 'http' }
+    expect(last_response.redirect?).to(be(true))
+  }
 }

@@ -11,7 +11,7 @@ require_relative 'lib/poll'
 module Rack
   class SslEnforcer
     def current_scheme
-      return @request.env['HTTP_FLY_FORWARDED_PROTO']
+      return @request.env.fetch('HTTP_FLY_FORWARDED_PROTO', 'http')
     end
   end
 end
