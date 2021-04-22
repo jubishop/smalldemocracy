@@ -1,30 +1,33 @@
-require 'chunky_png'
+require 'git'
 
 require_relative 'env'
 
 module RSpec
   class Goldens
+    @@git = Git.open('.')
+
     def self.verify(page, filename, **options)
       return if github_actions?
 
       unless File.exist?(golden_file(filename))
         warn("Creating new golden: #{filename}".light_red)
-        write_goldens(page, filename, **options)
-        return
+        write_golden(page, filename, **options)
+        @@git.add(golden_file(filename))
+
+        return unless ENV.fetch('FAIL_ON_GOLDEN', false)
+
+        raise RSpec::Expectations::ExpectationNotMetError,
+              "#{filename} does not exist"
       end
 
-      page.driver.save_screenshot(tmp_file(filename), **options)
-      golden_screenshot = ChunkyPNG::Image.from_file(golden_file(filename))
-      new_screenshot = ChunkyPNG::Image.from_file(tmp_file(filename))
-      0.upto(golden_screenshot.height - 1) { |y|
-        golden_screenshot.row(y).each_with_index { |pixel, x|
-          next if pixel == new_screenshot[x, y]
+      write_golden(page, filename, **options)
+      return unless @@git.diff.stats.key?(golden_file(filename))
 
-          warn("Fail at pixel [#{x}, #{y}] replacing: #{filename}".red)
-          write_goldens(page, filename, **options)
-          return true
-        }
-      }
+      warn("Failed match on #{filename}".red)
+      return unless ENV.fetch('FAIL_ON_GOLDEN', false)
+
+      raise RSpec::Expectations::ExpectationNotMetError,
+            "#{filename} does not match"
     end
 
     class << self
@@ -33,7 +36,7 @@ module RSpec
 
       private
 
-      def write_goldens(page, filename, **options)
+      def write_golden(page, filename, **options)
         page.driver.save_screenshot(golden_file(filename), **options)
         system("open #{golden_file(filename)}")
         return unless ENV.fetch('FAIL_ON_GOLDEN', false)
@@ -42,12 +45,8 @@ module RSpec
               "#{filename} does not match"
       end
 
-      def tmp_file(filename)
-        return File.join(ENV.fetch('TMPDIR', '/tmp'), "#{filename}.png")
-      end
-
       def golden_file(filename)
-        return File.join(Dir.pwd, 'spec/goldens', "#{filename}.png")
+        return File.join('spec/goldens', "#{filename}.png")
       end
     end
   end
