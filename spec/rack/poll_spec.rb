@@ -6,12 +6,12 @@ RSpec.describe('/poll', type: :feature) {
       current_time = 388341770
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
-      email = set_email_cookie(page: page)
+      page.email_cookie = 'test@example.com'
       visit '/poll/create'
 
       fill_in 'title', with: 'this is my title'
       fill_in 'question', with: 'what is life'
-      fill_in 'responders', with: email
+      fill_in 'responders', with: 'test@example.com'
       fill_in 'choices', with: 'one, two, three'
       fill_in 'expiration', with: current_time + 61
       click_button 'Submit'
