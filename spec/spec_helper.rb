@@ -71,3 +71,16 @@ def fake_email_cookie(email = 'test@example.com')
       receive(:fetch_email).and_return(email))
   return email
 end
+
+def compare_golden(filename, **options)
+  base64 = render_base64(**options)
+
+  filepath = File.join('spec/goldens', filename)
+  unless File.exist?(filepath)
+    warn("Creating new golden: #{filename}")
+    File.write(filepath, base64)
+    return
+  end
+
+  expect(File.open(filepath)).to(eq(base64), "#{filename} golden match fail")
+end

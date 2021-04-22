@@ -20,8 +20,8 @@ RSpec.describe('/poll', type: :feature) {
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'two'))
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'three'))
       expect(page).to(have_selector('p', text: '1 minute from now'))
-
       click_button 'Submit Choices'
+
       expect(page).to(have_content('recorded responses'))
     }
   }

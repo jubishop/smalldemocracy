@@ -24,9 +24,12 @@ end
 group :development do
   gem 'apparition'
   gem 'capybara'
+  gem 'colorize'
+  gem 'open3'
   gem 'rack-test'
   gem 'rake'
   gem 'rspec'
+  gem 'rspec_n', require: false
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'rubocop-rake'
