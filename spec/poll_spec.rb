@@ -2,6 +2,7 @@ RSpec.describe('/poll', type: :feature) {
   context('/create') {
     it('makes a poll') {
       Capybara.current_driver = Capybara.javascript_driver
+      allow(Time).to(receive(:now).and_return(Time.at(388341770)))
 
       email = fake_email_cookie
       visit '/poll/create'
@@ -20,11 +21,12 @@ RSpec.describe('/poll', type: :feature) {
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'two'))
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'three'))
       expect(page).to(have_selector('p', text: '1 minute from now'))
-      RSpec::Goldens.verify(page, 'poll_respond', selector: 'ul')
+      expect(page).to(have_button(text: 'Submit Choices'))
+      RSpec::Goldens.verify(page, 'poll_respond', full: true)
       click_button 'Submit Choices'
 
       expect(page).to(have_content('recorded responses'))
-      RSpec::Goldens.verify(page, 'poll_responded', selector: 'ol')
+      RSpec::Goldens.verify(page, 'poll_responded', full: true)
     }
   }
 }

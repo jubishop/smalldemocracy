@@ -15,10 +15,8 @@ module RSpec
 
       return if File.open(base64_file(filename)).read == base64
 
+      warn("Golden match fail, replacing: #{filename}".red)
       write_goldens(page, filename, base64, **options)
-
-      raise(RSpec::Expectations::ExpectationNotMetError,
-            "Golden match fail, replacing: #{filename}")
     end
 
     class << self
