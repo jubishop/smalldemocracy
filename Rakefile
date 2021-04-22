@@ -27,6 +27,7 @@ RSpec::Core::RakeTask.new(:spec) { |t|
 desc('Run rspec_n [count=20]')
 task(:rspec_n, [:count]) { |_, args|
   args.with_defaults(count: 20)
+  ENV['FAIL_ON_GOLDEN'] = '1'
 
   puts 'Now running...'
   results = ''

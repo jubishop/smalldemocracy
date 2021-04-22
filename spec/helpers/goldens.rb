@@ -29,6 +29,10 @@ module RSpec
         File.write(base64_file(filename), base64)
         page.driver.save_screenshot(png_file(filename), **options)
         system("open #{png_file(filename)}")
+        if ENV.fetch('FAIL_ON_GOLDEN', false)
+          raise RSpec::Expectations::ExpectationNotMetError,
+              "#{filename} does not match"
+        end
       end
 
       def png_file(filename)
