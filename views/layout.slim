@@ -4,7 +4,7 @@ html lang="en"
     meta http-equiv="Content-Type" content="text/html; charset=utf-8"
     meta name="viewport" content="width=device-width, initial-scale=0.8"
     ==google_fonts "Fira Code", "Fira Sans"
-    ==font_awesome :'9c18181028'
+    ==font_awesome(ENV.fetch('APP_ENV') == 'test' ? '97a3f62494' : '9c18181028')
     ==favicon_link_tag
     ==stylesheet_link_tag :main
     ==yield_content :head
