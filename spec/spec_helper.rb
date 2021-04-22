@@ -66,6 +66,10 @@ RSpec.configure do |config|
 end
 
 # Basic Helpers
+def github_actions?
+  return ENV.key?('CI')
+end
+
 def fake_email_cookie(email = 'test@example.com')
   require_relative '../lib/helpers/cookie'
   allow_any_instance_of(Helpers::Cookie).to(
@@ -74,16 +78,18 @@ def fake_email_cookie(email = 'test@example.com')
 end
 
 def verify_golden(filename, **options)
-  puts Dir.pwd
-  puts Dir.entries('.')
+  return if github_actions?
+
   base64 = page.driver.render_base64(:png, **options)
 
   filepath = File.join(Dir.pwd, 'spec/goldens', filename)
   unless File.exist?(filepath)
     warn("Creating new golden: #{filename}".light_red)
     File.write(filepath, base64)
+    save_screenshot("#{filepath}.png", **options)
     return
   end
 
-  expect(File.open(filepath).read).to(eq(base64))
+  expect(File.open(filepath).read).to(
+      eq(base64), "#{filename} golden match fail")
 end
