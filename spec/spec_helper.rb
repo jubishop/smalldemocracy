@@ -18,7 +18,7 @@ ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 
 RSpec.shared_context(:apparition) do
   include Capybara::RSpecMatchers
-  include RSpec::Session
+  include RSpec::ApparitionSession
 
   Capybara.server = :puma
   Capybara.app = Rack::Builder.parse_file('config.ru').first
@@ -42,7 +42,7 @@ end
 RSpec.shared_context(:rack_test) do
   include Capybara::RSpecMatchers
   include Rack::Test::Methods
-  include RSpec::Session
+  include RSpec::RackSession
 
   let(:app) { Rack::Builder.parse_file('config.ru').first }
 end

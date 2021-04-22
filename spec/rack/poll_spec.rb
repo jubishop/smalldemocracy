@@ -3,7 +3,6 @@ RSpec.describe('/poll', type: :feature) {
 
   context('/create') {
     it('makes a poll') {
-      Capybara.current_driver = Capybara.javascript_driver
       current_time = 388341770
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
