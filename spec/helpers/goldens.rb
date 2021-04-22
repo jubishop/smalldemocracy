@@ -20,8 +20,6 @@ module RSpec
       end
 
       page.driver.save_screenshot(golden_file(filename), **options)
-      puts golden_file(filename)
-      puts Git.open('.').diff.stats
       return unless Git.open('.').diff.stats[:files].key?(golden_file(filename))
 
       warn("Failed match on #{filename}".red)
