@@ -1,6 +1,8 @@
 RSpec.describe('/poll', type: :feature) {
   context('/create') {
     it('makes a poll') {
+      Capybara.current_driver = Capybara.javascript_driver
+
       email = fake_email_cookie
       visit '/poll/create'
 

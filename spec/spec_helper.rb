@@ -30,7 +30,7 @@ RSpec.shared_context(:rack_app) do
     Capybara::Apparition::Driver.new(app)
   }
   Capybara.default_max_wait_time = 5
-  Capybara.default_driver = :apparition
+  Capybara.default_driver = :rack_test
   Capybara.javascript_driver = :apparition
 
   before(:each) {
