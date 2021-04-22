@@ -11,18 +11,13 @@ module RSpec
         warn("Creating new golden: #{filename}".light_red)
         page.driver.save_screenshot(golden_file(filename), **options)
         system("open #{golden_file(filename)}")
-        Git.open('.').add(golden_file(filename))
-
-        return unless ENV.fetch('FAIL_ON_GOLDEN', false)
-
-        raise RSpec::Expectations::ExpectationNotMetError,
-              "#{filename} does not exist"
+        return
       end
 
       page.driver.save_screenshot(golden_file(filename), **options)
       return unless Git.open('.').diff.stats[:files].key?(golden_file(filename))
 
-      warn("Failed match on #{filename}".red)
+      warn("#{filename} appears to be modified".red)
       system("open #{golden_file(filename)}")
       return unless ENV.fetch('FAIL_ON_GOLDEN', false)
 
