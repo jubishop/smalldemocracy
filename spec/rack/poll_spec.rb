@@ -16,6 +16,7 @@ RSpec.describe('/poll', type: :feature) {
       fill_in 'expiration', with: current_time + 61
       click_button 'Submit'
 
+      expect(page).to(have_fontawesome)
       expect(page).to(have_selector('h1', exact_text: 'this is my title'))
       expect(page).to(have_selector('h2', exact_text: 'what is life'))
       expect(page).to(have_selector('.choice', count: 3))
@@ -23,7 +24,6 @@ RSpec.describe('/poll', type: :feature) {
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'two'))
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'three'))
       expect(page).to(have_selector('p', text: '1 minute from now'))
-      expect(page).to(have_fontawesome)
       expect(page).to(have_button(text: 'Submit Choices'))
       RSpec::Goldens.verify(page, 'poll_respond', full: true)
       click_button 'Submit Choices'

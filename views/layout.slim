@@ -8,6 +8,10 @@ html lang="en"
     ==favicon_link_tag
     ==stylesheet_link_tag :main
     ==yield_content :head
+    javascript:
+      document.fonts.load('1rem "Fira Sans"').then(() => {
+        document.documentElement.classList.add('google-fonts-loaded');
+      });
 
   body
     ==yield
