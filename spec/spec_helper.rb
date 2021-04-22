@@ -4,9 +4,10 @@ require 'colorize'
 require 'rack'
 require 'rack/test'
 
-require_relative 'helpers/goldens'
-require_relative 'helpers/session'
 require_relative 'helpers/env'
+require_relative 'helpers/goldens'
+require_relative 'helpers/matchers'
+require_relative 'helpers/session'
 
 # Basic ENV vars
 ENV['RACK_ENV'] = 'test'

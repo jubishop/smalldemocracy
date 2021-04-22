@@ -23,7 +23,7 @@ RSpec.describe('/poll', type: :feature) {
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'two'))
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'three'))
       expect(page).to(have_selector('p', text: '1 minute from now'))
-      expect(page).to(have_selector('.fontawesome-i2svg-complete'))
+      expect(page).to(have_fontawesome)
       expect(page).to(have_button(text: 'Submit Choices'))
       RSpec::Goldens.verify(page, 'poll_respond', full: true)
       click_button 'Submit Choices'
