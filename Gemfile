@@ -22,6 +22,7 @@ source 'https://www.jubigems.org' do
 end
 
 group :development do
+  gem 'apparition'
   gem 'capybara'
   gem 'rack-test'
   gem 'rake'

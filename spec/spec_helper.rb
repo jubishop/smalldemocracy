@@ -1,3 +1,4 @@
+require 'capybara/apparition'
 require 'capybara/rspec'
 require 'rack'
 require 'rack/test'
@@ -25,7 +26,12 @@ RSpec.shared_context(:rack_app) do
   Capybara.register_driver(:rack_test) { |app|
     Capybara::RackTest::Driver.new(app)
   }
-  Capybara.default_driver = :rack_test
+  Capybara.register_driver(:apparition) { |app|
+    Capybara::Apparition::Driver.new(app)
+  }
+  Capybara.default_max_wait_time = 5
+  Capybara.default_driver = :apparition
+  Capybara.javascript_driver = :apparition
 
   before(:each) {
     ENV['RACK_ENV'] = 'test'
