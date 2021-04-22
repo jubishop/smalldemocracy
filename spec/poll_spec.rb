@@ -23,6 +23,8 @@ RSpec.describe('/poll', type: :feature) {
       click_button 'Submit Choices'
 
       expect(page).to(have_content('recorded responses'))
+
+      verify_golden('poll_answers', selector: 'ol')
     }
   }
 }

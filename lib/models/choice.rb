@@ -1,7 +1,5 @@
 require 'sequel'
 
-require_relative 'poll'
-require_relative 'response'
 module Models
   class Choice < Sequel::Model
     many_to_one :poll

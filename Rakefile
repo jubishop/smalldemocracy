@@ -21,6 +21,7 @@ end
 RuboCop::RakeTask.new(:rubocop)
 RSpec::Core::RakeTask.new(:spec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
+  t.verbose
 }
 
 desc('Run rspec_n [count=20]')

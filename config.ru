@@ -4,6 +4,7 @@ require_relative 'setup'
 
 module Rack
   class SslEnforcer
+    undef_method :current_scheme
     def current_scheme
       return @request.env.fetch('HTTP_FLY_FORWARDED_PROTO', 'http')
     end

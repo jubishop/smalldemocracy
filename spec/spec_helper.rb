@@ -1,5 +1,6 @@
 require 'capybara/apparition'
 require 'capybara/rspec'
+require 'colorize'
 require 'rack'
 require 'rack/test'
 
@@ -72,15 +73,16 @@ def fake_email_cookie(email = 'test@example.com')
   return email
 end
 
-def compare_golden(filename, **options)
-  base64 = render_base64(**options)
+def verify_golden(filename, **options)
+  base64 = page.driver.render_base64(:png, **options)
 
   filepath = File.join('spec/goldens', filename)
   unless File.exist?(filepath)
-    warn("Creating new golden: #{filename}")
+    warn("Creating new golden: #{filename}".light_red)
     File.write(filepath, base64)
     return
   end
 
-  expect(File.open(filepath)).to(eq(base64), "#{filename} golden match fail")
+  expect(File.open(filepath).read).to(
+      eq(base64), "#{filename} golden match fail")
 end
