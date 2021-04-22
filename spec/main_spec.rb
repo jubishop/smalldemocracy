@@ -1,4 +1,6 @@
 RSpec.describe('/') {
+  include_context(:rack_app)
+
   context('/') {
     it('responds to / with OK status') {
       get '/'

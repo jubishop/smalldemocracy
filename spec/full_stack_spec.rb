@@ -1,4 +1,6 @@
 RSpec.describe('Full stack config.ru') {
+  include_context(:rack_app)
+
   context('/') {
     it('redirects to https in production only') {
       ENV['RACK_ENV'] = 'production'

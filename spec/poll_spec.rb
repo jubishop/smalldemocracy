@@ -1,4 +1,6 @@
 RSpec.describe('/poll', type: :feature) {
+  include_context(:rack_app)
+
   context('/create') {
     it('makes a poll') {
       Capybara.current_driver = Capybara.javascript_driver
