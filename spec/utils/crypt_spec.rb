@@ -1,4 +1,4 @@
-require_relative '../lib/utils/crypt'
+require_relative '../../lib/utils/crypt'
 
 RSpec.describe(Utils::Crypt) {
   it('encrypts and decrypts to the same thing') {

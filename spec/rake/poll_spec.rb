@@ -15,7 +15,6 @@ RSpec.describe('/poll', type: :feature) {
       fill_in 'responders', with: email
       fill_in 'choices', with: 'one, two, three'
       fill_in 'expiration', with: current_time + 61
-      RSpec::Goldens.verify(page, 'poll_create', full: true)
       click_button 'Submit'
 
       expect(page).to(have_selector('h1', exact_text: 'this is my title'))
