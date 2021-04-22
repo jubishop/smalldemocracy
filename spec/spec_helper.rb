@@ -74,6 +74,8 @@ def fake_email_cookie(email = 'test@example.com')
 end
 
 def verify_golden(filename, **options)
+  puts Dir.pwd
+  puts Dir.entries('.')
   base64 = page.driver.render_base64(:png, **options)
 
   filepath = File.join('spec/goldens', filename)
