@@ -22,7 +22,6 @@ RSpec.shared_context(:rack_app) do
   include Rack::Test::Methods
   include RSpec::Session
 
-  require_relative '../setup'
   full_stack_app = Rack::Builder.parse_file('config.ru').first
 
   let(:app) { full_stack_app }
@@ -38,11 +37,6 @@ RSpec.shared_context(:rack_app) do
   Capybara.default_max_wait_time = 5
   Capybara.default_driver = :rack_test
   Capybara.javascript_driver = :apparition
-
-  before(:each) {
-    ENV['RACK_ENV'] = 'test'
-    ENV['APP_ENV'] = 'test'
-  }
 
   after(:each) {
     Capybara.reset_sessions!
@@ -64,6 +58,14 @@ RSpec.configure do |config|
 
   config.default_formatter = 'doc' if config.files_to_run.one?
 
+  config.alias_it_should_behave_like_to :it_has_behavior, 'has behavior:'
+
   config.order = :random
   Kernel.srand(config.seed)
+
+  require_relative '../setup'
+  before(:each) {
+    ENV['RACK_ENV'] = 'test'
+    ENV['APP_ENV'] = 'test'
+  }
 end
