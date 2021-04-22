@@ -78,7 +78,7 @@ def verify_golden(filename, **options)
   puts Dir.entries('.')
   base64 = page.driver.render_base64(:png, **options)
 
-  filepath = File.join('spec/goldens', filename)
+  filepath = File.join(Dir.pwd, 'spec/goldens', filename)
   unless File.exist?(filepath)
     warn("Creating new golden: #{filename}".light_red)
     File.write(filepath, base64)
