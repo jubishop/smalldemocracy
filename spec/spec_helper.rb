@@ -25,10 +25,16 @@ RSpec.shared_context(:rack_app) do
   Capybara.register_driver(:rack_test) { |app|
     Capybara::RackTest::Driver.new(app)
   }
+  Capybara.default_driver = :rack_test
 
   before(:each) {
     ENV['RACK_ENV'] = 'test'
     ENV['APP_ENV'] = 'test'
+  }
+
+  after(:each) {
+    Capybara.reset_sessions!
+    Capybara.use_default_driver
   }
 end
 
