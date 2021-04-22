@@ -4,8 +4,6 @@ require_relative 'env'
 
 module RSpec
   class Goldens
-    @@git = Git.open('.')
-
     def self.verify(page, filename, **options)
       return if github_actions?
 
@@ -13,7 +11,7 @@ module RSpec
         warn("Creating new golden: #{filename}".light_red)
         page.driver.save_screenshot(golden_file(filename), **options)
         system("open #{golden_file(filename)}")
-        @@git.add(golden_file(filename))
+        Git.open('.').add(golden_file(filename))
 
         return unless ENV.fetch('FAIL_ON_GOLDEN', false)
 
@@ -22,7 +20,9 @@ module RSpec
       end
 
       page.driver.save_screenshot(golden_file(filename), **options)
-      return unless @@git.diff.stats.key?(golden_file(filename))
+      puts golden_file(filename)
+      puts Git.open('.').diff.stats
+      return unless Git.open('.').diff.stats[:files].key?(golden_file(filename))
 
       warn("Failed match on #{filename}".red)
       system("open #{golden_file(filename)}")
