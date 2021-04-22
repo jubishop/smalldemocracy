@@ -6,7 +6,7 @@ RSpec.describe('/poll', type: :feature) {
       current_time = 388341770
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
-      page.email_cookie = 'test@example.com'
+      page.set_cookie(:email, 'test@example.com')
       visit '/poll/create'
 
       fill_in 'title', with: 'this is my title'

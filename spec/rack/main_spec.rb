@@ -9,13 +9,13 @@ RSpec.describe('/') {
     }
 
     it('does not delete the email cookie') {
-      set_cookie('email=nomnomnom')
+      set_cookie(:email, 'nomnomnom')
       get '/'
-      expect(rack_mock_session.cookie_jar['email']).to(eq('nomnomnom'))
+      expect(get_cookie(:email)).to(eq('nomnomnom'))
     }
 
     it('welcomes user when they have email cookie') {
-      self.email_cookie = 'test@example.com'
+      set_cookie(:email, 'test@example.com')
       get '/'
       expect(last_response.body).to(include('test@example.com'))
       expect(last_response.body).to(have_link(href: '/logout'))
@@ -24,9 +24,9 @@ RSpec.describe('/') {
 
   context('/logout') {
     it('deletes the email cookie') {
-      set_cookie('email=nomnomnom')
+      set_cookie(:email, 'nomnomnom')
       get '/logout'
-      expect(rack_mock_session.cookie_jar['email']).to(eq(''))
+      expect(get_cookie(:email)).to(be_nil)
     }
   }
 }
