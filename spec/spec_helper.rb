@@ -4,6 +4,9 @@ require 'colorize'
 require 'rack'
 require 'rack/test'
 
+require_relative 'helpers/goldens'
+require_relative 'helpers/session'
+
 # Basic ENV vars
 ENV['RACK_ENV'] = 'test'
 ENV['APP_ENV'] = 'test'
@@ -14,8 +17,9 @@ ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 
 # Rack Testing Context
 RSpec.shared_context(:rack_app) do
-  include(Rack::Test::Methods)
   include(Capybara::RSpecMatchers)
+  include(Rack::Test::Methods)
+  include(RSpec::Session)
 
   require_relative '../setup'
   full_stack_app = Rack::Builder.parse_file('config.ru').first
@@ -63,33 +67,4 @@ RSpec.configure do |config|
   Kernel.srand(config.seed)
 
   config.include_context(:rack_app)
-end
-
-# Basic Helpers
-def github_actions?
-  return ENV.key?('CI')
-end
-
-def fake_email_cookie(email = 'test@example.com')
-  require_relative '../lib/helpers/cookie'
-  allow_any_instance_of(Helpers::Cookie).to(
-      receive(:fetch_email).and_return(email))
-  return email
-end
-
-def verify_golden(filename, **options)
-  return if github_actions?
-
-  base64 = page.driver.render_base64(:png, **options)
-
-  filepath = File.join(Dir.pwd, 'spec/goldens', filename)
-  unless File.exist?(filepath)
-    warn("Creating new golden: #{filename}".light_red)
-    File.write(filepath, base64)
-    save_screenshot("#{filepath}.png", **options)
-    return
-  end
-
-  expect(File.open(filepath).read).to(
-      eq(base64), "#{filename} golden match fail")
 end

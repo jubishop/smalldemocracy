@@ -24,7 +24,7 @@ RSpec.describe('/poll', type: :feature) {
 
       expect(page).to(have_content('recorded responses'))
 
-      verify_golden('poll_answers', selector: 'ol')
+      RSpec::Goldens.verify(page, 'poll_answers', selector: 'ol')
     }
   }
 }
