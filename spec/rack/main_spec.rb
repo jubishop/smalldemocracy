@@ -17,7 +17,7 @@ RSpec.describe('/') {
     it('welcomes user when they have email cookie') {
       set_cookie(:email, 'test@example.com')
       get '/'
-      expect(last_response.body).to(include('test@example.com'))
+      expect(last_response.body).to(have_content('test@example.com'))
       expect(last_response.body).to(have_link(href: '/logout'))
     }
   }
