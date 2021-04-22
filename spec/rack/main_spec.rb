@@ -15,7 +15,7 @@ RSpec.describe('/') {
     }
 
     it('welcomes user when they have email cookie') {
-      email = fake_email_cookie
+      email = set_email_cookie
       get '/'
       expect(last_response.body).to(include(email))
       expect(last_response.body).to(have_link(href: '/logout'))
