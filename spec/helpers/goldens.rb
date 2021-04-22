@@ -1,3 +1,5 @@
+require 'chunky_png'
+
 require_relative 'env'
 
 module RSpec
@@ -5,18 +7,24 @@ module RSpec
     def self.verify(page, filename, **options)
       return if github_actions?
 
-      base64 = page.driver.render_base64(:png, **options)
-
-      unless File.exist?(base64_file(filename))
+      unless File.exist?(golden_file(filename))
         warn("Creating new golden: #{filename}".light_red)
-        write_goldens(page, filename, base64, **options)
+        write_goldens(page, filename, **options)
         return
       end
 
-      return if File.open(base64_file(filename)).read == base64
+      page.driver.save_screenshot(tmp_file(filename), **options)
+      golden_screenshot = ChunkyPNG::Image.from_file(golden_file(filename))
+      new_screenshot = ChunkyPNG::Image.from_file(tmp_file(filename))
+      0.upto(golden_screenshot.height - 1) { |y|
+        golden_screenshot.row(y).each_with_index { |pixel, x|
+          next if pixel == new_screenshot[x, y]
 
-      warn("Golden match fail, replacing: #{filename}".red)
-      write_goldens(page, filename, base64, **options)
+          warn("Fail at pixel [#{x}, #{y}] replacing: #{filename}".red)
+          write_goldens(page, filename, **options)
+          return true
+        }
+      }
     end
 
     class << self
@@ -25,26 +33,21 @@ module RSpec
 
       private
 
-      def write_goldens(page, filename, base64, **options)
-        File.write(base64_file(filename), base64)
-        page.driver.save_screenshot(png_file(filename), **options)
-        system("open #{png_file(filename)}")
-        if ENV.fetch('FAIL_ON_GOLDEN', false)
-          raise RSpec::Expectations::ExpectationNotMetError,
+      def write_goldens(page, filename, **options)
+        page.driver.save_screenshot(golden_file(filename), **options)
+        system("open #{golden_file(filename)}")
+        return unless ENV.fetch('FAIL_ON_GOLDEN', false)
+
+        raise RSpec::Expectations::ExpectationNotMetError,
               "#{filename} does not match"
-        end
       end
 
-      def png_file(filename)
-        File.join(golden_path, 'images', "#{filename}.png")
+      def tmp_file(filename)
+        return File.join(ENV.fetch('TMPDIR', '/tmp'), "#{filename}.png")
       end
 
-      def base64_file(filename)
-        File.join(golden_path, 'base64', filename)
-      end
-
-      def golden_path
-        File.join(Dir.pwd, 'spec/goldens')
+      def golden_file(filename)
+        return File.join(Dir.pwd, 'spec/goldens', "#{filename}.png")
       end
     end
   end

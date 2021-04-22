@@ -24,6 +24,7 @@ end
 group :development do
   gem 'apparition'
   gem 'capybara'
+  gem 'chunky_png'
   gem 'colorize'
   gem 'open3'
   gem 'rack-test'
