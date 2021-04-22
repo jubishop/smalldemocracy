@@ -20,10 +20,10 @@ RSpec.describe(Models::Poll) {
 
     it('creates a poll with arrays') {
       poll = Models::Poll.create_poll(**basic_options,
-                                      choices: ['one', 'two', 'three'],
-                                      responders: ['a@b', 'b@c', 'c@d'])
-      expect(poll.choices.map(&:text)).to(match_array(%w[one two three]))
-      expect(poll.responders.map(&:email)).to(match_array(%w[a@b b@c c@d]))
+                                      choices: %w[four five six],
+                                      responders: ['d@e', 'e@f', 'f@g'])
+      expect(poll.choices.map(&:text)).to(match_array(%w[four five six]))
+      expect(poll.responders.map(&:email)).to(match_array(%w[d@e e@f f@g]))
     }
   }
 }
