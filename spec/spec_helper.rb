@@ -64,7 +64,7 @@ RSpec.configure do |config|
   Kernel.srand(config.seed)
 
   require_relative '../setup'
-  before(:each) {
+  config.before(:each) {
     ENV['RACK_ENV'] = 'test'
     ENV['APP_ENV'] = 'test'
   }
