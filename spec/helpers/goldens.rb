@@ -1,3 +1,5 @@
+require_relative 'env'
+
 module RSpec
   class Goldens
     def self.verify(page, filename, **options)
@@ -22,12 +24,9 @@ module RSpec
 
     class << self
       include RSpec::Matchers
+      include RSpec::Env
 
       private
-
-      def github_actions?
-        return ENV.key?('CI')
-      end
 
       def write_goldens(page, filename, base64, **options)
         File.write(base64_file(filename), base64)

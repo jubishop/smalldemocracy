@@ -6,6 +6,7 @@ require 'rack/test'
 
 require_relative 'helpers/goldens'
 require_relative 'helpers/session'
+require_relative 'helpers/env'
 
 # Basic ENV vars
 ENV['RACK_ENV'] = 'test'
@@ -17,9 +18,9 @@ ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 
 # Rack Testing Context
 RSpec.shared_context(:rack_app) do
-  include(Capybara::RSpecMatchers)
-  include(Rack::Test::Methods)
-  include(RSpec::Session)
+  include Capybara::RSpecMatchers
+  include Rack::Test::Methods
+  include RSpec::Session
 
   require_relative '../setup'
   full_stack_app = Rack::Builder.parse_file('config.ru').first
