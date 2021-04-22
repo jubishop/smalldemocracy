@@ -16,32 +16,35 @@ ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
 ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 
-# Rack Testing Context
-RSpec.shared_context(:rack_app) do
+RSpec.shared_context(:apparition) do
   include Capybara::RSpecMatchers
-  include Rack::Test::Methods
   include RSpec::Session
 
-  full_stack_app = Rack::Builder.parse_file('config.ru').first
-
-  let(:app) { full_stack_app }
-
   Capybara.server = :puma
-  Capybara.app = full_stack_app
-  Capybara.register_driver(:rack_test) { |app|
-    Capybara::RackTest::Driver.new(app)
-  }
+  Capybara.app = Rack::Builder.parse_file('config.ru').first
   Capybara.register_driver(:apparition) { |app|
     Capybara::Apparition::Driver.new(app)
   }
   Capybara.default_max_wait_time = 5
-  Capybara.default_driver = :rack_test
+  Capybara.default_driver = :apparition
   Capybara.javascript_driver = :apparition
+
+  before(:each) {
+    page.driver.headers = { Origin: 'http://localhost' }
+  }
 
   after(:each) {
     Capybara.reset_sessions!
     Capybara.use_default_driver
   }
+end
+
+RSpec.shared_context(:rack_test) do
+  include Capybara::RSpecMatchers
+  include Rack::Test::Methods
+  include RSpec::Session
+
+  let(:app) { Rack::Builder.parse_file('config.ru').first }
 end
 
 RSpec.configure do |config|

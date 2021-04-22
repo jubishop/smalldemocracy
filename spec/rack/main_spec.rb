@@ -1,5 +1,5 @@
 RSpec.describe('/') {
-  include_context(:rack_app)
+  include_context(:rack_test)
 
   context('/') {
     it('responds to / with OK status') {

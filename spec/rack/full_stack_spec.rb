@@ -1,5 +1,5 @@
 RSpec.describe('Full stack config.ru') {
-  include_context(:rack_app)
+  include_context(:rack_test)
 
   context('/') {
     it('redirects to https in production only') {

@@ -1,13 +1,11 @@
 RSpec.describe('/poll', type: :feature) {
-  include_context(:rack_app)
+  include_context(:apparition)
 
   context('/create') {
     it('makes a poll') {
       Capybara.current_driver = Capybara.javascript_driver
       current_time = 388341770
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
-
-      page.driver.headers = { Origin: 'http://localhost' }
 
       email = set_email_cookie(page: page)
       visit '/poll/create'
