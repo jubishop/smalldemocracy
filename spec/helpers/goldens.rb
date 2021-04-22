@@ -16,7 +16,6 @@ module RSpec
       return if File.open(base64_file(filename)).read == base64
 
       write_goldens(page, filename, base64, **options)
-      system("open #{png_file(filename)}")
 
       raise(RSpec::Expectations::ExpectationNotMetError,
             "Golden match fail, replacing: #{filename}")
@@ -31,6 +30,7 @@ module RSpec
       def write_goldens(page, filename, base64, **options)
         File.write(base64_file(filename), base64)
         page.driver.save_screenshot(png_file(filename), **options)
+        system("open #{png_file(filename)}")
       end
 
       def png_file(filename)

@@ -20,11 +20,11 @@ RSpec.describe('/poll', type: :feature) {
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'two'))
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'three'))
       expect(page).to(have_selector('p', text: '1 minute from now'))
+      RSpec::Goldens.verify(page, 'poll_respond', selector: 'ul')
       click_button 'Submit Choices'
 
       expect(page).to(have_content('recorded responses'))
-
-      RSpec::Goldens.verify(page, 'poll_answers', selector: 'ol')
+      RSpec::Goldens.verify(page, 'poll_responded', selector: 'ol')
     }
   }
 }
