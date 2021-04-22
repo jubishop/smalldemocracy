@@ -85,6 +85,5 @@ def verify_golden(filename, **options)
     return
   end
 
-  expect(File.open(filepath).read).to(
-      eq(base64), "#{filename} golden match fail")
+  expect(File.open(filepath).read).to(eq(base64))
 end
