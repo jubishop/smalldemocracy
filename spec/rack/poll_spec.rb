@@ -7,6 +7,8 @@ RSpec.describe('/poll', type: :feature) {
       current_time = 388341770
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
+      page.driver.headers = { Origin: 'http://localhost' }
+
       email = set_email_cookie(page: page)
       visit '/poll/create'
 
