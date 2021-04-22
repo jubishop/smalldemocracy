@@ -36,8 +36,6 @@ task(:rspec_n, [:count]) { |_, args|
       print(char)
     end
   end
-  # results = `bundle exec rspec_n #{args[:count]} -s`
-  # puts results
 
   failures = results.uncolorize.match(/Runs Failed:\s+(\d+)/)[1].to_i
   if failures.positive?
