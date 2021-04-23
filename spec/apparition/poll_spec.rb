@@ -7,49 +7,31 @@ RSpec.describe('/poll', type: :feature) {
     RSpec::Goldens.verify(page, filename, full: true)
   end
 
-  context('/create') {
-    def create_poll(email:, time: Time.now.to_i + 10)
-      visit('/poll/create')
-      fill_in('title', with: 'this is my title')
-      fill_in('question', with: 'what is life')
-      fill_in('responders', with: email)
-      fill_in('choices', with: 'one, two, three')
-      fill_in('expiration', with: time)
-      click_button('Submit')
-    end
+  it('supports full poll lifecycle') {
+    current_time = 388341770
+    allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
-    it('kicks off a full poll lifecycle') {
-      current_time = 388341770
-      allow(Time).to(receive(:now).and_return(Time.at(current_time)))
+    # Create a poll
+    page.set_cookie(:email, 'test@example.com')
+    visit('/poll/create')
+    fill_in('title', with: 'this is my title')
+    fill_in('question', with: 'what is life')
+    fill_in('responders', with: 'test@example.com')
+    fill_in('choices', with: 'one, two, three')
+    fill_in('expiration', with: current_time + 61)
+    click_button('Submit')
 
-      # Create a poll
-      page.set_cookie(:email, 'test@example.com')
-      create_poll(email: 'test@example.com', time: current_time + 61)
+    # Fill in poll choices
+    verify_poll_page('poll_respond')
+    click_button 'Submit Choices'
 
-      # Fill in poll choices
-      verify_poll_page('poll_respond')
-      click_button 'Submit Choices'
+    # See recorded responses
+    RSpec::Goldens.verify(page, 'poll_responded', full: true)
 
-      # See recorded responses
-      RSpec::Goldens.verify(page, 'poll_responded', full: true)
-
-      # See finished poll results
-      allow(Time).to(receive(:now).and_return(Time.at(current_time + 62)))
-      refresh
-      RSpec::Goldens.verify(page, 'poll_finished', full: true)
-    }
-
-    it('asks for email when not in poll') {
-      # Create a poll with different email cookie
-      page.set_cookie(:email, 'someoneelse@example.com')
-      create_poll(email: 'test@example.com')
-      RSpec::Goldens.verify(page, 'poll_email_not_in_poll', full: true)
-
-      # Remove cookie and still see email is needed
-      page.delete_cookie(:email)
-      refresh
-      RSpec::Goldens.verify(page, 'poll_email_needed', full: true)
-    }
+    # See finished poll results
+    allow(Time).to(receive(:now).and_return(Time.at(current_time + 62)))
+    refresh
+    RSpec::Goldens.verify(page, 'poll_finished', full: true)
   }
 
   context('/view') {
@@ -60,6 +42,19 @@ RSpec.describe('/poll', type: :feature) {
                                       choices: 'one, two, three',
                                       responders: 'a@a')
     end
+
+    it('asks for email when not in poll') {
+      # Create a poll but email cookie not in responders.
+      page.set_cookie(:email, 'other@example.com')
+      poll = create_poll
+      visit("/poll/view/#{poll.id}")
+      RSpec::Goldens.verify(page, 'poll_email_not_in_poll', full: true)
+
+      # Remove cookie and still see email is needed
+      page.delete_cookie(:email)
+      refresh
+      RSpec::Goldens.verify(page, 'poll_email_needed', full: true)
+    }
 
     it('logs you in when responder salt is in query') {
       current_time = 388341770
