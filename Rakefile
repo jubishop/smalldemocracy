@@ -19,8 +19,17 @@ namespace :db do
 end
 
 RuboCop::RakeTask.new(:rubocop)
+
+desc('Run all rspec tests')
 RSpec::Core::RakeTask.new(:spec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
+  t.verbose
+}
+
+desc('Run spec excluding apparition tests')
+RSpec::Core::RakeTask.new(:fspec) { |t|
+  t.pattern = Dir.glob('spec/**/*_spec.rb')
+  t.rspec_opts = '-t ~type:feature'
   t.verbose
 }
 
@@ -49,3 +58,4 @@ task(:rspec_n, [:count]) { |_, args|
 }
 
 task default: %w[rubocop:auto_correct spec]
+task fast: %w[rubocop:auto_correct fspec]
