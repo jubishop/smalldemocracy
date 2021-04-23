@@ -71,6 +71,7 @@ RSpec.describe('/poll', type: :feature) {
       visit("/poll/view/#{poll.id}?responder=#{salt}")
 
       # See poll
+      expect(page.get_cookie(:email)).to(eq('a@a'))
       verify_poll_page('poll_salt_logged_in')
 
       # Visit with improper salt and see login
