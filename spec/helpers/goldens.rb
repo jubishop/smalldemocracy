@@ -1,5 +1,3 @@
-require 'git'
-
 require_relative 'env'
 
 module RSpec
