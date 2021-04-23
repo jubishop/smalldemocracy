@@ -36,6 +36,9 @@ RSpec.describe('/poll') {
       }
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(201))
+
+      allow(Time).to(receive(:now).and_return(Time.at(10**10)))
+      expect(poll.results.map(&:text)).to(eq(poll.choices.map(&:text)))
     }
 
     it('rejects posting to an already responded poll') {
