@@ -8,7 +8,7 @@ RSpec.describe('/poll') {
       expect(last_response.body).to(have_content('Email Not Found'))
     }
 
-    it('shows poll if you have an email cookie') {
+    it('shows poll creation form if you have an email cookie') {
       set_cookie(:email, 'test@example.com')
       get '/poll/create'
       expect(last_response.ok?).to(be(true))

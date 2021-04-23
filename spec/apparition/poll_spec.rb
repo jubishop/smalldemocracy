@@ -2,6 +2,7 @@ RSpec.describe('/poll', type: :feature) {
   include_context(:apparition)
 
   def verify_poll_page(filename)
+    expect(page).to(have_fontawesome)
     expect(page).to(have_button(text: 'Submit Choices'))
     RSpec::Goldens.verify(page, filename, full: true)
   end
