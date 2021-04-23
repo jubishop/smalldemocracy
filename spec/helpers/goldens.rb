@@ -27,6 +27,13 @@ module RSpec
             "#{filename} does not match"
     end
 
+    def self.view(page, filename, **options)
+      expect(page).to(have_googlefonts)
+      tmp_file = File.join(ENV.fetch('TMPDIR', '/tmp'), "#{filename}.png")
+      page.driver.save_screenshot(tmp_file, **options)
+      system("open #{tmp_file}")
+    end
+
     class << self
       include Capybara::RSpecMatchers
       include RSpec::Env
