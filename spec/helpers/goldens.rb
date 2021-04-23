@@ -7,17 +7,21 @@ module RSpec
     def self.verify(page, filename, **options)
       return if github_actions?
 
-      unless File.exist?(golden_file(filename))
-        warn("Creating new golden: #{filename}".light_red)
+      expect(page).to(have_googlefonts)
+
+      unless File.exist?(base64_file(filename))
+        warn("Creating new golden for: #{filename}".light_red)
         write_golden(page, filename, **options)
         system("open #{golden_file(filename)}")
         return
       end
 
-      write_golden(page, filename, **options)
-      return unless Git.open('.').diff.stats[:files].key?(golden_file(filename))
+      golden_base64 = File.read(base64_file(filename))
+      new_base64 = page.driver.render_base64(:png, **options)
+      return if golden_base64 == new_base64
 
-      warn("#{filename} appears to be modified".red)
+      warn("Golden match failed for: #{filename}".red)
+      write_golden(page, filename, **options)
       system("open #{golden_file(filename)}")
       return unless ENV.fetch('FAIL_ON_GOLDEN', false)
 
@@ -33,12 +37,17 @@ module RSpec
       private
 
       def write_golden(page, filename, **options)
-        expect(page).to(have_googlefonts)
+        File.write(base64_file(filename),
+                   page.driver.render_base64(:png, **options))
         page.driver.save_screenshot(golden_file(filename), **options)
       end
 
       def golden_file(filename)
         return File.join('spec/goldens', "#{filename}.png")
+      end
+
+      def base64_file(filename)
+        return File.join('spec/goldens/base64', filename)
       end
     end
   end
