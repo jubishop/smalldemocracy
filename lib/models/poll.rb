@@ -30,8 +30,8 @@ module Models
     end
 
     def before_create
-      super
       self.id = SecureRandom.urlsafe_base64(16)
+      super
     end
 
     def responder(**options)

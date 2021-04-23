@@ -38,17 +38,17 @@ RSpec.describe(Models::Poll) {
 
     it('computes results properly') {
       choices = %w[one two three four]
-      responders = %w[a b c d]
+      responders = %w[a@a b@b c@c d@d]
       allow(Time).to(receive(:now).and_return(Time.now + 100))
       poll = Models::Poll.create_poll(**basic_options,
                                       choices: choices,
                                       responders: responders)
 
       responses = {
-        a: %w[one two three four],
-        b: %w[one two four three],
-        c: %w[three one two four],
-        d: %w[four two three one]
+        'a@a': %w[one two three four],
+        'b@b': %w[one two four three],
+        'c@c': %w[three one two four],
+        'd@d': %w[four two three one]
       }
       responses.each { |email, ranks|
         responder = poll.responder(email: email.to_s)

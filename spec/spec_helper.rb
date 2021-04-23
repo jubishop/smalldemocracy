@@ -23,7 +23,9 @@ RSpec.shared_context(:apparition) do
   Capybara.server = :puma
   Capybara.app = Rack::Builder.parse_file('config.ru').first
   Capybara.register_driver(:apparition) { |app|
-    Capybara::Apparition::Driver.new(app)
+    Capybara::Apparition::Driver.new(app, {
+      headless: !ENV.fetch('CHROME_DEBUG', false)
+    })
   }
   Capybara.default_max_wait_time = 5
   Capybara.default_driver = :apparition
