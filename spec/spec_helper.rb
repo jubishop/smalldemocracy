@@ -7,7 +7,7 @@ require 'rack/test'
 require_relative 'helpers/env'
 require_relative 'helpers/goldens'
 require_relative 'helpers/matchers'
-require_relative 'helpers/session'
+require_relative 'helpers/cookies'
 
 # Basic ENV vars
 ENV['RACK_ENV'] = 'test'
@@ -42,7 +42,7 @@ end
 RSpec.shared_context(:rack_test) do
   include Capybara::RSpecMatchers
   include Rack::Test::Methods
-  include RSpec::RackSession
+  include RSpec::RackCookies
 
   let(:app) { Rack::Builder.parse_file('config.ru').first }
 end
