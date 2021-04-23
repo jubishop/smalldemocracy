@@ -69,7 +69,7 @@ RSpec.describe('/poll', type: :feature) {
                                       question: 'question',
                                       expiration: Time.now.to_i + 62,
                                       choices: 'one, two, three',
-                                      responders: 'a@a, b@b, c@c')
+                                      responders: 'a@a')
 
       # Visit with salt of proper user
       salt = poll.responder(email: 'a@a').salt
@@ -79,6 +79,11 @@ RSpec.describe('/poll', type: :feature) {
       expect(page).to(have_googlefonts)
       expect(page).to(have_button(text: 'Submit Choices'))
       RSpec::Goldens.verify(page, 'poll_salt_logged_in', full: true)
+
+      # Visit with improper salt and see login
+      visit("/poll/view/#{poll.id}?responder=not_real_salt")
+      expect(page).to(have_googlefonts)
+      RSpec::Goldens.verify(page, 'poll_incorrect_responder', full: true)
     }
   }
 }
