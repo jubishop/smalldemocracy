@@ -25,7 +25,6 @@ group :development do
   gem 'apparition'
   gem 'capybara'
   gem 'colorize'
-  gem 'git'
   gem 'open3'
   gem 'rack-test'
   gem 'rake'
