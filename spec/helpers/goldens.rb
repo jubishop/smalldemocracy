@@ -3,6 +3,8 @@ require_relative 'env'
 module RSpec
   class Goldens
     def self.verify(page, filename, **options)
+      return if github_actions?
+
       expect(page).to(have_googlefonts)
 
       unless File.exist?(base64_file(filename))
