@@ -37,7 +37,6 @@ RSpec.shared_context(:apparition) do
 
   after(:each) {
     Capybara.reset_sessions!
-    Capybara.use_default_driver
   }
 end
 
@@ -47,6 +46,10 @@ RSpec.shared_context(:rack_test) do
   include RSpec::RackCookies
 
   let(:app) { Rack::Builder.parse_file('config.ru').first }
+
+  after(:each) {
+    clear_cookies
+  }
 end
 
 RSpec.configure do |config|
