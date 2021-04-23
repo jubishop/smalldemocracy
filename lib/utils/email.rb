@@ -5,6 +5,8 @@ require_relative 'async'
 module Utils
   module Email
     def self.email(poll, responder)
+      return if ENV.fetch('APP_ENV') == 'test'
+
       from = SendGrid::Email.new(name: 'JubiVote',
                                  email: 'support@jubivote.com')
       to = SendGrid::Email.new(email: responder.email)

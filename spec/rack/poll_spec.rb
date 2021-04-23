@@ -1,6 +1,11 @@
 RSpec.describe('/poll', type: :feature) {
   include_context(:apparition)
 
+  def verify_poll_page(filename)
+    expect(page).to(have_button(text: 'Submit Choices'))
+    RSpec::Goldens.verify(page, filename, full: true)
+  end
+
   context('/create') {
     def create_poll(email:, time: Time.now.to_i + 10)
       visit('/poll/create')
@@ -29,8 +34,7 @@ RSpec.describe('/poll', type: :feature) {
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'two'))
       expect(page).to(have_selector('.choice', count: 1, exact_text: 'three'))
       expect(page).to(have_selector('p', text: '1 minute from now'))
-      expect(page).to(have_button(text: 'Submit Choices'))
-      RSpec::Goldens.verify(page, 'poll_respond', full: true)
+      verify_poll_page('poll_respond')
       click_button 'Submit Choices'
 
       # See recorded responses
@@ -49,7 +53,7 @@ RSpec.describe('/poll', type: :feature) {
       page.set_cookie(:email, 'someoneelse@example.com')
       create_poll(email: 'test@example.com')
       expect(page).to(have_selector('h1', exact_text: 'Need Email'))
-      RSpec::Goldens.verify(page, 'poll_email_needed', full: true)
+      RSpec::Goldens.verify(page, 'poll_email_not_in_poll', full: true)
 
       # Remove cookie and still see email is needed
       page.delete_cookie(:email)
@@ -60,30 +64,45 @@ RSpec.describe('/poll', type: :feature) {
   }
 
   context('/view') {
-    it('logs you in when responder salt is in query') {
-      current_time = 388341770
-      allow(Time).to(receive(:now).and_return(Time.at(current_time)))
-
-      # Create a poll
-      poll = Models::Poll.create_poll(title: 'title',
+    def create_poll
+      return Models::Poll.create_poll(title: 'title',
                                       question: 'question',
                                       expiration: Time.now.to_i + 62,
                                       choices: 'one, two, three',
                                       responders: 'a@a')
+    end
+
+    it('logs you in when responder salt is in query') {
+      current_time = 388341770
+      allow(Time).to(receive(:now).and_return(Time.at(current_time)))
+      poll = create_poll
 
       # Visit with salt of proper user
       salt = poll.responder(email: 'a@a').salt
       visit("/poll/view/#{poll.id}?responder=#{salt}")
 
       # See poll
-      expect(page).to(have_googlefonts)
-      expect(page).to(have_button(text: 'Submit Choices'))
-      RSpec::Goldens.verify(page, 'poll_salt_logged_in', full: true)
+      verify_poll_page('poll_salt_logged_in')
 
       # Visit with improper salt and see login
       visit("/poll/view/#{poll.id}?responder=not_real_salt")
-      expect(page).to(have_googlefonts)
       RSpec::Goldens.verify(page, 'poll_incorrect_responder', full: true)
+    }
+
+    it('sends email when valid email given') {
+      poll = create_poll
+      visit("/poll/view/#{poll.id}")
+      fill_in('email', with: 'a@a')
+      click_button('Submit')
+      RSpec::Goldens.verify(page, 'poll_valid_email_submitted', full: true)
+    }
+
+    it('complains when invalid email given') {
+      poll = create_poll
+      visit("/poll/view/#{poll.id}")
+      fill_in('email', with: 'poop@hey')
+      click_button('Submit')
+      RSpec::Goldens.verify(page, 'poll_invalid_email_submitted', full: true)
     }
   }
 }
