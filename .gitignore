@@ -7,6 +7,7 @@
 .rubocop-https*
 
 Gemfile.lock
+rspec_n_iteration*
 tmp/
 
 *.DS_Store
