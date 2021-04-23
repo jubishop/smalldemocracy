@@ -12,7 +12,13 @@ class Poll < Base
 
   post('/create') {
     require_email
-    poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
+    begin
+      poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
+    rescue ArgumentError
+      halt(406, 'Not all poll fields provided')
+    rescue Sequel::CheckConstraintViolation
+      halt(406, 'Poll fields cannot be empty')
+    end
     return redirect("/poll/view/#{poll.id}")
   }
 

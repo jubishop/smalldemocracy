@@ -8,6 +8,7 @@ Sequel.migration {
 
       String :text, null: false
       unique %i[poll_id text]
+      constraint(:text_not_empty) { Sequel.char_length(text) >= 1 }
     }
   }
 }

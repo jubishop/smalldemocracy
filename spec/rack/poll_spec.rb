@@ -18,6 +18,40 @@ RSpec.describe('/poll') {
     }
   }
 
+  context('post /create') {
+    it('rejects any post without a cookie') {
+      post '/poll/create'
+      expect(last_response.ok?).to(be(false))
+      expect(last_response.body).to(have_content('Email Not Found'))
+    }
+
+    it('creates a new poll successfully') {
+      set_cookie(:email, 'test@example.com')
+      post '/poll/create', title: 'title',
+                           question: 'question',
+                           choices: 'one, two, three',
+                           responders: 'test@example.com',
+                           expiration: 10**10
+      expect(last_response.redirect?).to(be(true))
+      follow_redirect!
+      expect(last_response.ok?).to(be(true))
+      expect(last_response.body).to(have_selector('ul#choices'))
+    }
+
+    it('fails if any fields are empty or missing') {
+      set_cookie(:email, 'test@example.com')
+      post '/poll/create', title: 'title'
+      expect(last_response.status).to(be(406))
+
+      post '/poll/create', title: 'title',
+                           question: 'question',
+                           choices: '',
+                           responders: '',
+                           expiration: 0
+      expect(last_response.status).to(be(406))
+    }
+  }
+
   context('post /respond') {
     def create_poll
       return Models::Poll.create_poll(title: 'title',

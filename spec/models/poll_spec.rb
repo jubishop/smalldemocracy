@@ -31,8 +31,8 @@ RSpec.describe(Models::Poll) {
     it('returns no results if the poll is not expired') {
       allow(Time).to(receive(:now).and_return(Time.at(0)))
       poll = Models::Poll.create_poll(**basic_options,
-                                      choices: [],
-                                      responders: [])
+                                      choices: 'a',
+                                      responders: 'b@b')
       expect(poll.results).to(be_falsey)
     }
 

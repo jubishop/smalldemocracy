@@ -17,11 +17,15 @@ module Models
       poll = create(title: title, question: question, expiration: expiration)
 
       choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)
+      raise ArgumentError, 'There must be some choices' if choices.empty?
+
       choices.each { |choice|
         poll.add_choice(text: choice)
       }
 
       responders = responders.strip.split(/\s*,\s*/) if responders.is_a?(String)
+      raise ArgumentError, 'There must be some responders' if responders.empty?
+
       responders.each { |responder|
         poll.add_responder(email: responder)
       }
