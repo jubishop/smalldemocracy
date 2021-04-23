@@ -31,7 +31,6 @@ class Admin < Base
     poll = require_poll
 
     poll.responders.each { |responder|
-      logger.info("Now emailing: #{responder.email}")
       Utils::Email.email(poll, responder)
     }
 

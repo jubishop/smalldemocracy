@@ -20,7 +20,7 @@ class Base < Sinatra::Base
   set(views: 'views')
   set(:cookie_options, expires: Time.at(2**31 - 1), path: '/')
 
-  configure(:production, :development) {
+  configure(:development) {
     enable :logging
   }
 

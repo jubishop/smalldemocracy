@@ -47,7 +47,6 @@ class Poll < Base
     responder = poll.responder(email: params.fetch(:email))
     halt(404, slim_email(:responder_not_found)) unless responder
 
-    logger.info("Now emailing: #{responder.email}")
     Utils::Email.email(poll, responder)
     return slim_email(:sent)
   }
