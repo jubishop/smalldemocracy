@@ -53,16 +53,28 @@ class Poll < Base
   }
 
   post('/respond') {
-    params = JSON.parse(request.body.read).symbolize_keys
+    begin
+      params = JSON.parse(request.body.read).symbolize_keys
+    rescue JSON::ParserError
+      halt(400, 'Invalid JSON body')
+    end
 
+    halt(400, 'No poll_id provided') unless params.key?(:poll_id)
     poll = Models::Poll[params.fetch(:poll_id)]
     halt(404, 'Poll not found') unless poll
 
+    halt(400, 'No responder provided') unless params.key?(:responder)
     responder = poll.responder(salt: params.fetch(:responder))
     halt(404, 'Responder not found') unless responder
 
+    halt(400, 'No responses provided') unless params.key?(:responses)
+    responses = params.fetch(:responses)
+    unless responses.length == poll.choices.length
+      halt(406, 'Response set does not match number of choices')
+    end
+
     begin
-      params.fetch(:responses).each_with_index { |choice_id, rank|
+      responses.each_with_index { |choice_id, rank|
         responder.add_response(choice_id: choice_id, rank: rank)
       }
     rescue Sequel::UniqueConstraintViolation

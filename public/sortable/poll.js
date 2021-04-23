@@ -24,7 +24,8 @@ window.addEventListener('DOMContentLoaded', () => {
         poll_id: pollID,
         responder: responderSalt,
         responses: sortable.toArray()
-      })
+      }),
+      headers: { 'Content-Type': 'application/json' }
     }).then(res => {
       if (res.status == 201) {
         location.reload();
