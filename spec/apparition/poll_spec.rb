@@ -34,7 +34,7 @@ RSpec.describe('/poll', type: :feature) {
     RSpec::Goldens.verify(page, 'poll_finished', full: true)
   }
 
-  context('/view') {
+  context('poll') {
     def create_poll
       return Models::Poll.create_poll(title: 'title',
                                       question: 'question',
