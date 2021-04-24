@@ -29,7 +29,7 @@ RSpec::Core::RakeTask.new(:spec) { |t|
 desc('Run spec excluding apparition tests')
 RSpec::Core::RakeTask.new(:fspec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
-  t.rspec_opts = '-t ~js'
+  t.rspec_opts = '-t ~type:feature'
   t.verbose
 }
 

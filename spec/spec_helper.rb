@@ -17,52 +17,43 @@ ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
 ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 
-#####################################
-# CAPYBARA
-#####################################
 Capybara.server = :puma
 Capybara.app = Rack::Builder.parse_file('config.ru').first
+Capybara.default_max_wait_time = 5
 
-Capybara.register_driver(:rack_test) { |app|
-  Capybara::RackTest::Driver.new(app, {
-    headers: { Origin: 'http://localhost' }
-  })
-}
 Capybara.register_driver(:apparition) { |app|
   Capybara::Apparition::Driver.new(app, {
     headless: !ENV.fetch('CHROME_DEBUG', false),
     headers: { Origin: 'http://localhost' }
   })
 }
+Capybara.default_driver = :apparition
 
-Capybara.default_max_wait_time = 5
-Capybara.default_driver = :rack_test
-Capybara.javascript_driver = :apparition
+RSpec.shared_context(:apparition) do
+  include Capybara::RSpecMatchers
 
-RSpec.shared_context(:capybara) do
+  before(:each) {
+    page.driver.headers = { Origin: 'http://localhost' }
+  }
+
+  after(:each) {
+    page.clear_cookies
+    Capybara.reset_sessions!
+  }
+end
+
+RSpec.shared_context(:rack_test) do
   include Capybara::RSpecMatchers
   include Rack::Test::Methods
   include RSpec::RackCookies
 
   let(:app) { Capybara.app }
 
-  before(:each, js: true) {
-    page.driver.headers = { Origin: 'http://localhost' }
-  }
-
-  after(:each, js: true) {
-    page.clear_cookies
-  }
-
   after(:each) {
-    Capybara.reset_sessions!
     clear_cookies
   }
 end
 
-#####################################
-# CONFIGURE
-#####################################
 RSpec.configure do |config|
   config.expect_with(:rspec) do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -79,6 +70,9 @@ RSpec.configure do |config|
 
   config.order = :random
   Kernel.srand(config.seed)
+
+  config.include_context(:apparition, type: :feature)
+  config.include_context(:rack_test, type: :rack_test)
 
   require_relative '../setup'
   config.before(:each) {

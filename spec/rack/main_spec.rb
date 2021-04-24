@@ -1,6 +1,4 @@
-RSpec.describe('/', type: :feature) {
-  include_context(:capybara)
-
+RSpec.describe('/', type: :rack_test) {
   context('/') {
     it('responds to / with OK status') {
       get '/'

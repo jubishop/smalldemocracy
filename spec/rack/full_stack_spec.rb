@@ -1,6 +1,4 @@
-RSpec.describe('Full stack config.ru', type: :feature) {
-  include_context(:capybara)
-
+RSpec.describe('Full stack config.ru', type: :rack_test) {
   context('/') {
     it('redirects to https in production only') {
       ENV['RACK_ENV'] = 'production'

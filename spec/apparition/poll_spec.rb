@@ -1,6 +1,4 @@
-RSpec.describe('/poll', type: :feature, js: true) {
-  include_context(:capybara)
-
+RSpec.describe('/poll', type: :feature) {
   def verify_poll_page(filename)
     expect(page).to(have_fontawesome)
     expect(page).to(have_button(text: 'Submit Choices'))
