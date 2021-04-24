@@ -21,7 +21,7 @@ module Capybara
 end
 
 module RSpec
-  module RackCookies
+  module Cookies
     def set_cookie(name, value)
       rack_mock_session.cookie_jar[name] = Utils::Crypt.en(value)
     end

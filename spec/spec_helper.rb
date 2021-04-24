@@ -4,18 +4,20 @@ require 'colorize'
 require 'rack'
 require 'rack/test'
 
-require_relative 'helpers/env'
-require_relative 'helpers/goldens'
-require_relative 'helpers/matchers'
-require_relative 'helpers/cookies'
-
-# Basic ENV vars
 ENV['RACK_ENV'] = 'test'
 ENV['APP_ENV'] = 'test'
 ENV['JUBIVOTE_COOKIE_SECRET'] = 'U3v96K59yMnjmnb97CeSNDp4'
 ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
 ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
+
+require_relative '../setup'
+
+require_relative 'helpers/env'
+require_relative 'helpers/cookies'
+require_relative 'helpers/goldens'
+require_relative 'helpers/matchers'
+require_relative 'helpers/models'
 
 Capybara.server = :puma
 Capybara.app = Rack::Builder.parse_file('config.ru').first
@@ -30,6 +32,7 @@ Capybara.default_driver = :apparition
 
 RSpec.shared_context(:apparition) do
   include Capybara::RSpecMatchers
+  include RSpec::Models
 
   before(:each) {
     page.driver.headers = { Origin: 'http://localhost' }
@@ -44,7 +47,8 @@ end
 RSpec.shared_context(:rack_test) do
   include Capybara::RSpecMatchers
   include Rack::Test::Methods
-  include RSpec::RackCookies
+  include RSpec::Cookies
+  include RSpec::Models
 
   let(:app) { Capybara.app }
 
@@ -64,7 +68,7 @@ RSpec.configure do |config|
 
   config.shared_context_metadata_behavior = :apply_to_host_groups
   config.disable_monkey_patching!
-  config.default_formatter = 'doc' if config.files_to_run.one?
+  config.default_formatter = 'doc'
   config.alias_it_should_behave_like_to(:it_has_behavior, 'has behavior:')
 
   config.order = :random
@@ -73,7 +77,6 @@ RSpec.configure do |config|
   config.include_context(:apparition, type: :feature)
   config.include_context(:rack_test, type: :rack_test)
 
-  require_relative '../setup'
   config.before(:each) {
     ENV['RACK_ENV'] = 'test'
     ENV['APP_ENV'] = 'test'

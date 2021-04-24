@@ -50,6 +50,7 @@ class Poll < Base
   post('/send') {
     poll = require_poll
 
+    halt(400, 'No responder provided') unless params.key?(:email)
     responder = poll.responder(email: params.fetch(:email))
     halt(404, slim_email(:responder_not_found)) unless responder
 
@@ -59,14 +60,12 @@ class Poll < Base
 
   post('/respond') {
     begin
-      params = JSON.parse(request.body.read).symbolize_keys
+      @params = JSON.parse(request.body.read).symbolize_keys
     rescue JSON::ParserError
       halt(400, 'Invalid JSON body')
     end
 
-    halt(400, 'No poll_id provided') unless params.key?(:poll_id)
-    poll = Models::Poll[params.fetch(:poll_id)]
-    halt(404, 'Poll not found') unless poll
+    poll = require_poll
 
     halt(400, 'No responder provided') unless params.key?(:responder)
     responder = poll.responder(salt: params.fetch(:responder))

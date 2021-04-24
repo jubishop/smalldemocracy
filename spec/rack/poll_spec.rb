@@ -1,28 +1,67 @@
+require_relative '../../lib/utils/email'
+
 RSpec.describe('/poll', type: :rack_test) {
+  def expect_create_page
+    expect(last_response.ok?).to(be(true))
+    expect(last_response.body).to(
+        have_selector('form[action="/poll/create"][method=post]'))
+    expect(last_response.body).to(have_selector('input[type=submit]'))
+  end
+
+  def expect_email_not_found_page
+    expect(last_response.ok?).to(be(false))
+    expect(last_response.body).to(have_content('Email Not Found'))
+  end
+
+  def expect_email_get_page
+    expect(last_response.ok?).to(be(true))
+    expect(last_response.body).to(have_selector('h1', text: 'Need Email'))
+  end
+
+  def expect_email_sent_page
+    expect(last_response.ok?).to(be(true))
+    expect(last_response.body).to(have_selector('h1', text: 'Sent Email'))
+  end
+
+  def expect_finished_page
+    expect(last_response.ok?).to(be(true))
+    expect(last_response.body).to(have_content('is finished'))
+  end
+
+  def expect_not_found_page
+    expect(last_response.status).to(be(404))
+    expect(last_response.body).to(have_selector('h1', text: 'Poll Not Found'))
+  end
+
+  def expect_responded_page
+    expect(last_response.ok?).to(be(true))
+    expect(last_response.body).to(have_content('your recorded responses'))
+  end
+
+  def expect_responder_not_found_page
+    expect(last_response.status).to(be(404))
+    expect(last_response.body).to(have_selector('h1', text: 'Email Not Found'))
+  end
+
+  def expect_view_page
+    expect(last_response.ok?).to(be(true))
+    expect(last_response.body).to(have_selector('ul#choices'))
+  end
+
   context('get /create') {
     it('rejects any access without a cookie') {
       get '/poll/create'
-      expect(last_response.ok?).to(be(false))
-      expect(last_response.body).to(have_content('Email Not Found'))
+      expect_email_not_found_page
     }
 
     it('shows poll creation form if you have an email cookie') {
       set_cookie(:email, 'test@example.com')
       get '/poll/create'
-      expect(last_response.ok?).to(be(true))
-      expect(last_response.body).to(
-          have_selector('form[action="/poll/create"][method=post]'))
-      expect(last_response.body).to(have_selector('input[type=submit]'))
+      expect_create_page
     }
   }
 
   context('post /create') {
-    it('rejects any post without a cookie') {
-      post '/poll/create'
-      expect(last_response.ok?).to(be(false))
-      expect(last_response.body).to(have_content('Email Not Found'))
-    }
-
     it('creates a new poll successfully') {
       set_cookie(:email, 'test@example.com')
       post '/poll/create', title: 'title',
@@ -32,8 +71,12 @@ RSpec.describe('/poll', type: :rack_test) {
                            expiration: 10**10
       expect(last_response.redirect?).to(be(true))
       follow_redirect!
-      expect(last_response.ok?).to(be(true))
-      expect(last_response.body).to(have_selector('ul#choices'))
+      expect_view_page
+    }
+
+    it('rejects any post without a cookie') {
+      post '/poll/create'
+      expect_email_not_found_page
     }
 
     it('fails if any fields are empty or missing') {
@@ -50,16 +93,92 @@ RSpec.describe('/poll', type: :rack_test) {
     }
   }
 
-  context('post /respond') {
-    def create_poll
-      return Models::Poll.create_poll(title: 'title',
-                                      question: 'question',
-                                      expiration: Time.now.to_i + 62,
-                                      choices: 'one, two, three',
-                                      responders: 'a@a')
-    end
+  context('get /view') {
+    it('shows poll not found') {
+      get 'poll/view/does_not_exist'
+      expect_not_found_page
+    }
 
-    it('successfully saves posted results') {
+    it('shows results if the poll is finished') {
+      poll = create_poll(expiration: Time.now.to_i - 1)
+      get "/poll/view/#{poll.id}"
+      expect_finished_page
+    }
+
+    it('asks for email if responder param is not in poll') {
+      poll = create_poll
+      get "/poll/view/#{poll.id}?responder=not_in_poll"
+      expect_email_get_page
+    }
+
+    it('stores cookie if responder is in poll') {
+      poll = create_poll
+      get "/poll/view/#{poll.id}?responder=#{poll.responder(email: 'a@a').salt}"
+      expect(last_response.redirect?).to(be(true))
+      expect(get_cookie(:email)).to(eq('a@a'))
+      follow_redirect!
+      expect_view_page
+    }
+
+    it('asks for email if not logged in and no responder param') {
+      poll = create_poll
+      get "/poll/view/#{poll.id}"
+      expect_email_get_page
+    }
+
+    it('asks for email if logged in but not in this poll') {
+      set_cookie(:email, 'b@b')
+      poll = create_poll
+      get "/poll/view/#{poll.id}"
+      expect_email_get_page
+    }
+
+    it('shows poll if you have not responded to it yet') {
+      set_cookie(:email, 'a@a')
+      poll = create_poll
+      get "/poll/view/#{poll.id}"
+      expect_view_page
+    }
+
+    it('shows your answers if you have already responded') {
+      set_cookie(:email, 'a@a')
+      poll = create_poll
+      poll.mock_response
+
+      get "/poll/view/#{poll.id}"
+      expect_responded_page
+    }
+  }
+
+  context('post /send') {
+    it('sends email successfully') {
+      poll = create_poll
+      post "/poll/send?poll_id=#{poll.id}&email=a@a"
+      allow(Utils::Email).to(receive(:email)).with(
+          poll, poll.responder(email: 'a@a'))
+      expect_email_sent_page
+    }
+
+    it('rejects sending to nonexistent poll') {
+      post '/poll/send'
+      expect(last_response.status).to(be(400))
+
+      post '/poll/send?poll_id=does_not_exist'
+      expect_not_found_page
+    }
+
+    it('rejects sending to an email not in the response list') {
+      poll = create_poll
+      post "/poll/send?poll_id=#{poll.id}"
+      expect(last_response.status).to(be(400))
+
+      post "/poll/send?poll_id=#{poll.id}&email=does_not_exist"
+      expect_email_not_found_page
+    }
+  }
+
+  context('post /respond') {
+    it('saves posted results successfully') {
       poll = create_poll
       data = {
         poll_id: poll.id,
@@ -75,11 +194,7 @@ RSpec.describe('/poll', type: :rack_test) {
 
     it('rejects posting to an already responded poll') {
       poll = create_poll
-      responder = poll.responder(email: 'a@a')
-      responses = poll.choices.map(&:id)
-      responses.each_with_index { |choice_id, rank|
-        responder.add_response(choice_id: choice_id, rank: rank)
-      }
+      responder, responses = poll.mock_response
 
       data = {
         poll_id: poll.id,
