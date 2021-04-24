@@ -12,6 +12,7 @@ RSpec.describe('/poll', type: :feature) {
     fill_in('responders', with: 'test@example.com')
     fill_in('choices', with: 'one, two, three')
     fill_in('expiration', with: current_time + 61)
+    find('h1').click # Deselect any form field
     RSpec::Goldens.verify(page, 'poll_create', full: true)
     click_button('Submit')
 
