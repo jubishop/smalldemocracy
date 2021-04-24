@@ -109,9 +109,9 @@ RSpec.describe('/poll', type: :rack_test) {
   context('post /send') {
     it('sends email successfully') {
       poll = create_poll
-      post "/poll/send?poll_id=#{poll.id}&email=a@a"
-      allow(Utils::Email).to(receive(:email)).with(
+      expect(Utils::Email).to(receive(:email)).with(
           poll, poll.responder(email: 'a@a'))
+      post "/poll/send?poll_id=#{poll.id}&email=a@a"
       expect_email_sent_page
     }
 
