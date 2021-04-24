@@ -23,8 +23,7 @@ Capybara.default_max_wait_time = 5
 
 Capybara.register_driver(:apparition) { |app|
   Capybara::Apparition::Driver.new(app, {
-    headless: !ENV.fetch('CHROME_DEBUG', false),
-    headers: { Origin: 'http://localhost' }
+    headless: !ENV.fetch('CHROME_DEBUG', false)
   })
 }
 Capybara.default_driver = :apparition
