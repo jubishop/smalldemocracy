@@ -34,5 +34,5 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     });
   })
-  setTimeout(() => { submitButton.disabled = false; }, 500);
+  submitButton.disabled = false;
 });

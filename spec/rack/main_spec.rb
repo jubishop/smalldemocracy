@@ -29,4 +29,9 @@ RSpec.describe('/', type: :rack_test) {
       expect(get_cookie(:email)).to(be_nil)
     }
   }
+
+  it('returns not found to unknown urls') {
+    get '/not_a_url'
+    expect_not_found_page
+  }
 }
