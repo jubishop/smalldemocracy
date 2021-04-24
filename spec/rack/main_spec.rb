@@ -1,28 +1,24 @@
+require_relative '../helpers/main/expectations'
+
 RSpec.describe('/', type: :rack_test) {
+  include RSpec::MainExpectations
+
   context('/') {
-    it('responds to / with OK status') {
+    it('displays logged out page when there is no email cookie') {
       get '/'
-      expect(last_response.ok?).to(be(true))
-      expect(last_response.body).to(have_no_link(href: '/logout'))
+      expect_logged_out_index_page
+    }
+
+    it('displays logged in page when there is an email cookie') {
+      set_cookie(:email, 'test@example.com')
+      get '/'
+      expect_logged_in_index_page('test@example.com')
     }
 
     it('does not delete the email cookie') {
       set_cookie(:email, 'nomnomnom')
       get '/'
       expect(get_cookie(:email)).to(eq('nomnomnom'))
-    }
-
-    it('welcomes user when they have email cookie') {
-      set_cookie(:email, 'test@example.com')
-      get '/'
-      expect(last_response.body).to(have_content('test@example.com'))
-      expect(last_response.body).to(have_link(href: '/logout'))
-    }
-
-    it('provides create poll link with email cookie') {
-      set_cookie(:email, 'test@example.com')
-      get '/'
-      expect(last_response.body).to(have_link(href: '/poll/create'))
     }
   }
 

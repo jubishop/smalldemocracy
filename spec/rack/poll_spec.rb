@@ -1,5 +1,5 @@
 require_relative '../../lib/utils/email'
-require_relative '../helpers/poll/matchers'
+require_relative '../helpers/poll/expectations'
 
 RSpec.describe('/poll', type: :rack_test) {
   include RSpec::PollExpectations
