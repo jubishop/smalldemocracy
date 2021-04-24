@@ -1,5 +1,5 @@
-RSpec.describe('/poll') {
-  include_context(:rack_test)
+RSpec.describe('/poll', type: :feature) {
+  include_context(:capybara)
 
   context('get /create') {
     it('rejects any access without a cookie') {

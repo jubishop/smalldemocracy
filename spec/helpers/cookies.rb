@@ -13,6 +13,10 @@ module Capybara
     def delete_cookie(name)
       driver.remove_cookie(name)
     end
+
+    def clear_cookies
+      driver.clear_cookies
+    end
   end
 end
 

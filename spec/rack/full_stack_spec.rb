@@ -1,5 +1,5 @@
-RSpec.describe('Full stack config.ru') {
-  include_context(:rack_test)
+RSpec.describe('Full stack config.ru', type: :feature) {
+  include_context(:capybara)
 
   context('/') {
     it('redirects to https in production only') {

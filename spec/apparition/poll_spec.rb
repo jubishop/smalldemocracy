@@ -1,5 +1,5 @@
-RSpec.describe('/poll', type: :feature) {
-  include_context(:apparition)
+RSpec.describe('/poll', type: :feature, js: true) {
+  include_context(:capybara)
 
   def verify_poll_page(filename)
     expect(page).to(have_fontawesome)
