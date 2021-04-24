@@ -43,17 +43,26 @@ RSpec.describe('/poll', type: :feature) {
                                       responders: 'a@a')
     end
 
-    it('asks for email when not in poll') {
+    it('asks for email when email cookie is not in the poll') {
       # Create a poll but email cookie not in responders.
       page.set_cookie(:email, 'other@example.com')
       poll = create_poll
       visit("/poll/view/#{poll.id}")
       RSpec::Goldens.verify(page, 'poll_email_not_in_poll', full: true)
+    }
 
-      # Remove cookie and still see email is needed
-      page.delete_cookie(:email)
-      refresh
+    it('asks for email when not logged in') {
+      poll = create_poll
+      visit("/poll/view/#{poll.id}")
       RSpec::Goldens.verify(page, 'poll_email_needed', full: true)
+    }
+
+    it('asks for email when responder salt is incorrect') {
+      poll = create_poll
+
+      # Visit with improper salt and see login
+      visit("/poll/view/#{poll.id}?responder=not_real_salt")
+      RSpec::Goldens.verify(page, 'poll_incorrect_responder', full: true)
     }
 
     it('logs you in when responder salt is in query') {
@@ -68,10 +77,6 @@ RSpec.describe('/poll', type: :feature) {
       # See poll
       expect(page.get_cookie(:email)).to(eq('a@a'))
       verify_poll_page('poll_salt_logged_in')
-
-      # Visit with improper salt and see login
-      visit("/poll/view/#{poll.id}?responder=not_real_salt")
-      RSpec::Goldens.verify(page, 'poll_incorrect_responder', full: true)
     }
 
     it('sends email when valid email given') {
