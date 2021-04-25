@@ -2,15 +2,17 @@ require 'sendgrid-ruby'
 
 module Utils
   module Email
+    HOSTNAME = 'jubivote.com'.freeze
+    public_constant :HOSTNAME
+
     def self.email(poll, responder)
       return if ENV.fetch('APP_ENV') == 'test'
 
-      from = SendGrid::Email.new(name: 'JubiVote',
-                                 email: 'support@jubivote.com')
+      from = SendGrid::Email.new(name: 'JubiVote', email: "support@#{HOSTNAME}")
       to = SendGrid::Email.new(email: responder.email)
       subject = "Poll: #{poll.title}"
 
-      path = 'https://www.jubivote.com/poll/view'
+      path = "https://www.#{HOSTNAME}/poll/view"
       url = "#{path}/#{poll.id}?responder=#{responder.salt}"
       body = %(
         Please <a href="#{url}">click here</a> to answer the poll:
