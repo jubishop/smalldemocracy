@@ -18,9 +18,9 @@ RSpec.describe(Utils::Email) {
     allow(Process).to(receive(:fork)) { |&arg| arg.call }
     expect_any_instance_of(SendGrid::Client).to(receive(:post)).once { |_, data|
       node = Capybara.string(data[:request_body]['content'].first['value'])
-      base = 'https://www.jubivote.com/poll/view/'
-      query = "#{poll.id}?responder=#{poll.responders.first.salt}"
-      expect(node).to(have_link('click here', href: "#{base}#{query}"))
+      base = "https://www.jubivote.com/poll/view/#{poll.id}"
+      query = "responder=#{poll.responders.first.salt}"
+      expect(node).to(have_link('click here', href: "#{base}?#{query}"))
     }
     Utils::Email.email(poll, poll.responders.first)
   }
