@@ -17,6 +17,11 @@ RSpec.describe(Utils::Email) {
     allow(Process).to(receive(:detach))
     allow(Process).to(receive(:fork)) { |&arg| arg.call }
     expect_any_instance_of(SendGrid::Client).to(receive(:post)).once { |_, data|
+      expect(data[:request_body]['personalizations'].first).to(eq({
+        # rubocop:disable Style/StringHashKeys
+        'to' => [{ 'email' => 'jubi@hey.com' }]
+        # rubocop:enable Style/StringHashKeys
+      }))
       node = Capybara.string(data[:request_body]['content'].first['value'])
       base = "https://www.jubivote.com/poll/view/#{poll.id}"
       query = "responder=#{poll.responders.first.salt}"
