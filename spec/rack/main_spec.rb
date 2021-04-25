@@ -1,9 +1,9 @@
 require_relative '../helpers/main/expectations'
 
-RSpec.describe('/', type: :rack_test) {
+RSpec.describe(Main, type: :rack_test) {
   include RSpec::MainExpectations
 
-  context('/') {
+  context('get /') {
     it('displays logged out page when there is no email cookie') {
       get '/'
       expect_logged_out_index_page
@@ -22,7 +22,7 @@ RSpec.describe('/', type: :rack_test) {
     }
   }
 
-  context('/logout') {
+  context('get /logout') {
     it('deletes the email cookie') {
       set_cookie(:email, 'nomnomnom')
       get '/logout'
