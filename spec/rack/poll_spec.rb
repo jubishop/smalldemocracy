@@ -69,7 +69,7 @@ RSpec.describe('/poll', type: :rack_test) {
 
     it('stores cookie if responder is in poll') {
       poll = create_poll
-      get "/poll/view/#{poll.id}?responder=#{poll.responder(email: 'a@a').salt}"
+      get "/poll/view/#{poll.id}?responder=#{poll.responders.first.salt}"
       expect(last_response.redirect?).to(be(true))
       expect(get_cookie(:email)).to(eq('a@a'))
       follow_redirect!
@@ -110,7 +110,7 @@ RSpec.describe('/poll', type: :rack_test) {
     it('sends email successfully') {
       poll = create_poll
       expect(Utils::Email).to(receive(:email)).with(
-          poll, poll.responder(email: 'a@a'))
+          poll, poll.responders.first)
       post "/poll/send?poll_id=#{poll.id}&email=a@a"
       expect_email_sent_page
     }
@@ -138,7 +138,7 @@ RSpec.describe('/poll', type: :rack_test) {
       poll = create_poll
       data = {
         poll_id: poll.id,
-        responder: poll.responder(email: 'a@a').salt,
+        responder: poll.responders.first.salt,
         responses: poll.choices.map(&:id)
       }
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
@@ -189,7 +189,7 @@ RSpec.describe('/poll', type: :rack_test) {
 
     it('rejects posting with invalid responses') {
       poll = create_poll
-      data = { poll_id: poll.id, responder: poll.responder(email: 'a@a').salt }
+      data = { poll_id: poll.id, responder: poll.responders.first.salt }
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(400))
 

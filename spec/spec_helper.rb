@@ -32,7 +32,6 @@ Capybara.default_driver = :apparition
 
 RSpec.shared_context(:apparition) do
   include Capybara::RSpecMatchers
-  include RSpec::Models
 
   before(:each) {
     page.driver.headers = { Origin: 'http://localhost' }
@@ -48,7 +47,6 @@ RSpec.shared_context(:rack_test) do
   include Capybara::RSpecMatchers
   include Rack::Test::Methods
   include RSpec::Cookies
-  include RSpec::Models
 
   let(:app) { Capybara.app }
 
@@ -74,6 +72,7 @@ RSpec.configure do |config|
   config.order = :random
   Kernel.srand(config.seed)
 
+  config.include(RSpec::Models)
   config.include_context(:apparition, type: :feature)
   config.include_context(:rack_test, type: :rack_test)
 

@@ -1,7 +1,5 @@
 require 'sendgrid-ruby'
 
-require_relative 'async'
-
 module Utils
   module Email
     def self.email(poll, responder)
@@ -24,9 +22,9 @@ module Utils
 
       sg = SendGrid::API.new(api_key: ENV.fetch('SENDGRID_API_KEY'))
 
-      Async.run {
+      return Process.detach(Process.fork {
         sg.client.mail._('send').post(request_body: mail.to_json)
-      }
+      })
     end
   end
 end
