@@ -39,13 +39,13 @@ RSpec.describe('/poll', type: :feature) {
 
     it('asks for email') {
       poll = create_poll
-      visit("/poll/view/#{poll.id}")
+      visit(poll.url)
       RSpec::Goldens.verify(page, 'poll_email_get', full: true)
     }
 
     it('sends email') {
       poll = create_poll
-      visit("/poll/view/#{poll.id}")
+      visit(poll.url)
       fill_in('email', with: 'a@a')
       click_button('Submit')
       RSpec::Goldens.verify(page, 'poll_email_sent', full: true)
@@ -53,7 +53,7 @@ RSpec.describe('/poll', type: :feature) {
 
     it('complains when invalid email given') {
       poll = create_poll
-      visit("/poll/view/#{poll.id}")
+      visit(poll.url)
       fill_in('email', with: 'poop@hey')
       click_button('Submit')
       RSpec::Goldens.verify(page, 'poll_email_responder_not_found', full: true)

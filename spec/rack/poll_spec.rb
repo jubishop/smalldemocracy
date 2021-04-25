@@ -57,19 +57,19 @@ RSpec.describe('/poll', type: :rack_test) {
 
     it('shows results if the poll is finished') {
       poll = create_poll(expiration: Time.now.to_i - 1)
-      get "/poll/view/#{poll.id}"
+      get poll.url
       expect_finished_page
     }
 
     it('asks for email if responder param is not in poll') {
       poll = create_poll
-      get "/poll/view/#{poll.id}?responder=not_in_poll"
+      get poll.url('not_in_poll')
       expect_email_get_page
     }
 
     it('stores cookie if responder is in poll') {
       poll = create_poll
-      get "/poll/view/#{poll.id}?responder=#{poll.responders.first.salt}"
+      get poll.responders.first.url
       expect(last_response.redirect?).to(be(true))
       expect(get_cookie(:email)).to(eq('a@a'))
       follow_redirect!
@@ -78,21 +78,21 @@ RSpec.describe('/poll', type: :rack_test) {
 
     it('asks for email if not logged in and no responder param') {
       poll = create_poll
-      get "/poll/view/#{poll.id}"
+      get poll.url
       expect_email_get_page
     }
 
     it('asks for email if logged in but not in this poll') {
       set_cookie(:email, 'b@b')
       poll = create_poll
-      get "/poll/view/#{poll.id}"
+      get poll.url
       expect_email_get_page
     }
 
     it('shows poll if you have not responded to it yet') {
       set_cookie(:email, 'a@a')
       poll = create_poll
-      get "/poll/view/#{poll.id}"
+      get poll.url
       expect_view_page
     }
 
@@ -101,7 +101,7 @@ RSpec.describe('/poll', type: :rack_test) {
       poll = create_poll
       poll.mock_response
 
-      get "/poll/view/#{poll.id}"
+      get poll.url
       expect_responded_page
     }
   }

@@ -23,9 +23,8 @@ RSpec.describe(Utils::Email) {
         # rubocop:enable Style/StringHashKeys
       }))
       node = Capybara.string(data[:request_body]['content'].first['value'])
-      base = "https://www.#{Utils::Email::HOSTNAME}/poll/view/#{poll.id}"
-      query = "responder=#{poll.responders.first.salt}"
-      expect(node).to(have_link('click here', href: "#{base}?#{query}"))
+      url = "https://www.#{Utils::Email::HOSTNAME}#{poll.responders.first.url}"
+      expect(node).to(have_link('click here', href: url))
     }
     Utils::Email.email(poll, poll.responders.first)
   }

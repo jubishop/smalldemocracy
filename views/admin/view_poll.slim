@@ -7,7 +7,7 @@ p Poll ID: #{poll.id}
 
 include :expiration_text
 
-a href="/poll/view/#{poll.id}" Poll
+a href=poll.url Poll
 
 p View poll as:
 ul
@@ -15,7 +15,7 @@ ul
     - salt = responder.salt
     - email = responder.email
     li
-      a href="/poll/view/#{poll.id}?responder=#{salt}" =email
+      a href=responder.url =email
 
 include :poll_ul
 

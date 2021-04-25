@@ -19,7 +19,7 @@ class Poll < Base
     rescue Sequel::CheckConstraintViolation
       halt(406, 'Poll fields cannot be empty')
     end
-    return redirect("/poll/view/#{poll.id}")
+    return redirect(poll.url)
   }
 
   get('/view/:poll_id') {
@@ -34,7 +34,7 @@ class Poll < Base
       halt(slim_email(:get, locals: { poll: poll })) unless responder
 
       store_cookie(:email, responder.email)
-      return redirect("/poll/view/#{poll.id}")
+      return redirect(poll.url)
     end
 
     email = fetch_email

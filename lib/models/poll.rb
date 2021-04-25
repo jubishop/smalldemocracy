@@ -52,6 +52,12 @@ module Models
       return choices.length - response.rank - 1
     end
 
+    def url(responder_salt = nil)
+      return "/poll/view/#{id}" unless responder_salt
+
+      return "/poll/view/#{id}?responder=#{responder_salt}"
+    end
+
     private
 
     @@results = {}

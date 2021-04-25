@@ -18,7 +18,7 @@ class Admin < Base
 
   post('/poll/create') {
     poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
-    redirect "/admin/poll/view/#{poll.id}"
+    redirect "/admin#{poll.url}"
   }
 
   get('/poll/view/:poll_id') {

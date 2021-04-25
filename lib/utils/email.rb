@@ -12,8 +12,7 @@ module Utils
       to = SendGrid::Email.new(email: responder.email)
       subject = "Poll: #{poll.title}"
 
-      path = "https://www.#{HOSTNAME}/poll/view"
-      url = "#{path}/#{poll.id}?responder=#{responder.salt}"
+      url = "https://www.#{HOSTNAME}#{responder.url}"
       body = %(
         Please <a href="#{url}">click here</a> to answer the poll:
         <b>#{poll.title}</b>: #{poll.question}.

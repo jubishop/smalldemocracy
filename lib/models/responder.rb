@@ -17,5 +17,9 @@ module Models
       self.salt = SecureRandom.urlsafe_base64(8)
       super
     end
+
+    def url
+      return poll.url(salt)
+    end
   end
 end
