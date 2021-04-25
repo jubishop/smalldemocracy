@@ -1,4 +1,4 @@
-RSpec.describe('/poll', type: :feature) {
+RSpec.describe(Poll, type: :feature) {
   it('supports full poll lifecycle') {
     # It's 1982!
     current_time = 388341770
