@@ -2,12 +2,16 @@ namespace :db do
   desc 'Run migrations'
   task(:migrate, [:version]) { |_, args|
     require 'sequel/core'
+
     Sequel.extension(:migration)
     version = args[:version].to_i if args[:version]
+
     Sequel.connect('sqlite://.data/db.sqlite') do |db|
       Sequel::Migrator.run(db, 'db/migrations', target: version)
     end
   }
+
+  desc 'Clear db'
   task(:clear) {
     Rake::Task['db:migrate'].invoke(0)
   }
@@ -15,8 +19,6 @@ end
 
 return if ENV.fetch('RACK_ENV') == 'production'
 
-require 'colorize'
-require 'open3'
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 
@@ -37,6 +39,9 @@ RSpec::Core::RakeTask.new(:fspec) { |t|
 
 desc('Run rspec_n (count:20)')
 task(:rspec_n) {
+  require 'colorize'
+  require 'open3'
+
   ENV['FAIL_ON_GOLDEN'] = '1'
 
   puts 'Now running...'
