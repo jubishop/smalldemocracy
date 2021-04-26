@@ -1,8 +1,3 @@
-require 'colorize'
-require 'open3'
-require 'rspec/core/rake_task'
-require 'rubocop/rake_task'
-
 namespace :db do
   desc 'Run migrations'
   task(:migrate, [:version]) { |_, args|
@@ -17,6 +12,13 @@ namespace :db do
     Rake::Task['db:migrate'].invoke(0)
   }
 end
+
+return if ENV.fetch('RACK_ENV') == 'production'
+
+require 'colorize'
+require 'open3'
+require 'rspec/core/rake_task'
+require 'rubocop/rake_task'
 
 RuboCop::RakeTask.new(:rubocop)
 
