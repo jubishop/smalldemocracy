@@ -19,11 +19,7 @@ DB = if ENV.fetch('APP_ENV') == 'test'
      end
 
 Sequel.extension(:migration)
-if ENV.fetch('APP_ENV') == 'test'
-  Sequel::Migrator.run(DB, 'db/migrations')
-else
-  Sequel::Migrator.check_current(DB, 'db/migrations')
-end
+Sequel::Migrator.run(DB, 'db/migrations')
 
 require_relative 'lib/admin'
 require_relative 'lib/main'
