@@ -44,7 +44,7 @@ RSpec.describe(Poll, type: :rack_test) {
                            question: 'question',
                            choices: '',
                            responders: '',
-                           expiration: 0
+                           expiration: 1
       expect(last_response.status).to(be(406))
     }
   }

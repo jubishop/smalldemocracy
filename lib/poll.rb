@@ -16,7 +16,7 @@ class Poll < Base
       poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
     rescue ArgumentError
       halt(406, 'Not all poll fields provided')
-    rescue Sequel::CheckConstraintViolation
+    rescue Sequel::ConstraintViolation
       halt(406, 'Poll fields cannot be empty')
     end
     return redirect(poll.url)

@@ -25,6 +25,27 @@ RSpec.describe(Models::Poll) {
       poll = create_poll(type: :borda_split)
       expect(poll.type).to(eq(:borda_split))
     }
+
+    it('rejects creation of invalid type') {
+      expect { create_poll(type: :not_valid_type) }.to(
+          raise_error(Sequel::ConstraintViolation))
+    }
+
+    it('rejects creation without responders or choices') {
+      expect { create_poll(choices: '') }.to(raise_error(ArgumentError))
+      expect { create_poll(responders: '') }.to(raise_error(ArgumentError))
+      expect { create_poll(choices: []) }.to(raise_error(ArgumentError))
+      expect { create_poll(responders: []) }.to(raise_error(ArgumentError))
+    }
+
+    it('fatals if require fields are missing') {
+      expect { create_poll(title: nil) }.to(
+          raise_error(Sequel::ConstraintViolation))
+      expect { create_poll(question: nil) }.to(
+          raise_error(Sequel::ConstraintViolation))
+      expect { create_poll(expiration: nil) }.to(
+          raise_error(Sequel::ConstraintViolation))
+    }
   }
 
   context('#results') {
