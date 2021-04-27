@@ -28,12 +28,16 @@ module Models
       options[:type] = type if type
       poll = create(**options)
 
+      raise ArgumentError, 'Choices cannot be nil' unless choices
+
       choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)
       raise ArgumentError, 'There must be some choices' if choices.empty?
 
       choices.each { |choice|
         poll.add_choice(text: choice)
       }
+
+      raise ArgumentError, 'Responders cannot be nil' unless responders
 
       responders = responders.strip.split(/\s*,\s*/) if responders.is_a?(String)
       raise ArgumentError, 'There must be some responders' if responders.empty?

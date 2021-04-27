@@ -57,16 +57,24 @@ RSpec.describe(Models::Poll) {
     }
 
     it('rejects creation without responders or choices') {
+      expect { create_poll(choices: nil) }.to(raise_error(ArgumentError))
+      expect { create_poll(responders: nil) }.to(raise_error(ArgumentError))
       expect { create_poll(choices: '') }.to(raise_error(ArgumentError))
       expect { create_poll(responders: '') }.to(raise_error(ArgumentError))
       expect { create_poll(choices: []) }.to(raise_error(ArgumentError))
       expect { create_poll(responders: []) }.to(raise_error(ArgumentError))
     }
 
-    it('fatals if require fields are missing') {
+    it('fatals if require fields are missing or empty') {
+      expect { create_poll(title: '') }.to(
+          raise_error(Sequel::ConstraintViolation))
       expect { create_poll(title: nil) }.to(
           raise_error(Sequel::ConstraintViolation))
+      expect { create_poll(question: '') }.to(
+          raise_error(Sequel::ConstraintViolation))
       expect { create_poll(question: nil) }.to(
+          raise_error(Sequel::ConstraintViolation))
+      expect { create_poll(expiration: '') }.to(
           raise_error(Sequel::ConstraintViolation))
       expect { create_poll(expiration: nil) }.to(
           raise_error(Sequel::ConstraintViolation))

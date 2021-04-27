@@ -6,9 +6,14 @@ Sequel.migration {
 
       String :title, null: false
       constraint(:title_not_empty) { Sequel.char_length(title) >= 1 }
+
       String :question, null: false
       constraint(:question_not_empty) { Sequel.char_length(question) >= 1 }
+
       Integer :expiration, null: false
+
+      String :type, null: false, default: 'borda_single'
+      constraint(:type_is_valid, type: %w[borda_single borda_split])
     }
   }
 }
