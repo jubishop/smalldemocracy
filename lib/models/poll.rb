@@ -1,5 +1,6 @@
 require 'securerandom'
 require 'sequel'
+require 'set'
 
 require_relative 'choice'
 require_relative 'responder'
@@ -13,8 +14,15 @@ module Models
     Result = Struct.new(:text, :score, keyword_init: true)
     private_constant :Result
 
-    def self.create_poll(title:, question:, expiration:, choices:, responders:)
-      poll = create(title: title, question: question, expiration: expiration)
+    def self.create_poll(title:,
+                         question:,
+                         expiration:,
+                         choices:,
+                         responders:,
+                         type: nil)
+      options = { title: title, question: question, expiration: expiration }
+      options[:type] = type if type
+      poll = create(**options)
 
       choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)
       raise ArgumentError, 'There must be some choices' if choices.empty?
@@ -36,6 +44,10 @@ module Models
     def before_create
       self.id = SecureRandom.urlsafe_base64(16)
       super
+    end
+
+    def type
+      return super.to_sym
     end
 
     def responder(**options)

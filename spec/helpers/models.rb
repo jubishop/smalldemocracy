@@ -4,12 +4,16 @@ require_relative 'env'
 
 module RSpec
   module Models
-    def create_poll(expiration: Time.now.to_i + 62, responders: 'a@a')
+    def create_poll(expiration: Time.now.to_i + 62,
+                    choices: 'one, two, three',
+                    responders: 'a@a',
+                    type: nil)
       return ::Models::Poll.create_poll(title: 'title',
                                         question: 'question',
                                         expiration: expiration,
-                                        choices: 'one, two, three',
-                                        responders: responders)
+                                        choices: choices,
+                                        responders: responders,
+                                        type: type)
     end
   end
 end
