@@ -4,12 +4,16 @@ require 'set'
 
 require_relative 'choice'
 require_relative 'responder'
+require_relative 'response'
 
 module Models
   class Poll < Sequel::Model
     unrestrict_primary_key
     one_to_many :choices
     one_to_many :responders
+    many_to_many :responses, join_table: :responders,
+                             right_key: :id,
+                             right_primary_key: :responder_id
 
     Result = Struct.new(:text, :score, keyword_init: true)
     private_constant :Result
@@ -79,7 +83,7 @@ module Models
         [choice.id, Result.new(text: choice.text, score: 0)]
       }
 
-      Response.where(responder: responders).each { |response|
+      responses.each { |response|
         choices_hash[response.choice_id].score += score(response)
       }
 
