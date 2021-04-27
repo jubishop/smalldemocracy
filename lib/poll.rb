@@ -82,7 +82,7 @@ class Poll < Base
         responder.add_response(choice_id: choice_id, rank: rank)
       }
     rescue Sequel::UniqueConstraintViolation
-      halt(409, 'Response already exists')
+      halt(409, 'Duplicate response, choice, or rank found')
     end
 
     return 201, 'Poll created'

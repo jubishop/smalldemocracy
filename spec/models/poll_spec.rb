@@ -31,6 +31,31 @@ RSpec.describe(Models::Poll) {
           raise_error(Sequel::ConstraintViolation))
     }
 
+    it('rejects creating two choices with the same text') {
+      expect { create_poll(choices: %w[one one]) }.to(
+          raise_error(Sequel::ConstraintViolation))
+    }
+
+    it('rejects creating a choice with empty text') {
+      expect { create_poll(choices: ['one', '']) }.to(
+          raise_error(Sequel::ConstraintViolation))
+    }
+
+    it('rejects creating two responders with the same email') {
+      expect { create_poll(responders: %w[a@a a@a]) }.to(
+          raise_error(Sequel::ConstraintViolation))
+    }
+
+    it('rejects creating a responder with empty email') {
+      expect { create_poll(responders: ['a@a', '']) }.to(
+          raise_error(Sequel::HookFailed))
+    }
+
+    it('rejects creating a responder with invalid email address') {
+      expect { create_poll(responders: ['not_an_email_address']) }.to(
+          raise_error(Sequel::HookFailed))
+    }
+
     it('rejects creation without responders or choices') {
       expect { create_poll(choices: '') }.to(raise_error(ArgumentError))
       expect { create_poll(responders: '') }.to(raise_error(ArgumentError))

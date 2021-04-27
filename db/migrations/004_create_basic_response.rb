@@ -10,9 +10,10 @@ Sequel.migration {
       Integer :responder_id, null: false, index: true
       foreign_key [:responder_id], :responders, on_delete: :cascade,
                                                 on_update: :cascade
+      unique %i[responder_id choice_id]
 
       Integer :rank, null: false
-      unique %i[responder_id choice_id rank]
+      unique %i[responder_id rank]
     }
   }
 }

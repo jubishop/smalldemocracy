@@ -197,5 +197,18 @@ RSpec.describe(Poll, type: :rack_test) {
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(406))
     }
+
+    it('rejects posting with duplicate choices') {
+      poll = create_poll
+      data = {
+        poll_id: poll.id,
+        responder: poll.responders.first.salt,
+        responses: poll.choices.map(&:id),
+        expiration: 10**10
+      }
+      data[:responses][0] = data[:responses][1]
+      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      expect(last_response.status).to(be(409))
+    }
   }
 }
