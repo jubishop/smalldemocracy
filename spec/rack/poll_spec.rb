@@ -203,8 +203,7 @@ RSpec.describe(Poll, type: :rack_test) {
       data = {
         poll_id: poll.id,
         responder: poll.responders.first.salt,
-        responses: poll.choices.map(&:id),
-        expiration: 10**10
+        responses: poll.choices.map(&:id)
       }
       data[:responses][0] = data[:responses][1]
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
