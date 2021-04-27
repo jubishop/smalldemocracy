@@ -131,6 +131,13 @@ RSpec.describe(Poll, type: :rack_test) {
       post "/poll/send?poll_id=#{poll.id}&email=does_not_exist"
       expect_email_not_found_page
     }
+
+    it('rejects sending email for expired poll') {
+      ENV['APP_ENV'] = 'development'
+      poll = create_poll(expiration: 1)
+      post "/poll/send?poll_id=#{poll.id}&email=a@a"
+      expect(last_response.status).to(be(405))
+    }
   }
 
   context('post /respond') {
@@ -208,6 +215,17 @@ RSpec.describe(Poll, type: :rack_test) {
       data[:responses][0] = data[:responses][1]
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(409))
+    }
+
+    it('rejects posting responses to expired poll') {
+      poll = create_poll(expiration: 1)
+      data = {
+        poll_id: poll.id,
+        responder: poll.responders.first.salt,
+        responses: poll.choices.map(&:id)
+      }
+      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      expect(last_response.status).to(be(405))
     }
   }
 }

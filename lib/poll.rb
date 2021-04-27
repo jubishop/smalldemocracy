@@ -54,7 +54,12 @@ class Poll < Base
     responder = poll.responder(email: params.fetch(:email))
     halt(404, slim_email(:responder_not_found)) unless responder
 
-    Utils::Email.email(poll, responder)
+    begin
+      Utils::Email.email(poll, responder)
+    rescue ArgumentError
+      halt(405, 'Poll has already finished')
+    end
+
     return slim_email(:sent)
   }
 
@@ -83,6 +88,8 @@ class Poll < Base
       }
     rescue Sequel::UniqueConstraintViolation
       halt(409, 'Duplicate response, choice, or rank found')
+    rescue Sequel::HookFailed
+      halt(405, 'Poll has already finished')
     end
 
     return 201, 'Poll created'

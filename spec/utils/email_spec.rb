@@ -11,11 +11,14 @@ RSpec.describe(Utils::Email) {
     RSpec::Mocks.configuration.verify_partial_doubles = true
   }
 
-  it('sends email') {
+  before(:each) {
     ENV['APP_ENV'] = 'development'
-    poll = create_poll(responders: 'jubi@hey.com')
     allow(Process).to(receive(:detach))
     allow(Process).to(receive(:fork)) { |&arg| arg.call }
+  }
+
+  it('sends email') {
+    poll = create_poll(responders: 'jubi@hey.com')
     expect_any_instance_of(SendGrid::Client).to(receive(:post)).once { |_, data|
       expect(data[:request_body]['personalizations'].first).to(eq({
         # rubocop:disable Style/StringHashKeys
@@ -27,5 +30,11 @@ RSpec.describe(Utils::Email) {
       expect(node).to(have_link('click here', href: url))
     }
     Utils::Email.email(poll, poll.responders.first)
+  }
+
+  it('rejects sending email to expired poll') {
+    poll = create_poll(responders: 'jubi@hey.com', expiration: 1)
+    expect { Utils::Email.email(poll, poll.responders.first) }.to(
+        raise_error(ArgumentError))
   }
 }

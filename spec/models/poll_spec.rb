@@ -83,9 +83,7 @@ RSpec.describe(Models::Poll) {
     it('computes results properly') {
       choices = %w[one two three four]
       responders = %w[a@a b@b c@c d@d]
-      poll = create_poll(expiration: 1,
-                         choices: choices,
-                         responders: responders)
+      poll = create_poll(choices: choices, responders: responders)
 
       responses = {
         'a@a': %w[one two three four],
@@ -101,6 +99,7 @@ RSpec.describe(Models::Poll) {
         }
       }
 
+      allow(Time).to(receive(:now).and_return(Time.at(10**10)))
       results = { one: 8, two: 7, three: 5, four: 4 }
       results.each_with_index { |result, index|
         choice, score = *result

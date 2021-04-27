@@ -8,6 +8,11 @@ module Utils
     def self.email(poll, responder)
       return if ENV.fetch('APP_ENV') == 'test'
 
+      if poll.expiration < Time.now.to_i
+        raise ArgumentError, "Cannot send email to #{responder.email} " \
+          "because poll: #{poll.title} has expired"
+      end
+
       from = SendGrid::Email.new(name: 'JubiVote', email: "support@#{HOSTNAME}")
       to = SendGrid::Email.new(email: responder.email)
       subject = "Poll: #{poll.title}"

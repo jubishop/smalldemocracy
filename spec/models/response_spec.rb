@@ -15,7 +15,7 @@ RSpec.describe(Models::Response) {
     it('rejects making a response with no responder associated') {
       poll = create_poll
       expect { Models::Response.create(choice_id: poll.choices.first.id) }.to(
-          raise_error(Sequel::ConstraintViolation))
+          raise_error(Sequel::HookFailed))
     }
 
     it('rejects making a response with no choice associated') {
@@ -50,6 +50,14 @@ RSpec.describe(Models::Response) {
         poll.responders.first.add_response(
             choice_id: poll.choices[0].id, rank: 2)
       }.to(raise_error(Sequel::ConstraintViolation))
+    }
+
+    it('rejects creating a response on finished poll') {
+      poll = create_poll(expiration: 1)
+      expect {
+        poll.responders.first.add_response(
+            choice_id: poll.choices.first.id, rank: 0, chosen: true)
+      }.to(raise_error(Sequel::HookFailed))
     }
   }
 }
