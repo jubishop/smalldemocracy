@@ -12,6 +12,13 @@ RSpec.describe(Models::Response) {
       expect(response.chosen).to(be(true))
     }
 
+    it('does not require chosen to be set') {
+      poll = create_poll
+      response = poll.responders.first.add_response(
+          choice_id: poll.choices.first.id, rank: 0)
+      expect(response.chosen).to(be(nil))
+    }
+
     it('rejects making a response with no responder associated') {
       poll = create_poll
       expect { Models::Response.create(choice_id: poll.choices.first.id) }.to(
