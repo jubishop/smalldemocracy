@@ -16,5 +16,5 @@ jobs:
     - name: Run lint
       run: bundle exec rake rubocop
       env:
-        RACK_ENV: test
-        APP_ENV: test
+        RACK_ENV: development
+        APP_ENV: development
