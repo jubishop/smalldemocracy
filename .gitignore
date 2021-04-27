@@ -5,6 +5,7 @@
 .irb_history
 .rbenv
 .rubocop-https*
+.sqlite_history
 
 Gemfile.lock
 rspec_n_iteration*
