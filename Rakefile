@@ -1,3 +1,24 @@
+namespace :db do
+  desc 'Run migrations'
+  task(:migrate, [:version]) { |_, args|
+    require 'sequel/core'
+
+    Sequel.extension(:migration)
+    version = args[:version].to_i if args[:version]
+
+    Sequel.connect('sqlite://.data/db.sqlite') do |db|
+      Sequel::Migrator.run(db, 'db/migrations', target: version)
+    end
+  }
+
+  desc 'Clear DB'
+  task(:clear) {
+    Rake::Task['db:migrate'].invoke(0)
+  }
+end
+
+return if ENV.fetch('RACK_ENV') == 'production'
+
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 
