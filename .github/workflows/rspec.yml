@@ -15,3 +15,6 @@ jobs:
       run: bundle install
     - name: Run tests
       run: bundle exec rake spec
+      env:
+        RACK_ENV: test
+        APP_ENV: test
