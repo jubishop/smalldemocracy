@@ -21,6 +21,8 @@ DB = if ENV.fetch('APP_ENV') == 'test'
 Sequel.extension(:migration)
 Sequel::Migrator.run(DB, 'db/migrations')
 
+PUBLIC_FOLDER = 'public'.freeze
+
 require_relative 'lib/admin'
 require_relative 'lib/main'
 require_relative 'lib/poll'

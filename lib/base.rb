@@ -16,7 +16,7 @@ class Base < Sinatra::Base
   helpers Sinatra::Cookies
   register Sinatra::Static
 
-  set(public_folder: 'public')
+  set(public_folder: PUBLIC_FOLDER)
   set(static: false)
   set(views: 'views')
   set(:cookie_options, expires: Time.at(2**31 - 1), path: '/')

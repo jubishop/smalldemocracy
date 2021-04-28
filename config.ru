@@ -15,10 +15,10 @@ use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
 use Rack::Protection unless ENV.fetch('RACK_ENV') == 'test'
 
 module Rack
-  class GetOnlyCache
+  class LongCache
     def initialize(app)
       @app = app
-      @file_server = Rack::File.new(::File.join(Dir.pwd, 'public'))
+      @file_server = Rack::File.new(::File.join(Dir.pwd, PUBLIC_FOLDER))
     end
 
     def call(env)
@@ -33,6 +33,6 @@ module Rack
     end
   end
 end
-use Rack::GetOnlyCache
+use Rack::LongCache
 
 run Rack::URLMap.new(Setup.url_map)
