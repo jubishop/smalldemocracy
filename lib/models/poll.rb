@@ -82,12 +82,20 @@ module Models
     @@results = {}
 
     def compute_results
+      scores = tally_results { |response| score(response) }
+      return scores if type == :borda_single
+
+      chosen_count = tally_results { |response| response.chosen ? 1 : 0 }
+      return scores, chosen_count
+    end
+
+    def tally_results
       choices_hash = choices.to_h { |choice|
         [choice.id, Result.new(text: choice.text, score: 0)]
       }
 
       responses.each { |response|
-        choices_hash[response.choice_id].score += score(response)
+        choices_hash[response.choice_id].score += yield(response)
       }
 
       return choices_hash.values.sort_by(&:score).reverse!
