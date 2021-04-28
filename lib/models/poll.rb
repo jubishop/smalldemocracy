@@ -67,10 +67,6 @@ module Models
       return @@results[id] ||= compute_results
     end
 
-    def score(response)
-      return choices.length - response.rank - 1
-    end
-
     def url(responder_salt = nil)
       return "/poll/view/#{id}" unless responder_salt
 
@@ -82,7 +78,7 @@ module Models
     @@results = {}
 
     def compute_results
-      scores = tally_results { |response| score(response) }
+      scores = tally_results { |response| choices.length - response.rank - 1 }
       return scores if type == :borda_single
 
       chosen_count = tally_results { |response| response.chosen ? 1 : 0 }
