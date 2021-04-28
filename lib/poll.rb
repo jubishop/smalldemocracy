@@ -78,13 +78,24 @@ class Poll < Base
 
     halt(400, 'No responses provided') unless params.key?(:responses)
     responses = params.fetch(:responses)
-    unless responses.length == poll.choices.length
+
+    if poll.type == :borda_split && !params.key?(:bottom_responses)
+      halt(400, 'No bottom response array provided for a borda_split poll')
+    end
+
+    bottom_responses = params.fetch(:bottom_responses, [])
+    unless responses.length + bottom_responses.length == poll.choices.length
       halt(406, 'Response set does not match number of choices')
     end
 
     begin
       responses.each_with_index { |choice_id, rank|
-        responder.add_response(choice_id: choice_id, rank: rank)
+        responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
+      }
+      bottom_responses.each_with_index { |choice_id, rank|
+        response.add_response(choice_id: choice_id,
+                              rank: rank + responses.length,
+                              chosen: false)
       }
     rescue Sequel::UniqueConstraintViolation
       halt(409, 'Duplicate response, choice, or rank found')

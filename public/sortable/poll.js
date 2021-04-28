@@ -1,38 +1,55 @@
-window.addEventListener('DOMContentLoaded', () => {
-  const choicesElement = document.getElementById('choices');
+class Poll {
+  static domLoaded() {
+    const choicesElement = document.getElementById('choices');
+    const bottomChoicesElement = document.getElementById('bottom-choices')
 
-  const options = {
-    animation: 100,
+    const options = {
+      animation: 100,
+      group: 'choices'
+    }
+    if(window.matchMedia("(pointer: coarse)").matches) {
+      options.handle = '.grip';
+    }
+    this.sortable = Sortable.create(choicesElement, options);
+    if (bottomChoicesElement) {
+      this.bottomSortable = Sortable.create(bottomChoicesElement, options);
+    }
+
+    this.pollID = choicesElement.getAttribute('poll_id');
+    this.responderSalt = choicesElement.getAttribute('responder_salt');
+
+    this.submitButton = document.getElementById('submit');
+    this.submitButton.addEventListener('click', () => this.submitClicked());
+    this.submitButton.disabled = false;
   }
-  if(window.matchMedia("(pointer: coarse)").matches) {
-    options.handle = '.grip';
-  }
-  const sortable = Sortable.create(choicesElement, options);
 
-  const pollID = choicesElement.getAttribute('poll_id');
-  const responderSalt = choicesElement.getAttribute('responder_salt');
-
-  submitButton = document.getElementById('submit');
-  submitButton.addEventListener('click', () => {
-    message = document.createElement('p');
+  static async submitClicked() {
+    const message = document.createElement('p');
     message.textContent = 'Now submitting...';
-    submitButton.parentNode.replaceChild(message, submitButton);
-
+    this.submitButton.parentNode.replaceChild(message, this.submitButton);
     fetch('/poll/respond', {
       method: 'POST',
       body: JSON.stringify({
-        poll_id: pollID,
-        responder: responderSalt,
-        responses: sortable.toArray()
+        poll_id: this.pollID,
+        responder: this.responderSalt,
+        responses: this.sortable.toArray(),
+        bottom_responses: this?.bottomSortable?.toArray(),
       }),
       headers: { 'Content-Type': 'application/json' }
     }).then(res => {
       if (res.status == 201) {
-        location.reload();
+        return false;
       } else {
-        alert('Something went wrong :(');
+        return res.text();
+      }
+    }).then(error_message => {
+      if (error_message) {
+        alert('Error: ' + error_message);
+      } else {
+        location.reload();
       }
     });
-  })
-  submitButton.disabled = false;
-});
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => Poll.domLoaded());

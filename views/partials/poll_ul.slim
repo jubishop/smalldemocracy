@@ -6,3 +6,5 @@ ul#choices poll_id=poll.id responder_salt=locals[:responder]&.salt
     li.choice data-id=choice.id
       i.grip.fas.fa-grip-lines
       p =choice.text
+- if poll.type == :borda_split
+  ul#bottom-choices
