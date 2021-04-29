@@ -5,6 +5,14 @@ p Poll: #{poll.title}, is finished!
 
 p Results:
 
-ol
-  - results.each do |result|
-    li ="#{result.text} (#{result.score} #{"point".en.plural(result.score)})"
+- if poll.counts
+  ol
+    - poll.counts.each do |result|
+      - respondents = 'respondent'.en.plural(result.score)
+      - chosen = "(Chosen by #{result.score} #{respondents})"
+      li ="#{result.text} #{chosen}"
+
+- if poll.scores
+  ol
+    - poll.scores.each do |result|
+      li ="#{result.text} (#{result.score} #{"point".en.plural(result.score)})"

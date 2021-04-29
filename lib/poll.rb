@@ -25,9 +25,7 @@ class Poll < Base
   get('/view/:poll_id') {
     poll = require_poll
 
-    if (results = poll.results)
-      return slim_poll(:finished, locals: { poll: poll, results: results })
-    end
+    return slim_poll(:finished, locals: { poll: poll }) if poll.finished?
 
     if params.key?(:responder)
       responder = poll.responder(salt: params.fetch(:responder))

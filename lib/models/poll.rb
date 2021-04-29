@@ -61,10 +61,24 @@ module Models
       return responders_dataset.where(**options).first
     end
 
-    def results
-      return if Time.at(expiration) > Time.now
+    def finished?
+      return Time.at(expiration) < Time.now
+    end
 
-      return @@results[id] ||= compute_results
+    def scores
+      return unless finished?
+
+      @scores ||= tally_results { |response|
+        choices.length - response.rank - 1
+      }
+      return @scores
+    end
+
+    def counts
+      return unless finished? && type == :borda_split
+
+      @counts ||= tally_results { |response| response.chosen ? 1 : 0 }
+      return @counts
     end
 
     def url(responder_salt = nil)
@@ -74,16 +88,6 @@ module Models
     end
 
     private
-
-    @@results = {}
-
-    def compute_results
-      scores = tally_results { |response| choices.length - response.rank - 1 }
-      return scores if type == :borda_single
-
-      chosen_count = tally_results { |response| response.chosen ? 1 : 0 }
-      return scores, chosen_count
-    end
 
     def tally_results
       choices_hash = choices.to_h { |choice|
