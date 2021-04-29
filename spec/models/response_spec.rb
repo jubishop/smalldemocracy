@@ -2,7 +2,7 @@ require_relative '../../lib/models/response'
 
 RSpec.describe(Models::Response) {
   context('::create') {
-    it('successfully makes a basic response') {
+    it('successfully makes a ranked response') {
       poll = create_poll
       response = poll.responders.first.add_response(
           choice_id: poll.choices.first.id, rank: 0, chosen: true)
@@ -13,11 +13,20 @@ RSpec.describe(Models::Response) {
       expect(response.chosen).to(be(true))
     }
 
-    it('calculates results properly when chosen') {
+    it('successfully makes an unranked response') {
+      poll = create_poll
+      response = poll.responders.first.add_response(
+          choice_id: poll.choices.first.id, chosen: true)
+      expect(response.rank).to(eq(nil))
+    }
+
+    it('calculates results properly when chosen (ranked or unranked)') {
       poll = create_poll
       poll.mock_response
       poll.responses.each { |response|
         expect(response.score).to(eq(poll.choices.length - response.rank - 1))
+        response.rank = nil
+        expect(response.score).to(eq(0))
         expect(response.point).to(eq(1))
       }
     }
