@@ -21,7 +21,7 @@ RSpec.describe(Models::Poll) {
       expect(poll.type).to(eq(:borda_single))
     }
 
-    it('can be created with other types') {
+    it('can be created with other valid types') {
       poll = create_poll(type: :borda_split)
       expect(poll.type).to(eq(:borda_split))
     }

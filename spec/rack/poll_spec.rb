@@ -167,6 +167,17 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
     }
 
+    it('rejects posting to a :borda_split poll with no bottom responses') {
+      poll = create_poll(type: :borda_split)
+      data = {
+        poll_id: poll.id,
+        responder: poll.responders.first.salt,
+        responses: poll.choices.map(&:id)
+      }
+      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      expect(last_response.status).to(be(400))
+    }
+
     it('rejects posting to an already responded poll') {
       poll = create_poll
       responder, responses = poll.mock_response
@@ -185,34 +196,46 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
     }
 
-    it('rejects posting to nonexistent poll') {
+    it('rejects posting with no data') {
       data = {}
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(400))
+    }
 
-      data = { poll_id: 'does not exist' }
+    it('rejects posting to invalid poll') {
+      data = { poll_id: 'does_not_exist' }
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(404))
     }
 
-    it('rejects posting with invalid responder') {
+    it('rejects posting with no responder') {
       poll = create_poll
       data = { poll_id: poll.id }
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(400))
+    }
 
-      data[:responder] = 'does not exist'
+    it('rejects posting with invalid responder') {
+      poll = create_poll
+      data = { poll_id: poll.id, responder: 'does_not_exist' }
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(404))
     }
 
-    it('rejects posting with invalid responses') {
+    it('rejects posting with no responses') {
       poll = create_poll
       data = { poll_id: poll.id, responder: poll.responders.first.salt }
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(400))
+    }
 
-      data[:responses] = [1, 2]
+    it('rejects posting with invalid responses') {
+      poll = create_poll
+      data = {
+        poll_id: poll.id,
+        responder: poll.responders.first.salt,
+        responses: [1, 2]
+      }
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(406))
     }
