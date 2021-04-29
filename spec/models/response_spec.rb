@@ -13,11 +13,21 @@ RSpec.describe(Models::Response) {
       expect(response.chosen).to(be(true))
     }
 
-    it('calculated response score properly') {
+    it('calculates results properly when chosen') {
       poll = create_poll
       poll.mock_response
       poll.responses.each { |response|
         expect(response.score).to(eq(poll.choices.length - response.rank - 1))
+        expect(response.point).to(eq(1))
+      }
+    }
+
+    it('calculates results properly when not chosen') {
+      poll = create_poll
+      poll.mock_response(chosen: false)
+      poll.responses.each { |response|
+        expect(response.score).to(eq(0))
+        expect(response.point).to(eq(0))
       }
     }
 
@@ -33,14 +43,6 @@ RSpec.describe(Models::Response) {
       poll = create_poll
       expect {
         poll.responders.first.add_response(rank: 0,
-                                           chosen: true)
-      }.to(raise_error(Sequel::ConstraintViolation))
-    }
-
-    it('rejects making a response with no rank') {
-      poll = create_poll
-      expect {
-        poll.responders.first.add_response(choice_id: poll.choices.first.id,
                                            chosen: true)
       }.to(raise_error(Sequel::ConstraintViolation))
     }

@@ -90,9 +90,8 @@ class Poll < Base
       responses.each_with_index { |choice_id, rank|
         responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
       }
-      bottom_responses.each_with_index { |choice_id, rank|
-        rank += responses.length
-        responder.add_response(choice_id: choice_id, rank: rank, chosen: false)
+      bottom_responses.each { |choice_id|
+        responder.add_response(choice_id: choice_id, chosen: false)
       }
     rescue Sequel::UniqueConstraintViolation
       halt(409, 'Duplicate response, choice, or rank found')

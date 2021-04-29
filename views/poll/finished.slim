@@ -8,8 +8,8 @@ p Results:
 - if poll.counts
   ol
     - poll.counts.each do |result|
-      - respondents = 'respondent'.en.plural(result.score)
-      - chosen = "(Chosen by #{result.score} #{respondents})"
+      - respondents = 'respondent'.en.plural(result.count)
+      - chosen = "(Chosen by #{result.count} #{respondents})"
       li ="#{result} #{chosen}"
 
 - if poll.scores

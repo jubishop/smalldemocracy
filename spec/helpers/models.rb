@@ -24,12 +24,12 @@ module Models
   class Poll
     include RSpec::Env
 
-    def mock_response
+    def mock_response(chosen: true)
       test_only!
       responder = responder(email: 'a@a')
       responses = choices.map(&:id)
       responses.each_with_index { |choice_id, rank|
-        responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
+        responder.add_response(choice_id: choice_id, rank: rank, chosen: chosen)
       }
       return responder, responses
     end

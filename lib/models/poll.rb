@@ -2,7 +2,7 @@ require 'securerandom'
 require 'sequel'
 require 'set'
 
-require_relative 'helpers/poll_responses'
+require_relative 'helpers/poll_results'
 
 require_relative 'choice'
 require_relative 'responder'
@@ -67,16 +67,14 @@ module Models
     def scores
       return unless finished?
 
-      @scores ||= tally_results { |response|
-        response.chosen ? response.score : 0
-      }
+      @scores ||= poll_results(&:score)
       return @scores
     end
 
     def counts
       return unless finished? && type == :borda_split
 
-      @counts ||= tally_results { |response| response.chosen ? 1 : 0 }
+      @counts ||= poll_results(&:point)
       return @counts
     end
 
@@ -88,7 +86,7 @@ module Models
 
     private
 
-    def tally_results(&block)
+    def poll_results(&block)
       return Helpers::PollResults.new(responses, &block).to_a
     end
   end

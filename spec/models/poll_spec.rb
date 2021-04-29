@@ -89,32 +89,86 @@ RSpec.describe(Models::Poll) {
       expect(poll.counts).to(be_falsey)
     }
 
-    it('computes results properly') {
-      choices = %w[one two three four]
-      responders = %w[a@a b@b c@c d@d]
-      poll = create_poll(choices: choices, responders: responders)
+    context(':borda_single') {
+      it('computes scores properly') {
+        choices = %w[one two three four five]
+        responders = %w[a@a b@b c@c d@d e@e]
+        poll = create_poll(choices: choices, responders: responders)
 
-      responses = {
-        'a@a': %w[one two three four],
-        'b@b': %w[one two four three],
-        'c@c': %w[three one two four],
-        'd@d': %w[four two three one]
+        responses = {
+          'a@a': %w[one two five three four],
+          'b@b': %w[one two four three five],
+          'c@c': %w[three one two four five],
+          'd@d': %w[four two three one five],
+          'e@e': %w[three one two four five]
+        }
+        responses.each { |email, ranks|
+          responder = poll.responder(email: email.to_s)
+          poll.choices.each { |choice|
+            responder.add_response(choice_id: choice.id,
+                                   rank: ranks.index(choice.text),
+                                   chosen: true)
+          }
+        }
+
+        allow(Time).to(receive(:now).and_return(Time.at(10**10)))
+        results = { one: 15, two: 13, three: 12, four: 8, five: 2 }
+        results.each_with_index { |result, index|
+          choice, score = *result
+          expect(poll.scores[index].text).to(eq(choice.to_s))
+          expect(poll.scores[index].score).to(eq(score))
+        }
       }
-      responses.each { |email, ranks|
-        responder = poll.responder(email: email.to_s)
-        poll.choices.each { |choice|
-          responder.add_response(choice_id: choice.id,
-                                 rank: ranks.index(choice.text),
-                                 chosen: true)
+    }
+
+    context(':borda_split') {
+      before(:each) {
+        choices = %w[one two three four five]
+        responders = %w[a@a b@b c@c d@d e@e]
+        @poll = create_poll(choices: choices,
+                            responders: responders,
+                            type: :borda_split)
+
+        responses = {
+          'a@a': %w[one two],
+          'b@b': %w[one two five four],
+          'c@c': %w[two three five one],
+          'd@d': %w[two five three],
+          'e@e': %w[two one]
+        }
+
+        responses.each { |email, chosen_ranks|
+          responder = @poll.responder(email: email.to_s)
+          @poll.choices.each { |choice|
+            if chosen_ranks.include?(choice.text)
+              responder.add_response(choice_id: choice.id,
+                                     rank: chosen_ranks.index(choice.text),
+                                     chosen: true)
+            else
+              responder.add_response(choice_id: choice.id, chosen: false)
+            end
+          }
+        }
+
+        allow(Time).to(receive(:now).and_return(Time.at(10**10)))
+      }
+
+      it('computes scores properly') {
+        score_results = { two: 18, one: 12, five: 7, three: 5, four: 1 }
+        score_results.each_with_index { |result, index|
+          choice, score = *result
+          expect(@poll.scores[index].text).to(eq(choice.to_s))
+          expect(@poll.scores[index].score).to(eq(score))
         }
       }
 
-      allow(Time).to(receive(:now).and_return(Time.at(10**10)))
-      results = { one: 8, two: 7, three: 5, four: 4 }
-      results.each_with_index { |result, index|
-        choice, score = *result
-        expect(poll.scores[index].text).to(eq(choice.to_s))
-        expect(poll.scores[index].score).to(eq(score))
+      it('computes counts properly') {
+        count_results = { two: 5, one: 4, five: 3, three: 2, four: 1 }
+        count_results.each_with_index { |result, index|
+          choice, count = *result
+          expect(@poll.counts[index].text).to(eq(choice.to_s))
+          expect(@poll.counts[index].count).to(eq(count))
+        }
       }
     }
   }

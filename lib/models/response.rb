@@ -14,7 +14,11 @@ module Models
     end
 
     def score
-      return poll.choices.length - rank - 1
+      return chosen ? poll.choices.length - rank - 1 : 0
+    end
+
+    def point
+      return chosen ? 1 : 0
     end
   end
 end

@@ -4,12 +4,12 @@ module Models
       def initialize(responses)
         @results = {}
         responses.each { |response|
-          self[response.choice].score += yield(response)
+          self[response.choice].value += yield(response)
         }
       end
 
       def [](choice)
-        @results[choice.id] ||= PollResult.new(choice: choice)
+        @results[choice.id] ||= PollResult.new(choice)
         return @results[choice.id]
       end
 
@@ -22,18 +22,20 @@ module Models
       include Comparable
 
       attr_reader :choice
-      attr_accessor :score
+      attr_accessor :value
 
-      def initialize(choice:, score: 0)
+      def initialize(choice, value = 0)
         @choice = choice
-        @score = score
+        @value = value
       end
 
       def <=>(other)
-        return score <=> other.score
+        return to_i <=> other.to_i
       end
 
-      alias to_i score
+      alias to_i value
+      alias score value
+      alias count value
 
       def text
         return choice.text
