@@ -15,7 +15,7 @@ Sequel.migration {
       Integer :rank, null: false
       unique(%i[responder_id rank], name: :rank_unique)
 
-      TrueClass :chosen
+      TrueClass :chosen, null: false
     }
   }
 }

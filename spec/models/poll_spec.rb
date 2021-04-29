@@ -104,7 +104,8 @@ RSpec.describe(Models::Poll) {
         responder = poll.responder(email: email.to_s)
         poll.choices.each { |choice|
           responder.add_response(choice_id: choice.id,
-                                 rank: ranks.index(choice.text))
+                                 rank: ranks.index(choice.text),
+                                 chosen: true)
         }
       }
 

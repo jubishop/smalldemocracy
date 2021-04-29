@@ -29,7 +29,7 @@ module Models
       responder = responder(email: 'a@a')
       responses = choices.map(&:id)
       responses.each_with_index { |choice_id, rank|
-        responder.add_response(choice_id: choice_id, rank: rank)
+        responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
       }
       return responder, responses
     end
