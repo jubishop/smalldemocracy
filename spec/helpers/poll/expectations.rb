@@ -22,9 +22,16 @@ module RSpec
       expect(last_response.body).to(have_selector('h1', text: 'Sent Email'))
     end
 
-    def expect_finished_page
+    def expect_borda_single_finished_page
       expect(last_response.ok?).to(be(true))
       expect(last_response.body).to(have_content('is finished'))
+      expect(last_response.body).to(have_selector('ol', count: 1))
+    end
+
+    def expect_borda_split_finished_page
+      expect(last_response.ok?).to(be(true))
+      expect(last_response.body).to(have_content('is finished'))
+      expect(last_response.body).to(have_selector('ol', count: 2))
     end
 
     def expect_not_found_page

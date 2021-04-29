@@ -77,10 +77,22 @@ RSpec.describe(Poll, type: :rack_test) {
       expect_not_found_page
     }
 
-    it('shows results if the poll is finished') {
-      poll = create_poll(expiration: Time.now.to_i - 1)
+    it('shows results of :borda_single polls when finished') {
+      poll = create_poll
+      poll.mock_response
+      poll.expiration = 1
+      poll.save
       get poll.url
-      expect_finished_page
+      expect_borda_single_finished_page
+    }
+
+    it('shows results of :borda_split polls when finished') {
+      poll = create_poll(type: :borda_split)
+      poll.mock_response
+      poll.expiration = 1
+      poll.save
+      get poll.url
+      expect_borda_split_finished_page
     }
 
     it('asks for email if responder param is not in poll') {
@@ -178,9 +190,9 @@ RSpec.describe(Poll, type: :rack_test) {
         get "/poll/view/#{poll.id}"
         expect_responded_page
 
-        allow(Time).to(receive(:now).and_return(Time.at(10**10)))
-        # TODO: Confirm each score and not just text order.
+        poll.expiration = 1
         expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
+        expect(poll.scores.map(&:score)).to(eq([2, 1, 0]))
       }
     }
 
@@ -193,21 +205,19 @@ RSpec.describe(Poll, type: :rack_test) {
         data = {
           poll_id: @poll.id,
           responder: @poll.responders.first.salt,
-          responses: @poll.choices[0...-1].map(&:id),
-          bottom_responses: [@poll.choices[-1].id]
+          responses: [@poll.choices.first.id],
+          bottom_responses: @poll.choices.drop(1).map(&:id)
         }
         post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
         expect(last_response.status).to(be(201))
 
         set_cookie(:email, 'a@a')
         get "/poll/view/#{@poll.id}"
-
-        # TODO: expect_responded_borda_split_page
         expect_responded_page
 
-        allow(Time).to(receive(:now).and_return(Time.at(10**10)))
-        # TODO: Confirm each score and not just text order.
-        expect(@poll.scores.map(&:text)).to(eq(@poll.choices.map(&:text)))
+        @poll.expiration = 1
+        expect(@poll.scores.first.text).to(eq(@poll.choices.first.text))
+        expect(@poll.scores.map(&:score)).to(eq([2, 0, 0]))
       }
 
       it('rejects posting with no bottom responses') {

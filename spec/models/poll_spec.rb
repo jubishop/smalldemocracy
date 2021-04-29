@@ -83,7 +83,6 @@ RSpec.describe(Models::Poll) {
 
   context('#results') {
     it('returns no results if the poll is not expired') {
-      allow(Time).to(receive(:now).and_return(Time.at(0)))
       poll = create_poll(choices: 'a', responders: 'b@b')
       expect(poll.scores).to(be_falsey)
       expect(poll.counts).to(be_falsey)
@@ -111,7 +110,7 @@ RSpec.describe(Models::Poll) {
           }
         }
 
-        allow(Time).to(receive(:now).and_return(Time.at(10**10)))
+        poll.expiration = 1
         results = { one: 15, two: 13, three: 12, four: 8, five: 2 }
         results.each_with_index { |result, index|
           choice, score = *result
@@ -150,7 +149,7 @@ RSpec.describe(Models::Poll) {
           }
         }
 
-        allow(Time).to(receive(:now).and_return(Time.at(10**10)))
+        @poll.expiration = 1
       }
 
       it('computes scores properly') {

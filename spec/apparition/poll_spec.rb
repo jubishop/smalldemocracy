@@ -26,7 +26,7 @@ RSpec.describe(Poll, type: :feature) {
     RSpec::Goldens.verify(page, 'poll_responded', full: true)
 
     # See finished poll results
-    allow(Time).to(receive(:now).and_return(Time.at(current_time + 62)))
+    allow(Time).to(receive(:now).and_return(Time.at(10**10)))
     refresh
     RSpec::Goldens.verify(page, 'poll_finished', full: true)
   }
