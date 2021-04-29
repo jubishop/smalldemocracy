@@ -28,12 +28,22 @@ RSpec.describe(Poll, type: :rack_test) {
       }
     }
 
-    it('creates a new poll successfully') {
+    it('creates a new :borda_single poll successfully') {
       set_cookie(:email, 'test@example.com')
       post '/poll/create', **@valid_params
       expect(last_response.redirect?).to(be(true))
       follow_redirect!
-      expect_view_page
+      expect_view_borda_single_page
+    }
+
+    it('creates a new :borda_split poll successfully') {
+      set_cookie(:email, 'test@example.com')
+      params = @valid_params.clone
+      params[:type] = :borda_split
+      post '/poll/create', **params
+      expect(last_response.redirect?).to(be(true))
+      follow_redirect!
+      expect_view_borda_split_page
     }
 
     it('rejects any post without a cookie') {
@@ -85,7 +95,7 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.redirect?).to(be(true))
       expect(get_cookie(:email)).to(eq('a@a'))
       follow_redirect!
-      expect_view_page
+      expect_view_borda_single_page
     }
 
     it('asks for email if not logged in and no responder param') {
@@ -105,7 +115,7 @@ RSpec.describe(Poll, type: :rack_test) {
       set_cookie(:email, 'a@a')
       poll = create_poll
       get poll.url
-      expect_view_page
+      expect_view_borda_single_page
     }
 
     it('shows your answers if you have already responded') {
@@ -153,29 +163,73 @@ RSpec.describe(Poll, type: :rack_test) {
   }
 
   context('post /respond') {
-    it('saves posted results successfully') {
-      poll = create_poll
-      data = {
-        poll_id: poll.id,
-        responder: poll.responders.first.salt,
-        responses: poll.choices.map(&:id)
-      }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
-      expect(last_response.status).to(be(201))
+    context(':borda_single') {
+      it('saves posted results successfully') {
+        poll = create_poll
+        data = {
+          poll_id: poll.id,
+          responder: poll.responders.first.salt,
+          responses: poll.choices.map(&:id)
+        }
+        post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        expect(last_response.status).to(be(201))
 
-      allow(Time).to(receive(:now).and_return(Time.at(10**10)))
-      expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
+        set_cookie(:email, 'a@a')
+        get "/poll/view/#{poll.id}"
+        expect_responded_page
+
+        allow(Time).to(receive(:now).and_return(Time.at(10**10)))
+        # TODO: Confirm each score and not just text order.
+        expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
+      }
     }
 
-    it('rejects posting to a :borda_split poll with no bottom responses') {
-      poll = create_poll(type: :borda_split)
-      data = {
-        poll_id: poll.id,
-        responder: poll.responders.first.salt,
-        responses: poll.choices.map(&:id)
+    context(':borda_split') {
+      before(:each) {
+        @poll = create_poll(type: :borda_split)
       }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
-      expect(last_response.status).to(be(400))
+
+      it('saves posted results successfully') {
+        data = {
+          poll_id: @poll.id,
+          responder: @poll.responders.first.salt,
+          responses: @poll.choices[0...-1].map(&:id),
+          bottom_responses: [@poll.choices[-1].id]
+        }
+        post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        expect(last_response.status).to(be(201))
+
+        set_cookie(:email, 'a@a')
+        get "/poll/view/#{@poll.id}"
+
+        # TODO: expect_responded_borda_split_page
+        expect_responded_page
+
+        allow(Time).to(receive(:now).and_return(Time.at(10**10)))
+        # TODO: Confirm each score and not just text order.
+        expect(@poll.scores.map(&:text)).to(eq(@poll.choices.map(&:text)))
+      }
+
+      it('rejects posting with no bottom responses') {
+        data = {
+          poll_id: @poll.id,
+          responder: @poll.responders.first.salt,
+          responses: @poll.choices.map(&:id)
+        }
+        post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        expect(last_response.status).to(be(400))
+      }
+
+      it('rejects posting with invalid bottom responses') {
+        data = {
+          poll_id: @poll.id,
+          responder: @poll.responders.first.salt,
+          responses: @poll.choices.map(&:id),
+          bottom_responses: [1, 2]
+        }
+        post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        expect(last_response.status).to(be(406))
+      }
     }
 
     it('rejects posting to an already responded poll') {
@@ -196,7 +250,7 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
     }
 
-    it('rejects posting with no data') {
+    it('rejects posting with empty data object') {
       data = {}
       post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
       expect(last_response.status).to(be(400))

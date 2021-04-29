@@ -43,9 +43,16 @@ module RSpec
                                                   text: 'Email Not Found'))
     end
 
-    def expect_view_page
+    def expect_view_borda_single_page
       expect(last_response.ok?).to(be(true))
       expect(last_response.body).to(have_selector('ul#choices'))
+      expect(last_response.body).to(have_no_selector('ul#bottom-choices'))
+    end
+
+    def expect_view_borda_split_page
+      expect(last_response.ok?).to(be(true))
+      expect(last_response.body).to(have_selector('ul#choices'))
+      expect(last_response.body).to(have_selector('ul#bottom-choices'))
     end
   end
 end
