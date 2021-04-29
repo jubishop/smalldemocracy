@@ -2,7 +2,7 @@ require 'securerandom'
 require 'sequel'
 require 'set'
 
-require_relative '../utils/poll_responses'
+require_relative 'helpers/poll_responses'
 
 require_relative 'choice'
 require_relative 'responder'
@@ -89,7 +89,7 @@ module Models
     private
 
     def tally_results(&block)
-      return Utils::PollResults.new(responses, &block).to_a
+      return Helpers::PollResults.new(responses, &block).to_a
     end
   end
 end
