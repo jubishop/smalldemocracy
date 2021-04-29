@@ -28,8 +28,11 @@ RSpec.describe(Poll, type: :rack_test) {
       }
     }
 
-    it('creates a new :borda_single poll successfully') {
+    before(:each) {
       set_cookie(:email, 'test@example.com')
+    }
+
+    it('creates a new :borda_single poll successfully') {
       post '/poll/create', **@valid_params
       expect(last_response.redirect?).to(be(true))
       follow_redirect!
@@ -37,7 +40,6 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('creates a new :borda_split poll successfully') {
-      set_cookie(:email, 'test@example.com')
       params = @valid_params.clone
       params[:type] = :borda_split
       post '/poll/create', **params
@@ -47,18 +49,17 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects any post without a cookie') {
+      clear_cookies
       post '/poll/create'
       expect_email_not_found_page
     }
 
     it('fails if post body is nonexistent') {
-      set_cookie(:email, 'test@example.com')
       post '/poll/create'
       expect(last_response.status).to(be(406))
     }
 
     it('fails if any fields are empty or missing') {
-      set_cookie(:email, 'test@example.com')
       @valid_params.each_key { |key|
         params = @valid_params.clone
         params[key] = ''
@@ -175,6 +176,10 @@ RSpec.describe(Poll, type: :rack_test) {
   }
 
   context('post /respond') {
+    before(:each) {
+      set_cookie(:email, 'a@a')
+    }
+
     context(':borda_single') {
       it('saves posted results successfully') {
         poll = create_poll
@@ -186,7 +191,6 @@ RSpec.describe(Poll, type: :rack_test) {
         post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
         expect(last_response.status).to(be(201))
 
-        set_cookie(:email, 'a@a')
         get "/poll/view/#{poll.id}"
         expect_responded_page
 
@@ -211,7 +215,6 @@ RSpec.describe(Poll, type: :rack_test) {
         post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
         expect(last_response.status).to(be(201))
 
-        set_cookie(:email, 'a@a')
         get "/poll/view/#{@poll.id}"
         expect_responded_page
 
@@ -318,6 +321,30 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('rejects posting responses to expired poll') {
       poll = create_poll(expiration: 1)
+      data = {
+        poll_id: poll.id,
+        responder: poll.responders.first.salt,
+        responses: poll.choices.map(&:id)
+      }
+      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      expect(last_response.status).to(be(405))
+    }
+
+    it('rejects posting if you are not logged in') {
+      clear_cookies
+      poll = create_poll
+      data = {
+        poll_id: poll.id,
+        responder: poll.responders.first.salt,
+        responses: poll.choices.map(&:id)
+      }
+      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      expect(last_response.status).to(be(404))
+    }
+
+    it('rejects posting if you are logged in as someone else') {
+      set_cookie(:email, 'someone_else@hey.com')
+      poll = create_poll
       data = {
         poll_id: poll.id,
         responder: poll.responders.first.salt,

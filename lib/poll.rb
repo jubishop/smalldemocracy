@@ -69,10 +69,15 @@ class Poll < Base
     end
 
     poll = require_poll
+    email = require_email
 
     halt(400, 'No responder provided') unless params.key?(:responder)
     responder = poll.responder(salt: params.fetch(:responder))
     halt(404, 'Responder not found') unless responder
+
+    if responder.email != email
+      halt(405, 'Logged in user is not the responder in the form')
+    end
 
     halt(400, 'No responses provided') unless params.key?(:responses)
     responses = params.fetch(:responses)
