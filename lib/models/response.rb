@@ -12,5 +12,9 @@ module Models
       cancel_action unless poll && poll.expiration >= Time.now.to_i
       super
     end
+
+    def score
+      return poll.choices.length - rank - 1
+    end
   end
 end

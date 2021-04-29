@@ -8,8 +8,17 @@ RSpec.describe(Models::Response) {
           choice_id: poll.choices.first.id, rank: 0, chosen: true)
       expect(response.responder).to(eq(poll.responders.first))
       expect(response.choice).to(eq(poll.choices.first))
+      expect(response.poll).to(eq(poll))
       expect(response.rank).to(eq(0))
       expect(response.chosen).to(be(true))
+    }
+
+    it('calculated response score properly') {
+      poll = create_poll
+      poll.mock_response
+      poll.responses.each { |response|
+        expect(response.score).to(eq(poll.choices.length - response.rank - 1))
+      }
     }
 
     it('rejects making a response with no responder associated') {

@@ -68,7 +68,7 @@ module Models
       return unless finished?
 
       @scores ||= tally_results { |response|
-        response.chosen ? choices.length - response.rank - 1 : 0
+        response.chosen ? response.score : 0
       }
       return @scores
     end
