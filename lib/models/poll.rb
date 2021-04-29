@@ -2,6 +2,8 @@ require 'securerandom'
 require 'sequel'
 require 'set'
 
+require_relative '../utils/poll_responses'
+
 require_relative 'choice'
 require_relative 'responder'
 require_relative 'response'
@@ -87,48 +89,7 @@ module Models
     private
 
     def tally_results(&block)
-      return PollResults.new(responses, &block).to_a
-    end
-  end
-
-  class PollResults
-    class PollResult
-      include Comparable
-
-      attr_reader :choice
-      attr_accessor :score
-
-      def initialize(choice:, score: 0)
-        @choice = choice
-        @score = score
-      end
-
-      def <=>(other)
-        return score <=> other.score
-      end
-
-      alias to_i score
-
-      def text
-        return choice.text
-      end
-      alias to_s text
-    end
-
-    def initialize(responses)
-      @results = {}
-      responses.each { |response|
-        self[response.choice].score += yield(response)
-      }
-    end
-
-    def [](choice)
-      @results[choice.id] ||= PollResult.new(choice: choice)
-      return @results[choice.id]
-    end
-
-    def to_a
-      return @results.values.sort!.reverse!
+      return Utils::PollResults.new(responses, &block).to_a
     end
   end
 end
