@@ -15,9 +15,6 @@ module Models
                              right_key: :id,
                              right_primary_key: :responder_id
 
-    Result = Struct.new(:text, :score, keyword_init: true)
-    private_constant :Result
-
     def self.create_poll(title:,
                          question:,
                          expiration:,
@@ -89,16 +86,49 @@ module Models
 
     private
 
-    def tally_results
-      choices_hash = choices.to_h { |choice|
-        [choice.id, Result.new(text: choice.text, score: 0)]
-      }
+    def tally_results(&block)
+      return PollResults.new(responses, &block).to_a
+    end
+  end
 
+  class PollResults
+    class PollResult
+      include Comparable
+
+      attr_reader :choice
+      attr_accessor :score
+
+      def initialize(choice:, score: 0)
+        @choice = choice
+        @score = score
+      end
+
+      def <=>(other)
+        return score <=> other.score
+      end
+
+      alias to_i score
+
+      def text
+        return choice.text
+      end
+      alias to_s text
+    end
+
+    def initialize(responses)
+      @results = {}
       responses.each { |response|
-        choices_hash[response.choice_id].score += yield(response)
+        self[response.choice].score += yield(response)
       }
+    end
 
-      return choices_hash.values.sort_by(&:score).reverse!
+    def [](choice)
+      @results[choice.id] ||= PollResult.new(choice: choice)
+      return @results[choice.id]
+    end
+
+    def to_a
+      return @results.values.sort!.reverse!
     end
   end
 end
