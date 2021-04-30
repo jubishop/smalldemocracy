@@ -24,17 +24,17 @@ class Poll {
       this.bottomSortable = Sortable.create(bottomChoicesElement, options);
     }
 
-    this.updateScores();
-
     this.pollID = choicesElement.getAttribute('poll_id');
     this.responderSalt = choicesElement.getAttribute('responder_salt');
 
     this.submitButton = document.getElementById('submit');
     this.submitButton.addEventListener('click', () => this.submitClicked());
-    this.submitButton.disabled = false;
+
+    this.updateScores();
   }
 
   static updateScores() {
+    this.submitButton.disabled = true;
     let baseScore = 0;
     if (this.bottomSortable) {
       baseScore = this.bottomSortable.toArray().length;
@@ -50,6 +50,7 @@ class Poll {
       const points = currentScore == 1 ? 'point' : 'points';
       this.choiceElements[choiceID].textContent = currentScore + ' ' + points;
     });
+    this.submitButton.disabled = false;
   }
 
   static async submitClicked() {

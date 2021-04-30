@@ -7,19 +7,20 @@ module RSpec
 
       expect(page).to(have_googlefonts)
 
+      page.driver.save_screenshot(golden_file(filename), **options)
+      new_base64 = Base64.encode64(File.read(golden_file(filename)))
+
       unless File.exist?(base64_file(filename))
-        warn("Creating new golden for: #{filename}".light_red)
-        write_golden(page, filename, **options)
+        File.write(base64_file(filename), new_base64)
         system("open #{golden_file(filename)}")
         return
       end
 
       golden_base64 = File.read(base64_file(filename))
-      new_base64 = page.driver.render_base64(:png, **options)
       return if golden_base64 == new_base64
 
       warn("Golden match failed for: #{filename}".red)
-      write_golden(page, filename, **options)
+      File.write(base64_file(filename), new_base64)
       system("open #{golden_file(filename)}")
       return unless ENV.fetch('FAIL_ON_GOLDEN', false)
 
@@ -44,7 +45,6 @@ module RSpec
       def write_golden(page, filename, **options)
         File.write(base64_file(filename),
                    page.driver.render_base64(:png, **options))
-        page.driver.save_screenshot(golden_file(filename), **options)
       end
 
       def golden_file(filename)
