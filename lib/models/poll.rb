@@ -57,7 +57,7 @@ module Models
     end
 
     def responder(**options)
-      return responders_dataset.where(**options).first
+      return responders { |ds| ds.where(**options) }.first
     end
 
     def finished?

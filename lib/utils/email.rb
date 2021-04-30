@@ -6,8 +6,6 @@ module Utils
     public_constant :HOSTNAME
 
     def self.email(poll, responder)
-      return if ENV.fetch('APP_ENV') == 'test'
-
       if poll.expiration < Time.now.to_i
         raise ArgumentError, "Cannot send email to #{responder.email} " \
           "because poll: #{poll.title} has expired"
@@ -27,6 +25,7 @@ module Utils
       mail = SendGrid::Mail.new(from, subject, to, content)
 
       sg = SendGrid::API.new(api_key: ENV.fetch('SENDGRID_API_KEY'))
+      return if ENV.fetch('APP_ENV') == 'test'
 
       return Process.detach(Process.fork {
         sg.client.mail._('send').post(request_body: mail.to_json)
