@@ -14,7 +14,8 @@ class Poll {
     const options = {
       animation: 100,
       group: 'choices',
-      onSort: () => this.updateScores()
+      onStart: () => { this.submitButton.disabled = true; },
+      onEnd: () => this.updateScores()
     };
     if(window.matchMedia("(pointer: coarse)").matches) {
       options.handle = '.grip';
@@ -34,7 +35,6 @@ class Poll {
   }
 
   static updateScores() {
-    this.submitButton.disabled = true;
     let baseScore = 0;
     if (this.bottomSortable) {
       baseScore = this.bottomSortable.toArray().length;
