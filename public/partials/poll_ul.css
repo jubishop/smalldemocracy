@@ -24,10 +24,22 @@ li.choice {
 }
 
 li.choice .grip {
+  flex: 0 0 auto;
   font-size: 2em;
   margin: 0 0.5em;
 }
 
-li.choice p {
+li.choice .text {
+  flex: 1 1 auto;
   margin: 0;
+}
+
+li.choice .score {
+  color: #80bfff;
+  flex: 0 0 auto;
+  font-size: 0.75em;
+  font-style: italic;
+  margin: 0 0.5em;
+  position: relative;
+  top: 0.5em;
 }

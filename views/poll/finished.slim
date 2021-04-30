@@ -6,13 +6,17 @@ p Poll: #{poll.title}, is finished!
 p Results:
 
 - if poll.counts
+  h2 Positive Respondents
   ol
     - poll.counts.each do |result|
       - respondents = 'respondent'.en.plural(result.count)
-      - chosen = "(Chosen by #{result.count} #{respondents})"
-      li ="#{result} #{chosen}"
+      - count = "(#{result.count} #{respondents})"
+      li ="#{result} #{count}"
 
 - if poll.scores
+  h2 Borda Score
   ol
     - poll.scores.each do |result|
-      li ="#{result} (#{result.score} #{"point".en.plural(result.score)})"
+      - points = 'point'.en.plural(result.score)
+      - score = "(#{result.score} #{points})"
+      li ="#{result} #{score}"
