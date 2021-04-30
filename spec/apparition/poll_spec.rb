@@ -44,11 +44,8 @@ RSpec.describe(Poll, type: :feature) {
     it('executes borda_split') {
       select('Borda Split', from: 'type')
       submit_creation('poll_borda_split_create')
-
-      # TODO: Drag something to the red box.
       page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
       submit_choices('poll_borda_split_view')
-
       RSpec::Goldens.verify(page, 'poll_borda_split_responded', full: true)
       verify_finished_poll('poll_borda_split_finished')
     }
