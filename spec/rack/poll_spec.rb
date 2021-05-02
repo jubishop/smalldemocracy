@@ -180,15 +180,21 @@ RSpec.describe(Poll, type: :rack_test) {
       set_cookie(:email, 'a@a')
     }
 
+    # rubocop:disable Style/StringHashKeys
+    def post_json(data = {})
+      post('/poll/respond', data.to_json,
+           { 'CONTENT_TYPE' => 'application/json' })
+    end
+    # rubocop:enable Style/StringHashKeys
+
     context(':borda_single') {
       it('saves posted results successfully') {
         poll = create_poll
-        data = {
+        post_json({
           poll_id: poll.id,
           responder: poll.responders.first.salt,
           responses: poll.choices.map(&:id)
-        }
-        post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        })
         expect(last_response.status).to(be(201))
 
         get "/poll/view/#{poll.id}"
@@ -206,13 +212,12 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       it('saves posted results successfully') {
-        data = {
+        post_json({
           poll_id: @poll.id,
           responder: @poll.responders.first.salt,
           responses: [@poll.choices.first.id],
           bottom_responses: @poll.choices.drop(1).map(&:id)
-        }
-        post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        })
         expect(last_response.status).to(be(201))
 
         get "/poll/view/#{@poll.id}"
@@ -224,23 +229,21 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       it('rejects posting with no bottom responses') {
-        data = {
+        post_json({
           poll_id: @poll.id,
           responder: @poll.responders.first.salt,
           responses: @poll.choices.map(&:id)
-        }
-        post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        })
         expect(last_response.status).to(be(400))
       }
 
       it('rejects posting with invalid bottom responses') {
-        data = {
+        post_json({
           poll_id: @poll.id,
           responder: @poll.responders.first.salt,
           responses: @poll.choices.map(&:id),
           bottom_responses: [1, 2]
-        }
-        post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        })
         expect(last_response.status).to(be(406))
       }
     }
@@ -249,12 +252,11 @@ RSpec.describe(Poll, type: :rack_test) {
       poll = create_poll
       responder, responses = poll.mock_response
 
-      data = {
+      post_json({
         poll_id: poll.id,
         responder: responder.salt,
         responses: responses
-      }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      })
       expect(last_response.status).to(be(409))
     }
 
@@ -264,93 +266,84 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects posting with empty data object') {
-      data = {}
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      post_json
       expect(last_response.status).to(be(400))
     }
 
     it('rejects posting to invalid poll') {
-      data = { poll_id: 'does_not_exist' }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      post_json({ poll_id: 'does_not_exist' })
       expect(last_response.status).to(be(404))
     }
 
     it('rejects posting with no responder') {
       poll = create_poll
-      data = { poll_id: poll.id }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      post_json({ poll_id: poll.id })
       expect(last_response.status).to(be(400))
     }
 
     it('rejects posting with invalid responder') {
       poll = create_poll
-      data = { poll_id: poll.id, responder: 'does_not_exist' }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      post_json({ poll_id: poll.id, responder: 'does_not_exist' })
       expect(last_response.status).to(be(404))
     }
 
     it('rejects posting with no responses') {
       poll = create_poll
-      data = { poll_id: poll.id, responder: poll.responders.first.salt }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      post_json({ poll_id: poll.id, responder: poll.responders.first.salt })
       expect(last_response.status).to(be(400))
     }
 
     it('rejects posting with invalid responses') {
       poll = create_poll
-      data = {
+      post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,
         responses: [1, 2]
-      }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      })
       expect(last_response.status).to(be(406))
     }
 
     it('rejects posting with duplicate choices') {
       poll = create_poll
-      data = {
+      responses = poll.choices.map(&:id)
+      responses[0] = responses[1]
+      post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,
-        responses: poll.choices.map(&:id)
-      }
-      data[:responses][0] = data[:responses][1]
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+        responses: responses
+      })
       expect(last_response.status).to(be(409))
     }
 
     it('rejects posting responses to expired poll') {
       poll = create_poll(expiration: 1)
-      data = {
+      post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,
         responses: poll.choices.map(&:id)
-      }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      })
       expect(last_response.status).to(be(405))
     }
 
     it('rejects posting if you are not logged in') {
       clear_cookies
       poll = create_poll
-      data = {
+      post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,
         responses: poll.choices.map(&:id)
-      }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      })
       expect(last_response.status).to(be(404))
     }
 
     it('rejects posting if you are logged in as someone else') {
       set_cookie(:email, 'someone_else@hey.com')
       poll = create_poll
-      data = {
+      post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,
         responses: poll.choices.map(&:id)
-      }
-      post '/poll/respond', data.to_json, { CONTENT_TYPE: 'application/json' }
+      })
       expect(last_response.status).to(be(405))
     }
   }

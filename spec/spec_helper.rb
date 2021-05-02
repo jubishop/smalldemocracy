@@ -1,6 +1,5 @@
 require 'capybara/apparition'
 require 'capybara/rspec'
-require 'colorize'
 require 'rack'
 require 'rack/test'
 

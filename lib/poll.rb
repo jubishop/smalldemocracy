@@ -62,12 +62,6 @@ class Poll < Base
   }
 
   post('/respond') {
-    begin
-      @params = JSON.parse(request.body.read).symbolize_keys
-    rescue JSON::ParserError
-      halt(400, 'Invalid JSON body')
-    end
-
     poll = require_poll
     email = require_email
 
