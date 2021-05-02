@@ -2,6 +2,7 @@ require 'capybara/apparition'
 require 'capybara/rspec'
 require 'rack'
 require 'rack/test'
+require 'tony/test'
 
 ENV['RACK_ENV'] = 'test'
 ENV['APP_ENV'] = 'test'
@@ -46,7 +47,7 @@ end
 RSpec.shared_context(:rack_test) do
   include Capybara::RSpecMatchers
   include Rack::Test::Methods
-  include Tony::RSpec::Cookies
+  include Tony::Test::RSpec::Cookies
 
   let(:app) { Capybara.app }
   let(:cookie_secret) { ENV.fetch('JUBIVOTE_CIPHER_KEY') }
