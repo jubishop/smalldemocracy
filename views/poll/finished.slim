@@ -6,11 +6,11 @@ p Poll: #{poll.title}, is finished!
 p Results:
 
 - if poll.counts
-  h2 Positive Respondents
+  h2 Participants
   ol
     - poll.counts.each do |result|
-      - respondents = 'respondent'.en.plural(result.count)
-      - count = "(#{result.count} #{respondents})"
+      - participants = 'participant'.en.plural(result.count)
+      - count = "(#{result.count} #{participants})"
       li ="#{result} #{count}"
 
 - if poll.scores

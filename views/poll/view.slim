@@ -18,6 +18,9 @@ include :expiration_text
 
 p Drag and drop to rank your choices.
 
+- if poll.type == :borda_split
+  p Drag to red those in which you won't participate.
+
 include :poll_ul
 
 button#submit type="submit" disabled=true Submit Choices
