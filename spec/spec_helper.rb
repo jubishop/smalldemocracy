@@ -16,7 +16,6 @@ require_relative '../setup'
 
 require_relative 'helpers/env'
 require_relative 'helpers/goldens'
-require_relative 'helpers/matchers'
 require_relative 'helpers/models'
 
 Capybara.server = :puma
