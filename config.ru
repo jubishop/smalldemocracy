@@ -14,7 +14,7 @@ module Rack
 end
 use Rack::SslEnforcer, only_environments: 'production'
 use Rack::Session::Cookie, secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET')
-use Rack::Protection unless ENV.fetch('RACK_ENV') == 'test'
+use Rack::Protection if ENV.fetch('RACK_ENV') == 'production'
 use Rack::JSONBodyParser
 
 use Tony::Static
