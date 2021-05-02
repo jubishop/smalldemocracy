@@ -1,13 +1,12 @@
 ruby '>= 3'
 
-gem 'rack-ssl-enforcer', github: 'jubishop/rack-ssl-enforcer'
-
 source 'https://rubygems.org' do
   gem 'base64'
   gem 'linguistics'
   gem 'openssl'
   gem 'puma'
   gem 'rack-contrib'
+  gem 'rack-ssl-enforcer'
   gem 'rake'
   gem 'sendgrid-ruby'
   gem 'sequel'
