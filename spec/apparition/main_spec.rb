@@ -6,7 +6,7 @@ RSpec.describe(Main, type: :feature) {
     }
 
     it('displays logged in index') {
-      page.set_cookie(:email, 'test@example.com')
+      set_cookie(:email, 'test@example.com')
       visit('/')
       RSpec::Goldens.verify(page, 'index_logged_in', full: true)
     }

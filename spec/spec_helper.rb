@@ -15,7 +15,6 @@ ENV['SENDGRID_API_KEY'] = 'dummy_api_key'
 require_relative '../setup'
 
 require_relative 'helpers/env'
-require_relative 'helpers/cookies'
 require_relative 'helpers/goldens'
 require_relative 'helpers/matchers'
 require_relative 'helpers/models'
@@ -33,13 +32,16 @@ Capybara.default_driver = :apparition
 
 RSpec.shared_context(:apparition) do
   include Capybara::RSpecMatchers
+  include Tony::Test::Apparition::Cookies
+
+  let(:cookie_secret) { ENV.fetch('JUBIVOTE_CIPHER_KEY') }
 
   before(:each) {
     page.driver.headers = { Origin: 'http://localhost' }
   }
 
   after(:each) {
-    page.clear_cookies
+    clear_cookies
     Capybara.reset_sessions!
   }
 end
@@ -47,7 +49,7 @@ end
 RSpec.shared_context(:rack_test) do
   include Capybara::RSpecMatchers
   include Rack::Test::Methods
-  include Tony::Test::RSpec::Cookies
+  include Tony::Test::Rack::Cookies
 
   let(:app) { Capybara.app }
   let(:cookie_secret) { ENV.fetch('JUBIVOTE_CIPHER_KEY') }

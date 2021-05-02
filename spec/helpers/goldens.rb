@@ -1,3 +1,5 @@
+require 'colorize'
+
 require_relative 'env'
 
 module RSpec

@@ -25,7 +25,7 @@ RSpec.describe(Poll, type: :feature) {
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
       # Create a poll
-      page.set_cookie(:email, 'test@example.com')
+      set_cookie(:email, 'test@example.com')
       visit('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
