@@ -1,7 +1,6 @@
 require 'sinatra'
 require 'sinatra/content_for'
 require 'sinatra/cookies'
-require 'sinatra/static'
 
 require_relative 'helpers/cookie'
 require_relative 'helpers/guard'
@@ -11,10 +10,10 @@ class Base < Sinatra::Base
   include Helpers::Cookie
   include Helpers::Guard
   include Helpers::Slim
+  include Tony::AssetTagHelper
 
   helpers Sinatra::ContentFor
   helpers Sinatra::Cookies
-  register Sinatra::Static
 
   set(public_folder: 'public')
   set(static: false)

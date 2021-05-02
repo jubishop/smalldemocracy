@@ -20,7 +20,6 @@ end
 source 'https://www.jubigems.org' do
   gem 'core'
   gem 'duration'
-  gem 'sinatra-static'
   gem 'tony'
 end
 

@@ -4,8 +4,8 @@ require 'rack'
 require 'rack/test'
 require 'tony/test'
 
-ENV['RACK_ENV'] = 'test'
 ENV['APP_ENV'] = 'test'
+ENV['RACK_ENV'] = 'test'
 ENV['JUBIVOTE_COOKIE_SECRET'] = 'U3v96K59yMnjmnb97CeSNDp4'
 ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_CIPHER_IV'] = 'qqwmQKGBbRo6wOLX'
@@ -81,7 +81,7 @@ RSpec.configure do |config|
   config.include_context(:rack_test, type: :rack_test)
 
   config.before(:each) {
-    ENV['RACK_ENV'] = 'test'
     ENV['APP_ENV'] = 'test'
+    ENV['RACK_ENV'] = 'test'
   }
 end
