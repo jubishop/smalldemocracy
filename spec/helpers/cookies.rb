@@ -1,13 +1,14 @@
-require_relative '../../lib/utils/crypt'
+require 'tony'
 
 module Capybara
   class Session
+    @@crypt = Tony::Utils::Crypt.new(ENV.fetch('JUBIVOTE_CIPHER_KEY'))
     def set_cookie(name, value)
-      driver.set_cookie(name, Utils::Crypt.en(value))
+      driver.set_cookie(name, @@crypt.en(value))
     end
 
     def get_cookie(name)
-      return Utils::Crypt.de(driver.cookies[name.to_s].value)
+      return @@crypt.de(driver.cookies[name.to_s].value)
     end
 
     def delete_cookie(name)
@@ -22,12 +23,14 @@ end
 
 module RSpec
   module Cookies
+    @@crypt = Tony::Utils::Crypt.new(ENV.fetch('JUBIVOTE_CIPHER_KEY'))
+
     def set_cookie(name, value)
-      rack_mock_session.cookie_jar[name] = Utils::Crypt.en(value)
+      rack_mock_session.cookie_jar[name] = @@crypt.en(value)
     end
 
     def get_cookie(name)
-      return Utils::Crypt.de(rack_mock_session.cookie_jar[name])
+      return @@crypt.de(rack_mock_session.cookie_jar[name])
     end
   end
 end
