@@ -46,9 +46,10 @@ end
 RSpec.shared_context(:rack_test) do
   include Capybara::RSpecMatchers
   include Rack::Test::Methods
-  include RSpec::Cookies
+  include Tony::RSpec::Cookies
 
   let(:app) { Capybara.app }
+  let(:cookie_secret) { ENV.fetch('JUBIVOTE_CIPHER_KEY') }
 
   after(:each) {
     clear_cookies

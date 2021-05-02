@@ -20,17 +20,3 @@ module Capybara
     end
   end
 end
-
-module RSpec
-  module Cookies
-    @@crypt = Tony::Utils::Crypt.new(ENV.fetch('JUBIVOTE_CIPHER_KEY'))
-
-    def set_cookie(name, value)
-      rack_mock_session.cookie_jar[name] = @@crypt.en(value)
-    end
-
-    def get_cookie(name)
-      return @@crypt.de(rack_mock_session.cookie_jar[name])
-    end
-  end
-end
