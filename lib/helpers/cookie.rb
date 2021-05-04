@@ -2,7 +2,7 @@ require 'tony'
 
 module Helpers
   module Cookie
-    @@crypt = Tony::Utils::Crypt.new(ENV.fetch('JUBIVOTE_CIPHER_KEY'))
+    @@crypt = Tony::Utils::Crypt.new(ENV.fetch('JUBIVOTE_COOKIE_SECRET'))
 
     def fetch_email
       email = fetch_cookie(:email)

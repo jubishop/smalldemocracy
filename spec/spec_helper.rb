@@ -6,9 +6,8 @@ require 'tony/test'
 
 ENV['APP_ENV'] = 'test'
 ENV['RACK_ENV'] = 'test'
-ENV['JUBIVOTE_COOKIE_SECRET'] = 'U3v96K59yMnjmnb97CeSNDp4'
 ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
-ENV['JUBIVOTE_CIPHER_KEY'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
+ENV['JUBIVOTE_COOKIE_SECRET'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 ENV['SENDGRID_API_KEY'] = 'dummy_api_key'
 
 require_relative '../setup'
@@ -32,7 +31,7 @@ RSpec.shared_context(:apparition) do
   include Capybara::RSpecMatchers
   include Tony::Test::Apparition::Cookies
 
-  let(:cookie_secret) { ENV.fetch('JUBIVOTE_CIPHER_KEY') }
+  let(:cookie_secret) { ENV.fetch('JUBIVOTE_COOKIE_SECRET') }
 
   before(:each) {
     page.driver.headers = { Origin: 'http://localhost' }
@@ -50,7 +49,7 @@ RSpec.shared_context(:rack_test) do
   include Tony::Test::Rack::Cookies
 
   let(:app) { Capybara.app }
-  let(:cookie_secret) { ENV.fetch('JUBIVOTE_CIPHER_KEY') }
+  let(:cookie_secret) { ENV.fetch('JUBIVOTE_COOKIE_SECRET') }
 
   after(:each) {
     clear_cookies
