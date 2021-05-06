@@ -30,14 +30,14 @@ module Setup
     # rubocop:disable Style/StringHashKeys
     return {
       '/' => Main.new,
-      '/poll' => Poll,
+      '/poll' => Poll.new,
       '/admin' => Rack::Builder.app {
         use(Rack::Auth::Basic) { |_, pw|
           Rack::Utils.secure_compare(
               Base64.strict_encode64(OpenSSL::Digest.new('SHA256').digest(pw)),
               ENV.fetch('JUBIVOTE_HASHED_PASSWORD'))
         }
-        run(Admin)
+        run(Admin.new)
       }
     }
     # rubocop:enable Style/StringHashKeys

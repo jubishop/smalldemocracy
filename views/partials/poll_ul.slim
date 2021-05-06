@@ -1,7 +1,7 @@
-- content_for :head
+= content_for :head
   ==stylesheet_link_tag :'partials/poll_ul'
 
-ul#choices poll_id=poll.id responder_salt=locals[:responder]&.salt
+ul#choices poll_id=poll.id responder_salt=responder.salt
   - poll.choices.each do |choice|
     li.choice data-id=choice.id
       i.grip.fas.fa-grip-lines

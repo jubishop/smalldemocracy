@@ -25,8 +25,16 @@ RSpec.describe(Main, type: :rack_test) {
   context('get /logout') {
     it('deletes the email cookie') {
       set_cookie(:email, 'nomnomnom')
-      get '/logout'
+      # rubocop:disable Style/StringHashKeys
+      get '/logout', {}, { 'HTTPS' => 'on' }
+      # rubocop:enable Style/StringHashKeys
       expect(get_cookie(:email)).to(be_nil)
+    }
+
+    it('redirects after logging out') {
+      get '/logout?r=/somewhere_else'
+      expect(last_response.redirect?).to(be(true))
+      expect(last_response.location).to(eq('/somewhere_else'))
     }
   }
 

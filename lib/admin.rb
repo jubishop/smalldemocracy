@@ -1,39 +1,38 @@
-require 'core'
-
 require_relative 'base'
-require_relative 'helpers/admin/slim'
 require_relative 'models/poll'
 require_relative 'utils/email'
 
 class Admin < Base
-  include AdminHelpers::Slim
+  def initialize
+    super
 
-  get('/') {
-    slim_admin :admin
-  }
+    get('/admin', ->(_, resp) {
+      resp.write(slim.render('admin/admin'))
+    })
 
-  get('/poll/create') {
-    slim_admin :create_poll
-  }
+    get('/admin/poll/create', ->(_, resp) {
+      resp.write(slim.render('/admin/create_poll'))
+    })
 
-  post('/poll/create') {
-    poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
-    redirect "/admin#{poll.url}"
-  }
+    post('/admin/poll/create', ->(req, resp) {
+      poll = Models::Poll.create_poll(**req.params.to_h.symbolize_keys)
+      resp.redirect("/admin#{poll.url}")
+    })
 
-  get('/poll/view/:poll_id') {
-    poll = require_poll
+    get(%r{^/admin/poll/view/(?<poll_id>.+)$}, ->(req, resp) {
+      poll = require_poll(req, resp)
 
-    slim_admin(:view_poll, locals: { poll: poll })
-  }
+      resp.write(slim.render('admin/view_poll', poll: poll))
+    })
 
-  get('/poll/blast') {
-    poll = require_poll
+    get('admin/poll/blast', ->(req, resp) {
+      poll = require_poll(req, resp)
 
-    poll.responders.each { |responder|
-      Utils::Email.email(poll, responder)
-    }
+      poll.responders.each { |responder|
+        Utils::Email.email(poll, responder)
+      }
 
-    slim_admin(:blast_emails_sent, locals: { poll: poll })
-  }
+      resp.write(slim.render('admin/blast_emails_sent', poll: poll))
+    })
+  end
 end

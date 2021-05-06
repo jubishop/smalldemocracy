@@ -1,103 +1,158 @@
-require 'core'
-
 require_relative 'base'
 require_relative 'models/poll'
 require_relative 'utils/email'
 
 class Poll < Base
-  get('/create') {
-    require_email
-    return slim_poll(:create)
-  }
+  include Helpers::Cookie
+  include Helpers::Guard
 
-  post('/create') {
-    require_email
-    begin
-      poll = Models::Poll.create_poll(**params.to_h.symbolize_keys)
-    rescue ArgumentError
-      halt(406, 'Not all poll fields provided')
-    rescue Sequel::ConstraintViolation
-      halt(406, 'Poll fields cannot be empty')
-    end
-    return redirect(poll.url)
-  }
+  def initialize
+    super
 
-  get('/view/:poll_id') {
-    poll = require_poll
+    get('/poll/create', ->(req, resp) {
+      require_email(req, resp)
+      resp.write(slim.render('poll/create'))
+    })
 
-    return slim_poll(:finished, locals: { poll: poll }) if poll.finished?
+    post('/poll/create', ->(req, resp) {
+      require_email(req, resp)
+      begin
+        poll = Models::Poll.create_poll(**req.params.to_h.symbolize_keys)
+      rescue ArgumentError
+        resp.status = 406
+        resp.write('Not all poll fields provided')
+      rescue Sequel::ConstraintViolation
+        resp.status = 406
+        resp.write('Poll fields cannot be empty')
+      else
+        resp.redirect(poll.url)
+      end
+    })
 
-    if params.key?(:responder)
-      responder = poll.responder(salt: params.fetch(:responder))
-      halt(slim_email(:get, locals: { poll: poll })) unless responder
+    get(%r{^/poll/view/(?<poll_id>.+)$}, ->(req, resp) {
+      poll = require_poll(req, resp)
 
-      store_cookie(:email, responder.email)
-      return redirect(poll.url)
-    end
+      if poll.finished?
+        resp.write(slim.render('poll/finished', poll: poll))
+        return
+      end
 
-    email = fetch_email
-    halt(slim_email(:get, locals: { poll: poll })) unless email
+      if req.params.key?(:responder)
+        responder = poll.responder(salt: req.params.fetch(:responder))
+        unless responder
+          resp.write(slim.render('email/get', poll: poll))
+          return
+        end
 
-    responder = poll.responder(email: email)
-    halt(slim_email(:get, locals: { poll: poll })) unless responder
+        resp.set_cookie(:email, responder.email)
+        resp.redirect(poll.url)
+        return
+      end
 
-    template = responder.responses.empty? ? :view : :responded
-    return slim_poll(template, locals: { poll: poll, responder: responder })
-  }
+      email = fetch_email(req)
+      unless email
+        resp.write(slim.render('email/get', poll: poll))
+        return
+      end
 
-  post('/send') {
-    poll = require_poll
+      responder = poll.responder(email: email)
+      unless responder
+        resp.write(slim.render('email/get', poll: poll))
+        return
+      end
 
-    halt(400, 'No responder provided') unless params.key?(:email)
-    responder = poll.responder(email: params.fetch(:email))
-    halt(404, slim_email(:responder_not_found)) unless responder
+      template = responder.responses.empty? ? :view : :responded
+      resp.write(slim.render("poll/#{template}", poll: poll,
+                                                 responder: responder))
+    })
 
-    begin
-      Utils::Email.email(poll, responder)
-    rescue ArgumentError
-      halt(405, 'Poll has already finished')
-    end
+    post('/poll/send', ->(req, resp) {
+      poll = require_poll(req, resp)
 
-    return slim_email(:sent)
-  }
+      unless req.params.key?(:email)
+        resp.status = 400
+        resp.write('No responder provided')
+        return
+      end
 
-  post('/respond') {
-    poll = require_poll
-    email = require_email
+      responder = poll.responder(email: req.params.fetch(:email))
+      unless responder
+        resp.status = 404
+        resp.write(slim.render('email/responder_not_found'))
+        return
+      end
 
-    halt(400, 'No responder provided') unless params.key?(:responder)
-    responder = poll.responder(salt: params.fetch(:responder))
-    halt(404, 'Responder not found') unless responder
+      begin
+        Utils::Email.email(poll, responder)
+      rescue ArgumentError
+        resp.status = 405
+        resp.write('Poll has already finished')
+        return
+      end
 
-    if responder.email != email
-      halt(405, 'Logged in user is not the responder in the form')
-    end
+      resp.write(slim.render('email/sent'))
+    })
 
-    halt(400, 'No responses provided') unless params.key?(:responses)
-    responses = params.fetch(:responses)
+    post('/poll/respond', ->(req, resp) {
+      poll = require_poll(req, resp)
+      email = require_email(req, resp)
 
-    if poll.type == :borda_split && !params.key?(:bottom_responses)
-      halt(400, 'No bottom response array provided for a borda_split poll')
-    end
+      unless req.params.key?(:responder)
+        resp.status = 400
+        resp.write('No responder provided')
+        return
+      end
 
-    bottom_responses = params.fetch(:bottom_responses, [])
-    unless responses.length + bottom_responses.length == poll.choices.length
-      halt(406, 'Response set does not match number of choices')
-    end
+      responder = poll.responder(salt: req.params.fetch(:responder))
+      unless responder
+        resp.status = 404
+        resp.write('Responder not found')
+        return
+      end
 
-    begin
-      responses.each_with_index { |choice_id, rank|
-        responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
-      }
-      bottom_responses.each { |choice_id|
-        responder.add_response(choice_id: choice_id, chosen: false)
-      }
-    rescue Sequel::UniqueConstraintViolation
-      halt(409, 'Duplicate response, choice, or rank found')
-    rescue Sequel::HookFailed
-      halt(405, 'Poll has already finished')
-    end
+      if responder.email != email
+        resp.status = 405
+        resp.write('Logged in user is not the responder in the form')
+        return
+      end
 
-    return 201, 'Poll created'
-  }
+      unless req.params.key?(:responses)
+        resp.status = 400
+        resp.write('No responses provided')
+        return
+      end
+      responses = req.params.fetch(:responses)
+
+      if poll.type == :borda_split && !req.params.key?(:bottom_responses)
+        resp.status = 400
+        resp.write('No bottom response array provided for a borda_split poll')
+        return
+      end
+
+      bottom_responses = req.params.fetch(:bottom_responses, [])
+      unless responses.length + bottom_responses.length == poll.choices.length
+        resp.status = 406
+        resp.write('Response set does not match number of choices')
+        return
+      end
+
+      begin
+        responses.each_with_index { |choice_id, rank|
+          responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
+        }
+        bottom_responses.each { |choice_id|
+          responder.add_response(choice_id: choice_id, chosen: false)
+        }
+      rescue Sequel::UniqueConstraintViolation
+        resp.status = 409
+        resp.write('Duplicate response, choice, or rank found')
+      rescue Sequel::HookFailed
+        resp.status = 405
+        resp.write('Poll has already finished')
+      else
+        resp.status = 201
+        resp.write('Poll created')
+      end
+    })
+  end
 end

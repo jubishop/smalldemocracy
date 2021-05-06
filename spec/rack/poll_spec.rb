@@ -104,7 +104,9 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('stores cookie if responder is in poll') {
       poll = create_poll
-      get poll.responders.first.url
+      # rubocop:disable Style/StringHashKeys
+      get poll.responders.first.url, {}, { 'HTTPS' => 'on' }
+      # rubocop:enable Style/StringHashKeys
       expect(last_response.redirect?).to(be(true))
       expect(get_cookie(:email)).to(eq('a@a'))
       follow_redirect!
