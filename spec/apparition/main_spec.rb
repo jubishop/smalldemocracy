@@ -11,4 +11,11 @@ RSpec.describe(Main, type: :feature) {
       RSpec::Goldens.verify(page, 'index_logged_in', full: true)
     }
   }
+
+  context('not found') {
+    it('displays a not found page') {
+      visit('does_not_exist')
+      RSpec::Goldens.verify(page, 'page_not_found', full: true)
+    }
+  }
 }
