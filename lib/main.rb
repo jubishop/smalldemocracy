@@ -1,8 +1,4 @@
-require 'core'
-
 require_relative 'base'
-require_relative 'models/poll'
-require_relative 'utils/email'
 
 class Main < Base
   get('/') {
