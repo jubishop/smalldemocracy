@@ -43,18 +43,12 @@ RSpec.shared_context(:apparition) do
   }
 end
 
-RSpec.shared_context(:rack_test) do
-  include Capybara::RSpecMatchers
-  include Rack::Test::Methods
-  include Tony::Test::Rack::Cookies
+RSpec.shared_context(:rack_test) {
+  include_context(:tony_rack_test)
 
   let(:app) { Capybara.app }
   let(:cookie_secret) { ENV.fetch('JUBIVOTE_COOKIE_SECRET') }
-
-  after(:each) {
-    clear_cookies
-  }
-end
+}
 
 RSpec.configure do |config|
   config.expect_with(:rspec) do |expectations|

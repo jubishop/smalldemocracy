@@ -29,7 +29,7 @@ module Setup
   def self.url_map
     # rubocop:disable Style/StringHashKeys
     return {
-      '/' => Main,
+      '/' => Main.new,
       '/poll' => Poll,
       '/admin' => Rack::Builder.app {
         use(Rack::Auth::Basic) { |_, pw|
