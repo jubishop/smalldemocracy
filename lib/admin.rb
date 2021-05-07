@@ -25,7 +25,7 @@ class Admin < Base
       resp.write(slim.render('admin/view_poll', poll: poll))
     })
 
-    get('admin/poll/blast', ->(req, resp) {
+    get('/admin/poll/blast', ->(req, resp) {
       poll = require_poll(req, resp)
 
       poll.responders.each { |responder|
