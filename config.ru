@@ -1,4 +1,5 @@
 require 'rack/contrib'
+require 'rack/protection'
 require 'tony'
 
 require_relative 'setup'

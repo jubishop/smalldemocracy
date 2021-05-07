@@ -22,6 +22,33 @@ RSpec.describe(Main, type: :rack_test) {
     }
   }
 
+  context('in faux production') {
+    before(:each) {
+      ENV['APP_ENV'] = 'production'
+      ENV['RACK_ENV'] = 'production'
+      Capybara.app = Rack::Builder.parse_file('config.ru').first
+    }
+
+    it('displays logged out page when there is no email cookie') {
+      # rubocop:disable Style/StringHashKeys
+      get '/', {}, { 'HTTPS' => 'on' }
+      # rubocop:enable Style/StringHashKeys
+      expect_logged_out_index_page
+    }
+
+    it('displays logged in page when there is an email cookie') {
+      set_cookie(:email, 'test@example.com')
+      # rubocop:disable Style/StringHashKeys
+      get '/', {}, { 'HTTPS' => 'on' }
+      # rubocop:enable Style/StringHashKeys
+      expect_logged_in_index_page('test@example.com')
+    }
+
+    after(:all) {
+      Capybara.app = Rack::Builder.parse_file('config.ru').first
+    }
+  }
+
   context('get /logout') {
     it('deletes the email cookie') {
       set_cookie(:email, 'nomnomnom')
