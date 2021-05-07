@@ -1,7 +1,4 @@
 require 'capybara/apparition'
-require 'capybara/rspec'
-require 'rack'
-require 'rack/test'
 require 'tony/test'
 
 ENV['APP_ENV'] = 'test'
@@ -28,19 +25,9 @@ Capybara.register_driver(:apparition) { |app|
 Capybara.default_driver = :apparition
 
 RSpec.shared_context(:apparition) do
-  include Capybara::RSpecMatchers
-  include Tony::Test::Apparition::Cookies
+  include_context(:tony_apparition)
 
   let(:cookie_secret) { ENV.fetch('JUBIVOTE_COOKIE_SECRET') }
-
-  before(:each) {
-    page.driver.headers = { Origin: 'http://localhost' }
-  }
-
-  after(:each) {
-    clear_cookies
-    Capybara.reset_sessions!
-  }
 end
 
 RSpec.shared_context(:rack_test) {
