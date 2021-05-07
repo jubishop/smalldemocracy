@@ -10,15 +10,15 @@ RSpec.describe(Main, type: :rack_test) {
     }
 
     it('displays logged in page when there is an email cookie') {
-      set_cookie(:email, 'test@example.com')
+      set_cookie(:email_address, 'test@example.com')
       get '/'
       expect_logged_in_index_page('test@example.com')
     }
 
     it('does not delete the email cookie') {
-      set_cookie(:email, 'nomnomnom')
+      set_cookie(:email_address, 'nomnomnom')
       get '/'
-      expect(get_cookie(:email)).to(eq('nomnomnom'))
+      expect(get_cookie(:email_address)).to(eq('nomnomnom'))
     }
   }
 
@@ -37,7 +37,7 @@ RSpec.describe(Main, type: :rack_test) {
     }
 
     it('displays logged in page when there is an email cookie') {
-      set_cookie(:email, 'test@example.com')
+      set_cookie(:email_address, 'test@example.com')
       # rubocop:disable Style/StringHashKeys
       get '/', {}, { 'HTTPS' => 'on' }
       # rubocop:enable Style/StringHashKeys
@@ -51,11 +51,11 @@ RSpec.describe(Main, type: :rack_test) {
 
   context('get /logout') {
     it('deletes the email cookie') {
-      set_cookie(:email, 'nomnomnom')
+      set_cookie(:email_address, 'nomnomnom')
       # rubocop:disable Style/StringHashKeys
       get '/logout', {}, { 'HTTPS' => 'on' }
       # rubocop:enable Style/StringHashKeys
-      expect(get_cookie(:email)).to(be_nil)
+      expect(get_cookie(:email_address)).to(be_nil)
     }
 
     it('redirects after logging out') {

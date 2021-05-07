@@ -9,7 +9,7 @@ class Main < Base
     })
 
     get('/logout', ->(req, resp) {
-      resp.delete_cookie(:email)
+      resp.delete_cookie(:email_address)
       resp.redirect(req.params.fetch(:r, '/'))
     })
 
