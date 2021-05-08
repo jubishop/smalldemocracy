@@ -11,7 +11,7 @@ class Admin < Base
     })
 
     get('/admin/poll/create', ->(_, resp) {
-      resp.write(slim.render('/admin/create_poll'))
+      resp.write(slim.render('/poll/create'))
     })
 
     post('/admin/poll/create', ->(req, resp) {

@@ -3,7 +3,7 @@ module RSpec
     def expect_create_page
       expect(last_response.ok?).to(be(true))
       expect(last_response.body).to(
-          have_selector('form[action="/poll/create"][method=post]'))
+          have_selector('form[action="create"][method=post]'))
       expect(last_response.body).to(have_selector('input[type=submit]'))
     end
 

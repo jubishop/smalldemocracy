@@ -1,5 +1,33 @@
 li.choice {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.75);
+  border: solid white 1px;
   cursor: grab;
+  display: flex;
+  margin: 0.5em 0;
+  padding: 0.5em 0;
+  max-width: 20em;
+}
+
+li.choice .grip {
+  flex: 0 0 auto;
+  font-size: 2em;
+  margin: 0 0.5em;
+}
+
+li.choice .text {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+li.choice .score {
+  color: #80bfff;
+  flex: 0 0 auto;
+  font-size: 0.75em;
+  font-style: italic;
+  margin: 0 0.5em;
+  position: relative;
+  top: 0.5em;
 }
 
 li.choice:hover {
@@ -8,4 +36,19 @@ li.choice:hover {
 
 li.choice:active, .sortable-ghost {
   background-color: #004080; /* dodgerblue 25% */
+}
+
+ul#choices, ul#bottom-choices {
+  list-style-type: none;
+  margin: 0;
+  max-width: 20em;
+  min-height: 1em;
+  padding: 0;
+}
+
+ul#bottom-choices {
+  background-color: darkred;
+  margin: 1em 0;
+  min-height: 1em;
+  padding: 0.25em 0;
 }
