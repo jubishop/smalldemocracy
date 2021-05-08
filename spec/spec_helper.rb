@@ -1,4 +1,5 @@
 require 'capybara/apparition'
+require 'core/test'
 require 'tony/test'
 
 ENV['APP_ENV'] = 'test'
@@ -9,7 +10,6 @@ ENV['SENDGRID_API_KEY'] = 'dummy_api_key'
 
 require_relative '../setup'
 
-require_relative 'helpers/env'
 require_relative 'helpers/goldens'
 require_relative 'helpers/models'
 

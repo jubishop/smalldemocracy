@@ -1,7 +1,5 @@
 require 'colorize'
 
-require_relative 'env'
-
 module RSpec
   class Goldens
     def self.verify(page, filename, **options)
@@ -37,7 +35,7 @@ module RSpec
 
     class << self
       include Capybara::RSpecMatchers
-      include RSpec::Env
+      include Test::Env
       include RSpec::Matchers
 
       private

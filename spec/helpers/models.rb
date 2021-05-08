@@ -1,7 +1,5 @@
 require_relative '../../lib/models/poll'
 
-require_relative 'env'
-
 module RSpec
   module Models
     def create_poll(title: 'title',
@@ -22,7 +20,7 @@ end
 
 module Models
   class Poll
-    include RSpec::Env
+    include Test::Env
 
     def mock_response(chosen: true)
       test_only!

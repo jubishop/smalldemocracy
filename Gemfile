@@ -39,6 +39,7 @@ group :development do
   end
 
   source 'https://www.jubigems.org' do
+    gem 'core-test'
     gem 'tony-test'
   end
 end
