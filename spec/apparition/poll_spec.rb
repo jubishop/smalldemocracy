@@ -2,21 +2,21 @@ RSpec.describe(Poll, type: :feature) {
   context('full poll lifecycles') {
     def submit_creation(page_name)
       find('h1').click # Deselect any form field
-      RSpec::Goldens.verify(page, page_name, full: true)
+      RSpec::Goldens.verify(page, page_name)
       click_button('Submit')
     end
 
     def submit_choices(page_name)
       expect(page).to(have_fontawesome)
       expect(page).to(have_button(text: 'Submit Choices'))
-      RSpec::Goldens.verify(page, page_name, full: true)
+      RSpec::Goldens.verify(page, page_name)
       click_button('Submit Choices')
     end
 
     def verify_finished_poll(page_name)
       allow(Time).to(receive(:now).and_return(Time.at(10**10)))
       refresh
-      RSpec::Goldens.verify(page, page_name, full: true)
+      RSpec::Goldens.verify(page, page_name)
     end
 
     before(:each) {
@@ -37,7 +37,7 @@ RSpec.describe(Poll, type: :feature) {
     it('executes borda_single') {
       submit_creation('poll_borda_single_create')
       submit_choices('poll_borda_single_view')
-      RSpec::Goldens.verify(page, 'poll_borda_single_responded', full: true)
+      RSpec::Goldens.verify(page, 'poll_borda_single_responded')
       verify_finished_poll('poll_borda_single_finished')
     }
 
@@ -46,7 +46,7 @@ RSpec.describe(Poll, type: :feature) {
       submit_creation('poll_borda_split_create')
       page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
       submit_choices('poll_borda_split_view')
-      RSpec::Goldens.verify(page, 'poll_borda_split_responded', full: true)
+      RSpec::Goldens.verify(page, 'poll_borda_split_responded')
       verify_finished_poll('poll_borda_split_finished')
     }
   }
@@ -54,13 +54,13 @@ RSpec.describe(Poll, type: :feature) {
   context('poll') {
     it('blocks create when not logged in') {
       visit('/poll/create')
-      RSpec::Goldens.verify(page, 'poll_email_not_found', full: true)
+      RSpec::Goldens.verify(page, 'poll_email_not_found')
     }
 
     it('asks for email') {
       poll = create_poll
       visit(poll.url)
-      RSpec::Goldens.verify(page, 'poll_email_get', full: true)
+      RSpec::Goldens.verify(page, 'poll_email_get')
     }
 
     it('sends email') {
@@ -68,7 +68,7 @@ RSpec.describe(Poll, type: :feature) {
       visit(poll.url)
       fill_in('email', with: 'a@a')
       click_button('Submit')
-      RSpec::Goldens.verify(page, 'poll_email_sent', full: true)
+      RSpec::Goldens.verify(page, 'poll_email_sent')
     }
 
     it('complains when invalid email given') {
@@ -76,12 +76,12 @@ RSpec.describe(Poll, type: :feature) {
       visit(poll.url)
       fill_in('email', with: 'poop@hey')
       click_button('Submit')
-      RSpec::Goldens.verify(page, 'poll_email_responder_not_found', full: true)
+      RSpec::Goldens.verify(page, 'poll_email_responder_not_found')
     }
 
     it('responds when poll not found') {
       visit('/poll/view/does_not_exist')
-      RSpec::Goldens.verify(page, 'poll_not_found', full: true)
+      RSpec::Goldens.verify(page, 'poll_not_found')
     }
   }
 }

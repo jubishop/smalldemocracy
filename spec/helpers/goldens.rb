@@ -7,23 +7,22 @@ module RSpec
     def self.verify(page, filename, **options)
       return if github_actions?
 
+      options = { full: true } if options.empty?
       expect(page).to(have_googlefonts)
 
-      page.driver.save_screenshot(golden_file(filename), **options)
-      new_base64 = Base64.encode64(File.read(golden_file(filename)))
+      page.driver.save_screenshot(tmp_file(filename), **options)
 
-      unless File.exist?(base64_file(filename))
-        File.write(base64_file(filename), new_base64)
-        system("open #{golden_file(filename)}")
+      unless File.exist?(golden_file(filename))
+        apply_golden(filename)
         return
       end
 
-      golden_base64 = File.read(base64_file(filename))
-      return if golden_base64 == new_base64
+      golden_bytes = File.read(golden_file(filename), mode: 'rb')
+      new_bytes = File.read(tmp_file(filename), mode: 'rb')
+      return if golden_bytes == new_bytes
 
       warn("Golden match failed for: #{filename}".red)
-      File.write(base64_file(filename), new_base64)
-      system("open #{golden_file(filename)}")
+      apply_golden(filename)
       return unless ENV.fetch('FAIL_ON_GOLDEN', false)
 
       raise RSpec::Expectations::ExpectationNotMetError,
@@ -32,9 +31,8 @@ module RSpec
 
     def self.view(page, filename, **options)
       expect(page).to(have_googlefonts)
-      tmp_file = File.join(ENV.fetch('TMPDIR', '/tmp'), "#{filename}.png")
-      page.driver.save_screenshot(tmp_file, **options)
-      system("open #{tmp_file}")
+      page.driver.save_screenshot(tmp_file(filename), **options)
+      system("open #{tmp_file(filename)}")
     end
 
     class << self
@@ -44,17 +42,17 @@ module RSpec
 
       private
 
-      def write_golden(page, filename, **options)
-        File.write(base64_file(filename),
-                   page.driver.render_base64(:png, **options))
+      def apply_golden(filename)
+        FileUtils.mv(tmp_file(filename), golden_file(filename))
+        system("open #{golden_file(filename)}")
       end
 
       def golden_file(filename)
         return File.join('spec/goldens', "#{filename}.png")
       end
 
-      def base64_file(filename)
-        return File.join('spec/goldens/base64', filename)
+      def tmp_file(filename)
+        return File.join(Dir.tmpdir, "#{filename}.png")
       end
     end
   end
