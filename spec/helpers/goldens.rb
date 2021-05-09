@@ -1,11 +1,21 @@
 require 'colorize'
 
-module RSpec
+module Tony
   class Goldens
-    def self.verify(page, filename, **options)
+    include Capybara::RSpecMatchers
+    include RSpec::Matchers
+    include ::Test::Env
+
+    def initialize(goldens_folder = 'spec/goldens', **default_options)
+      default_options = { full: true } if default_options.empty?
+      @goldens_folder = goldens_folder
+      @default_options = default_options
+    end
+
+    def verify(page, filename, **options)
       return if github_actions?
 
-      options = { full: true } if options.empty?
+      options = @default_options.merge(options)
       expect(page).to(have_googlefonts)
 
       page.driver.save_screenshot(tmp_file(filename), **options)
@@ -27,31 +37,19 @@ module RSpec
             "#{filename} does not match"
     end
 
-    def self.view(page, filename, **options)
-      expect(page).to(have_googlefonts)
-      page.driver.save_screenshot(tmp_file(filename), **options)
-      system("open #{tmp_file(filename)}")
+    private
+
+    def apply_golden(filename)
+      FileUtils.mv(tmp_file(filename), golden_file(filename))
+      system("open #{golden_file(filename)}")
     end
 
-    class << self
-      include Capybara::RSpecMatchers
-      include Test::Env
-      include RSpec::Matchers
+    def golden_file(filename)
+      return File.join(@goldens_folder, "#{filename}.png")
+    end
 
-      private
-
-      def apply_golden(filename)
-        FileUtils.mv(tmp_file(filename), golden_file(filename))
-        system("open #{golden_file(filename)}")
-      end
-
-      def golden_file(filename)
-        return File.join('spec/goldens', "#{filename}.png")
-      end
-
-      def tmp_file(filename)
-        return File.join(Dir.tmpdir, "#{filename}.png")
-      end
+    def tmp_file(filename)
+      return File.join(Dir.tmpdir, "#{filename}.png")
     end
   end
 end
