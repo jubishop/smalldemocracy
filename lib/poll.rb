@@ -8,7 +8,7 @@ class Poll < Base
 
   def initialize
     super
-    partials_dir = File.join(Dir.pwd, '/views/poll/partials')
+    partials_dir = File.join(Dir.pwd, 'views/poll/partials')
     @slim = Tony::Slim.new(views: 'views',
                            layout: 'views/layout',
                            options: { include_dirs: [partials_dir] })

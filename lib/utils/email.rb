@@ -16,10 +16,8 @@ module Utils
       subject = "Poll: #{poll.title}"
 
       url = "https://www.#{HOSTNAME}#{responder.url}"
-      body = %(
-        Please <a href="#{url}">click here</a> to answer the poll:
-        <b>#{poll.title}</b>: #{poll.question}.
-      )
+      slim = Tony::Slim.new(views: 'lib/utils')
+      body = slim.render(:email, poll: poll, url: url)
 
       content = SendGrid::Content.new(type: 'text/html', value: body)
       mail = SendGrid::Mail.new(from, subject, to, content)
