@@ -5,13 +5,14 @@ require_relative 'utils/email'
 class Admin < Base
   def initialize
     super
+    @slim = Tony::Slim.new(views: 'views', layout: 'views/layout')
 
     get('/admin', ->(_, resp) {
-      resp.write(slim.render('admin/admin'))
+      resp.write(@slim.render('admin/admin'))
     })
 
     get('/admin/poll/create', ->(_, resp) {
-      resp.write(slim.render('/poll/create'))
+      resp.write(@slim.render('/poll/create'))
     })
 
     post('/admin/poll/create', ->(req, resp) {
@@ -22,7 +23,7 @@ class Admin < Base
     get(%r{^/admin/poll/view/(?<poll_id>.+)$}, ->(req, resp) {
       poll = require_poll(req, resp)
 
-      resp.write(slim.render('admin/view_poll', poll: poll))
+      resp.write(@slim.render('admin/view_poll', poll: poll))
     })
 
     get('/admin/poll/blast', ->(req, resp) {

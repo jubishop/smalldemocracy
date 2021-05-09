@@ -8,10 +8,14 @@ class Poll < Base
 
   def initialize
     super
+    partials_dir = File.join(Dir.pwd, '/views/poll/partials')
+    @slim = Tony::Slim.new(views: 'views',
+                           layout: 'views/layout',
+                           options: { include_dirs: [partials_dir] })
 
     get('/poll/create', ->(req, resp) {
       require_email(req, resp)
-      resp.write(slim.render('poll/create'))
+      resp.write(@slim.render('poll/create'))
     })
 
     post('/poll/create', ->(req, resp) {
@@ -33,14 +37,14 @@ class Poll < Base
       poll = require_poll(req, resp)
 
       if poll.finished?
-        resp.write(slim.render('poll/finished', poll: poll))
+        resp.write(@slim.render('poll/finished', poll: poll))
         return
       end
 
       if req.params.key?(:responder)
         responder = poll.responder(salt: req.params.fetch(:responder))
         unless responder
-          resp.write(slim.render('email/get', poll: poll))
+          resp.write(@slim.render('email/get', poll: poll))
           return
         end
 
@@ -51,19 +55,19 @@ class Poll < Base
 
       email = fetch_email(req)
       unless email
-        resp.write(slim.render('email/get', poll: poll))
+        resp.write(@slim.render('email/get', poll: poll))
         return
       end
 
       responder = poll.responder(email: email)
       unless responder
-        resp.write(slim.render('email/get', poll: poll))
+        resp.write(@slim.render('email/get', poll: poll))
         return
       end
 
       template = responder.responses.empty? ? :view : :responded
-      resp.write(slim.render("poll/#{template}", poll: poll,
-                                                 responder: responder))
+      resp.write(@slim.render("poll/#{template}", poll: poll,
+                                                  responder: responder))
     })
 
     post('/poll/send', ->(req, resp) {
@@ -78,7 +82,7 @@ class Poll < Base
       responder = poll.responder(email: req.params.fetch(:email))
       unless responder
         resp.status = 404
-        resp.write(slim.render('email/responder_not_found'))
+        resp.write(@slim.render('email/responder_not_found'))
         return
       end
 
@@ -90,7 +94,7 @@ class Poll < Base
         return
       end
 
-      resp.write(slim.render('email/sent'))
+      resp.write(@slim.render('email/sent'))
     })
 
     post('/poll/respond', ->(req, resp) {

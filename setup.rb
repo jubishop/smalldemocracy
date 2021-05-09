@@ -9,7 +9,6 @@ Linguistics.use(:en)
 
 Slim::Engine.set_options(
     tabsize: 2,
-    include_dirs: ["#{Dir.pwd}/views/partials"],
     pretty: ENV.fetch('APP_ENV') != 'production')
 
 DB = if ENV.fetch('APP_ENV') == 'test'

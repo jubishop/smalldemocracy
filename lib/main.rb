@@ -3,9 +3,10 @@ require_relative 'base'
 class Main < Base
   def initialize
     super
+    @slim = Tony::Slim.new(views: 'views', layout: 'views/layout')
 
     get('/', ->(req, resp) {
-      resp.write(slim.render(:index, email: fetch_email(req)))
+      resp.write(@slim.render(:index, email: fetch_email(req)))
     })
 
     get('/logout', ->(req, resp) {
@@ -14,7 +15,7 @@ class Main < Base
     })
 
     not_found(->(_, resp) {
-      resp.write(slim.render(:not_found))
+      resp.write(@slim.render(:not_found))
     })
   end
 end

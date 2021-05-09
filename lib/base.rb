@@ -9,14 +9,9 @@ class Base < Tony::App
 
   def initialize
     super(secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET'))
-    @slim = Tony::Slim.new(views: 'views', layout: 'views/layout')
 
     not_found(->(_, resp) {
       resp.write(slim.render(:not_found))
     })
   end
-
-  private
-
-  attr_reader :slim
 end

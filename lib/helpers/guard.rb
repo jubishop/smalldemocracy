@@ -14,7 +14,7 @@ module Helpers
       poll = Models::Poll[req.params.fetch(:poll_id)]
       unless poll
         resp.status = 404
-        resp.write(slim.render('poll/not_found'))
+        resp.write(@slim.render('poll/not_found'))
         throw(:response)
       end
 
@@ -25,7 +25,7 @@ module Helpers
       email = fetch_email(req)
       unless email
         resp.status = 404
-        resp.write(slim.render('/email/not_found'))
+        resp.write(@slim.render('email/not_found'))
         throw(:response)
       end
       return email
