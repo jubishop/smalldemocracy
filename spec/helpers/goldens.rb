@@ -6,19 +6,17 @@ module Tony
     include RSpec::Matchers
     include ::Test::Env
 
-    def initialize(goldens_folder = 'spec/goldens', **default_options)
-      default_options = { full: true } if default_options.empty?
+    def initialize(page, goldens_folder = 'spec/goldens')
+      @page = page
       @goldens_folder = goldens_folder
-      @default_options = default_options
     end
 
-    def verify(page, filename, **options)
+    def verify(filename)
       return if github_actions?
 
-      options = @default_options.merge(options)
-      expect(page).to(have_googlefonts)
+      expect(@page).to(have_googlefonts)
 
-      page.driver.save_screenshot(tmp_file(filename), **options)
+      @page.driver.save_screenshot(tmp_file(filename), { full: true })
 
       unless File.exist?(golden_file(filename))
         apply_golden(filename)
