@@ -1,7 +1,17 @@
 require 'colorize'
+require 'rspec'
 
 module Tony
   class Goldens
+    @failures = []
+    def self.mark_failure(failure)
+      @failures.push(failure)
+    end
+
+    def self.review_failures
+      return if @failures.empty?
+    end
+
     include Capybara::RSpecMatchers
     include RSpec::Matchers
     include ::Test::Env
@@ -38,6 +48,10 @@ module Tony
     private
 
     def apply_golden(filename)
+      failure = GoldenFailure.new(golden: golden_file(filename),
+                                  new: tmp_file(filename))
+      self.class.mark_failure(failure)
+
       FileUtils.mv(tmp_file(filename), golden_file(filename))
       system("open #{golden_file(filename)}")
     end
@@ -49,5 +63,18 @@ module Tony
     def tmp_file(filename)
       return File.join(Dir.tmpdir, "#{filename}.png")
     end
+
+    class GoldenFailure
+      def initialize(golden:, new:)
+        @golden = golden
+        @new = new
+      end
+    end
   end
 end
+
+RSpec.configure { |config|
+  config.after(:suite) {
+    Tony::Goldens.review_failures
+  }
+}
