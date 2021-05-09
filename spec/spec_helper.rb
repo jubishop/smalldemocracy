@@ -10,7 +10,7 @@ ENV['SENDGRID_API_KEY'] = 'dummy_api_key'
 
 require_relative '../setup'
 
-require_relative 'helpers/goldens'
+require_relative 'helpers/goldens/page'
 require_relative 'helpers/models'
 
 Capybara.server = :puma

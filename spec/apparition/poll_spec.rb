@@ -1,5 +1,5 @@
 RSpec.describe(Poll, type: :feature) {
-  let(:goldens) { Tony::Goldens.new(page) }
+  let(:goldens) { Tony::Test::Goldens::Page.new(page) }
 
   context('full poll lifecycles') {
     def submit_creation(page_name)
