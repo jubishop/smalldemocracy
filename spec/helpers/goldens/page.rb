@@ -12,8 +12,6 @@ module Tony
       end
 
       def self.review_failures
-        return if @failures.empty?
-
         Server.new(@failures)
       end
 
