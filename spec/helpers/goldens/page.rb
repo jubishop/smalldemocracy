@@ -33,7 +33,6 @@ module Tony
           @page.driver.save_screenshot(tmp_file(filename), { full: true })
 
           unless File.exist?(golden_file(filename))
-            apply_golden(filename)
             Goldens.mark_failure(Failure.new(golden: golden_file(filename),
                                              new: tmp_file(filename)))
             return
@@ -44,7 +43,6 @@ module Tony
           return if golden_bytes == new_bytes
 
           warn("Golden match failed for: #{filename}".red)
-          apply_golden(filename)
           Goldens.mark_failure(Failure.new(golden: golden_file(filename),
                                            new: tmp_file(filename)))
           return unless ENV.fetch('FAIL_ON_GOLDEN', false)
@@ -55,11 +53,6 @@ module Tony
 
         private
 
-        def apply_golden(filename)
-          FileUtils.mv(tmp_file(filename), golden_file(filename))
-          system("open #{golden_file(filename)}")
-        end
-
         def golden_file(filename)
           return File.join(@goldens_folder, "#{filename}.png")
         end
@@ -69,9 +62,11 @@ module Tony
         end
 
         class Failure
+          attr_accessor :golden, :new
+
           def initialize(golden:, new:)
-            @golden = golden
-            @new = new
+            @golden = File.expand_path(golden)
+            @new = File.expand_path(new)
           end
         end
       end

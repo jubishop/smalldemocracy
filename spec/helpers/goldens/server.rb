@@ -12,6 +12,7 @@ module Tony
           return if failures.empty?
 
           app = Tony::App.new
+          slim = Tony::Slim.new(views: __dir__)
           server = ::Rack::Builder.new {
             use(Tony::Static, public_folder: '/')
             run(app)
@@ -24,7 +25,7 @@ module Tony
           launcher = Puma::Launcher.new(conf, events: events)
 
           app.get('/', ->(_, resp) {
-            resp.write('hello world')
+            resp.write(slim.render(:review, failures: failures))
           })
 
           app.get('/finished', ->(_, resp) {
