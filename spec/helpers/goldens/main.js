@@ -1,6 +1,6 @@
 class Goldens {
   static domLoaded() {
-    alert('hello from Goldens class');
+    // alert('hello from Goldens class');
   }
 }
 

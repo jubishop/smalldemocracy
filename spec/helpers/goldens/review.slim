@@ -7,6 +7,10 @@ html lang="en"
 
   body
     - failures.each do |failure|
-      .failure
-        ==image_tag(failure.golden, alt: 'Golden')
-        ==image_tag(failure.new, alt: 'New')
+      .images
+        .golden
+          ==image_tag(failure.golden, alt: 'Golden')
+          button.reject type="submit" Keep Old
+        .new
+          ==image_tag(failure.new, alt: 'New')
+          button.accept type="submit" Accept New
