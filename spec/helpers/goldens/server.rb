@@ -14,6 +14,7 @@ module Tony
           app = Tony::App.new
           slim = Tony::Slim.new(views: __dir__)
           server = ::Rack::Builder.new {
+            use(Tony::Static, public_folder: __dir__)
             use(Tony::Static, public_folder: '/')
             run(app)
           }
