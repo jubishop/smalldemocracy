@@ -6,11 +6,14 @@ html lang="en"
     ==javascript_include_tag :main
 
   body
-    - failures.each do |failure|
+    - failures.each_with_index do |failure, index|
       .images
         .golden
           ==image_tag(failure.golden, alt: 'Golden')
-          button.reject type="submit" Keep Old
+          button.reject type="submit" value=index Keep Old
         .new
           ==image_tag(failure.new, alt: 'New')
-          button.accept type="submit" Accept New
+          button.accept type="submit" value=index Accept New
+
+    form action="finish" method="post"
+      input type="submit" value="Finish"

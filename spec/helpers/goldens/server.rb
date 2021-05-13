@@ -2,6 +2,7 @@ require 'puma'
 require 'puma/configuration'
 require 'puma/events'
 require 'rack'
+require 'rack/contrib'
 require 'tony'
 
 module Tony
@@ -16,6 +17,7 @@ module Tony
           server = ::Rack::Builder.new {
             use(Tony::Static, public_folder: __dir__)
             use(Tony::Static, public_folder: '/')
+            use(::Rack::JSONBodyParser)
             run(app)
           }
           conf = Puma::Configuration.new { |user_config|
@@ -29,9 +31,20 @@ module Tony
             resp.write(slim.render(:review, failures: failures))
           })
 
-          app.get('/finished', ->(_, resp) {
+          app.post('/finish', ->(_, resp) {
             launcher.stop
             resp.write('All done...please close this window.')
+          })
+
+          app.post('/reject', ->(req, resp) {
+            resp.status = 201
+          })
+
+          app.post('/accept', ->(req, resp) {
+            failure = failures[req.params[:index].to_i]
+            FileUtils.mv(failure.new, failure.golden)
+            resp.status = 201
+            resp.write("Accepting: #{req.params[:index]}")
           })
 
           events.on_booted {
