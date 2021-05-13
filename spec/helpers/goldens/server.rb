@@ -36,7 +36,7 @@ module Tony
             resp.write('All done...please close this window.')
           })
 
-          app.post('/reject', ->(req, resp) {
+          app.post('/reject', ->(_, resp) {
             resp.status = 201
           })
 
