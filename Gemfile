@@ -1,6 +1,6 @@
 ruby '>= 3'
 
-source 'https://rubygems.org' do
+source 'https://www.rubygems.org' do
   gem 'base64'
   gem 'linguistics'
   gem 'openssl'
@@ -23,7 +23,7 @@ source 'https://www.jubigems.org' do
 end
 
 group :development do
-  source 'https://rubygems.org' do
+  source 'https://www.rubygems.org' do
     gem 'apparition'
     gem 'capybara'
     gem 'colorize'
