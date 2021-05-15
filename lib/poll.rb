@@ -65,9 +65,11 @@ class Poll < Base
         return
       end
 
+      timezone = req.cookies.fetch('tz', 'America/Los_Angeles')
       template = responder.responses.empty? ? :view : :responded
       resp.write(@slim.render("poll/#{template}", poll: poll,
-                                                  responder: responder))
+                                                  responder: responder,
+                                                  timezone: timezone))
     })
 
     post('/poll/send', ->(req, resp) {

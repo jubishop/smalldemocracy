@@ -12,6 +12,9 @@ html lang="en"
       document.fonts.load('1rem "Fira Sans"').then(() => {
         document.documentElement.classList.add('google-fonts-loaded');
       });
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      document.cookie = "tz="+tz+"; expires=31536000; path=/";
+
 
   body
     ==yield

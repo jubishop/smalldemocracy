@@ -133,6 +133,18 @@ RSpec.describe(Poll, type: :rack_test) {
       expect_view_borda_single_page
     }
 
+    it('shows expiration time respecting timezone') {
+      current_time = 388341770 # 8:43 AM PST
+      allow(Time).to(receive(:now).and_return(Time.at(current_time)))
+
+      set_cookie(:email_address, 'a@a')
+      poll = create_poll
+
+      rack_mock_session.cookie_jar[:tz] = 'Africa/Djibouti'
+      get poll.url
+      expect(last_response.body).to(have_content('7:43 PM EAT'))
+    }
+
     it('shows your answers if you have already responded') {
       set_cookie(:email_address, 'a@a')
       poll = create_poll
