@@ -44,7 +44,7 @@ class Poll < Base
       if req.params.key?(:responder)
         responder = poll.responder(salt: req.params.fetch(:responder))
         unless responder
-          resp.write(@slim.render('email/get', poll: poll))
+          resp.write(@slim.render('email/get', poll: poll, req: req))
           return
         end
 
@@ -55,13 +55,13 @@ class Poll < Base
 
       email = fetch_email(req)
       unless email
-        resp.write(@slim.render('email/get', poll: poll))
+        resp.write(@slim.render('email/get', poll: poll, req: req))
         return
       end
 
       responder = poll.responder(email: email)
       unless responder
-        resp.write(@slim.render('email/get', poll: poll))
+        resp.write(@slim.render('email/get', poll: poll, req: req))
         return
       end
 

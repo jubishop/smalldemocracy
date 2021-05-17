@@ -3,7 +3,7 @@
 
 h1 Need Email
 
-p Please provide your email address to take this survey.
+p Please login to take this survey.
 
 form action="/poll/send" method="post"
   input name="poll_id" type="hidden" value=poll.id
@@ -13,3 +13,6 @@ form action="/poll/send" method="post"
   br
 
   input value="Submit" type="submit"
+
+br
+a href=Tony::Auth::Google.url(req, redirect: poll.url) Sign in with Google
