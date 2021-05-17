@@ -1,5 +1,5 @@
 require 'capybara/apparition'
-require 'core/test'
+require 'securerandom'
 require 'tony/test'
 
 ENV['APP_ENV'] = 'test'
@@ -55,6 +55,11 @@ RSpec.configure do |config|
   config.include(RSpec::Models)
   config.include_context(:apparition, type: :feature)
   config.include_context(:rack_test, type: :rack_test)
+
+  config.before(:each) {
+    allow(Tony::Auth::Google).to(receive(:url)).and_return(
+        SecureRandom.alphanumeric(24))
+  }
 
   config.after(:each) {
     ENV['APP_ENV'] = 'test'

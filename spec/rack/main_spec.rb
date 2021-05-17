@@ -23,7 +23,7 @@ RSpec.describe(Main, type: :rack_test) {
   }
 
   context('in faux production') {
-    before(:each) {
+    before(:all) {
       ENV['APP_ENV'] = 'production'
       ENV['RACK_ENV'] = 'production'
       Capybara.app = Rack::Builder.parse_file('config.ru').first
