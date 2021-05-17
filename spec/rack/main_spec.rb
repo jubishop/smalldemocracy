@@ -52,9 +52,7 @@ RSpec.describe(Main, type: :rack_test) {
   context('get /logout') {
     it('deletes the email cookie') {
       set_cookie(:email_address, 'nomnomnom')
-      # rubocop:disable Style/StringHashKeys
-      get '/logout', {}, { 'HTTPS' => 'on' }
-      # rubocop:enable Style/StringHashKeys
+      get '/logout'
       expect(get_cookie(:email_address)).to(be_nil)
     }
 
@@ -62,6 +60,29 @@ RSpec.describe(Main, type: :rack_test) {
       get '/logout?r=/somewhere_else'
       expect(last_response.redirect?).to(be(true))
       expect(last_response.location).to(eq('/somewhere_else'))
+    }
+  }
+
+  context('get /auth/google') {
+    before(:each) {
+      @login_info = Tony::Auth::LoginInfo.new(email: 'jubi@github.com',
+                                              state: { redirect: '/onward' })
+    }
+
+    it('sets the email address') {
+      set_cookie(:email_address, 'nomnomnom')
+      # rubocop:disable Style/StringHashKeys
+      get '/auth/google', {}, { 'login_info' => @login_info }
+      # rubocop:enable Style/StringHashKeys
+      expect(get_cookie(:email_address)).to(eq('jubi@github.com'))
+    }
+
+    it('redirects to :redirect in state') {
+      # rubocop:disable Style/StringHashKeys
+      get '/auth/google', {}, { 'login_info' => @login_info }
+      # rubocop:enable Style/StringHashKeys
+      expect(last_response.redirect?).to(be(true))
+      expect(last_response.location).to(eq('/onward'))
     }
   }
 
