@@ -8,10 +8,10 @@ module Tony
     class Google
       @@paths = {}
       def self.url(req, path: '/auth/google', scope: 'email', **state)
-        info = @@paths.fetch(path)
+        client_id = @@paths.fetch(path)
         uri = URI('https://accounts.google.com/o/oauth2/v2/auth')
         uri.query = URI.encode_www_form(
-            client_id: info.fetch(:client_id),
+            client_id: client_id,
             redirect_uri: "#{req.base_url}#{path}",
             response_type: 'code',
             scope: scope,
@@ -20,11 +20,13 @@ module Tony
       end
 
       def initialize(app, client_id:, secret:, path: '/auth/google')
+        raise ArgumentError if @@paths.key?(path)
+
+        @@paths[path] = client_id
         @app = app
         @path = path
         @client_id = client_id
         @secret = secret
-        @@paths[path] = { client_id: client_id, secret: secret }
       end
 
       def call(env)
