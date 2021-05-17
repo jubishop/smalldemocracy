@@ -1,8 +1,8 @@
 require 'rack/contrib'
 require 'rack/protection'
 require 'tony'
+require 'tony/auth'
 
-require_relative 'lib/helpers/google'
 require_relative 'setup'
 
 use Tony::SSLEnforcer if ENV.fetch('RACK_ENV') == 'production'
