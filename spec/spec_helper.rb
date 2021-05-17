@@ -7,6 +7,8 @@ ENV['RACK_ENV'] = 'test'
 ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['JUBIVOTE_COOKIE_SECRET'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 ENV['SENDGRID_API_KEY'] = 'dummy_api_key'
+ENV['GOOGLE_CLIENT_ID'] = 'id'
+ENV['GOOGLE_SECRET'] = 'secret'
 
 require_relative '../setup'
 
