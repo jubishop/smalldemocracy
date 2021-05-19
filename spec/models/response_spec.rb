@@ -3,7 +3,7 @@ require_relative '../../lib/models/response'
 RSpec.describe(Models::Response) {
   context('::create') {
     it('successfully makes a ranked response') {
-      poll = create
+      poll = create_borda
       response = poll.responders.first.add_response(
           choice_id: poll.choices.first.id, rank: 0, chosen: true)
       expect(response.responder).to(eq(poll.responders.first))
@@ -14,14 +14,14 @@ RSpec.describe(Models::Response) {
     }
 
     it('successfully makes an unranked response') {
-      poll = create
+      poll = create_borda
       response = poll.responders.first.add_response(
           choice_id: poll.choices.first.id, chosen: true)
       expect(response.rank).to(eq(nil))
     }
 
     it('calculates results properly when chosen (ranked or unranked)') {
-      poll = create
+      poll = create_borda
       poll.mock_response
       poll.responses.each { |response|
         expect(response.score).to(eq(poll.choices.length - response.rank - 1))
@@ -32,7 +32,7 @@ RSpec.describe(Models::Response) {
     }
 
     it('calculates results properly when not chosen') {
-      poll = create
+      poll = create_borda
       poll.mock_response(chosen: false)
       poll.responses.each { |response|
         expect(response.score).to(eq(0))
@@ -41,7 +41,7 @@ RSpec.describe(Models::Response) {
     }
 
     it('rejects making a response with no responder associated') {
-      poll = create
+      poll = create_borda
       expect {
         poll.choices.first.add_response(rank: 0,
                                         chosen: true)
@@ -49,7 +49,7 @@ RSpec.describe(Models::Response) {
     }
 
     it('rejects making a response with no choice associated') {
-      poll = create
+      poll = create_borda
       expect {
         poll.responders.first.add_response(rank: 0,
                                            chosen: true)
@@ -57,7 +57,7 @@ RSpec.describe(Models::Response) {
     }
 
     it('rejects making a response with no chosen') {
-      poll = create
+      poll = create_borda
       expect {
         poll.responders.first.add_response(choice_id: poll.choices.first.id,
                                            rank: 0)
@@ -65,7 +65,7 @@ RSpec.describe(Models::Response) {
     }
 
     it('rejects creating two responses with duplicate ranks') {
-      poll = create
+      poll = create_borda
       poll.responders.first.add_response(choice_id: poll.choices[0].id,
                                          rank: 1,
                                          chosen: true)
@@ -77,7 +77,7 @@ RSpec.describe(Models::Response) {
     }
 
     it('rejects creating two responses with duplicate choices') {
-      poll = create
+      poll = create_borda
       poll.responders.first.add_response(choice_id: poll.choices[0].id,
                                          rank: 1,
                                          chosen: true)
@@ -89,7 +89,7 @@ RSpec.describe(Models::Response) {
     }
 
     it('rejects creating a response on finished poll') {
-      poll = create(expiration: 1)
+      poll = create_borda(expiration: 1)
       expect {
         poll.responders.first.add_response(choice_id: poll.choices.first.id,
                                            rank: 0,
