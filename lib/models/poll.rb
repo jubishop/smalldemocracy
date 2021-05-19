@@ -17,15 +17,12 @@ module Models
                              right_key: :id,
                              right_primary_key: :responder_id
 
-    def self.create_poll(title:,
-                         question:,
-                         expiration:,
-                         choices:,
-                         responders:,
-                         type: nil)
-      options = { title: title, question: question, expiration: expiration }
-      options[:type] = type if type
-
+    def self.create(title:,
+                    question:,
+                    expiration:,
+                    choices:,
+                    responders:,
+                    type: nil)
       raise ArgumentError, 'Choices cannot be nil' unless choices
 
       choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)
@@ -36,7 +33,10 @@ module Models
       responders = responders.strip.split(/\s*,\s*/) if responders.is_a?(String)
       raise ArgumentError, 'There must be some responders' if responders.empty?
 
-      poll = create(**options)
+      options = { title: title, question: question, expiration: expiration }
+      options[:type] = type if type
+
+      poll = super(**options)
       choices.each { |choice|
         poll.add_choice(text: choice)
       }

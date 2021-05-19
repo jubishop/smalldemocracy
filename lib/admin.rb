@@ -16,7 +16,7 @@ class Admin < Base
     })
 
     post('/admin/poll/create', ->(req, resp) {
-      poll = Models::Poll.create_poll(**req.params.to_h.symbolize_keys)
+      poll = Models::Poll.create(**req.params.to_h.symbolize_keys)
       resp.redirect("/admin#{poll.url}")
     })
 

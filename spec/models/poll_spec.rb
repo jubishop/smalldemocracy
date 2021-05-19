@@ -1,89 +1,87 @@
 require_relative '../../lib/models/poll'
 
 RSpec.describe(Models::Poll) {
-  context('::create_poll') {
+  context('::create') {
     it('creates a poll with comma strings') {
-      poll = create_poll(choices: 'one, two, three',
-                         responders: 'a@b, b@c, c@d')
+      poll = create(choices: 'one, two, three', responders: 'a@b, b@c, c@d')
       expect(poll.choices.map(&:text)).to(match_array(%w[one two three]))
       expect(poll.responders.map(&:email)).to(match_array(%w[a@b b@c c@d]))
     }
 
     it('creates a poll with arrays') {
-      poll = create_poll(choices: %w[four five six],
-                         responders: ['d@e', 'e@f', 'f@g'])
+      poll = create(choices: %w[four five six],
+                    responders: ['d@e', 'e@f', 'f@g'])
       expect(poll.choices.map(&:text)).to(match_array(%w[four five six]))
       expect(poll.responders.map(&:email)).to(match_array(%w[d@e e@f f@g]))
     }
 
     it('defaults to creating a poll that is `borda_single` type') {
-      poll = create_poll
+      poll = create
       expect(poll.type).to(eq(:borda_single))
     }
 
     it('can be created with other valid types') {
-      poll = create_poll(type: :borda_split)
+      poll = create(type: :borda_split)
       expect(poll.type).to(eq(:borda_split))
     }
 
     it('rejects creation of invalid type') {
-      expect { create_poll(type: :not_valid_type) }.to(
+      expect { create(type: :not_valid_type) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
 
     it('rejects creating two choices with the same text') {
-      expect { create_poll(choices: %w[one one]) }.to(
+      expect { create(choices: %w[one one]) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
 
     it('rejects creating a choice with empty text') {
-      expect { create_poll(choices: ['one', '']) }.to(
+      expect { create(choices: ['one', '']) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
 
     it('rejects creating two responders with the same email') {
-      expect { create_poll(responders: %w[a@a a@a]) }.to(
+      expect { create(responders: %w[a@a a@a]) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
 
     it('rejects creating a responder with empty email') {
-      expect { create_poll(responders: ['a@a', '']) }.to(
+      expect { create(responders: ['a@a', '']) }.to(
           raise_error(Sequel::HookFailed))
     }
 
     it('rejects creating a responder with invalid email address') {
-      expect { create_poll(responders: ['not_an_email_address']) }.to(
+      expect { create(responders: ['not_an_email_address']) }.to(
           raise_error(Sequel::HookFailed))
     }
 
     it('rejects creation without responders or choices') {
-      expect { create_poll(choices: nil) }.to(raise_error(ArgumentError))
-      expect { create_poll(responders: nil) }.to(raise_error(ArgumentError))
-      expect { create_poll(choices: '') }.to(raise_error(ArgumentError))
-      expect { create_poll(responders: '') }.to(raise_error(ArgumentError))
-      expect { create_poll(choices: []) }.to(raise_error(ArgumentError))
-      expect { create_poll(responders: []) }.to(raise_error(ArgumentError))
+      expect { create(choices: nil) }.to(raise_error(ArgumentError))
+      expect { create(responders: nil) }.to(raise_error(ArgumentError))
+      expect { create(choices: '') }.to(raise_error(ArgumentError))
+      expect { create(responders: '') }.to(raise_error(ArgumentError))
+      expect { create(choices: []) }.to(raise_error(ArgumentError))
+      expect { create(responders: []) }.to(raise_error(ArgumentError))
     }
 
     it('fatals if require fields are missing or empty') {
-      expect { create_poll(title: '') }.to(
+      expect { create(title: '') }.to(raise_error(Sequel::ConstraintViolation))
+      expect { create(title: nil) }.to(
           raise_error(Sequel::ConstraintViolation))
-      expect { create_poll(title: nil) }.to(
+      expect { create(question: '') }.to(
           raise_error(Sequel::ConstraintViolation))
-      expect { create_poll(question: '') }.to(
+      expect { create(question: nil) }.to(
           raise_error(Sequel::ConstraintViolation))
-      expect { create_poll(question: nil) }.to(
+      expect { create(expiration: '') }.to(
           raise_error(Sequel::ConstraintViolation))
-      expect { create_poll(expiration: '') }.to(
-          raise_error(Sequel::ConstraintViolation))
-      expect { create_poll(expiration: nil) }.to(
+      expect { create(expiration: nil) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
   }
 
   context('#results') {
     it('returns no results if the poll is not expired') {
-      poll = create_poll(choices: 'a', responders: 'b@b')
+      poll = create(choices: 'a', responders: 'b@b')
       expect(poll.scores).to(be_falsey)
       expect(poll.counts).to(be_falsey)
     }
@@ -92,7 +90,7 @@ RSpec.describe(Models::Poll) {
       it('computes scores properly') {
         choices = %w[one two three four five]
         responders = %w[a@a b@b c@c d@d e@e]
-        poll = create_poll(choices: choices, responders: responders)
+        poll = create(choices: choices, responders: responders)
 
         responses = {
           'a@a': %w[one two five three four],
@@ -124,9 +122,9 @@ RSpec.describe(Models::Poll) {
       before(:each) {
         choices = %w[one two three four five]
         responders = %w[a@a b@b c@c d@d e@e]
-        @poll = create_poll(choices: choices,
-                            responders: responders,
-                            type: :borda_split)
+        @poll = create(choices: choices,
+                       responders: responders,
+                       type: :borda_split)
 
         responses = {
           'a@a': %w[one two],

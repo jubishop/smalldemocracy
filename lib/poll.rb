@@ -21,7 +21,7 @@ class Poll < Base
     post('/poll/create', ->(req, resp) {
       require_email(req, resp)
       begin
-        poll = Models::Poll.create_poll(**req.params.to_h.symbolize_keys)
+        poll = Models::Poll.create(**req.params.to_h.symbolize_keys)
       rescue ArgumentError
         resp.status = 406
         resp.write('Not all poll fields provided')

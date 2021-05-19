@@ -60,13 +60,13 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     it('asks for email') {
-      poll = create_poll
+      poll = create
       visit(poll.url)
       goldens.verify('poll_email_get')
     }
 
     it('sends email') {
-      poll = create_poll
+      poll = create
       visit(poll.url)
       fill_in('email', with: 'a@a')
       click_button('Submit')
@@ -74,7 +74,7 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     it('complains when invalid email given') {
-      poll = create_poll
+      poll = create
       visit(poll.url)
       fill_in('email', with: 'poop@hey')
       click_button('Submit')
