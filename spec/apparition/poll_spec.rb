@@ -1,5 +1,5 @@
 RSpec.describe(Poll, type: :feature) {
-  let(:goldens) { Tony::Test::Goldens::Page.new(page) }
+  let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
   context('full poll lifecycles') {
     def submit_creation(page_name)
@@ -37,32 +37,32 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     it('executes borda_single') {
-      submit_creation('poll_borda_single_create')
-      submit_choices('poll_borda_single_view')
-      goldens.verify('poll_borda_single_responded')
-      verify_finished_poll('poll_borda_single_finished')
+      submit_creation('borda_single_create')
+      submit_choices('borda_single_view')
+      goldens.verify('borda_single_responded')
+      verify_finished_poll('borda_single_finished')
     }
 
     it('executes borda_split') {
       select('Borda Split', from: 'type')
-      submit_creation('poll_borda_split_create')
+      submit_creation('borda_split_create')
       page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
-      submit_choices('poll_borda_split_view')
-      goldens.verify('poll_borda_split_responded')
-      verify_finished_poll('poll_borda_split_finished')
+      submit_choices('borda_split_view')
+      goldens.verify('borda_split_responded')
+      verify_finished_poll('borda_split_finished')
     }
   }
 
   context('poll') {
     it('blocks create when not logged in') {
       visit('/poll/create')
-      goldens.verify('poll_email_not_found')
+      goldens.verify('email_not_found')
     }
 
     it('asks for email') {
       poll = create_borda
       visit(poll.url)
-      goldens.verify('poll_email_get')
+      goldens.verify('email_get')
     }
 
     it('sends email') {
@@ -70,7 +70,7 @@ RSpec.describe(Poll, type: :feature) {
       visit(poll.url)
       fill_in('email', with: 'a@a')
       click_button('Submit')
-      goldens.verify('poll_email_sent')
+      goldens.verify('email_sent')
     }
 
     it('complains when invalid email given') {
@@ -78,12 +78,12 @@ RSpec.describe(Poll, type: :feature) {
       visit(poll.url)
       fill_in('email', with: 'poop@hey')
       click_button('Submit')
-      goldens.verify('poll_email_responder_not_found')
+      goldens.verify('email_responder_not_found')
     }
 
     it('responds when poll not found') {
       visit('/poll/view/does_not_exist')
-      goldens.verify('poll_not_found')
+      goldens.verify('not_found')
     }
   }
 }
