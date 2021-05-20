@@ -13,7 +13,7 @@ Sequel.migration {
       Integer :expiration, null: false
 
       String :type, null: false, default: 'borda_single'
-      constraint(:type_is_valid, type: %w[borda_single borda_split yes_or_no])
+      constraint(:type_is_valid, type: %w[borda_single borda_split choose_one])
     }
   }
 }
