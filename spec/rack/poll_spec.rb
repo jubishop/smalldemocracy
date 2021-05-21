@@ -79,7 +79,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows results of :borda_single polls when finished') {
-      poll = create_borda
+      poll =  create
       poll.mock_response
       poll.expiration = 1
       poll.save
@@ -88,7 +88,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows results of :borda_split polls when finished') {
-      poll = create_borda(type: :borda_split)
+      poll =  create(type: :borda_split)
       poll.mock_response
       poll.expiration = 1
       poll.save
@@ -97,13 +97,13 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('asks for email if responder param is not in poll') {
-      poll = create_borda
+      poll = create
       get poll.url('not_in_poll')
       expect_email_get_page
     }
 
     it('stores cookie if responder is in poll') {
-      poll = create_borda
+      poll = create
       # rubocop:disable Style/StringHashKeys
       get poll.responders.first.url, {}, { 'HTTPS' => 'on' }
       # rubocop:enable Style/StringHashKeys
@@ -114,21 +114,21 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('asks for email if not logged in and no responder param') {
-      poll = create_borda
+      poll = create
       get poll.url
       expect_email_get_page
     }
 
     it('asks for email if logged in but not in this poll') {
       set_cookie(:email_address, 'b@b')
-      poll = create_borda
+      poll = create
       get poll.url
       expect_email_get_page
     }
 
     it('shows poll if you have not responded to it yet') {
       set_cookie(:email_address, 'a@a')
-      poll = create_borda
+      poll = create
       get poll.url
       expect_view_borda_single_page
     }
@@ -138,7 +138,7 @@ RSpec.describe(Poll, type: :rack_test) {
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
       set_cookie(:email_address, 'a@a')
-      poll = create_borda
+      poll = create
 
       rack_mock_session.cookie_jar[:tz] = 'Africa/Djibouti'
       get poll.url
@@ -147,7 +147,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('shows your answers if you have already responded') {
       set_cookie(:email_address, 'a@a')
-      poll = create_borda
+      poll = create
       poll.mock_response
 
       get poll.url
@@ -157,7 +157,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
   context('post /send') {
     it('sends email successfully') {
-      poll = create_borda
+      poll =  create
       expect(Utils::Email).to(receive(:email)).with(
           poll, poll.responders.first)
       post "/poll/send?poll_id=#{poll.id}&email=a@a"
@@ -173,7 +173,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects sending to an email not in the response list') {
-      poll = create_borda
+      poll = create
       post "/poll/send?poll_id=#{poll.id}"
       expect(last_response.status).to(be(400))
 
@@ -183,7 +183,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('rejects sending email for expired poll') {
       ENV['APP_ENV'] = 'development'
-      poll = create_borda(expiration: 1)
+      poll = create(expiration: 1)
       post "/poll/send?poll_id=#{poll.id}&email=a@a"
       expect(last_response.status).to(be(405))
     }
@@ -203,7 +203,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     context(':borda_single') {
       it('saves posted results successfully') {
-        poll = create_borda
+        poll =  create
         post_json({
           poll_id: poll.id,
           responder: poll.responders.first.salt,
@@ -222,7 +222,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     context(':borda_split') {
       before(:each) {
-        @poll = create_borda(type: :borda_split)
+        @poll = create(type: :borda_split)
       }
 
       it('saves posted results successfully') {
@@ -263,7 +263,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects posting to an already responded poll') {
-      poll = create_borda
+      poll = create
       responder, responses = poll.mock_response
 
       post_json({
@@ -290,25 +290,25 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects posting with no responder') {
-      poll = create_borda
+      poll = create
       post_json({ poll_id: poll.id })
       expect(last_response.status).to(be(400))
     }
 
     it('rejects posting with invalid responder') {
-      poll = create_borda
+      poll = create
       post_json({ poll_id: poll.id, responder: 'does_not_exist' })
       expect(last_response.status).to(be(404))
     }
 
     it('rejects posting with no responses') {
-      poll = create_borda
+      poll = create
       post_json({ poll_id: poll.id, responder: poll.responders.first.salt })
       expect(last_response.status).to(be(400))
     }
 
     it('rejects posting with invalid responses') {
-      poll = create_borda
+      poll = create
       post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,
@@ -318,7 +318,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects posting with duplicate choices') {
-      poll = create_borda
+      poll = create
       responses = poll.choices.map(&:id)
       responses[0] = responses[1]
       post_json({
@@ -330,7 +330,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects posting responses to expired poll') {
-      poll = create_borda(expiration: 1)
+      poll = create(expiration: 1)
       post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,
@@ -341,7 +341,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('rejects posting if you are not logged in') {
       clear_cookies
-      poll = create_borda
+      poll = create
       post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,
@@ -352,7 +352,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('rejects posting if you are logged in as someone else') {
       set_cookie(:email_address, 'someone_else@hey.com')
-      poll = create_borda
+      poll = create
       post_json({
         poll_id: poll.id,
         responder: poll.responders.first.salt,

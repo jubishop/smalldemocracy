@@ -2,12 +2,12 @@ require_relative '../../lib/models/poll'
 
 module RSpec
   module Models
-    def create_borda(title: 'title',
-                     question: 'question',
-                     expiration: Time.now.to_i + 62,
-                     choices: 'one, two, three',
-                     responders: 'a@a',
-                     type: nil)
+    def create(title: 'title',
+               question: 'question',
+               expiration: Time.now.to_i + 62,
+               choices: 'one, two, three',
+               responders: 'a@a',
+               type: nil)
       return ::Models::Poll.create(title: title,
                                    question: question,
                                    expiration: expiration,

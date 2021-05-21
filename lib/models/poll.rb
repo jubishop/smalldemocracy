@@ -65,6 +65,7 @@ module Models
     end
 
     def scores
+      assert_type(:borda_single, :borda_split)
       return unless finished?
 
       @scores ||= poll_results(&:score)
@@ -72,6 +73,7 @@ module Models
     end
 
     def counts
+      assert_type(:borda_single, :borda_split)
       return unless finished? && type == :borda_split
 
       @counts ||= poll_results(&:point)
@@ -88,6 +90,13 @@ module Models
 
     def poll_results(&block)
       return Helpers::PollResults.new(responses, &block).to_a
+    end
+
+    def assert_type(*types)
+      return if types.include?(type)
+
+      raise TypeError, "#{title} has type: #{type} but must be one of " \
+                       "#{types.join(',')} for this method"
     end
   end
 end
