@@ -87,6 +87,11 @@ RSpec.describe(Models::Poll) {
       expect { poll.scores }.to(raise_error(Models::TypeError))
     }
 
+    it('raises an error if using counts on borda_single type') {
+      poll = create(type: :borda_single)
+      expect { poll.counts }.to(raise_error(Models::TypeError))
+    }
+
     it('raises error if using breakdown on borda_* types') {
       poll = create(type: :borda_single)
       expect { poll.breakdown }.to(raise_error(Models::TypeError))
