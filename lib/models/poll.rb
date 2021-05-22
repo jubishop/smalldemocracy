@@ -5,6 +5,7 @@ require 'set'
 require_relative 'helpers/poll_results'
 
 require_relative 'choice'
+require_relative 'exceptions'
 require_relative 'responder'
 require_relative 'response'
 
@@ -23,15 +24,17 @@ module Models
                     choices:,
                     responders:,
                     type: nil)
-      raise ArgumentError, 'Choices cannot be nil' unless choices
+      raise Models::ArgumentError, 'Choices cannot be nil' unless choices
 
       choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)
-      raise ArgumentError, 'There must be some choices' if choices.empty?
+      raise Models::ArgumentError,
+            'There must be some choices' if choices.empty?
 
-      raise ArgumentError, 'Responders cannot be nil' unless responders
+      raise Models::ArgumentError, 'Responders cannot be nil' unless responders
 
       responders = responders.strip.split(/\s*,\s*/) if responders.is_a?(String)
-      raise ArgumentError, 'There must be some responders' if responders.empty?
+      raise Models::ArgumentError,
+            'There must be some responders' if responders.empty?
 
       options = { title: title, question: question, expiration: expiration }
       options[:type] = type if type
@@ -60,24 +63,36 @@ module Models
       return responders { |ds| ds.where(**options) }.first
     end
 
+    def choice(**options)
+      return choices { |ds| ds.where(**options) }.first
+    end
+
     def finished?
       return Time.at(expiration) < Time.now
     end
 
     def scores
       assert_type(:borda_single, :borda_split)
-      return unless finished?
 
       @scores ||= poll_results(&:score)
       return @scores
     end
 
     def counts
-      assert_type(:borda_single, :borda_split)
-      return unless finished? && type == :borda_split
+      assert_type(:borda_split, :choose_one)
 
       @counts ||= poll_results(&:point)
       return @counts
+    end
+
+    def breakdown
+      assert_type(:choose_one)
+
+      results = Hash.new { |hash, key| hash[key] = [] }
+      responses.select(&:chosen).each { |response|
+        results[response.choice].push(response.responder)
+      }
+      return results
     end
 
     def url(responder_salt = nil)
@@ -96,7 +111,7 @@ module Models
       return if types.include?(type)
 
       raise TypeError, "#{title} has type: #{type} but must be one of " \
-                       "#{types.join(',')} for this method"
+                       "#{types.sentence('or')} for this method"
     end
   end
 end

@@ -22,7 +22,7 @@ class Poll < Base
       require_email(req, resp)
       begin
         poll = Models::Poll.create(**req.params.to_h.symbolize_keys)
-      rescue ArgumentError
+      rescue Models::ArgumentError, ArgumentError
         resp.status = 406
         resp.write('Not all poll fields provided')
       rescue Sequel::ConstraintViolation
@@ -90,7 +90,7 @@ class Poll < Base
 
       begin
         Utils::Email.email(poll, responder)
-      rescue ArgumentError
+      rescue Utils::ArgumentError
         resp.status = 405
         resp.write('Poll has already finished')
         return

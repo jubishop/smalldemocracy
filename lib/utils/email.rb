@@ -1,5 +1,7 @@
 require 'sendgrid-ruby'
 
+require_relative 'exceptions'
+
 module Utils
   module Email
     HOSTNAME = 'jubivote.com'.freeze

@@ -35,6 +35,6 @@ RSpec.describe(Utils::Email) {
   it('rejects sending email to expired poll') {
     poll = create(responders: 'jubi@hey.com', expiration: 1)
     expect { Utils::Email.email(poll, poll.responders.first) }.to(
-        raise_error(ArgumentError))
+        raise_error(Utils::ArgumentError))
   }
 }

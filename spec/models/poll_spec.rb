@@ -56,12 +56,12 @@ RSpec.describe(Models::Poll) {
     }
 
     it('rejects creation without responders or choices') {
-      expect {  create(choices: nil) }.to(raise_error(ArgumentError))
-      expect {  create(responders: nil) }.to(raise_error(ArgumentError))
-      expect {  create(choices: '') }.to(raise_error(ArgumentError))
-      expect {  create(responders: '') }.to(raise_error(ArgumentError))
-      expect {  create(choices: []) }.to(raise_error(ArgumentError))
-      expect {  create(responders: []) }.to(raise_error(ArgumentError))
+      expect {  create(choices: nil) }.to(raise_error(Models::ArgumentError))
+      expect {  create(responders: nil) }.to(raise_error(Models::ArgumentError))
+      expect {  create(choices: '') }.to(raise_error(Models::ArgumentError))
+      expect {  create(responders: '') }.to(raise_error(Models::ArgumentError))
+      expect {  create(choices: []) }.to(raise_error(Models::ArgumentError))
+      expect {  create(responders: []) }.to(raise_error(Models::ArgumentError))
     }
 
     it('fatals if require fields are missing or empty') {
@@ -82,16 +82,16 @@ RSpec.describe(Models::Poll) {
   }
 
   context('#results') {
-    it('raises error if using counts or scores on choose_* types') {
+    it('raises error if using scores on choose_* types') {
       poll = create(type: :choose_one)
-      expect { poll.scores }.to(raise_error(TypeError))
-      expect { poll.counts }.to(raise_error(TypeError))
+      expect { poll.scores }.to(raise_error(Models::TypeError))
     }
 
-    it('returns no results if the poll is not expired') {
-      poll = create(choices: 'a', responders: 'b@b')
-      expect(poll.scores).to(be_falsey)
-      expect(poll.counts).to(be_falsey)
+    it('raises error if using breakdown on borda_* types') {
+      poll = create(type: :borda_single)
+      expect { poll.breakdown }.to(raise_error(Models::TypeError))
+      poll = create(type: :borda_split)
+      expect { poll.breakdown }.to(raise_error(Models::TypeError))
     }
 
     context(':borda_single') {
@@ -169,6 +169,53 @@ RSpec.describe(Models::Poll) {
 
       it('computes counts properly') {
         count_results = { two: 5, one: 4, five: 3, three: 2, four: 1 }
+        count_results.each_with_index { |result, index|
+          choice, count = *result
+          expect(@poll.counts[index].text).to(eq(choice.to_s))
+          expect(@poll.counts[index].count).to(eq(count))
+        }
+      }
+    }
+
+    context(':choose_one') {
+      before(:each) {
+        choices = %w[yes no maybe]
+        responders = %w[a@a b@b c@c d@d e@e f@f]
+        @poll = create(choices: choices,
+                       responders: responders,
+                       type: :choose_one)
+
+        responses = {
+          'a@a': 'yes',
+          'b@b': 'no',
+          'c@c': 'yes',
+          'd@d': 'maybe',
+          'e@e': 'yes',
+          'f@f': 'maybe'
+        }
+
+        responses.each { |email, choice|
+          responder = @poll.responder(email: email.to_s)
+          choice = @poll.choice(text: choice)
+          responder.add_response(choice_id: choice.id, chosen: true)
+        }
+      }
+
+      it('computes breakdown properly') {
+        breakdown_results = {
+          yes: ['a@a', 'c@c', 'e@e'],
+          maybe: ['d@d', 'f@f'],
+          no: ['b@b']
+        }
+        breakdown = @poll.breakdown
+        breakdown.each { |choice, responders|
+          expect(breakdown_results[choice.text.to_sym]).to(
+              eq(responders.map(&:email).sort))
+        }
+      }
+
+      it('computes counts properly') {
+        count_results = { yes: 3, maybe: 2, no: 1 }
         count_results.each_with_index { |result, index|
           choice, count = *result
           expect(@poll.counts[index].text).to(eq(choice.to_s))

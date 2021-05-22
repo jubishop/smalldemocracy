@@ -5,10 +5,16 @@ p Poll: #{poll.title}, is finished!
 
 p Results:
 
-- if poll.counts
+ruby:
+  begin
+    counts = poll.counts
+  rescue Models::TypeError
+  end
+
+- if counts
   h2 Participants
   ol
-    - poll.counts.each do |result|
+    - counts.each do |result|
       - participants = 'participant'.en.plural(result.count)
       - count = "(#{result.count} #{participants})"
       li ="#{result} #{count}"
