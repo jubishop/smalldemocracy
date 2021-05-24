@@ -1,8 +1,13 @@
 = content_for :head
   title =poll.title
-  ==javascript_include_tag "https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"
-  ==javascript_include_tag 'sortable/poll'
-  ==stylesheet_link_tag 'sortable/poll'
+  - case poll.type
+  - when :borda_single, :borda_split
+    ==javascript_include_tag "https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"
+    ==javascript_include_tag 'sortable/poll'
+    ==stylesheet_link_tag 'sortable/poll'
+  - when :choose_one
+    ==javascript_include_tag 'choose/one'
+    ==stylesheet_link_tag 'choose/one'
 
 h1 =poll.title
 
@@ -16,18 +21,29 @@ h2 =poll.question
 
 include :expiration_text
 
-p Drag and drop to rank your choices.
+- case poll.type
+- when :borda_single, :borda_split
+  p Drag and drop to rank your choices.
 
-- if poll.type == :borda_split
-  p Drag to red those in which you won't participate.
+  - if poll.type == :borda_split
+    p Drag to red those in which you won't participate.
 
-ul#choices poll_id=poll.id responder_salt=responder.salt
-  - poll.choices.each do |choice|
-    li.choice data-id=choice.id
-      i.grip.fas.fa-grip-lines
-      p.text =choice.text
-      p.score
-- if poll.type == :borda_split
-  ul#bottom-choices
+  ul#choices poll_id=poll.id responder_salt=responder.salt
+    - poll.choices.each do |choice|
+      li.choice data-id=choice.id
+        i.grip.fas.fa-grip-lines
+        p.text =choice.text
+        p.score
 
-button#submit type="submit" disabled=true Submit Choices
+  - if poll.type == :borda_split
+    ul#bottom-choices
+
+  button#submit type="submit" disabled=true Submit Choices
+
+- when :choose_one
+  p Click on your choice.
+
+  ul#choices poll_id=poll.id responder_salt=responder.salt
+    - poll.choices.each do |choice|
+      li.choice data-id=choice.id
+        button.text disabled=true =choice.text
