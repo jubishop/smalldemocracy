@@ -122,33 +122,13 @@ class Poll < Base
         return
       end
 
-      unless req.params.key?(:responses)
-        resp.status = 400
-        resp.write('No responses provided')
-        return
-      end
-      responses = req.params.fetch(:responses)
-
-      if poll.type == :borda_split && !req.params.key?(:bottom_responses)
-        resp.status = 400
-        resp.write('No bottom response array provided for a borda_split poll')
-        return
-      end
-
-      bottom_responses = req.params.fetch(:bottom_responses, [])
-      unless responses.length + bottom_responses.length == poll.choices.length
-        resp.status = 406
-        resp.write('Response set does not match number of choices')
-        return
-      end
-
       begin
-        responses.each_with_index { |choice_id, rank|
-          responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
-        }
-        bottom_responses.each { |choice_id|
-          responder.add_response(choice_id: choice_id, chosen: false)
-        }
+        case poll.type
+        when :borda_single, :borda_split
+          save_borda_poll(req, resp, poll, responder)
+        when :choose_one
+          save_choose_one_poll(req, resp, responder)
+        end
       rescue Sequel::UniqueConstraintViolation
         resp.status = 409
         resp.write('Duplicate response, choice, or rank found')
@@ -160,5 +140,46 @@ class Poll < Base
         resp.write('Poll created')
       end
     })
+  end
+
+  private
+
+  def save_choose_one_poll(req, resp, responder)
+    unless req.params.key?(:choice)
+      resp.status = 400
+      resp.write('No choice provided')
+      throw(:response)
+    end
+    choice_id = req.params.fetch(:choice)
+    responder.add_response(choice_id: choice_id, chosen: true)
+  end
+
+  def save_borda_poll(req, resp, poll, responder)
+    unless req.params.key?(:responses)
+      resp.status = 400
+      resp.write('No responses provided')
+      throw(:response)
+    end
+    responses = req.params.fetch(:responses)
+
+    if poll.type == :borda_split && !req.params.key?(:bottom_responses)
+      resp.status = 400
+      resp.write('No bottom response array provided for a borda_split poll')
+      throw(:response)
+    end
+
+    bottom_responses = req.params.fetch(:bottom_responses, [])
+    unless responses.length + bottom_responses.length == poll.choices.length
+      resp.status = 406
+      resp.write('Response set does not match number of choices')
+      throw(:response)
+    end
+
+    responses.each_with_index { |choice_id, rank|
+      responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
+    }
+    bottom_responses.each { |choice_id|
+      responder.add_response(choice_id: choice_id, chosen: false)
+    }
   end
 end
