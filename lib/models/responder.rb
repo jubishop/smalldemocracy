@@ -18,8 +18,15 @@ module Models
       super
     end
 
+    def response
+      return responses.first if responses.length == 1 && responses.first.chosen
+
+      raise RangeError, "#{email} has #{responses.length} responses for " \
+                        "#{poll.title}, but should only have one that is chosen"
+    end
+
     def url
-      return poll.url(salt)
+      return poll.url(self)
     end
   end
 end

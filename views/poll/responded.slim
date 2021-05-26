@@ -10,10 +10,15 @@ p
 
 include :expiration_text
 
-p Here's your recorded responses.
+- case poll.type
+- when :borda_single, :borda_split
+  p Here's your recorded responses.
 
-ol
-  - responder.responses.sort_by(&:score).reverse.each do |response|
-    - chosen = response.chosen ? '✅' : '❌'
-    - points = 'point'.en.plural(response.score)
-    li ="#{response.choice.text} #{chosen} (#{response.score} #{points})"
+  ol
+    - responder.responses.sort_by(&:score).reverse.each do |response|
+      - chosen = response.chosen ? '✅' : '❌'
+      - points = 'point'.en.plural(response.score)
+      li ="#{response.choice.text} #{chosen} (#{response.score} #{points})"
+
+-when :choose_one
+  p You responded: #{responder.response.choice.text}

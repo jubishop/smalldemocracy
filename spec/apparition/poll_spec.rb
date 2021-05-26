@@ -66,7 +66,7 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     it('sends email') {
-      poll =  create
+      poll = create
       visit(poll.url)
       fill_in('email', with: 'a@a')
       click_button('Submit')

@@ -79,7 +79,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows results of :borda_single polls when finished') {
-      poll =  create
+      poll = create
       poll.mock_response
       poll.expiration = 1
       poll.save
@@ -88,18 +88,12 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows results of :borda_split polls when finished') {
-      poll =  create(type: :borda_split)
+      poll = create(type: :borda_split)
       poll.mock_response
       poll.expiration = 1
       poll.save
       get poll.url
       expect_borda_split_finished_page
-    }
-
-    it('asks for email if responder param is not in poll') {
-      poll = create
-      get poll.url('not_in_poll')
-      expect_email_get_page
     }
 
     it('stores cookie if responder is in poll') {
@@ -157,7 +151,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
   context('post /send') {
     it('sends email successfully') {
-      poll =  create
+      poll = create
       expect(Utils::Email).to(receive(:email)).with(
           poll, poll.responders.first)
       post "/poll/send?poll_id=#{poll.id}&email=a@a"
@@ -203,7 +197,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     context(':borda_single') {
       it('saves posted results successfully') {
-        poll =  create
+        poll = create
         post_json({
           poll_id: poll.id,
           responder: poll.responders.first.salt,

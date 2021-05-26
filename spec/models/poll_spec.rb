@@ -26,58 +26,78 @@ RSpec.describe(Models::Poll) {
     }
 
     it('rejects creation of invalid type') {
-      expect {  create(type: :not_valid_type) }.to(
+      expect { create(type: :not_valid_type) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
 
     it('rejects creating two choices with the same text') {
-      expect {  create(choices: %w[one one]) }.to(
+      expect { create(choices: %w[one one]) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
 
     it('rejects creating a choice with empty text') {
-      expect {  create(choices: ['one', '']) }.to(
+      expect { create(choices: ['one', '']) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
 
     it('rejects creating two responders with the same email') {
-      expect {  create(responders: %w[a@a a@a]) }.to(
+      expect { create(responders: %w[a@a a@a]) }.to(
           raise_error(Sequel::ConstraintViolation))
     }
 
     it('rejects creating a responder with empty email') {
-      expect {  create(responders: ['a@a', '']) }.to(
+      expect { create(responders: ['a@a', '']) }.to(
           raise_error(Sequel::HookFailed))
     }
 
     it('rejects creating a responder with invalid email address') {
-      expect {  create(responders: ['not_an_email_address']) }.to(
+      expect { create(responders: ['not_an_email_address']) }.to(
           raise_error(Sequel::HookFailed))
     }
 
     it('rejects creation without responders or choices') {
-      expect {  create(choices: nil) }.to(raise_error(Models::ArgumentError))
-      expect {  create(responders: nil) }.to(raise_error(Models::ArgumentError))
-      expect {  create(choices: '') }.to(raise_error(Models::ArgumentError))
-      expect {  create(responders: '') }.to(raise_error(Models::ArgumentError))
-      expect {  create(choices: []) }.to(raise_error(Models::ArgumentError))
-      expect {  create(responders: []) }.to(raise_error(Models::ArgumentError))
+      expect { create(choices: nil) }.to(raise_error(Models::ArgumentError))
+      expect { create(responders: nil) }.to(raise_error(Models::ArgumentError))
+      expect { create(choices: '') }.to(raise_error(Models::ArgumentError))
+      expect { create(responders: '') }.to(raise_error(Models::ArgumentError))
+      expect { create(choices: []) }.to(raise_error(Models::ArgumentError))
+      expect { create(responders: []) }.to(raise_error(Models::ArgumentError))
     }
 
     it('fatals if require fields are missing or empty') {
-      expect {
-        create(title: '')
-      }.to(raise_error(Sequel::ConstraintViolation))
-      expect {  create(title: nil) }.to(
+      expect { create(title: '') }.to(raise_error(Sequel::ConstraintViolation))
+      expect { create(title: nil) }.to(raise_error(Sequel::ConstraintViolation))
+      expect { create(question: '') }.to(
           raise_error(Sequel::ConstraintViolation))
-      expect {  create(question: '') }.to(
+      expect { create(question: nil) }.to(
           raise_error(Sequel::ConstraintViolation))
-      expect {  create(question: nil) }.to(
+      expect { create(expiration: '') }.to(
           raise_error(Sequel::ConstraintViolation))
-      expect {  create(expiration: '') }.to(
+      expect { create(expiration: nil) }.to(
           raise_error(Sequel::ConstraintViolation))
-      expect {  create(expiration: nil) }.to(
-          raise_error(Sequel::ConstraintViolation))
+    }
+  }
+
+  context('#url') {
+    before(:each) {
+      @poll = create
+    }
+
+    it('creates plain url with no responder') {
+      expect(@poll.url).to(eq("/poll/view/#{@poll.id}"))
+    }
+
+    it('creates url with responder') {
+      responder = @poll.add_responder(email: 'yo@yo')
+      expect(@poll.url(responder)).to(
+          eq("/poll/view/#{@poll.id}?responder=#{responder.salt}"))
+    }
+
+    it('throws error if trying to create URL of responder not in poll') {
+      poll = create
+      another_poll = create
+      responder = another_poll.add_responder(email: 'yo@yo.com')
+      expect { poll.url(responder) }.to(raise_error(Models::ArgumentError))
     }
   }
 

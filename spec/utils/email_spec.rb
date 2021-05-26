@@ -18,7 +18,7 @@ RSpec.describe(Utils::Email) {
   }
 
   it('sends email') {
-    poll =  create(responders: 'jubi@hey.com')
+    poll = create(responders: 'jubi@hey.com')
     expect_any_instance_of(SendGrid::Client).to(receive(:post)).once { |_, data|
       expect(data[:request_body]['personalizations'].first).to(eq({
         # rubocop:disable Style/StringHashKeys

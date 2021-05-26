@@ -95,10 +95,12 @@ module Models
       return results
     end
 
-    def url(responder_salt = nil)
-      return "/poll/view/#{id}" unless responder_salt
+    def url(responder = nil)
+      return "/poll/view/#{id}" unless responder
 
-      return "/poll/view/#{id}?responder=#{responder_salt}"
+      raise ArgumentError unless responders.include?(responder)
+
+      return "/poll/view/#{id}?responder=#{responder.salt}"
     end
 
     private

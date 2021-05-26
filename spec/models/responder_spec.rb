@@ -33,4 +33,37 @@ RSpec.describe(Models::Responder) {
           raise_error(Sequel::HookFailed))
     }
   }
+
+  context('#url') {
+    it('creates valid responder url') {
+      poll = create
+      responder = poll.add_responder(email: 'yo@yo')
+      expect(responder.url).to(
+          eq("/poll/view/#{poll.id}?responder=#{responder.salt}"))
+    }
+  }
+
+  context('#response') {
+    before(:each) {
+      @poll = create
+      @responder = @poll.add_responder(email: 'yo@yo')
+    }
+
+    it('returns only response if only one') {
+      response = @responder.add_response(choice_id: @poll.choices.first.id,
+                                         chosen: true)
+      expect(@responder.response).to(eq(response))
+    }
+
+    it('raises error if only response is not chosen') {
+      @responder.add_response(choice_id: @poll.choices.first.id, chosen: false)
+      expect { @responder.response }.to(raise_error(Models::RangeError))
+    }
+
+    it('raises error if more than one response exists') {
+      @responder.add_response(choice_id: @poll.choices.first.id, chosen: true)
+      @responder.add_response(choice_id: @poll.choices.last.id, chosen: true)
+      expect { @responder.response }.to(raise_error(Models::RangeError))
+    }
+  }
 }
