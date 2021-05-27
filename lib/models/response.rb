@@ -20,5 +20,9 @@ module Models
     def point
       return chosen ? 1 : 0
     end
+
+    def to_s
+      choice.to_s
+    end
   end
 end

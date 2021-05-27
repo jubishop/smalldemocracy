@@ -28,5 +28,9 @@ module Models
     def url
       return poll.url(self)
     end
+
+    def to_s
+      email
+    end
   end
 end

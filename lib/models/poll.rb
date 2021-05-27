@@ -60,11 +60,15 @@ module Models
     end
 
     def responder(**options)
-      return responders { |ds| ds.where(**options) }.first
+      return responders.find { |responder|
+        options.all? { |attrib, value| responder.public_send(attrib) == value }
+      }
     end
 
     def choice(**options)
-      return choices { |ds| ds.where(**options) }.first
+      return choices.find { |choice|
+        options.all? { |attrib, value| choice.public_send(attrib) == value }
+      }
     end
 
     def finished?
@@ -89,10 +93,15 @@ module Models
       assert_type(:choose_one)
 
       results = Hash.new { |hash, key| hash[key] = [] }
-      responses.select(&:chosen).each { |response|
-        results[response.choice].push(response.responder)
+      unresponded = []
+      responders.each { |responder|
+        if responder.responses.empty?
+          unresponded.push(responder)
+        else
+          results[responder.response.choice].push(responder)
+        end
       }
-      return results
+      return results, unresponded
     end
 
     def url(responder = nil)
@@ -101,6 +110,10 @@ module Models
       raise ArgumentError unless responders.include?(responder)
 
       return "/poll/view/#{id}?responder=#{responder.salt}"
+    end
+
+    def to_s
+      title
     end
 
     private

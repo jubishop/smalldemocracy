@@ -205,7 +205,7 @@ RSpec.describe(Models::Poll) {
     context(':choose_one') {
       before(:each) {
         choices = %w[yes no maybe]
-        responders = %w[a@a b@b c@c d@d e@e f@f]
+        responders = %w[a@a b@b c@c d@d e@e f@f g@g]
         @poll = create(choices: choices,
                        responders: responders,
                        type: :choose_one)
@@ -218,7 +218,6 @@ RSpec.describe(Models::Poll) {
           'e@e': 'yes',
           'f@f': 'maybe'
         }
-
         responses.each { |email, choice|
           responder = @poll.responder(email: email.to_s)
           choice = @poll.choice(text: choice)
@@ -227,15 +226,17 @@ RSpec.describe(Models::Poll) {
       }
 
       it('computes breakdown properly') {
-        breakdown_results = {
+        results_expected = {
           yes: ['a@a', 'c@c', 'e@e'],
           maybe: ['d@d', 'f@f'],
           no: ['b@b']
         }
-        breakdown = @poll.breakdown
-        breakdown.each { |choice, responders|
-          expect(breakdown_results[choice.text.to_sym]).to(
-              eq(responders.map(&:email).sort))
+        unresponded_expected = ['g@g']
+        results, unresponded = @poll.breakdown
+        expect(unresponded_expected).to(match_array(unresponded.map(&:email)))
+        results.each { |choice, responders|
+          expect(results_expected[choice.text.to_sym]).to(
+              match_array(responders.map(&:email)))
         }
       }
 
