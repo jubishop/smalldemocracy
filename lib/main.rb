@@ -21,7 +21,7 @@ class Main < Base
     get('/auth/google', ->(req, resp) {
       login_info = req.env['login_info']
       resp.set_cookie(:email_address, login_info.email)
-      resp.redirect(login_info.state[:redirect])
+      resp.redirect(login_info.state[:r])
     })
   end
 end

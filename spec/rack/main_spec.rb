@@ -66,7 +66,7 @@ RSpec.describe(Main, type: :rack_test) {
   context('get /auth/google') {
     before(:each) {
       @login_info = Tony::Auth::LoginInfo.new(email: 'jubi@github.com',
-                                              state: { redirect: '/onward' })
+                                              state: { r: '/onward' })
     }
 
     it('sets the email address') {
@@ -77,7 +77,7 @@ RSpec.describe(Main, type: :rack_test) {
       expect(get_cookie(:email_address)).to(eq('jubi@github.com'))
     }
 
-    it('redirects to :redirect in state') {
+    it('redirects to :r in state') {
       # rubocop:disable Style/StringHashKeys
       get '/auth/google', {}, { 'login_info' => @login_info }
       # rubocop:enable Style/StringHashKeys
