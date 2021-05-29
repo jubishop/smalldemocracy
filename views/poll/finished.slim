@@ -5,24 +5,40 @@ p Poll: #{poll.title}, is finished!
 
 p Results:
 
-ruby:
-  begin
-    counts = poll.counts
-  rescue Models::TypeError
-  end
+- case poll.type
+- when :borda_single, :borda_split
+  ruby:
+    begin
+      counts = poll.counts
+    rescue Models::TypeError
+    end
 
-- if counts
-  h2 Participants
-  ol
-    - counts.each do |result|
-      - participants = 'participant'.en.plural(result.count)
-      - count = "(#{result.count} #{participants})"
-      li ="#{result} #{count}"
+  - if counts
+    h2 Participants
+    ol
+      - counts.each do |result|
+        - participants = 'participant'.en.plural(result.count)
+        - count = "(#{result.count} #{participants})"
+        li ="#{result} #{count}"
 
-- if poll.scores
-  h2 Borda Score
-  ol
-    - poll.scores.each do |result|
-      - points = 'point'.en.plural(result.score)
-      - score = "(#{result.score} #{points})"
-      li ="#{result} #{score}"
+  - if poll.scores
+    h2 Borda Score
+    ol
+      - poll.scores.each do |result|
+        - points = 'point'.en.plural(result.score)
+        - score = "(#{result.score} #{points})"
+        li ="#{result} #{score}"
+
+- when :choose_one
+  - results, unresponded = poll.breakdown
+  h2 Choices
+  - results.each do |choice, responders|
+    h3 =choice.text
+    ul
+      - responders.each do |responder|
+        li =responder.email
+
+  h2 Unresponded
+  ul
+    - unresponded.each do |responder|
+      li =responder.email
