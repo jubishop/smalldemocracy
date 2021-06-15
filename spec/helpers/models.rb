@@ -26,9 +26,18 @@ module Models
       test_only!
       responder = responder(email: 'a@a')
       responses = choices.map(&:id)
-      responses.each_with_index { |choice_id, rank|
-        responder.add_response(choice_id: choice_id, rank: rank, chosen: chosen)
-      }
+
+      case type
+      when :borda_single, :borda_split
+        responses.each_with_index { |choice_id, rank|
+          responder.add_response(choice_id: choice_id,
+                                 rank: rank,
+                                 chosen: chosen)
+        }
+      when :choose_one
+        responder.add_response(choice_id: choices.first.id, chosen: true)
+      end
+
       return responder, responses
     end
   end

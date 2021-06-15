@@ -48,6 +48,15 @@ RSpec.describe(Poll, type: :rack_test) {
       expect_view_borda_split_page
     }
 
+    it('creates a new :choose_one poll successfully') {
+      params = @valid_params.clone
+      params[:type] = :choose_one
+      post '/poll/create', **params
+      expect(last_response.redirect?).to(be(true))
+      follow_redirect!
+      expect_view_choose_one_page
+    }
+
     it('rejects any post without a cookie') {
       clear_cookies
       post '/poll/create'
@@ -73,27 +82,31 @@ RSpec.describe(Poll, type: :rack_test) {
   }
 
   context('get /view') {
+    def respond_to_poll(poll)
+      poll.mock_response
+      poll.expiration = 1
+      poll.save
+      get(poll.url)
+    end
+
     it('shows poll not found') {
       get 'poll/view/does_not_exist'
       expect_not_found_page
     }
 
     it('shows results of :borda_single polls when finished') {
-      poll = create
-      poll.mock_response
-      poll.expiration = 1
-      poll.save
-      get poll.url
+      respond_to_poll(create)
       expect_borda_single_finished_page
     }
 
     it('shows results of :borda_split polls when finished') {
-      poll = create(type: :borda_split)
-      poll.mock_response
-      poll.expiration = 1
-      poll.save
-      get poll.url
+      respond_to_poll(create(type: :borda_split))
       expect_borda_split_finished_page
+    }
+
+    it('shows results of :choose_one polls when finished') {
+      respond_to_poll(create(type: :choose_one))
+      expect_choose_one_finished_page
     }
 
     it('stores cookie if responder is in poll') {
