@@ -39,9 +39,14 @@ module RSpec
       expect(last_response.body).to(have_selector('h1', text: 'Poll Not Found'))
     end
 
-    def expect_responded_page
+    def expect_borda_responded_page
       expect(last_response.ok?).to(be(true))
       expect(last_response.body).to(have_content('your recorded responses'))
+    end
+
+    def expect_choose_responded_page
+      expect(last_response.ok?).to(be(true))
+      expect(last_response.body).to(have_content('You responded:'))
     end
 
     def expect_responder_not_found_page

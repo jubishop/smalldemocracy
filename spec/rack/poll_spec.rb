@@ -145,7 +145,7 @@ RSpec.describe(Poll, type: :rack_test) {
       poll.mock_response
 
       get poll.url
-      expect_responded_page
+      expect_borda_responded_page
     }
   }
 
@@ -195,6 +195,41 @@ RSpec.describe(Poll, type: :rack_test) {
     end
     # rubocop:enable Style/StringHashKeys
 
+    context(':choose_one') {
+      before(:each) {
+        @poll = create(type: :choose_one)
+      }
+
+      it('saves posted results successfully') {
+        post_json({
+          poll_id: @poll.id,
+          responder: @poll.responders.first.salt,
+          choice: @poll.choices.first.id
+        })
+        expect(last_response.status).to(be(201))
+
+        get "/poll/view/#{@poll.id}"
+        expect_choose_responded_page
+      }
+
+      it('rejects posting with an incorrect choice id') {
+        post_json({
+          poll_id: 'bad_id',
+          responder: @poll.responders.first.salt,
+          choice: @poll.choices.first.id
+        })
+        expect(last_response.status).to(be(404))
+      }
+
+      it('rejects posting with no choice id') {
+        post_json({
+          responder: @poll.responders.first.salt,
+          choice: @poll.choices.first.id
+        })
+        expect(last_response.status).to(be(400))
+      }
+    }
+
     context(':borda_single') {
       it('saves posted results successfully') {
         poll = create
@@ -206,7 +241,7 @@ RSpec.describe(Poll, type: :rack_test) {
         expect(last_response.status).to(be(201))
 
         get "/poll/view/#{poll.id}"
-        expect_responded_page
+        expect_borda_responded_page
 
         poll.expiration = 1
         expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
@@ -229,7 +264,7 @@ RSpec.describe(Poll, type: :rack_test) {
         expect(last_response.status).to(be(201))
 
         get "/poll/view/#{@poll.id}"
-        expect_responded_page
+        expect_borda_responded_page
 
         @poll.expiration = 1
         expect(@poll.scores.first.text).to(eq(@poll.choices.first.text))
