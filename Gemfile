@@ -39,6 +39,7 @@ group :development do
     gem 'rubocop-rake'
     gem 'rubocop-rspec'
     gem 'rubocop-sequel'
+    gem 'websocket-driver'
   end
 
   source 'https://www.jubigems.org' do
