@@ -24,8 +24,11 @@ source 'https://www.jubigems.org' do
 end
 
 group :development do
+  # TODO: Fix this once apparition has updated its gem.
+  gem 'apparition', github: 'twalpole/apparition',
+                    ref: 'ca86be4d54af835d531dbcd2b86e7b2c77f85f34'
+
   source 'https://www.rubygems.org' do
-    gem 'apparition'
     gem 'capybara'
     gem 'colorize'
     gem 'open3'
