@@ -1,4 +1,5 @@
 RSpec.describe(Poll, type: :feature) {
+  let(:current_time) { 388341770 }
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
   context('full poll lifecycles') {
@@ -23,7 +24,6 @@ RSpec.describe(Poll, type: :feature) {
 
     before(:each) {
       # It's 1982!
-      current_time = 388341770
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
       # Create a poll
@@ -59,6 +59,19 @@ RSpec.describe(Poll, type: :feature) {
       submit_choices('borda_split_view')
       goldens.verify('borda_split_responded')
       verify_finished_poll('borda_split_finished')
+    }
+
+    it('executes choose_one') {
+      select('Choose One', from: 'type')
+      submit_creation('choose_one_create')
+      click_button('one')
+      goldens.verify('choose_one_responded')
+      verify_finished_poll('choose_one_some_finished')
+      allow(Time).to(receive(:now).and_return(Time.at(current_time + 1)))
+      set_cookie(:email_address, 'two@two')
+      refresh
+      click_button('two')
+      verify_finished_poll('choose_one_all_finished')
     }
   }
 
