@@ -71,6 +71,10 @@ module Models
       }
     end
 
+    def shuffled_choices
+      choices.shuffle(random: Random.new(Time.now.to_i))
+    end
+
     def finished?
       return Time.at(expiration) < Time.now
     end
