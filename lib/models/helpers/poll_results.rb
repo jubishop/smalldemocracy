@@ -18,7 +18,7 @@ module Models
       end
 
       def to_a
-        return @results.values.sort!.reverse!
+        return values.sort_by! { |result| -result.count }
       end
     end
 
