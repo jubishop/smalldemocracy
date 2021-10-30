@@ -82,18 +82,20 @@ module Models
     def scores
       assert_type(:borda_single, :borda_split)
 
-      @scores ||= poll_results(&:score)
+      @scores ||= scores_by_choice.to_a
       return @scores
     end
 
     def counts
       assert_type(:borda_split, :choose_one)
 
-      @counts ||= poll_results(&:point)
+      return @counts unless @counts.nil?
 
-      if type == :borda_split
-        scores_by_choice = Helpers::PollResults.new(responses, &:score)
-        @counts.sort_by! { |result|
+      case type
+      when :choose_one
+        @counts = counts_by_choice.to_a
+      when :borda_split
+        @counts = counts_by_choice.values.sort_by! { |result|
           [-result.count, -scores_by_choice[result.choice].score]
         }
       end
@@ -130,8 +132,14 @@ module Models
 
     private
 
-    def poll_results(&block)
-      return Helpers::PollResults.new(responses, &block).to_a
+    def scores_by_choice
+      @scores_by_choice ||= Helpers::PollResults.new(responses, &:score)
+      return @scores_by_choice
+    end
+
+    def counts_by_choice
+      @counts_by_choice ||= Helpers::PollResults.new(responses, &:point)
+      return @counts_by_choice
     end
 
     def assert_type(*types)

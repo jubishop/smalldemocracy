@@ -13,6 +13,10 @@ module Models
         return @results[choice.id]
       end
 
+      def values
+        return @results.values
+      end
+
       def to_a
         return @results.values.sort!.reverse!
       end

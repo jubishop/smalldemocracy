@@ -164,7 +164,7 @@ RSpec.describe(Models::Poll) {
           'b@b': %w[one five four two],
           'c@c': %w[one three five two],
           'd@d': %w[five three two],
-          'e@e': %w[one]
+          'e@e': %w[one five]
         }
 
         responses.each { |email, chosen_ranks|
@@ -184,7 +184,7 @@ RSpec.describe(Models::Poll) {
       }
 
       it('computes scores properly') {
-        score_results = { one: 16, five: 9, two: 7, three: 6, four: 2 }
+        score_results = { one: 16, five: 12, two: 7, three: 6, four: 2 }
         score_results.each_with_index { |result, index|
           choice, score = *result
           expect(@poll.scores[index].text).to(eq(choice.to_s))
@@ -193,7 +193,7 @@ RSpec.describe(Models::Poll) {
       }
 
       it('computes counts properly') {
-        count_results = { one: 4, two: 4, five: 3, three: 2, four: 1 }
+        count_results = { one: 4, five: 4, two: 4, three: 2, four: 1 }
         count_results.each_with_index { |result, index|
           choice, count = *result
           expect(@poll.counts[index].text).to(eq(choice.to_s))
