@@ -90,6 +90,14 @@ module Models
       assert_type(:borda_split, :choose_one)
 
       @counts ||= poll_results(&:point)
+
+      if type == :borda_split
+        scores_by_choice = Helpers::PollResults.new(responses, &:score)
+        @counts.sort_by! { |result|
+          [-result.count, -scores_by_choice[result.choice].score]
+        }
+      end
+
       return @counts
     end
 
