@@ -72,7 +72,7 @@ module Models
     end
 
     def shuffled_choices
-      choices.shuffle(random: Random.new(Time.now.to_i))
+      choices.shuffle!(random: Random.new(Time.now.to_i))
     end
 
     def finished?
@@ -101,7 +101,7 @@ module Models
     end
 
     def breakdown
-      assert_type(:choose_one)
+      assert_type(:choose_one, :borda_single)
 
       results = Hash.new { |hash, key| hash[key] = [] }
       unresponded = []
@@ -109,7 +109,12 @@ module Models
         if responder.responses.empty?
           unresponded.push(responder)
         else
-          results[responder.response.choice].push(responder)
+          responder.responses.each { |response|
+            results[response.choice].push({
+              responder: responder,
+              score: response.score
+            })
+          }
         end
       }
       return results, unresponded

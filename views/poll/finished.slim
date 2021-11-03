@@ -30,13 +30,13 @@ p Results:
         li ="#{result} #{score}"
 
 - when :choose_one
-  - results, unresponded = poll.breakdown
+  - breakdown, unresponded = poll.breakdown
   h2 Choices
-  - results.each do |choice, responders|
+  - breakdown.each do |choice, results|
     h3 =choice.text
     ul
-      - responders.each do |responder|
-        li =responder.email
+      - results.each do |result|
+        li =result[:responder].email
 
   h2 Unresponded
   ul
