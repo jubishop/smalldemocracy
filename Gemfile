@@ -18,6 +18,7 @@ end
 source 'https://www.jubigems.org' do
   gem 'core'
   gem 'duration'
+  gem 'rstruct'
   gem 'tony'
   gem 'tony-auth'
 end

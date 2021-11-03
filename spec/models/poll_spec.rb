@@ -165,9 +165,8 @@ RSpec.describe(Models::Poll) {
         breakdown.each { |choice, results|
           results.each { |result|
             expected_result = expected_results[choice.text.to_sym]
-            email = result[:responder].email
-            score = result[:score]
-            expect(expected_result[email.to_sym]).to(eq(score))
+            email = result.responder.email
+            expect(expected_result[email.to_sym]).to(eq(result.score))
           }
         }
       }

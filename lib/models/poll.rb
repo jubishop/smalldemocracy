@@ -1,3 +1,4 @@
+require 'rstruct'
 require 'securerandom'
 require 'sequel'
 require 'set'
@@ -8,6 +9,8 @@ require_relative 'choice'
 require_relative 'exceptions'
 require_relative 'responder'
 require_relative 'response'
+
+BreakdownResult = KVStruct.new(:responder, :score)
 
 module Models
   class Poll < Sequel::Model
@@ -110,10 +113,9 @@ module Models
           unresponded.push(responder)
         else
           responder.responses.each { |response|
-            results[response.choice].push({
-              responder: responder,
-              score: response.score
-            })
+            results[response.choice].push(BreakdownResult.new(
+                                              responder: responder,
+                                              score: response.score))
           }
         end
       }

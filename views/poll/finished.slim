@@ -36,7 +36,7 @@ p Results:
     h3 =choice.text
     ul
       - results.each do |result|
-        li =result[:responder].email
+        li =result.responder.email
 
   h2 Unresponded
   ul
