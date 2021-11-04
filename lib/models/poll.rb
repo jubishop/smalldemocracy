@@ -104,7 +104,7 @@ module Models
     end
 
     def breakdown
-      assert_type(:choose_one, :borda_single)
+      assert_type(:choose_one, :borda_single, :borda_split)
 
       results = Hash.new { |hash, key| hash[key] = [] }
       unresponded = []
