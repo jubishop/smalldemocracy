@@ -5,7 +5,6 @@ require_relative 'utils/email'
 class Admin < Base
   def initialize
     super
-    @slim = Tony::Slim.new(views: 'views', layout: 'views/layout')
 
     get('/admin', ->(_, resp) {
       resp.write(@slim.render('admin/admin'))
