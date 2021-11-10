@@ -108,4 +108,11 @@ RSpec.describe(Poll, type: :feature) {
       goldens.verify('not_found')
     }
   }
+
+  context('not found') {
+    it('displays a not found page') {
+      visit('poll/blah')
+      goldens.verify('page_not_found')
+    }
+  }
 }

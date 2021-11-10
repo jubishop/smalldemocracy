@@ -59,33 +59,33 @@ module Models
     end
 
     def type
-      return super.to_sym
+      super.to_sym
     end
 
     def responder(**options)
-      return responders.find { |responder|
+      responders.find { |responder|
         options.all? { |attrib, value| responder.public_send(attrib) == value }
       }
     end
 
     def choice(**options)
-      return choices.find { |choice|
+      choices.find { |choice|
         options.all? { |attrib, value| choice.public_send(attrib) == value }
       }
     end
 
     def shuffled_choices
-      choices.shuffle!(random: Random.new(Time.now.to_i))
+      choices.shuffle(random: Random.new(Time.now.to_i))
     end
 
     def finished?
-      return Time.at(expiration) < Time.now
+      Time.at(expiration) < Time.now
     end
 
     def scores
       assert_type(:borda_single, :borda_split)
 
-      Helpers::PollResults.new(responses, &:score).to_a
+      return Helpers::PollResults.new(responses, &:score).to_a
     end
 
     def counts

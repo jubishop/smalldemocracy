@@ -11,7 +11,7 @@ class Base < Tony::App
     super(secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET'))
 
     not_found(->(_, resp) {
-      resp.write(slim.render(:not_found))
+      resp.write(@slim.render(:not_found))
     })
   end
 end

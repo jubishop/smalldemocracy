@@ -26,7 +26,7 @@ module Models
     end
 
     def url
-      return poll.url(self)
+      poll.url(self)
     end
 
     def to_s

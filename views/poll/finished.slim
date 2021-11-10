@@ -1,5 +1,8 @@
 = content_for :head
   title Poll Finished
+  - case poll.type
+  - when :borda_single, :borda_split
+    ==stylesheet_link_tag 'borda/finished'
 
 p Poll: #{poll.title}, is finished!
 
@@ -19,7 +22,11 @@ p Results:
       - counts.each do |result|
         - participants = 'participant'.en.plural(result.count)
         - count = "(#{result.count} #{participants})"
-        li ="#{result} #{count}"
+        li.result
+          | #{result} #{count}
+          a.more href="/poll/breakdown/#{result.choice.id}"
+            |(Response Breakdown)
+
 
   - if poll.scores
     h2 Borda Score

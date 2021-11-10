@@ -14,10 +14,6 @@ class Main < Base
       resp.redirect(req.params.fetch(:r, '/'))
     })
 
-    not_found(->(_, resp) {
-      resp.write(@slim.render(:not_found))
-    })
-
     get('/auth/google', ->(req, resp) {
       login_info = req.env['login_info']
       resp.set_cookie(:email_address, login_info.email)

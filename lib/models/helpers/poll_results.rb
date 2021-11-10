@@ -34,7 +34,7 @@ module Models
       end
 
       def <=>(other)
-        return to_i <=> other.to_i
+        to_i <=> other.to_i
       end
 
       alias to_i value
@@ -42,7 +42,7 @@ module Models
       alias count value
 
       def text
-        return choice.text
+        choice.text
       end
       alias to_s text
     end

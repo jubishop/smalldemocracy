@@ -14,11 +14,11 @@ module Models
     end
 
     def score
-      return chosen && rank ? poll.choices.length - rank - 1 : 0
+      chosen && rank ? poll.choices.length - rank - 1 : 0
     end
 
     def point
-      return chosen ? 1 : 0
+      chosen ? 1 : 0
     end
 
     def to_s
