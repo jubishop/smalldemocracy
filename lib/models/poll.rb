@@ -75,7 +75,7 @@ module Models
     end
 
     def shuffled_choices
-      choices.shuffle(random: Random.new(Time.now.to_i))
+      choices.shuffle!
     end
 
     def finished?

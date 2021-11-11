@@ -26,6 +26,11 @@ RSpec.describe(Poll, type: :feature) {
       # It's 1982!
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
+      # Deterministic choice ordering
+      allow_any_instance_of(Models::Poll).to(receive(:shuffled_choices) { |poll|
+        poll.choices.sort!
+      })
+
       # Create a poll
       set_cookie(:email_address, 'one@one')
       visit('/poll/create')
