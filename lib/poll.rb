@@ -75,10 +75,8 @@ class Poll < Base
                                                   timezone: timezone))
     })
 
-    get(%r{^/poll/
-      (?<tally>count|score)/
-      (?<poll_id>.+?)/
-      (?<choice_id>.+)
+    get(%r{^/poll/(?<tally>count|score)/
+      (?<poll_id>.+?)/(?<choice_id>.+)
     $}x, ->(req, resp) {
       poll = require_finished_poll(req, resp)
       choice = require_choice(req, resp)

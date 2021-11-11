@@ -1,8 +1,14 @@
 = content_for :head
   title Participant Breakdown
 
-p Participants for #{choice.text} in #{poll.title}
+p Participating #{choice.text} in #{poll.title}:
 
 ul
-  - breakdown[choice].each do |result|
+  - breakdown[choice].select { |result| result.score > 0 }.each do |result|
+    li =result.responder.email
+
+p Rejected #{choice.text} in #{poll.title}:
+
+ul
+  - breakdown[choice].select { |result| result.score == 0 }.each do |result|
     li =result.responder.email
