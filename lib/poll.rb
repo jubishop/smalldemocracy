@@ -1,4 +1,5 @@
 require_relative 'base'
+require_relative 'models/choice'
 require_relative 'models/poll'
 require_relative 'utils/email'
 
@@ -72,6 +73,21 @@ class Poll < Base
       resp.write(@slim.render("poll/#{template}", poll: poll,
                                                   responder: responder,
                                                   timezone: timezone))
+    })
+
+    get(%r{^/poll/
+      (?<tally>count|score)/
+      (?<poll_id>.+?)/
+      (?<choice_id>.+)
+    $}x, ->(req, resp) {
+      poll = require_finished_poll(req, resp)
+      choice = require_choice(req, resp)
+
+      breakdown, = poll.breakdown
+      template = req.params.fetch(:tally)
+      resp.write(@slim.render("poll/#{template}", poll: poll,
+                                                  choice: choice,
+                                                  breakdown: breakdown))
     })
 
     post('/poll/send', ->(req, resp) {

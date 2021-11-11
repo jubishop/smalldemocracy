@@ -21,6 +21,29 @@ module Helpers
       return poll
     end
 
+    def require_finished_poll(req, resp)
+      poll = require_poll(req, resp)
+
+      unless poll.finished?
+        resp.status = 403
+        resp.write(@slim.render('poll/not_finished'))
+        throw(:response)
+      end
+
+      return poll
+    end
+
+    def require_choice(req, resp)
+      choice = Models::Choice[req.params.fetch(:choice_id)]
+      unless choice
+        resp.status = 404
+        resp.write(@slim.render('poll/choice_not_found'))
+        throw(:response)
+      end
+
+      return choice
+    end
+
     def require_email(req, resp)
       email = fetch_email(req)
       unless email

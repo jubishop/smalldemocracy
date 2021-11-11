@@ -1,0 +1,8 @@
+= content_for :head
+  title Participant Breakdown
+
+p Participants for #{choice.text} in #{poll.title}
+
+ul
+  - breakdown[choice].each do |result|
+    li =result.responder.email

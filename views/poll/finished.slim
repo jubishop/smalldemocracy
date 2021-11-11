@@ -24,8 +24,8 @@ p Results:
         - count = "(#{result.count} #{participants})"
         li.result
           | #{result} #{count}
-          a.more href="/poll/breakdown/#{result.choice.id}"
-            |(Response Breakdown)
+          a.more href="/poll/count/#{poll.id}/#{result.choice.id}"
+            | (Participant Breakdown)
 
 
   - if poll.scores
@@ -34,7 +34,10 @@ p Results:
       - poll.scores.each do |result|
         - points = 'point'.en.plural(result.score)
         - score = "(#{result.score} #{points})"
-        li ="#{result} #{score}"
+        li.result
+          | #{result} #{score}
+          a.more href="/poll/score/#{poll.id}/#{result.choice.id}"
+            | (Score Breakdown)
 
 - when :choose_one
   - breakdown, unresponded = poll.breakdown
