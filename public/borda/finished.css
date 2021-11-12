@@ -17,12 +17,11 @@ label.details:hover {
   color: chartreuse;
 }
 
-.breakdown {
+ul.breakdown {
   display: none;
   font-size: 0.8em;
-  overflow: hidden;
 }
 
-input:checked + .breakdown {
+input:checked + ul.breakdown {
   display: block;
 }
