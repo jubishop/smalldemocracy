@@ -1,8 +1,0 @@
-= content_for :head
-  title Score Breakdown
-
-p Scores for #{choice.text} in #{poll.title}
-
-ul
-  - breakdown[choice].each do |result|
-    li ="#{result.responder.email} : #{result.score} points"
