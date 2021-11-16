@@ -14,7 +14,7 @@ module Models
     end
 
     def score
-      chosen && rank ? poll.choices.length - rank - 1 : 0
+      chosen && rank ? poll.choices.length - rank : 0
     end
 
     def point

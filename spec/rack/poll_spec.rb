@@ -258,7 +258,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
         poll.expiration = 1
         expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
-        expect(poll.scores.map(&:score)).to(eq([2, 1, 0]))
+        expect(poll.scores.map(&:score)).to(eq([3, 2, 1]))
       }
     }
 
@@ -281,7 +281,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
         @poll.expiration = 1
         expect(@poll.scores.first.text).to(eq(@poll.choices.first.text))
-        expect(@poll.scores.map(&:score)).to(eq([2, 0, 0]))
+        expect(@poll.scores.map(&:score)).to(eq([3, 0, 0]))
       }
 
       it('rejects posting with no bottom responses') {

@@ -138,7 +138,7 @@ RSpec.describe(Models::Poll) {
       }
 
       it('computes scores properly') {
-        results = { one: 15, two: 13, three: 12, four: 8, five: 2 }
+        results = { one: 20, two: 18, three: 17, four: 13, five: 7 }
         results.each_with_index { |result, index|
           choice, score = *result
           expect(@poll.scores[index].text).to(eq(choice.to_s))
@@ -148,11 +148,11 @@ RSpec.describe(Models::Poll) {
 
       it('computes breakdown properly') {
         expected_results = {
-          one: { 'a@a': 4, 'b@b': 4, 'c@c': 3, 'd@d': 1, 'e@e': 3 },
-          two: { 'a@a': 3, 'b@b': 3, 'c@c': 2, 'd@d': 3, 'e@e': 2 },
-          three: { 'a@a': 1, 'b@b': 1, 'c@c': 4, 'd@d': 2, 'e@e': 4 },
-          four: { 'a@a': 0, 'b@b': 2, 'c@c': 1, 'd@d': 4, 'e@e': 1 },
-          five: { 'a@a': 2, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
+          one: { 'a@a': 5, 'b@b': 5, 'c@c': 4, 'd@d': 2, 'e@e': 4 },
+          two: { 'a@a': 4, 'b@b': 4, 'c@c': 3, 'd@d': 4, 'e@e': 3 },
+          three: { 'a@a': 2, 'b@b': 2, 'c@c': 5, 'd@d': 3, 'e@e': 5 },
+          four: { 'a@a': 1, 'b@b': 3, 'c@c': 2, 'd@d': 5, 'e@e': 2 },
+          five: { 'a@a': 3, 'b@b': 1, 'c@c': 1, 'd@d': 1, 'e@e': 1 }
         }
 
         breakdown, unresponded = @poll.breakdown
@@ -203,11 +203,17 @@ RSpec.describe(Models::Poll) {
       }
 
       it('computes scores properly') {
-        score_results = { one: 16, five: 12, two: 7, three: 6, four: 2 }
+        score_results = { one: 20, five: 16, two: 11, three: 8, four: 3 }
         score_results.each_with_index { |result, index|
           choice, score = *result
-          expect(@poll.scores[index].text).to(eq(choice.to_s))
-          expect(@poll.scores[index].score).to(eq(score))
+          expect(@poll.scores[index].text).to(
+              eq(choice.to_s),
+              "expected #{choice} for position #{index} but got " \
+              "#{@poll.scores[index].text}")
+          expect(@poll.scores[index].score).to(
+              eq(score),
+              "expected #{score} for #{choice} but got " \
+              "#{@poll.scores[index].score}")
         }
       }
 
@@ -222,11 +228,11 @@ RSpec.describe(Models::Poll) {
 
       it('computes breakdown properly') {
         expected_results = {
-          one: { 'a@a': 4, 'b@b': 4, 'c@c': 4, 'd@d': 0, 'e@e': 4 },
-          two: { 'a@a': 3, 'b@b': 1, 'c@c': 1, 'd@d': 2, 'e@e': 0 },
-          three: { 'a@a': 0, 'b@b': 0, 'c@c': 3, 'd@d': 3, 'e@e': 0 },
-          four: { 'a@a': 0, 'b@b': 2, 'c@c': 0, 'd@d': 0, 'e@e': 0 },
-          five: { 'a@a': 0, 'b@b': 3, 'c@c': 2, 'd@d': 4, 'e@e': 3 }
+          one: { 'a@a': 5, 'b@b': 5, 'c@c': 5, 'd@d': 0, 'e@e': 5 },
+          two: { 'a@a': 4, 'b@b': 2, 'c@c': 2, 'd@d': 3, 'e@e': 0 },
+          three: { 'a@a': 0, 'b@b': 0, 'c@c': 4, 'd@d': 4, 'e@e': 0 },
+          four: { 'a@a': 0, 'b@b': 3, 'c@c': 0, 'd@d': 0, 'e@e': 0 },
+          five: { 'a@a': 0, 'b@b': 4, 'c@c': 3, 'd@d': 5, 'e@e': 4 }
         }
 
         breakdown, unresponded = @poll.breakdown

@@ -34,23 +34,22 @@ p Results:
                 li =br.responder.email
 
 
-  - if poll.scores
-    h2 Borda Score
-    ol
-      - poll.scores.each do |result|
-        - points = 'point'.en.plural(result.score)
-        - score = "(#{result.score} #{points})"
-        li.result
-          | #{result} #{score}
-          - details = breakdown[result.choice]
-          - unless details.empty?
-            label.details for="score_#{result.choice.id}"
-              | (Score Breakdown)
-            <input id="score_#{result.choice.id}" type="checkbox" />
-            ul.breakdown
-              - details.each do |br|
-                - - points = 'point'.en.plural(br.score)
-                li ="#{br.responder.email} (#{br.score} #{points})"
+  h2 Borda Score
+  ol
+    - poll.scores.each do |result|
+      - points = 'point'.en.plural(result.score)
+      - score = "(#{result.score} #{points})"
+      li.result
+        | #{result} #{score}
+        - details = breakdown[result.choice]
+        - unless details.empty?
+          label.details for="score_#{result.choice.id}"
+            | (Score Breakdown)
+          <input id="score_#{result.choice.id}" type="checkbox" />
+          ul.breakdown
+            - details.each do |br|
+              - - points = 'point'.en.plural(br.score)
+              li ="#{br.responder.email} (#{br.score} #{points})"
 
 - when :choose_one
   - breakdown, unresponded = poll.breakdown

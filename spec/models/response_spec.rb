@@ -24,7 +24,7 @@ RSpec.describe(Models::Response) {
       poll = create
       poll.mock_response
       poll.responses.each { |response|
-        expect(response.score).to(eq(poll.choices.length - response.rank - 1))
+        expect(response.score).to(eq(poll.choices.length - response.rank))
         response.rank = nil
         expect(response.score).to(eq(0))
         expect(response.point).to(eq(1))
