@@ -51,6 +51,8 @@ RSpec.describe(Poll, type: :feature) {
       submit_choices('borda_single_view')
       goldens.verify('borda_single_responded')
       verify_finished_poll('borda_single_finished')
+      all('label.details')[1].click
+      goldens.verify('borda_single_details_expanded')
     }
 
     it('executes borda_split') {
@@ -64,6 +66,9 @@ RSpec.describe(Poll, type: :feature) {
       submit_choices('borda_split_view')
       goldens.verify('borda_split_responded')
       verify_finished_poll('borda_split_finished')
+      all('label.details')[1].click
+      all('label.details')[4].click
+      goldens.verify('borda_split_details_expanded')
     }
 
     it('executes choose_one') {
