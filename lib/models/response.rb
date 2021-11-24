@@ -9,7 +9,7 @@ module Models
                            left_primary_key: :responder_id
 
     def before_validation
-      cancel_action unless poll && poll.expiration >= Time.now.to_i
+      cancel_action unless poll && poll.expiration >= Time.now
       super
     end
 

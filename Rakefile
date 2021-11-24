@@ -6,7 +6,12 @@ namespace :db do
     Sequel.extension(:migration)
     version = args[:version].to_i if args[:version]
 
-    Sequel.connect('sqlite://.data/db.sqlite') do |db|
+    Sequel.connect(adapter: :postgres,
+                   database: 'voteshark_dev',
+                   user: 'jubishop',
+                   host: 'localhost',
+                   port: 5432) do |db|
+      db.extension(:pg_enum)
       Sequel::Migrator.run(db, 'db/migrations', target: version)
     end
   }

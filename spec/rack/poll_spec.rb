@@ -84,7 +84,7 @@ RSpec.describe(Poll, type: :rack_test) {
   context('get /view') {
     def respond_to_poll(poll)
       poll.mock_response
-      poll.expiration = 1
+      poll.expiration = Time.at(1)
       poll.save
       get(poll.url)
     end

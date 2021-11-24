@@ -8,7 +8,7 @@ module Utils
     public_constant :HOSTNAME
 
     def self.email(poll, responder)
-      if poll.expiration < Time.now.to_i
+      if poll.expiration < Time.now
         raise ArgumentError, "Cannot send email to #{responder.email} " \
                              "because poll: #{poll.title} has expired"
       end

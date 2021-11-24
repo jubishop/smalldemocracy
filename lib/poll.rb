@@ -25,12 +25,9 @@ class Poll < Base
       require_email(req, resp)
       begin
         poll = Models::Poll.create(**req.params.to_h.symbolize_keys)
-      rescue Models::ArgumentError, ArgumentError
+      rescue StandardError => error
         resp.status = 406
-        resp.write('Not all poll fields provided')
-      rescue Sequel::ConstraintViolation
-        resp.status = 406
-        resp.write('Poll fields cannot be empty')
+        resp.write(error)
       else
         resp.redirect(poll.url)
       end

@@ -11,12 +11,19 @@ Slim::Engine.set_options(
     tabsize: 2,
     pretty: ENV.fetch('APP_ENV') != 'production')
 
-DB = if ENV.fetch('APP_ENV') == 'test'
-       Sequel.sqlite
+DB = case ENV.fetch('APP_ENV')
+     when 'development'
+       Sequel.postgres(database: 'voteshark_dev',
+                       user: 'jubishop',
+                       host: 'localhost',
+                       port: 5432)
+     when 'production'
+       Sequel.postgres(ENV.fetch('DATABASE_URL'))
      else
-       Sequel.sqlite('.data/db.sqlite')
+       Sequel.postgres
      end
 
+DB.extension(:pg_enum)
 Sequel.extension(:migration)
 Sequel::Migrator.run(DB, 'db/migrations')
 

@@ -4,6 +4,7 @@ source 'https://www.rubygems.org' do
   gem 'base64'
   gem 'linguistics'
   gem 'openssl'
+  gem 'pg'
   gem 'puma'
   gem 'rack-contrib'
   gem 'rack-protection'
@@ -11,7 +12,6 @@ source 'https://www.rubygems.org' do
   gem 'sendgrid-ruby'
   gem 'sequel'
   gem 'slim'
-  gem 'sqlite3'
   gem 'tzinfo'
 end
 

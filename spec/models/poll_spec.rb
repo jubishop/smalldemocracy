@@ -27,7 +27,7 @@ RSpec.describe(Models::Poll) {
 
     it('rejects creation of invalid type') {
       expect { create(type: :not_valid_type) }.to(
-          raise_error(Sequel::ConstraintViolation))
+          raise_error(Sequel::DatabaseError))
     }
 
     it('rejects creating two choices with the same text') {

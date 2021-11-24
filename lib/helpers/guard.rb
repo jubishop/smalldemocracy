@@ -11,7 +11,12 @@ module Helpers
         throw(:response)
       end
 
-      poll = Models::Poll[req.params.fetch(:poll_id)]
+      begin
+        poll = Models::Poll[req.params.fetch(:poll_id)]
+      rescue Sequel::DatabaseError => error
+        puts error
+      end
+
       unless poll
         resp.status = 404
         resp.write(@slim.render('poll/not_found'))

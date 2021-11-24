@@ -39,6 +39,10 @@ module Models
       raise Models::ArgumentError,
             'There must be some responders' if responders.empty?
 
+      unless expiration.is_a?(Time) || expiration.to_i.zero?
+        expiration = Time.at(expiration.to_i)
+      end
+
       options = { title: title, question: question, expiration: expiration }
       options[:type] = type if type
 
@@ -51,11 +55,6 @@ module Models
       }
 
       return poll
-    end
-
-    def before_create
-      self.id = SecureRandom.urlsafe_base64(16)
-      super
     end
 
     def type
