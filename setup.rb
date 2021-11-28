@@ -21,7 +21,7 @@ DB = case ENV.fetch('APP_ENV')
        Sequel.postgres(ENV.fetch('DATABASE_URL'))
      when 'test'
        if ENV.key?('POSTGRES_HOST') && ENV.key?('POSTGRES_PORT')
-         Sequel.postgres(database: 'postgres',
+         Sequel.postgres(database: 'poopface',
                          user: 'postgres',
                          password: 'postgres',
                          host: ENV.fetch('POSTGRES_HOST'),
