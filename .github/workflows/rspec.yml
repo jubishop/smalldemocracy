@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   runner-job:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres
@@ -37,10 +37,10 @@ jobs:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           RACK_ENV: test
-      # - name: Upload screenshots
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     path: |
-      #       spec/goldens/main/failures
-      #       spec/goldens/poll/failures
-      #     if-no-files-found: ignore
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v2
+        with:
+          path: |
+            spec/goldens/main/failures
+            spec/goldens/poll/failures
+          if-no-files-found: ignore
