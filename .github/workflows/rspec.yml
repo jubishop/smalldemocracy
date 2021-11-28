@@ -40,4 +40,5 @@ jobs:
       - name: Upload screenshots
         uses: actions/upload-artifact@v2
         with:
-          path: /tmp/
+          path: spec/goldens/failures
+          if-no-files-found: ignore
