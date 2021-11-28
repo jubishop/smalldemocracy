@@ -19,8 +19,16 @@ DB = case ENV.fetch('APP_ENV')
                        port: 5432)
      when 'production'
        Sequel.postgres(ENV.fetch('DATABASE_URL'))
-     else
-       Sequel.postgres
+     when 'test'
+       if ENV.key?('POSTGRES_HOST') && ENV.key?('POSTGRES_PORT')
+         Sequel.postgres(database: 'postgres',
+                         user: 'postgres',
+                         password: 'postgres',
+                         host: ENV.fetch('POSTGRES_HOST'),
+                         port: ENV.fetch('POSTGRES_PORT'))
+       else
+         Sequel.postgres
+       end
      end
 
 DB.extension(:pg_enum)

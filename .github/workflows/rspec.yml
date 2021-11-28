@@ -1,20 +1,35 @@
 name: RSpec
-
 on: [push, pull_request]
 
 jobs:
-  test:
+  container-job:
     runs-on: ubuntu-latest
+    container: node:10.18-jessie
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.0
-    - name: Install dependencies
-      run: bundle install
-    - name: Run tests
-      run: bundle exec rake spec
-      env:
-        RACK_ENV: test
-        APP_ENV: test
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.2
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run tests
+        run: bundle exec rake spec
+        env:
+          APP_ENV: test
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+          RACK_ENV: test
