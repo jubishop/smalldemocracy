@@ -20,10 +20,10 @@ DB = case ENV.fetch('APP_ENV')
      when 'production'
        Sequel.postgres(ENV.fetch('DATABASE_URL'))
      when 'test'
-       if ENV.key?('POSTGRES_HOST') && ENV.key?('POSTGRES_PORT') # Github
-         Sequel.postgres(database: 'postgres',
-                         user: 'postgres',
-                         password: 'postgres',
+       if ENV.key?('POSTGRES_DB') # Remote CI
+         Sequel.postgres(database: ENV.fetch('POSTGRES_DB'),
+                         user: ENV.fetch('POSTGRES_USER'),
+                         password: ENV.fetch('POSTGRES_PASSWORD'),
                          host: ENV.fetch('POSTGRES_HOST'),
                          port: ENV.fetch('POSTGRES_PORT'))
        else
