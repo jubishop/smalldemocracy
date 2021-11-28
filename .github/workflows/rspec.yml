@@ -25,18 +25,18 @@ jobs:
       - name: Create small_democracy database
         run: |
           createdb --owner=postgres small_democracy
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Set up webdriver
+        uses: nanasess/setup-chromedriver@master
+      - name: Launch webdriver
+        run: |
+          chromedriver --url-base=/wd/hub &
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1.87.0
         with:
           ruby-version: 3.0.2
           bundler-cache: true
-      - name: Set up webdriver
-        uses: nanasess/setup-chromedriver@master
-      - name: Launch chromedriver
-        run: |
-          chromedriver --url-base=/wd/hub &
+      - name: Check out code
+        uses: actions/checkout@v2
       - name: Run tests
         run: |
           bundle exec rake spec
