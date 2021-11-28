@@ -29,6 +29,6 @@ jobs:
         run: bundle exec rake spec
         env:
           APP_ENV: test
-          POSTGRES_HOST: postgres
+          POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           RACK_ENV: test
