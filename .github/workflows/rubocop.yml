@@ -1,21 +1,21 @@
-# name: Rubocop
+name: Rubocop
 
-# on: [push, pull_request]
+on: [push, pull_request]
 
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: Check out code
-#       uses: actions/checkout@v2
-#     - name: Set up Ruby
-#       uses: ruby/setup-ruby@v1.87.0
-#       with:
-#         ruby-version: 3.0.2
-#     - name: Install dependencies
-#       run: bundle install
-#     - name: Run lint
-#       run: bundle exec rake rubocop
-#       env:
-#         RACK_ENV: development
-#         APP_ENV: development
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1.87.0
+      with:
+        ruby-version: 3.0.2
+    - name: Install dependencies
+      run: bundle install
+    - name: Run lint
+      run: bundle exec rake rubocop
+      env:
+        RACK_ENV: development
+        APP_ENV: development
