@@ -2,9 +2,8 @@ name: RSpec
 on: [push, pull_request]
 
 jobs:
-  container-job:
+  runner-job:
     runs-on: ubuntu-latest
-    container: node:10.18-jessie
     services:
       postgres:
         image: postgres
@@ -15,6 +14,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - name: Check out code
