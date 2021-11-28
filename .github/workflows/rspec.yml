@@ -27,7 +27,7 @@ jobs:
           bundler-cache: true
       - name: Set up webdriver
         uses: nanasess/setup-chromedriver@master
-        run: |
+      - run: |
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
       - name: Run tests
