@@ -34,7 +34,8 @@ jobs:
           bundler-cache: true
       - name: Set up webdriver
         uses: nanasess/setup-chromedriver@master
-      - run: |
+      - name: Launch chromedriver
+        run: |
           chromedriver --url-base=/wd/hub &
       - name: Run tests
         run: |
