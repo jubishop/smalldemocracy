@@ -2,40 +2,34 @@ name: RSpec
 on: [push, pull_request]
 
 jobs:
-  setup:
-    name: Setup PostgreSQL on MacOS
-    runs-on: macos-latest
-    steps:
-    - name: Start PostgreSQL on MacOS
-      run: |
-        brew services start postgresql
-        echo "Check PostgreSQL service is running"
-        i=10
-        COMMAND='pg_isready'
-        while [ $i -gt 0 ]; do
-            echo "Check PostgreSQL service status"
-            eval $COMMAND && break
-            ((i--))
-            if [ $i == 0 ]; then
-                echo "PostgreSQL service not ready, all attempts exhausted"
-                exit 1
-            fi
-            echo "PostgreSQL service not ready, wait 10 more sec, attempts left: $i"
-            sleep 10
-        done
-    - name: Create postgres user
-      run: |
-        psql --command="CREATE USER postgres PASSWORD 'postgres'" --command="\du" postgres
-    - name: Create small_democracy database
-      run: |
-        createdb --owner=postgres small_democracy
-        PGPASSWORD=postgres psql --username=postgres --host=localhost --list small_democracy
-
   test:
     name: Run tests
     runs-on: macos-latest
-    needs: setup
     steps:
+      - name: Start PostgreSQL on MacOS
+        run: |
+          brew services start postgresql
+          echo "Check PostgreSQL service is running"
+          i=10
+          COMMAND='pg_isready'
+          while [ $i -gt 0 ]; do
+              echo "Check PostgreSQL service status"
+              eval $COMMAND && break
+              ((i--))
+              if [ $i == 0 ]; then
+                  echo "PostgreSQL service not ready, all attempts exhausted"
+                  exit 1
+              fi
+              echo "PostgreSQL service not ready, wait 10 more sec, attempts left: $i"
+              sleep 10
+          done
+      - name: Create postgres user
+        run: |
+          psql --command="CREATE USER postgres PASSWORD 'postgres'" --command="\du" postgres
+      - name: Create small_democracy database
+        run: |
+          createdb --owner=postgres small_democracy
+          PGPASSWORD=postgres psql --username=postgres --host=localhost --list small_democracy
       - name: Check out code
         uses: actions/checkout@v2
       - name: Set up Ruby
