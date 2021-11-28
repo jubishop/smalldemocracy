@@ -17,15 +17,13 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.87.0
         with:
           ruby-version: 3.0.2
-
-      - name: Install dependencies
-        run: bundle install
-
+          bundler-cache: true
       - name: Run tests
         run: bundle exec rake spec
         env:
