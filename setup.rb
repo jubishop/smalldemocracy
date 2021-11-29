@@ -13,20 +13,20 @@ Slim::Engine.set_options(
 
 DB = case ENV.fetch('APP_ENV')
      when 'development'
-       Sequel.postgres(database: 'voteshark_dev',
+       Sequel.postgres(database: 'smalldemocracy_dev',
                        user: 'jubishop',
                        host: 'localhost',
                        port: 5432)
      when 'production'
        Sequel.postgres(ENV.fetch('DATABASE_URL'))
      when 'test'
-       if ENV.key?('POSTGRES_DB') # Remote CI
-         Sequel.postgres(database: ENV.fetch('POSTGRES_DB'),
-                         user: ENV.fetch('POSTGRES_USER'),
-                         host: ENV.fetch('POSTGRES_HOST'),
-                         port: ENV.fetch('POSTGRES_PORT'))
+       if ENV.key?('CI') # Remote CI
+         Sequel.postgres(database: 'smalldemocracy',
+                         user: 'postgres',
+                         host: 'localhost',
+                         port: 5432)
        else
-         Sequel.postgres # Local machine
+         Sequel.postgres # Local
        end
      end
 
