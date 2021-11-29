@@ -9,16 +9,14 @@ jobs:
       - name: Start PostgreSQL on MacOS
         run: |
           brew services start postgresql
-          i=10
-          COMMAND='pg_isready'
-          while [ $i -gt 0 ]; do
-              eval $COMMAND && break
-              ((i--))
-              if [ $i == 0 ]; then
-                  exit 1
-              fi
-              sleep 1
-          done
+      - name: Wait for PostgreSQL to be ready
+        uses: nick-invision/retry@v2
+        with:
+          timeout_seconds: 5
+          max_attempts: 10
+          retry_wait_seconds: 1
+          command: |
+            pg_isready
       - name: Create postgres user
         run: |
           psql --command="CREATE USER postgres" postgres
