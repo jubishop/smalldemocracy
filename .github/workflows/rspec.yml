@@ -23,9 +23,9 @@ jobs:
       - name: Create smalldemocracy database
         run: |
           createdb --owner=postgres smalldemocracy
-      - name: Set up webdriver
+      - name: Set up WebDriver
         uses: nanasess/setup-chromedriver@master
-      - name: Launch webdriver
+      - name: Launch WebDriver
         run: |
           chromedriver --url-base=/wd/hub &
       - name: Check out code

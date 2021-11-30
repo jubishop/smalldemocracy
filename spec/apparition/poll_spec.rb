@@ -14,6 +14,7 @@ RSpec.describe(Poll, type: :feature) {
       expect(page).to(have_button(text: 'Submit Choices'))
       goldens.verify(page_name) if page_name
       click_button('Submit Choices')
+      expect(page).to(have_content('Completed'))
     end
 
     def verify_finished_poll(page_name)
