@@ -58,6 +58,7 @@ RSpec.describe(Poll, type: :feature) {
     it('executes borda_split') {
       select('Borda Split', from: 'type')
       submit_creation('borda_split_create')
+      expect(page).to(have_fontawesome)
       goldens.verify('borda_split_before_input')
       page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
       submit_choices
