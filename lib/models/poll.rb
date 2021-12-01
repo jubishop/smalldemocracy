@@ -14,7 +14,6 @@ BreakdownResult = KVStruct.new(:responder, :score)
 
 module Models
   class Poll < Sequel::Model
-    unrestrict_primary_key
     one_to_many :choices
     one_to_many :responders
     many_to_many :responses, join_table: :responders,
