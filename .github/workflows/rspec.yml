@@ -48,6 +48,5 @@ jobs:
         with:
           name: golden-failures
           path: |
-            spec/goldens/main/failures
-            spec/goldens/poll/failures
+            spec/**/failures/*.png
           if-no-files-found: ignore
