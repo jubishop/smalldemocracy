@@ -11,7 +11,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows poll creation form if you have an email cookie') {
-      set_cookie(:email_address, 'test@example.com')
+      set_cookie(:email, 'test@example.com')
       get '/poll/create'
       expect_create_page
     }
@@ -29,7 +29,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     before(:each) {
-      set_cookie(:email_address, 'test@example.com')
+      set_cookie(:email, 'test@example.com')
     }
 
     it('creates a new :borda_single poll successfully') {
@@ -115,7 +115,7 @@ RSpec.describe(Poll, type: :rack_test) {
       get poll.responders.first.url, {}, { 'HTTPS' => 'on' }
       # rubocop:enable Style/StringHashKeys
       expect(last_response.redirect?).to(be(true))
-      expect(get_cookie(:email_address)).to(eq('a@a'))
+      expect(get_cookie(:email)).to(eq('a@a'))
       follow_redirect!
       expect_view_borda_single_page
     }
@@ -127,14 +127,14 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('asks for email if logged in but not in this poll') {
-      set_cookie(:email_address, 'b@b')
+      set_cookie(:email, 'b@b')
       poll = create
       get poll.url
       expect_email_get_page
     }
 
     it('shows poll if you have not responded to it yet') {
-      set_cookie(:email_address, 'a@a')
+      set_cookie(:email, 'a@a')
       poll = create
       get poll.url
       expect_view_borda_single_page
@@ -144,7 +144,7 @@ RSpec.describe(Poll, type: :rack_test) {
       current_time = 388341770 # 8:43 AM PST
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
-      set_cookie(:email_address, 'a@a')
+      set_cookie(:email, 'a@a')
       poll = create
 
       rack_mock_session.cookie_jar[:tz] = 'Africa/Djibouti'
@@ -153,7 +153,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows your answers if you have already responded') {
-      set_cookie(:email_address, 'a@a')
+      set_cookie(:email, 'a@a')
       poll = create
       poll.mock_response
 
@@ -198,7 +198,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
   context('post /respond') {
     before(:each) {
-      set_cookie(:email_address, 'a@a')
+      set_cookie(:email, 'a@a')
     }
 
     # rubocop:disable Style/StringHashKeys
@@ -393,7 +393,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects posting if you are logged in as someone else') {
-      set_cookie(:email_address, 'someone_else@hey.com')
+      set_cookie(:email, 'someone_else@hey.com')
       poll = create
       post_json({
         poll_id: poll.id,

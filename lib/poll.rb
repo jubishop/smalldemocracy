@@ -50,7 +50,7 @@ class Poll < Base
           return
         end
 
-        resp.set_cookie(:email_address, responder.email)
+        resp.set_cookie(:email, responder.email)
         resp.redirect(poll.url)
         return
       end

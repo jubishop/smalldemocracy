@@ -51,7 +51,7 @@ RSpec.describe(Models::Poll) {
     }
 
     it('rejects creating a responder with invalid email address') {
-      expect { create(responders: ['not_an_email_address']) }.to(
+      expect { create(responders: ['not_an_email']) }.to(
           raise_error(Sequel::HookFailed))
     }
 

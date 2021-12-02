@@ -33,7 +33,7 @@ RSpec.describe(Poll, type: :feature) {
       })
 
       # Create a poll
-      set_cookie(:email_address, 'one@one')
+      set_cookie(:email, 'one@one')
       visit('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
@@ -46,7 +46,7 @@ RSpec.describe(Poll, type: :feature) {
       submit_creation('borda_single_create')
       page.first('li.choice').drag_to(page.all('li.choice').last)
       submit_choices
-      set_cookie(:email_address, 'two@two')
+      set_cookie(:email, 'two@two')
       refresh
       page.all('li.choice').last.drag_to(page.first('li.choice'))
       submit_choices('borda_single_view')
@@ -63,7 +63,7 @@ RSpec.describe(Poll, type: :feature) {
       goldens.verify('borda_split_before_input')
       page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
       submit_choices
-      set_cookie(:email_address, 'two@two')
+      set_cookie(:email, 'two@two')
       refresh
       page.all('li.choice')[1].drag_to(page.find_by_id('bottom-choices'))
       submit_choices('borda_split_view')
@@ -81,7 +81,7 @@ RSpec.describe(Poll, type: :feature) {
       goldens.verify('choose_one_responded')
       verify_finished_poll('choose_one_some_finished')
       allow(Time).to(receive(:now).and_return(Time.at(current_time + 1)))
-      set_cookie(:email_address, 'two@two')
+      set_cookie(:email, 'two@two')
       refresh
       click_button('two')
       verify_finished_poll('choose_one_all_finished')
