@@ -7,6 +7,10 @@ module Tony
         def have_sortable_js
           have_button(text: 'Submit Choices')
         end
+
+        def have_timezone
+          have_selector('.timezone-loaded')
+        end
       end
     end
   end

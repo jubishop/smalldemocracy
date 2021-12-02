@@ -14,6 +14,7 @@ html lang="en"
       });
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       document.cookie = "tz="+tz+"; expires=31536000; path=/";
+      document.documentElement.classList.add('timezone-loaded');
 
 
   body

@@ -4,6 +4,7 @@ RSpec.describe(Poll, type: :feature) {
 
   context('full poll lifecycles') {
     def set_timezone
+      expect(page).to(have_timezone)
       page.driver.set_cookie(:tz, 'America/New_York')
     end
 
