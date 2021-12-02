@@ -46,7 +46,6 @@ RSpec.describe(Poll, type: :feature) {
 
       # Create a poll
       set_cookie(:email, 'one@one')
-      set_timezone
       visit('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
