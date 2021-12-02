@@ -3,10 +3,6 @@ RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
   context('full poll lifecycles') {
-    def expect_sortable_is_loaded
-      expect(page).to(have_button(text: 'Submit Choices'))
-    end
-
     def submit_creation(page_name)
       find('h1').click # Deselect any form field
       goldens.verify(page_name)
@@ -15,7 +11,7 @@ RSpec.describe(Poll, type: :feature) {
 
     def submit_choices(page_name = nil)
       expect(page).to(have_fontawesome)
-      expect_sortable_is_loaded
+      expect(page).to(have_sortable_js)
       goldens.verify(page_name) if page_name
       click_button('Submit Choices')
       expect(page).to(have_content('Completed'))
@@ -44,16 +40,19 @@ RSpec.describe(Poll, type: :feature) {
       fill_in('responders', with: 'one@one, two@two')
       fill_in('choices', with: 'one, two, three')
       fill_in('expiration', with: current_time + 61)
+
+      # Need fixed timezone for testing
+      page.driver.set_cookie(:tz, 'America/Los_Angeles')
     }
 
     it('executes borda_single') {
       submit_creation('borda_single_create')
-      expect_sortable_is_loaded
+      expect(page).to(have_sortable_js)
       page.first('li.choice').drag_to(page.all('li.choice').last)
       submit_choices
       set_cookie(:email, 'two@two')
       refresh
-      expect_sortable_is_loaded
+      expect(page).to(have_sortable_js)
       page.all('li.choice').last.drag_to(page.first('li.choice'))
       submit_choices('borda_single_view')
       goldens.verify('borda_single_responded')
@@ -67,12 +66,12 @@ RSpec.describe(Poll, type: :feature) {
       submit_creation('borda_split_create')
       expect(page).to(have_fontawesome)
       goldens.verify('borda_split_before_input')
-      expect_sortable_is_loaded
+      expect(page).to(have_sortable_js)
       page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
       submit_choices
       set_cookie(:email, 'two@two')
       refresh
-      expect_sortable_is_loaded
+      expect(page).to(have_sortable_js)
       page.all('li.choice')[1].drag_to(page.find_by_id('bottom-choices'))
       submit_choices('borda_split_view')
       goldens.verify('borda_split_responded')
