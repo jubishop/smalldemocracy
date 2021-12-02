@@ -142,7 +142,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows expiration time respecting timezone') {
-      current_time = 388341770 # 8:43 AM PST
+      current_time = 388341770 # 11:43 AM EST
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
 
       set_cookie(:email, 'a@a')

@@ -3,9 +3,19 @@ RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
   context('full poll lifecycles') {
+    def set_timezone
+      page.driver.set_cookie(:tz, 'America/New_York')
+    end
+
+    def refresh_page
+      set_timezone
+      refresh
+    end
+
     def submit_creation(page_name)
       find('h1').click # Deselect any form field
       goldens.verify(page_name)
+      set_timezone
       click_button('Submit')
     end
 
@@ -13,13 +23,14 @@ RSpec.describe(Poll, type: :feature) {
       expect(page).to(have_fontawesome)
       expect(page).to(have_sortable_js)
       goldens.verify(page_name) if page_name
+      set_timezone
       click_button('Submit Choices')
       expect(page).to(have_content('Completed'))
     end
 
     def verify_finished_poll(page_name)
       allow(Time).to(receive(:now).and_return(Time.at(10**10)))
-      refresh
+      refresh_page
       goldens.verify(page_name)
     end
 
@@ -34,15 +45,13 @@ RSpec.describe(Poll, type: :feature) {
 
       # Create a poll
       set_cookie(:email, 'one@one')
+      set_timezone
       visit('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
       fill_in('responders', with: 'one@one, two@two')
       fill_in('choices', with: 'one, two, three')
       fill_in('expiration', with: current_time + 61)
-
-      # Need fixed timezone for testing
-      page.driver.set_cookie(:tz, 'America/Los_Angeles')
     }
 
     it('executes borda_single') {
@@ -51,7 +60,7 @@ RSpec.describe(Poll, type: :feature) {
       page.first('li.choice').drag_to(page.all('li.choice').last)
       submit_choices
       set_cookie(:email, 'two@two')
-      refresh
+      refresh_page
       expect(page).to(have_sortable_js)
       page.all('li.choice').last.drag_to(page.first('li.choice'))
       submit_choices('borda_single_view')
@@ -70,7 +79,7 @@ RSpec.describe(Poll, type: :feature) {
       page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
       submit_choices
       set_cookie(:email, 'two@two')
-      refresh
+      refresh_page
       expect(page).to(have_sortable_js)
       page.all('li.choice')[1].drag_to(page.find_by_id('bottom-choices'))
       submit_choices('borda_split_view')
@@ -84,12 +93,13 @@ RSpec.describe(Poll, type: :feature) {
     it('executes choose_one') {
       select('Choose One', from: 'type')
       submit_creation('choose_one_create')
+      set_timezone
       click_button('one')
       goldens.verify('choose_one_responded')
       verify_finished_poll('choose_one_some_finished')
       allow(Time).to(receive(:now).and_return(Time.at(current_time + 1)))
       set_cookie(:email, 'two@two')
-      refresh
+      refresh_page
       click_button('two')
       verify_finished_poll('choose_one_all_finished')
     }
