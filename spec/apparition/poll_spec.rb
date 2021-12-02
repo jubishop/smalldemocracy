@@ -3,6 +3,10 @@ RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
   context('full poll lifecycles') {
+    def expect_sortable_is_loaded
+      expect(page).to(have_button(text: 'Submit Choices'))
+    end
+
     def submit_creation(page_name)
       find('h1').click # Deselect any form field
       goldens.verify(page_name)
@@ -11,7 +15,7 @@ RSpec.describe(Poll, type: :feature) {
 
     def submit_choices(page_name = nil)
       expect(page).to(have_fontawesome)
-      expect(page).to(have_button(text: 'Submit Choices'))
+      expect_sortable_is_loaded
       goldens.verify(page_name) if page_name
       click_button('Submit Choices')
       expect(page).to(have_content('Completed'))
@@ -44,12 +48,12 @@ RSpec.describe(Poll, type: :feature) {
 
     it('executes borda_single') {
       submit_creation('borda_single_create')
-      expect(page).to(have_selector('li.choice', count: 3))
+      expect_sortable_is_loaded
       page.first('li.choice').drag_to(page.all('li.choice').last)
       submit_choices
       set_cookie(:email, 'two@two')
       refresh
-      expect(page).to(have_selector('li.choice', count: 3))
+      expect_sortable_is_loaded
       page.all('li.choice').last.drag_to(page.first('li.choice'))
       submit_choices('borda_single_view')
       goldens.verify('borda_single_responded')
@@ -63,12 +67,12 @@ RSpec.describe(Poll, type: :feature) {
       submit_creation('borda_split_create')
       expect(page).to(have_fontawesome)
       goldens.verify('borda_split_before_input')
-      expect(page).to(have_selector('li.choice', count: 3))
+      expect_sortable_is_loaded
       page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
       submit_choices
       set_cookie(:email, 'two@two')
       refresh
-      expect(page).to(have_selector('li.choice', count: 3))
+      expect_sortable_is_loaded
       page.all('li.choice')[1].drag_to(page.find_by_id('bottom-choices'))
       submit_choices('borda_split_view')
       goldens.verify('borda_split_responded')
