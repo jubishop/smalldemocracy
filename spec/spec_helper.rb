@@ -25,8 +25,8 @@ Capybara.register_driver(:apparition) { |app|
 }
 Capybara.default_driver = :apparition
 
-RSpec.shared_context(:apparition) do
-  include_context(:tony_apparition)
+RSpec.shared_context(:capybara) do
+  include_context(:tony_capybara)
 
   let(:cookie_secret) { ENV.fetch('JUBIVOTE_COOKIE_SECRET') }
 end
@@ -55,7 +55,7 @@ RSpec.configure do |config|
   Kernel.srand(config.seed)
 
   config.include(RSpec::Models)
-  config.include_context(:apparition, type: :feature)
+  config.include_context(:capybara, type: :feature)
   config.include_context(:rack_test, type: :rack_test)
 
   config.before(:each) {

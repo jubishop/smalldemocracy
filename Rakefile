@@ -35,7 +35,7 @@ RSpec::Core::RakeTask.new(:spec) { |t|
   t.verbose
 }
 
-desc('Run spec excluding apparition tests')
+desc('Run spec excluding capybara tests')
 RSpec::Core::RakeTask.new(:fspec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.rspec_opts = '-t ~type:feature'
