@@ -57,12 +57,10 @@ RSpec.describe(Poll, type: :feature) {
     it('executes borda_single') {
       submit_creation('borda_single_create')
       expect(page).to(have_sortable_js)
-      page.first('li.choice').drag_to(page.all('li.choice').last)
       submit_choices
       set_cookie(:email, 'two@two')
       refresh_page
       expect(page).to(have_sortable_js)
-      page.all('li.choice').last.drag_to(page.first('li.choice'))
       submit_choices('borda_single_view')
       goldens.verify('borda_single_responded')
       verify_finished_poll('borda_single_finished')
@@ -76,12 +74,10 @@ RSpec.describe(Poll, type: :feature) {
       expect(page).to(have_fontawesome)
       goldens.verify('borda_split_before_input')
       expect(page).to(have_sortable_js)
-      page.first('li.choice').drag_to(page.find_by_id('bottom-choices'))
       submit_choices
       set_cookie(:email, 'two@two')
       refresh_page
       expect(page).to(have_sortable_js)
-      page.all('li.choice')[1].drag_to(page.find_by_id('bottom-choices'))
       submit_choices('borda_split_view')
       goldens.verify('borda_split_responded')
       verify_finished_poll('borda_split_finished')

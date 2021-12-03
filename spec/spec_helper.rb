@@ -1,4 +1,4 @@
-require 'capybara/apparition'
+require 'capybara/cuprite'
 require 'securerandom'
 require 'tony/test'
 
@@ -18,12 +18,12 @@ Capybara.server = :puma
 Capybara.app = Rack::Builder.parse_file('config.ru').first
 Capybara.default_max_wait_time = 5
 
-Capybara.register_driver(:apparition) { |app|
-  Capybara::Apparition::Driver.new(app, {
+Capybara.register_driver(:cuprite) { |app|
+  Capybara::Cuprite::Driver.new(app, {
     headless: !ENV.fetch('CHROME_DEBUG', false)
   })
 }
-Capybara.default_driver = :apparition
+Capybara.default_driver = :cuprite
 
 RSpec.shared_context(:capybara) do
   include_context(:tony_capybara)

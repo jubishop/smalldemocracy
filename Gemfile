@@ -23,10 +23,9 @@ source 'https://www.jubigems.org' do
 end
 
 group :development do
-  gem 'apparition', github: 'twalpole/apparition', branch: 'master'
-
   gem 'capybara'
   gem 'colorize'
+  gem 'cuprite'
   gem 'open3'
   gem 'rack-test'
   gem 'rspec'
