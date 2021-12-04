@@ -2,39 +2,7 @@ RSpec.describe(Poll, type: :feature) {
   let(:current_time) { 388341770 }
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
-  context('full poll lifecycles') {
-    def set_timezone
-      expect(page).to(have_timezone)
-      page.driver.set_cookie(:tz, 'America/New_York')
-    end
-
-    def refresh_page
-      set_timezone
-      refresh
-    end
-
-    def submit_creation(page_name)
-      find('h1').click # Deselect any form field
-      goldens.verify(page_name)
-      set_timezone
-      click_button('Submit')
-    end
-
-    def submit_choices(page_name = nil)
-      expect(page).to(have_fontawesome)
-      expect(page).to(have_sortable_js)
-      goldens.verify(page_name) if page_name
-      set_timezone
-      click_button('Submit Choices')
-      expect(page).to(have_content('Completed'))
-    end
-
-    def verify_finished_poll(page_name)
-      allow(Time).to(receive(:now).and_return(Time.at(10**10)))
-      refresh_page
-      goldens.verify(page_name)
-    end
-
+  context('poll lifecycles') {
     before(:each) {
       # It's 1982!
       allow(Time).to(receive(:now).and_return(Time.at(current_time)))
@@ -54,50 +22,72 @@ RSpec.describe(Poll, type: :feature) {
       fill_in('expiration', with: current_time + 61)
     }
 
-    it('executes borda_single') {
-      submit_creation('borda_single_create')
-      expect(page).to(have_sortable_js)
-      submit_choices
-      set_cookie(:email, 'two@two')
-      refresh_page
-      expect(page).to(have_sortable_js)
-      submit_choices('borda_single_view')
-      goldens.verify('borda_single_responded')
-      verify_finished_poll('borda_single_finished')
-      all('label.details')[1].click
-      goldens.verify('borda_single_details_expanded')
-    }
-
-    it('executes borda_split') {
-      select('Borda Split', from: 'type')
-      submit_creation('borda_split_create')
-      expect(page).to(have_fontawesome)
-      goldens.verify('borda_split_before_input')
-      expect(page).to(have_sortable_js)
-      submit_choices
-      set_cookie(:email, 'two@two')
-      refresh_page
-      expect(page).to(have_sortable_js)
-      submit_choices('borda_split_view')
-      goldens.verify('borda_split_responded')
-      verify_finished_poll('borda_split_finished')
-      all('label.details')[1].click
-      all('label.details')[4].click
-      goldens.verify('borda_split_details_expanded')
-    }
-
-    it('executes choose_one') {
-      select('Choose One', from: 'type')
-      submit_creation('choose_one_create')
+    def submit_creation(page_name)
+      find('h1').click # Deselect any form field
+      goldens.verify(page_name)
       set_timezone
-      click_button('one')
-      goldens.verify('choose_one_responded')
-      verify_finished_poll('choose_one_some_finished')
-      allow(Time).to(receive(:now).and_return(Time.at(current_time + 1)))
-      set_cookie(:email, 'two@two')
+      click_button('Submit')
+    end
+
+    def verify_finished_poll(page_name)
+      allow(Time).to(receive(:now).and_return(Time.at(10**10)))
       refresh_page
-      click_button('two')
-      verify_finished_poll('choose_one_all_finished')
+      goldens.verify(page_name)
+    end
+
+    context('borda') {
+      def submit_choices(page_name = nil)
+        expect(page).to(have_fontawesome)
+        expect(page).to(have_sortable_js)
+        goldens.verify(page_name) if page_name
+        set_timezone
+        click_button('Submit Choices')
+        expect(page).to(have_content('Completed'))
+      end
+
+      it('executes borda_single') {
+        submit_creation('borda_single_create')
+        submit_choices
+        set_cookie(:email, 'two@two')
+        refresh_page
+        submit_choices('borda_single_view')
+        goldens.verify('borda_single_responded')
+        verify_finished_poll('borda_single_finished')
+        all('label.details')[1].click
+        goldens.verify('borda_single_details_expanded')
+      }
+
+      it('executes borda_split') {
+        select('Borda Split', from: 'type')
+        submit_creation('borda_split_create')
+        expect(page).to(have_fontawesome)
+        goldens.verify('borda_split_before_input')
+        submit_choices
+        set_cookie(:email, 'two@two')
+        refresh_page
+        submit_choices('borda_split_view')
+        goldens.verify('borda_split_responded')
+        verify_finished_poll('borda_split_finished')
+        all('label.details')[1].click
+        all('label.details')[4].click
+        goldens.verify('borda_split_details_expanded')
+      }
+    }
+
+    context('choose') {
+      it('executes choose_one') {
+        select('Choose One', from: 'type')
+        submit_creation('choose_one_create')
+        set_timezone
+        click_button('one')
+        goldens.verify('choose_one_responded')
+        verify_finished_poll('choose_one_some_finished')
+        allow(Time).to(receive(:now).and_return(Time.at(current_time + 1)))
+        set_cookie(:email, 'two@two')
+        refresh_page
+        click_button('two')
+        verify_finished_poll('choose_one_all_finished')
+      }
     }
   }
 

@@ -17,6 +17,7 @@ require_relative 'helpers/models'
 Capybara.server = :puma
 Capybara.app = Rack::Builder.parse_file('config.ru').first
 Capybara.default_max_wait_time = 5
+Capybara.disable_animation = true
 
 Capybara.register_driver(:cuprite) { |app|
   Capybara::Cuprite::Driver.new(app, {
@@ -29,6 +30,16 @@ RSpec.shared_context(:capybara) do
   include_context(:tony_capybara)
 
   let(:cookie_secret) { ENV.fetch('JUBIVOTE_COOKIE_SECRET') }
+
+  def set_timezone
+    expect(page).to(have_timezone)
+    page.driver.set_cookie(:tz, 'America/New_York')
+  end
+
+  def refresh_page
+    set_timezone
+    refresh
+  end
 end
 
 RSpec.shared_context(:rack_test) {
