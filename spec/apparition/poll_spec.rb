@@ -22,6 +22,15 @@ RSpec.describe(Poll, type: :feature) {
       fill_in('expiration', with: current_time + 61)
     }
 
+    def drag_to_bottom(choice)
+      expect(page).to(have_fontawesome)
+      expect(page).to(have_sortable_js)
+      choice_node = find(
+          :xpath,
+          "//li[@class='choice' and ./p[normalize-space()='#{choice}']]")
+      choice_node.drag_to(find(:xpath, "//ul[@id='bottom-choices']"))
+    end
+
     def submit_creation(page_name)
       find('h1').click # Deselect any form field
       goldens.verify(page_name)
@@ -38,7 +47,7 @@ RSpec.describe(Poll, type: :feature) {
     context('borda') {
       def submit_choices(page_name = nil)
         expect(page).to(have_fontawesome)
-        expect(page).to(have_sortable_js)
+        expect(page).to(have_button(text: 'Submit Choices'))
         goldens.verify(page_name) if page_name
         set_timezone
         click_button('Submit Choices')
@@ -60,11 +69,14 @@ RSpec.describe(Poll, type: :feature) {
       it('executes borda_split') {
         select('Borda Split', from: 'type')
         submit_creation('borda_split_create')
-        expect(page).to(have_fontawesome)
+        drag_to_bottom('two')
+        drag_to_bottom('three')
+        expect(page).to(have_button(text: 'Submit Choices'))
         goldens.verify('borda_split_before_input')
         submit_choices
         set_cookie(:email, 'two@two')
         refresh_page
+        drag_to_bottom('two')
         submit_choices('borda_split_view')
         goldens.verify('borda_split_responded')
         verify_finished_poll('borda_split_finished')

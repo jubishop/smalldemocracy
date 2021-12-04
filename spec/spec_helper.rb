@@ -1,4 +1,4 @@
-require 'capybara/cuprite'
+require 'capybara/apparition'
 require 'securerandom'
 require 'tony/test'
 
@@ -19,12 +19,13 @@ Capybara.app = Rack::Builder.parse_file('config.ru').first
 Capybara.default_max_wait_time = 5
 Capybara.disable_animation = true
 
-Capybara.register_driver(:cuprite) { |app|
-  Capybara::Cuprite::Driver.new(app, {
-    headless: !ENV.fetch('CHROME_DEBUG', false)
+Capybara.register_driver(:apparition) { |app|
+  Capybara::Apparition::Driver.new(app, {
+    headless: !ENV.fetch('CHROME_DEBUG', false),
+    window_size: [1280, 1024]
   })
 }
-Capybara.default_driver = :cuprite
+Capybara.default_driver = :apparition
 
 RSpec.shared_context(:capybara) do
   include_context(:tony_capybara)
