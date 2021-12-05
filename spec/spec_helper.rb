@@ -21,8 +21,7 @@ Capybara.disable_animation = true
 
 Capybara.register_driver(:apparition) { |app|
   Capybara::Apparition::Driver.new(app, {
-    headless: !ENV.fetch('CHROME_DEBUG', false),
-    window_size: [1280, 1024]
+    headless: !ENV.fetch('CHROME_DEBUG', false)
   })
 }
 Capybara.default_driver = :apparition
