@@ -23,7 +23,7 @@ source 'https://www.jubigems.org' do
 end
 
 group :development do
-  gem 'apparition', github: 'twalpole/apparition'
+  gem 'apparition', github: 'jubishop/apparition'
   gem 'capybara'
   gem 'colorize'
   gem 'open3'
