@@ -31,6 +31,14 @@ RSpec.describe(Poll, type: :feature) {
       choice_node.drag_to(find(:xpath, "//ul[@id='bottom-choices']"))
     end
 
+    def rearrange_choices(order)
+      expect(page).to(have_fontawesome)
+      expect(page).to(have_sortable_js)
+      values = page.evaluate_script('Poll.sortable.toArray()')
+      values = order.map { |position| values[position] }
+      page.execute_script("Poll.sortable.sort(#{values})")
+    end
+
     def submit_creation(page_name)
       find('h1').click # Deselect any form field
       goldens.verify(page_name)
@@ -56,9 +64,11 @@ RSpec.describe(Poll, type: :feature) {
 
       it('executes borda_single') {
         submit_creation('borda_single_create')
+        rearrange_choices([1, 2, 0])
         submit_choices
         set_cookie(:email, 'two@two')
         refresh_page
+        rearrange_choices([2, 0, 1])
         submit_choices('borda_single_view')
         goldens.verify('borda_single_responded')
         verify_finished_poll('borda_single_finished')
@@ -77,6 +87,7 @@ RSpec.describe(Poll, type: :feature) {
         set_cookie(:email, 'two@two')
         refresh_page
         drag_to_bottom('two')
+        rearrange_choices([1, 0])
         submit_choices('borda_split_view')
         goldens.verify('borda_split_responded')
         verify_finished_poll('borda_split_finished')
