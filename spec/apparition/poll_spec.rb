@@ -28,7 +28,7 @@ RSpec.describe(Poll, type: :feature) {
       choice_node = find(
           :xpath,
           "//li[@class='choice' and ./p[normalize-space()='#{choice}']]")
-      choice_node.drag_to(find(:xpath, "//ul[@id='bottom-choices']"))
+      choice_node.drag_to(find('ul#bottom-choices'))
     end
 
     def rearrange_choices(order)
