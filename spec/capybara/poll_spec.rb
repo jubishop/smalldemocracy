@@ -146,6 +146,13 @@ RSpec.describe(Poll, type: :feature) {
       visit('/poll/view/does_not_exist')
       goldens.verify('not_found')
     }
+
+    it('fails when creation form is incomplete') {
+      set_cookie(:email, 'one@one')
+      visit('/poll/create')
+      click_button('Submit')
+      goldens.verify('poll_form_incomplete', expect_google_fonts: false)
+    }
   }
 
   context('not found') {
