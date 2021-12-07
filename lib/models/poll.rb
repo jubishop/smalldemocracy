@@ -20,28 +20,32 @@ module Models
                              right_key: :id,
                              right_primary_key: :responder_id
 
-    def self.create(title:,
-                    question:,
-                    expiration:,
-                    choices:,
-                    responders:,
+    def self.create(title: '',
+                    question: '',
+                    expiration: '',
+                    choices: [],
+                    responders: [],
                     type: nil)
-      raise Models::ArgumentError, 'Choices cannot be nil' unless choices
-
-      choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)
-      raise Models::ArgumentError,
-            'There must be some choices' if choices.empty?
-
-      raise Models::ArgumentError, 'Responders cannot be nil' unless responders
-
-      responders = responders.strip.split(/\s*,\s*/) if responders.is_a?(String)
-      raise Models::ArgumentError,
-            'There must be some responders' if responders.empty?
-
-      unless expiration.is_a?(Time) || expiration.to_i.zero?
-        expiration = Time.at(expiration.to_i)
+      if title.nil? || title.empty?
+        raise Models::ArgumentError, 'Title cannot be empty'
+      end
+      if question.nil? || question.empty?
+        raise Models::ArgumentError, 'Question cannot be empty'
       end
 
+      if responders.nil? || responders.empty?
+        raise Models::ArgumentError, 'There must be some responders'
+      end
+      if choices.nil? || choices.empty?
+        raise Models::ArgumentError, 'There must be some choices'
+      end
+
+      expiration = Time.at(expiration.to_i) unless expiration.is_a?(Time)
+      raise Models::ArgumentError,
+            'There must be an expiration' if expiration.to_i.zero?
+
+      responders = responders.strip.split(/\s*,\s*/) if responders.is_a?(String)
+      choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)
       options = { title: title, question: question, expiration: expiration }
       options[:type] = type if type
 

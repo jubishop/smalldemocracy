@@ -25,9 +25,9 @@ class Poll < Base
       require_email(req, resp)
       begin
         poll = Models::Poll.create(**req.params.to_h.symbolize_keys)
-      rescue StandardError => error
+      rescue Models::ArgumentError => error
         resp.status = 406
-        resp.write(error)
+        resp.write(error.message)
       else
         resp.redirect(poll.url)
       end

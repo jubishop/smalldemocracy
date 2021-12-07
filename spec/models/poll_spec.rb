@@ -65,16 +65,12 @@ RSpec.describe(Models::Poll) {
     }
 
     it('fatals if require fields are missing or empty') {
-      expect { create(title: '') }.to(raise_error(Sequel::ConstraintViolation))
-      expect { create(title: nil) }.to(raise_error(Sequel::ConstraintViolation))
-      expect { create(question: '') }.to(
-          raise_error(Sequel::ConstraintViolation))
-      expect { create(question: nil) }.to(
-          raise_error(Sequel::ConstraintViolation))
-      expect { create(expiration: '') }.to(
-          raise_error(Sequel::ConstraintViolation))
-      expect { create(expiration: nil) }.to(
-          raise_error(Sequel::ConstraintViolation))
+      expect { create(title: '') }.to(raise_error(Models::ArgumentError))
+      expect { create(title: nil) }.to(raise_error(Models::ArgumentError))
+      expect { create(question: '') }.to(raise_error(Models::ArgumentError))
+      expect { create(question: nil) }.to(raise_error(Models::ArgumentError))
+      expect { create(expiration: '') }.to(raise_error(Models::ArgumentError))
+      expect { create(expiration: nil) }.to(raise_error(Models::ArgumentError))
     }
   }
 

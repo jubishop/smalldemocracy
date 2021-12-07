@@ -14,5 +14,12 @@ class Base < Tony::App
     not_found(->(_, resp) {
       resp.write(@slim.render(:not_found))
     })
+
+    error(->(_, resp) {
+      raise resp.error unless ENV['APP_ENV'] == 'production'
+
+      resp.status = 500
+      resp.write('Sorry, an error has occurred')
+    })
   end
 end
