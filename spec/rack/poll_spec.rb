@@ -194,6 +194,7 @@ RSpec.describe(Poll, type: :rack_test) {
       poll = create(expiration: 1)
       post "/poll/send?poll_id=#{poll.id}&email=a@a"
       expect(last_response.status).to(be(405))
+      expect(last_response.body).to(eq('Poll has already finished'))
     }
   }
 
@@ -380,6 +381,7 @@ RSpec.describe(Poll, type: :rack_test) {
         responses: poll.choices.map(&:id)
       })
       expect(last_response.status).to(be(405))
+      expect(last_response.body).to(eq('Poll has already finished'))
     }
 
     it('rejects posting if you are not logged in') {

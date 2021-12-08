@@ -134,9 +134,9 @@ class Poll < Base
       rescue Sequel::UniqueConstraintViolation
         resp.status = 409
         resp.write('Duplicate response, choice, or rank found')
-      rescue Sequel::HookFailed
+      rescue Sequel::HookFailed => error
         resp.status = 405
-        resp.write('Poll has already finished')
+        resp.write(error.message)
       else
         resp.status = 201
         resp.write('Poll created')

@@ -24,13 +24,13 @@ RSpec.describe(Models::Responder) {
     it('rejects creating a responder with empty email') {
       poll = create
       expect { poll.add_responder(email: '') }.to(
-          raise_error(Sequel::HookFailed))
+          raise_error(Sequel::HookFailed, 'Email: , is invalid'))
     }
 
     it('rejects creating a responder with invalid email') {
       poll = create
-      expect { poll.add_responder(email: 'not_a_real_email') }.to(
-          raise_error(Sequel::HookFailed))
+      expect { poll.add_responder(email: 'not_an_email') }.to(
+          raise_error(Sequel::HookFailed, 'Email: not_an_email, is invalid'))
     }
   }
 

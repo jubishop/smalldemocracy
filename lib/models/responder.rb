@@ -9,7 +9,9 @@ module Models
     one_to_many :responses
 
     def before_validation
-      cancel_action unless URI::MailTo::EMAIL_REGEXP.match?(email)
+      unless URI::MailTo::EMAIL_REGEXP.match?(email)
+        cancel_action("Email: #{email}, is invalid")
+      end
       super
     end
 
