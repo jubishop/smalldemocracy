@@ -194,7 +194,8 @@ RSpec.describe(Poll, type: :rack_test) {
       poll = create(expiration: 1)
       post "/poll/send?poll_id=#{poll.id}&email=a@a"
       expect(last_response.status).to(be(405))
-      expect(last_response.body).to(eq('Poll has already finished'))
+      expect(last_response.body).to(
+          eq('Cannot send email to a@a because poll: title has expired'))
     }
   }
 

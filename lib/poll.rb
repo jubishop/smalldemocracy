@@ -92,9 +92,9 @@ class Poll < Base
 
       begin
         Utils::Email.email(poll, responder)
-      rescue Utils::ArgumentError
+      rescue Utils::ArgumentError => error
         resp.status = 405
-        resp.write('Poll has already finished')
+        resp.write(error.message)
         return
       end
 
