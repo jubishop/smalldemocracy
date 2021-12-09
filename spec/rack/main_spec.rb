@@ -23,28 +23,42 @@ RSpec.describe(Main, type: :rack_test) {
   }
 
   context('in faux production') {
+    def get_path(path)
+      # rubocop:disable Style/StringHashKeys
+      get(path, {}, { 'HTTPS' => 'on' })
+      # rubocop:enable Style/StringHashKeys
+    end
+
     before(:all) {
       ENV['APP_ENV'] = 'production'
       ENV['RACK_ENV'] = 'production'
       Capybara.app = Rack::Builder.parse_file('config.ru').first
     }
 
+    before(:each) {
+      ENV['APP_ENV'] = 'production'
+      ENV['RACK_ENV'] = 'production'
+    }
+
     it('displays logged out page when there is no email cookie') {
-      # rubocop:disable Style/StringHashKeys
-      get '/', {}, { 'HTTPS' => 'on' }
-      # rubocop:enable Style/StringHashKeys
+      get_path('/')
       expect_logged_out_index_page
     }
 
     it('displays logged in page when there is an email cookie') {
       set_cookie(:email, 'test@example.com')
-      # rubocop:disable Style/StringHashKeys
-      get '/', {}, { 'HTTPS' => 'on' }
-      # rubocop:enable Style/StringHashKeys
+      get_path('/')
       expect_logged_in_index_page('test@example.com')
     }
 
+    it('does not display raised error messages in production') {
+      get_path('/throw_error')
+      expect_production_error_page
+    }
+
     after(:all) {
+      ENV['APP_ENV'] = 'test'
+      ENV['RACK_ENV'] = 'test'
       Capybara.app = Rack::Builder.parse_file('config.ru').first
     }
   }

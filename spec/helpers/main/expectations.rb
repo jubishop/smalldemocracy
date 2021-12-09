@@ -17,5 +17,11 @@ module RSpec
       expect(last_response.status).to(be(404))
       expect(last_response.body).to(have_selector('h1', text: 'Not Found'))
     end
+
+    def expect_production_error_page
+      expect(last_response.status).to(be(500))
+      expect(last_response.body).to(have_selector('h1', text: 'Not Found'))
+      expect(last_response.body).not_to(have_content('Fuck you'))
+    end
   end
 end
