@@ -43,7 +43,10 @@ class Poll {
       });
     }
 
-    let topScore = this.sortable.toArray().length - 1;
+    let topScore = this.sortable.toArray().length;
+    if (!this.bottomSortable) {
+      topScore -= 1;
+    }
     this.sortable.toArray().forEach((choiceID) => {
       const currentScore = topScore + baseScore;
       topScore -= 1;

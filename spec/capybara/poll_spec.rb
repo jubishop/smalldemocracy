@@ -37,6 +37,7 @@ RSpec.describe(Poll, type: :feature) {
       values = page.evaluate_script('Poll.sortable.toArray()')
       values = order.map { |position| values[position] }
       page.execute_script("Poll.sortable.sort(#{values})")
+      page.execute_script('Poll.updateScores()')
     end
 
     def submit_creation(page_name)

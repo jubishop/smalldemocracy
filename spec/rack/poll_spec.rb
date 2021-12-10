@@ -261,7 +261,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
         poll.expiration = 1
         expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
-        expect(poll.scores.map(&:score)).to(eq([3, 2, 1]))
+        expect(poll.scores.map(&:score)).to(eq([2, 1, 0]))
       }
     }
 
