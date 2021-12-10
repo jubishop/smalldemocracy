@@ -1,7 +1,7 @@
 = content_for :head
   title Poll Completed
 
-h1 #{poll.title} Completed
+h1 #{poll} Completed
 
 p
   | Thanks #{responder.email}! (
@@ -16,7 +16,7 @@ include :expiration_text
 
   ol
     - responder.responses.sort_by!(&:score).reverse!.each do |response|
-      - chosen = response.chosen ? '✅' : '❌'
+      - chosen = response.score > 0 ? '✅' : '❌'
       - points = 'point'.en.plural(response.score)
       li ="#{response.choice.text} #{chosen} (#{response.score} #{points})"
 

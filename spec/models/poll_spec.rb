@@ -124,9 +124,8 @@ RSpec.describe(Models::Poll) {
         responses.each { |email, ranks|
           responder = @poll.responder(email: email.to_s)
           @poll.choices.each { |choice|
-            responder.add_response(choice_id: choice.id,
-                                   rank: ranks.index(choice.text),
-                                   chosen: true)
+            score = choices.length - ranks.index(choice.text) - 1
+            responder.add_response(choice_id: choice.id, score: score)
           }
         }
 
@@ -192,11 +191,8 @@ RSpec.describe(Models::Poll) {
           responder = @poll.responder(email: email.to_s)
           @poll.choices.each { |choice|
             if chosen_ranks.include?(choice.text)
-              responder.add_response(choice_id: choice.id,
-                                     rank: chosen_ranks.index(choice.text),
-                                     chosen: true)
-            else
-              responder.add_response(choice_id: choice.id, chosen: false)
+              score = choices.length - chosen_ranks.index(choice.text)
+              responder.add_response(choice_id: choice.id, score: score)
             end
           }
         }
@@ -271,7 +267,7 @@ RSpec.describe(Models::Poll) {
         responses.each { |email, choice|
           responder = @poll.responder(email: email.to_s)
           choice = @poll.choice(text: choice)
-          responder.add_response(choice_id: choice.id, chosen: true)
+          responder.add_response(choice_id: choice.id)
         }
       }
 

@@ -15,18 +15,6 @@ module Models
       super
     end
 
-    def score
-      return 0 unless chosen && rank
-
-      value = poll.choices.length - rank
-      value -= 1 if poll.type == :borda_single
-      return value
-    end
-
-    def point
-      chosen ? 1 : 0
-    end
-
     def to_s
       choice.to_s
     end

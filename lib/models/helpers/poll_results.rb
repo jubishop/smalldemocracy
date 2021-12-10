@@ -4,7 +4,7 @@ module Models
       def initialize(responses)
         @results = {}
         responses.each { |response|
-          self[response.choice].value += yield(response)
+          self[response.choice].value += block_given? ? yield(response) : 1
         }
       end
 

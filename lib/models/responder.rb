@@ -21,10 +21,10 @@ module Models
     end
 
     def response
-      return responses.first if responses.length == 1 && responses.first.chosen
+      return responses.first if responses.length == 1
 
       raise RangeError, "#{email} has #{responses.length} responses for " \
-                        "#{poll.title}, but should only have one that is chosen"
+                        "#{poll}, but should only have one"
     end
 
     def url

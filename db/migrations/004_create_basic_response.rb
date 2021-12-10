@@ -12,10 +12,7 @@ Sequel.migration {
                                                 on_update: :cascade
       unique(%i[responder_id choice_id], name: :choice_unique)
 
-      Integer :rank
-      unique(%i[responder_id rank], name: :rank_unique)
-
-      TrueClass :chosen, null: false
+      Integer :score
     }
   }
 }

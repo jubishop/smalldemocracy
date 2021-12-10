@@ -93,7 +93,7 @@ module Models
     def counts
       assert_type(:borda_split, :choose_one)
 
-      point_results = Helpers::PollResults.new(responses, &:point)
+      point_results = Helpers::PollResults.new(responses)
       case type
       when :choose_one
         return point_results.to_a
