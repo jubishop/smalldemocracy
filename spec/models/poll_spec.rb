@@ -111,7 +111,7 @@ RSpec.describe(Models::Poll) {
     context(':borda_single') {
       before(:each) {
         choices = %w[one two three four five]
-        responders = %w[a@a b@b c@c d@d e@e]
+        responders = %w[a@a b@b c@c d@d e@e f@f]
         @poll = create(choices: choices, responders: responders)
 
         responses = {
@@ -155,10 +155,13 @@ RSpec.describe(Models::Poll) {
           four: { 'a@a': 0, 'b@b': 2, 'c@c': 1, 'd@d': 4, 'e@e': 1 },
           five: { 'a@a': 2, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
         }
+        unresponded_expected = ['f@f']
 
         breakdown, unresponded = @poll.breakdown
-        expect(unresponded).to(be_empty)
+        expect(unresponded_expected).to(match_array(unresponded.map(&:email)))
+        expect(breakdown.length).to(be(5))
         breakdown.each { |choice, results|
+          expect(results.length).to(be(5))
           results.each { |result|
             expected_result = expected_results[choice.text.to_sym]
             email = result.responder.email
@@ -173,8 +176,8 @@ RSpec.describe(Models::Poll) {
 
     context(':borda_split') {
       before(:each) {
-        choices = %w[one two three four five]
-        responders = %w[a@a b@b c@c d@d e@e]
+        choices = %w[one two three four five six]
+        responders = %w[a@a b@b c@c d@d e@e f@f]
         @poll = create(choices: choices,
                        responders: responders,
                        type: :borda_split)
@@ -201,7 +204,10 @@ RSpec.describe(Models::Poll) {
       }
 
       it('computes scores properly') {
-        score_results = { one: 20, five: 16, two: 11, three: 8, four: 3 }
+        score_results = {
+          one: 24, five: 20, two: 15, three: 10, four: 4, six: 0
+        }
+        expect(@poll.scores.length).to(be(6))
         score_results.each_with_index { |result, index|
           choice, score = *result
           expect(@poll.scores[index].text).to(
@@ -216,7 +222,8 @@ RSpec.describe(Models::Poll) {
       }
 
       it('computes counts properly') {
-        count_results = { one: 4, five: 4, two: 4, three: 2, four: 1 }
+        count_results = { one: 4, five: 4, two: 4, three: 2, four: 1, six: 0 }
+        expect(@poll.counts.length).to(be(6))
         count_results.each_with_index { |result, index|
           choice, count = *result
           expect(@poll.counts[index].text).to(eq(choice.to_s))
@@ -226,16 +233,20 @@ RSpec.describe(Models::Poll) {
 
       it('computes breakdown properly') {
         expected_results = {
-          one: { 'a@a': 5, 'b@b': 5, 'c@c': 5, 'd@d': 0, 'e@e': 5 },
-          two: { 'a@a': 4, 'b@b': 2, 'c@c': 2, 'd@d': 3, 'e@e': 0 },
-          three: { 'a@a': 0, 'b@b': 0, 'c@c': 4, 'd@d': 4, 'e@e': 0 },
-          four: { 'a@a': 0, 'b@b': 3, 'c@c': 0, 'd@d': 0, 'e@e': 0 },
-          five: { 'a@a': 0, 'b@b': 4, 'c@c': 3, 'd@d': 5, 'e@e': 4 }
+          one: { 'a@a': 6, 'b@b': 6, 'c@c': 6, 'd@d': 0, 'e@e': 6 },
+          two: { 'a@a': 5, 'b@b': 3, 'c@c': 3, 'd@d': 4, 'e@e': 0 },
+          three: { 'a@a': 0, 'b@b': 0, 'c@c': 5, 'd@d': 5, 'e@e': 0 },
+          four: { 'a@a': 0, 'b@b': 4, 'c@c': 0, 'd@d': 0, 'e@e': 0 },
+          five: { 'a@a': 0, 'b@b': 5, 'c@c': 4, 'd@d': 6, 'e@e': 5 },
+          six: { 'a@a': 0, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
         }
+        unresponded_expected = ['f@f']
 
         breakdown, unresponded = @poll.breakdown
-        expect(unresponded).to(be_empty)
+        expect(unresponded_expected).to(match_array(unresponded.map(&:email)))
+        expect(breakdown.length).to(be(6))
         breakdown.each { |choice, results|
+          expect(results.length).to(be(5))
           results.each { |result|
             expected_result = expected_results[choice.text.to_sym]
             email = result.responder.email
@@ -280,6 +291,7 @@ RSpec.describe(Models::Poll) {
         unresponded_expected = ['g@g']
         breakdown, unresponded = @poll.breakdown
         expect(unresponded_expected).to(match_array(unresponded.map(&:email)))
+        expect(breakdown.length).to(be(3))
         breakdown.each { |choice, results|
           expect(results_expected[choice.text.to_sym]).to(
               match_array(results.map { |result| result[:responder].email }))
