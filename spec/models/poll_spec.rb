@@ -108,6 +108,41 @@ RSpec.describe(Models::Poll) {
       expect { poll.counts }.to(raise_error(Models::TypeError))
     }
 
+    shared_examples('computability') {
+      it('computes breakdown properly') {
+        breakdown, unresponded = @poll.breakdown
+        expect(@expected_unresponded).to(match_array(unresponded.map(&:email)))
+        expect(breakdown.length).to(eq(@expected_results.length))
+        breakdown.each { |choice, results|
+          expected_result = @expected_results[choice.text.to_sym]
+          expect(results.length).to(be(expected_result.length))
+          results.each { |result|
+            email = result.responder.email
+            expect(result.score).to(
+                eq(expected_result[email.to_sym]),
+                "expected #{expected_result[email.to_sym]} for #{choice.text}" \
+                " => #{email} but got #{result.score}")
+          }
+        }
+      }
+
+      it('computes scores properly') {
+        results = @expected_results.transform_values { |v| v.values.sum }
+        expect(@poll.scores.length).to(be(results.length))
+        results.sort_by { |_, v| -v }.each_with_index { |result, index|
+          choice, score = *result
+          expect(@poll.scores[index].text).to(
+              eq(choice.to_s),
+              "expected #{choice} for position #{index} but got " \
+              "#{@poll.scores[index].text}")
+          expect(@poll.scores[index].score).to(
+              eq(score),
+              "expected #{score} for #{choice} but got " \
+              "#{@poll.scores[index].score}")
+        }
+      }
+    }
+
     context(':borda_single') {
       before(:each) {
         choices = %w[one two three four five six]
@@ -142,38 +177,7 @@ RSpec.describe(Models::Poll) {
         @poll.expiration = 1
       }
 
-      it('computes scores properly') {
-        results = @expected_results.transform_values { |v| v.values.sum }
-        expect(@poll.scores.length).to(be(results.length))
-        results.each_with_index { |result, index|
-          choice, score = *result
-          expect(@poll.scores[index].text).to(
-              eq(choice.to_s),
-              "expected #{choice} for position #{index} but got " \
-              "#{@poll.scores[index].text}")
-          expect(@poll.scores[index].score).to(
-              eq(score),
-              "expected #{score} for #{choice} but got " \
-              "#{@poll.scores[index].score}")
-        }
-      }
-
-      it('computes breakdown properly') {
-        breakdown, unresponded = @poll.breakdown
-        expect(@expected_unresponded).to(match_array(unresponded.map(&:email)))
-        expect(breakdown.length).to(eq(@expected_results.length))
-        breakdown.each { |choice, results|
-          expected_result = @expected_results[choice.text.to_sym]
-          expect(results.length).to(be(expected_result.length))
-          results.each { |result|
-            email = result.responder.email
-            expect(result.score).to(
-                eq(expected_result[email.to_sym]),
-                "expected #{expected_result[email.to_sym]} for #{choice.text}" \
-                " => #{email} but got #{result.score}")
-          }
-        }
-      }
+      it_has_behavior('computability')
     }
 
     context(':borda_split') {
@@ -213,22 +217,6 @@ RSpec.describe(Models::Poll) {
         @poll.expiration = 1
       }
 
-      it('computes scores properly') {
-        results = @expected_results.transform_values { |v| v.values.sum }
-        expect(@poll.scores.length).to(be(results.length))
-        results.sort_by { |_, v| -v }.each_with_index { |result, index|
-          choice, score = *result
-          expect(@poll.scores[index].text).to(
-              eq(choice.to_s),
-              "expected #{choice} for position #{index} but got " \
-              "#{@poll.scores[index].text}")
-          expect(@poll.scores[index].score).to(
-              eq(score),
-              "expected #{score} for #{choice} but got " \
-              "#{@poll.scores[index].score}")
-        }
-      }
-
       it('computes counts properly') {
         count_results = @expected_results.transform_values(&:length)
         count_results = count_results.sort_by { |k, v|
@@ -242,22 +230,7 @@ RSpec.describe(Models::Poll) {
         }
       }
 
-      it('computes breakdown properly') {
-        breakdown, unresponded = @poll.breakdown
-        expect(@expected_unresponded).to(match_array(unresponded.map(&:email)))
-        expect(breakdown.length).to(be(@expected_results.length))
-        breakdown.each { |choice, results|
-          expected_result = @expected_results[choice.text.to_sym]
-          expect(results.length).to(be(expected_result.length))
-          results.each { |result|
-            email = result.responder.email
-            expect(result.score).to(
-                eq(expected_result[email.to_sym]),
-                "expected #{expected_result[email.to_sym]} for #{choice.text}" \
-                " => #{email} but got #{result.score}")
-          }
-        }
-      }
+      it_has_behavior('computability')
     }
 
     context(':choose_one') {
