@@ -108,7 +108,7 @@ RSpec.describe(Models::Poll) {
       expect { poll.counts }.to(raise_error(Models::TypeError))
     }
 
-    shared_examples('breakdownability') {
+    shared_examples('breakdown') {
       it('computes breakdown properly') {
         breakdown, unresponded = @poll.breakdown
         expect(unresponded.map(&:email)).to(match_array(@expected_unresponded))
@@ -123,7 +123,7 @@ RSpec.describe(Models::Poll) {
       }
     }
 
-    shared_examples('scoreability') {
+    shared_examples('scores') {
       it('computes scores properly') {
         results = @expected_results.transform_values { |v| v.values.sum }
         results = results.sort_by { |_, v| -v }
@@ -133,7 +133,7 @@ RSpec.describe(Models::Poll) {
       }
     }
 
-    shared_examples('countability') {
+    shared_examples('counts') {
       it('computes counts properly') {
         results = @expected_results.transform_values(&:length).sort_by { |k, v|
           [-v, -@expected_results[k].values.sum(&:to_i)]
@@ -179,8 +179,8 @@ RSpec.describe(Models::Poll) {
         @poll.expiration = 1
       }
 
-      it_has_behavior('breakdownability')
-      it_has_behavior('scoreability')
+      it_has_behavior('breakdown')
+      it_has_behavior('scores')
     }
 
     context(':borda_split') {
@@ -220,9 +220,9 @@ RSpec.describe(Models::Poll) {
         @poll.expiration = 1
       }
 
-      it_has_behavior('breakdownability')
-      it_has_behavior('scoreability')
-      it_has_behavior('countability')
+      it_has_behavior('breakdown')
+      it_has_behavior('scores')
+      it_has_behavior('counts')
     }
 
     context(':choose_one') {
@@ -255,8 +255,8 @@ RSpec.describe(Models::Poll) {
         @expected_unresponded = ['g@g']
       }
 
-      it_has_behavior('breakdownability')
-      it_has_behavior('countability')
+      it_has_behavior('breakdown')
+      it_has_behavior('counts')
     }
   }
 }
