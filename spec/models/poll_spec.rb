@@ -111,18 +111,14 @@ RSpec.describe(Models::Poll) {
     shared_examples('breakdownability') {
       it('computes breakdown properly') {
         breakdown, unresponded = @poll.breakdown
-        expect(@expected_unresponded).to(match_array(unresponded.map(&:email)))
-        expect(breakdown.length).to(eq(@expected_results.length))
+        expect(unresponded.map(&:email)).to(match_array(@expected_unresponded))
+        expect(@expected_results.keys.map(&:to_s)).to(
+            match_array(breakdown.keys))
         breakdown.each { |choice, results|
-          expected_result = @expected_results[choice.text.to_sym]
-          expect(results.length).to(be(expected_result.length))
-          results.each { |result|
-            email = result.responder.email
-            expect(result.score).to(
-                eq(expected_result[email.to_sym]),
-                "expected #{expected_result[email.to_sym]} for #{choice.text}" \
-                " => #{email} but got #{result.score}")
-          }
+          expected_result = @expected_results[choice.to_s.to_sym]
+          expect(expected_result.keys).to(
+              match_array(results.map { |r| r.responder.email.to_sym }))
+          expect(expected_result.values).to(match_array(results.map(&:score)))
         }
       }
     }
@@ -130,29 +126,19 @@ RSpec.describe(Models::Poll) {
     shared_examples('scoreability') {
       it('computes scores properly') {
         results = @expected_results.transform_values { |v| v.values.sum }
-        expect(@poll.scores.length).to(be(results.length))
-        results.sort_by { |_, v| -v }.each_with_index { |result, index|
-          choice, score = *result
-          expect(@poll.scores[index].text).to(
-              eq(choice.to_s),
-              "expected #{choice} for position #{index} but got " \
-              "#{@poll.scores[index].text}")
-          expect(@poll.scores[index].score).to(
-              eq(score),
-              "expected #{score} for #{choice} but got " \
-              "#{@poll.scores[index].score}")
-        }
+        results = results.sort_by { |_, v| -v }
+        expect(@poll.scores.map(&:to_s)).to(
+            match_array(results.map { |r| r[0].to_s }))
+        expect(@poll.scores).to(match_array(results.map { |r| r[1] }))
       }
     }
 
     shared_examples('countability') {
       it('computes counts properly') {
-        expect(@poll.counts.length).to(be(expected_results.length))
-        expected_results.each_with_index { |result, index|
-          choice, count = *result
-          expect(@poll.counts[index].text).to(eq(choice.to_s))
-          expect(@poll.counts[index].count).to(eq(count))
-        }
+        expect(@poll.counts.map(&:to_s)).to(
+            match_array(expected_results.map { |r| r[0].to_s }))
+        expect(@poll.counts.map(&:count)).to(
+            match_array(expected_results.map { |r| r[1] }))
       }
     }
 
@@ -263,24 +249,16 @@ RSpec.describe(Models::Poll) {
           choice = @poll.choice(text: choice)
           responder.add_response(choice_id: choice.id)
         }
+
+        @expected_results = {
+          yes: { 'a@a': nil, 'c@c': nil, 'e@e': nil },
+          maybe: { 'd@d': nil, 'f@f': nil },
+          no: { 'b@b': nil }
+        }
+        @expected_unresponded = ['g@g']
       }
 
-      it('computes breakdown properly') {
-        results_expected = {
-          yes: ['a@a', 'c@c', 'e@e'],
-          maybe: ['d@d', 'f@f'],
-          no: ['b@b']
-        }
-        expected_unresponded = ['g@g']
-        breakdown, unresponded = @poll.breakdown
-        expect(expected_unresponded).to(match_array(unresponded.map(&:email)))
-        expect(breakdown.length).to(be(results_expected.length))
-        breakdown.each { |choice, results|
-          expect(results_expected[choice.text.to_sym]).to(
-              match_array(results.map { |result| result[:responder].email }))
-        }
-      }
-
+      it_has_behavior('breakdownability')
       it_has_behavior('countability') {
         let(:expected_results) { { yes: 3, maybe: 2, no: 1 } }
       }
