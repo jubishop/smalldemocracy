@@ -135,10 +135,13 @@ RSpec.describe(Models::Poll) {
 
     shared_examples('countability') {
       it('computes counts properly') {
+        results = @expected_results.transform_values(&:length).sort_by { |k, v|
+          [-v, -@expected_results[k].values.sum(&:to_i)]
+        }
         expect(@poll.counts.map(&:to_s)).to(
-            match_array(expected_results.map { |r| r[0].to_s }))
+            match_array(results.map { |r| r[0].to_s }))
         expect(@poll.counts.map(&:count)).to(
-            match_array(expected_results.map { |r| r[1] }))
+            match_array(results.map { |r| r[1] }))
       }
     }
 
@@ -219,13 +222,7 @@ RSpec.describe(Models::Poll) {
 
       it_has_behavior('breakdownability')
       it_has_behavior('scoreability')
-      it_has_behavior('countability') {
-        let(:expected_results) {
-          @expected_results.transform_values(&:length).sort_by { |k, v|
-            [-v, -@expected_results[k].values.sum]
-          }
-        }
-      }
+      it_has_behavior('countability')
     }
 
     context(':choose_one') {
@@ -259,9 +256,7 @@ RSpec.describe(Models::Poll) {
       }
 
       it_has_behavior('breakdownability')
-      it_has_behavior('countability') {
-        let(:expected_results) { { yes: 3, maybe: 2, no: 1 } }
-      }
+      it_has_behavior('countability')
     }
   }
 }

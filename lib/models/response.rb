@@ -9,7 +9,7 @@ module Models
                            left_primary_key: :responder_id
 
     def before_validation
-      unless poll && poll.expiration >= Time.now
+      unless poll.expiration >= Time.now
         cancel_action('Poll has already finished')
       end
       super
