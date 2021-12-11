@@ -48,7 +48,7 @@ p Results:
           <input id="score_#{result.choice.id}" type="checkbox" />
           ul.breakdown
             - details.each do |br|
-              - - points = 'point'.en.plural(br.score)
+              - points = 'point'.en.plural(br.score)
               li ="#{br.responder.email} (#{br.score} #{points})"
 
 - when :choose_one
