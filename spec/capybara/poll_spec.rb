@@ -9,7 +9,7 @@ RSpec.describe(Poll, type: :feature) {
 
       # Deterministic choice ordering
       allow_any_instance_of(Models::Poll).to(receive(:shuffled_choices) { |poll|
-        poll.choices.sort
+        poll.choices.sort_by(&:text)
       })
 
       # Create a poll
