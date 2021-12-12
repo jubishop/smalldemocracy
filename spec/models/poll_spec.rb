@@ -113,7 +113,7 @@ RSpec.describe(Models::Poll) {
         breakdown, unresponded = @poll.breakdown
         expect(unresponded.map(&:email)).to(match_array(@expected_unresponded))
         expect(@expected_results.keys.map(&:to_s)).to(
-            match_array(breakdown.keys))
+            match_array(breakdown.keys.map(&:text)))
         breakdown.each { |choice, results|
           expected_result = @expected_results[choice.to_s.to_sym]
           expect(expected_result.keys).to(
