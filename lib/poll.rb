@@ -133,7 +133,7 @@ class Poll < Base
         end
       rescue Sequel::UniqueConstraintViolation
         resp.status = 409
-        resp.write('Duplicate response, choice, or rank found')
+        resp.write('Duplicate response or choice found')
       rescue Sequel::HookFailed => error
         resp.status = 405
         resp.write(error.message)
@@ -153,7 +153,7 @@ class Poll < Base
       throw(:response)
     end
     choice_id = req.params.fetch(:choice)
-    responder.add_response(choice_id: choice_id, chosen: true)
+    responder.add_response(choice_id: choice_id)
   end
 
   def save_borda_poll(req, resp, poll, responder)
@@ -178,10 +178,9 @@ class Poll < Base
     end
 
     responses.each_with_index { |choice_id, rank|
-      responder.add_response(choice_id: choice_id, rank: rank, chosen: true)
-    }
-    bottom_responses.each { |choice_id|
-      responder.add_response(choice_id: choice_id, chosen: false)
+      score = poll.choices.length - rank
+      score -= 1 if poll.type == :borda_single
+      responder.add_response(choice_id: choice_id, score: score)
     }
   end
 end

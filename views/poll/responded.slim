@@ -1,7 +1,7 @@
 = content_for :head
   title Poll Completed
 
-h1 #{poll.title} Completed
+h1 #{poll} Completed
 
 p
   | Thanks #{responder.email}! (
@@ -11,14 +11,27 @@ p
 include :expiration_text
 
 - case poll.type
-- when :borda_single, :borda_split
+- when :borda_single
   p Here's your recorded responses.
-
   ol
     - responder.responses.sort_by!(&:score).reverse!.each do |response|
-      - chosen = response.chosen ? '✅' : '❌'
       - points = 'point'.en.plural(response.score)
-      li ="#{response.choice.text} #{chosen} (#{response.score} #{points})"
+      li ="#{response.choice} (#{response.score} #{points})"
 
--when :choose_one
+- when :borda_split
+  ruby:
+    positive_responses = responder.responses.sort_by!(&:score).reverse!
+    rejected_choices = poll.choices.reject { |choice|
+      positive_responses.find { |response| response.choice == choice }
+    }
+
+  p Here's your recorded responses.
+  ol
+    - positive_responses.each do |response|
+      - points = 'point'.en.plural(response.score)
+      li ="#{response.choice} ✅ (#{response.score} #{points})"
+    - rejected_choices.each do |choice|
+      li ="#{choice} ❌ (0 points)"
+
+- when :choose_one
   p You responded: #{responder.response.choice.text}

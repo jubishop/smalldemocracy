@@ -4,63 +4,59 @@
   - when :borda_single, :borda_split
     ==stylesheet_link_tag 'borda/finished'
 
-p Poll: #{poll.title}, is finished!
+p Poll: #{poll}, is finished!
 
 p Results:
 
-- case poll.type
-- when :borda_single, :borda_split
-  ruby:
-    begin
-      counts = poll.counts
-    rescue Models::TypeError
-    end
+ruby:
+  rejected_choices = poll.choices.reject { |choice|
+    poll.responses.find { |response| response.choice == choice }
+  }
 
-  - if counts
+- if poll.type == :borda_split
     h2 Participants
     ol
-      - counts.each do |result|
-        - participants = 'participant'.en.plural(result.count)
-        - count = "(#{result.count} #{participants})"
+      - poll.counts.each do |result|
+        - count = "(#{result.count} #{'participant'.en.plural(result.count)})"
         li.result
           | #{result} #{count}
-          - details = breakdown[result.choice].select { |br| br.score > 0 }
-          - unless details.empty?
-            label.details for="count_#{result.choice.id}"
-              | (Participant Breakdown)
-            <input id="count_#{result.choice.id}" type="checkbox" />
-            ul.breakdown
-              - details.each do |br|
-                li =br.responder.email
+          label.details for="count_#{result.choice.id}"
+            | (Participant Breakdown)
+          <input id="count_#{result.choice.id}" type="checkbox" />
+          ul.breakdown
+            - breakdown[result.choice].each do |br|
+              li =br.responder
+      - rejected_choices.each do |choice|
+        li.result
+          | #{choice} (0 participants)
 
-
+- if [:borda_split, :borda_single].include?(poll.type)
   h2 Borda Score
   ol
     - poll.scores.each do |result|
-      - points = 'point'.en.plural(result.score)
-      - score = "(#{result.score} #{points})"
+      - score = "(#{result.score} #{'point'.en.plural(result.score)})"
       li.result
         | #{result} #{score}
-        - details = breakdown[result.choice]
-        - unless details.empty?
-          label.details for="score_#{result.choice.id}"
-            | (Score Breakdown)
-          <input id="score_#{result.choice.id}" type="checkbox" />
-          ul.breakdown
-            - details.each do |br|
-              - - points = 'point'.en.plural(br.score)
-              li ="#{br.responder.email} (#{br.score} #{points})"
+        label.details for="score_#{result.choice.id}"
+          | (Score Breakdown)
+        <input id="score_#{result.choice.id}" type="checkbox" />
+        ul.breakdown
+          - breakdown[result.choice].each do |br|
+            li ="#{br.responder} (#{br.score} #{'point'.en.plural(br.score)})"
+    - rejected_choices.each do |choice|
+      li.result
+        | #{choice} (0 points)
 
-- when :choose_one
+- if poll.type == :choose_one
   - breakdown, unresponded = poll.breakdown
   h2 Choices
   - breakdown.each do |choice, results|
-    h3 =choice.text
+    h3 =choice
     ul
       - results.each do |result|
-        li =result.responder.email
+        li =result.responder
 
   h2 Unresponded
   ul
     - unresponded.each do |responder|
-      li =responder.email
+      li =responder

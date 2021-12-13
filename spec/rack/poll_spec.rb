@@ -283,8 +283,9 @@ RSpec.describe(Poll, type: :rack_test) {
         expect_borda_responded_page
 
         @poll.expiration = 1
-        expect(@poll.scores.first.text).to(eq(@poll.choices.first.text))
-        expect(@poll.scores.map(&:score)).to(eq([3, 0, 0]))
+        expect(@poll.scores.length).to(be(1))
+        expect(@poll.scores.first.text).to(eq('one'))
+        expect(@poll.scores.first.score).to(be(3))
       }
 
       it('rejects posting with no bottom responses') {

@@ -108,74 +108,85 @@ RSpec.describe(Models::Poll) {
       expect { poll.counts }.to(raise_error(Models::TypeError))
     }
 
-    context(':borda_single') {
-      before(:each) {
-        choices = %w[one two three four five]
-        responders = %w[a@a b@b c@c d@d e@e]
-        @poll = create(choices: choices, responders: responders)
-
-        responses = {
-          'a@a': %w[one two five three four],
-          'b@b': %w[one two four three five],
-          'c@c': %w[three one two four five],
-          'd@d': %w[four two three one five],
-          'e@e': %w[three one two four five]
-        }
-        responses.each { |email, ranks|
-          responder = @poll.responder(email: email.to_s)
-          @poll.choices.each { |choice|
-            responder.add_response(choice_id: choice.id,
-                                   rank: ranks.index(choice.text),
-                                   chosen: true)
-          }
-        }
-
-        @poll.expiration = 1
-      }
-
-      it('computes scores properly') {
-        results = { one: 15, two: 13, three: 12, four: 8, five: 2 }
-        results.each_with_index { |result, index|
-          choice, score = *result
-          expect(@poll.scores[index].text).to(
-              eq(choice.to_s),
-              "expected #{choice} for position #{index} but got " \
-              "#{@poll.scores[index].text}")
-          expect(@poll.scores[index].score).to(
-              eq(score),
-              "expected #{score} for #{choice} but got " \
-              "#{@poll.scores[index].score}")
-        }
-      }
-
+    shared_examples('breakdown') {
       it('computes breakdown properly') {
-        expected_results = {
-          one: { 'a@a': 4, 'b@b': 4, 'c@c': 3, 'd@d': 1, 'e@e': 3 },
-          two: { 'a@a': 3, 'b@b': 3, 'c@c': 2, 'd@d': 3, 'e@e': 2 },
-          three: { 'a@a': 1, 'b@b': 1, 'c@c': 4, 'd@d': 2, 'e@e': 4 },
-          four: { 'a@a': 0, 'b@b': 2, 'c@c': 1, 'd@d': 4, 'e@e': 1 },
-          five: { 'a@a': 2, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
-        }
-
         breakdown, unresponded = @poll.breakdown
-        expect(unresponded).to(be_empty)
+        expect(unresponded.map(&:email)).to(match_array(@expected_unresponded))
+        expect(@expected_results.keys.map(&:to_s)).to(
+            match_array(breakdown.keys.map(&:text)))
         breakdown.each { |choice, results|
-          results.each { |result|
-            expected_result = expected_results[choice.text.to_sym]
-            email = result.responder.email
-            expect(result.score).to(
-                eq(expected_result[email.to_sym]),
-                "expected #{expected_result[email.to_sym]} for #{choice.text}" \
-                " => #{email} but got #{result.score}")
-          }
+          expected_result = @expected_results[choice.to_s.to_sym]
+          expect(expected_result.keys).to(
+              match_array(results.map { |r| r.responder.email.to_sym }))
+          expect(expected_result.values).to(match_array(results.map(&:score)))
         }
       }
     }
 
+    shared_examples('scores') {
+      it('computes scores properly') {
+        results = @expected_results.transform_values { |v| v.values.sum }
+        results = results.sort_by { |_, v| -v }
+        expect(@poll.scores.map(&:to_s)).to(
+            match_array(results.map { |r| r[0].to_s }))
+        expect(@poll.scores).to(match_array(results.map { |r| r[1] }))
+      }
+    }
+
+    shared_examples('counts') {
+      it('computes counts properly') {
+        results = @expected_results.transform_values(&:length).sort_by { |k, v|
+          [-v, -@expected_results[k].values.sum(&:to_i)]
+        }
+        expect(@poll.counts.map(&:to_s)).to(
+            match_array(results.map { |r| r[0].to_s }))
+        expect(@poll.counts.map(&:count)).to(
+            match_array(results.map { |r| r[1] }))
+      }
+    }
+
+    context(':borda_single') {
+      before(:each) {
+        choices = %w[one two three four five six]
+        responders = %w[a@a b@b c@c d@d e@e f@f]
+        @poll = create(choices: choices, responders: responders)
+
+        responses = {
+          'a@a': %w[one two five three four six],
+          'b@b': %w[one two four three five six],
+          'c@c': %w[three one two four five six],
+          'd@d': %w[four two three one five six],
+          'e@e': %w[three one two four five six]
+        }
+        responses.each { |email, ranks|
+          responder = @poll.responder(email: email.to_s)
+          @poll.choices.each { |choice|
+            score = choices.length - ranks.index(choice.text) - 1
+            responder.add_response(choice_id: choice.id, score: score)
+          }
+        }
+
+        @expected_results = {
+          one: { 'a@a': 5, 'b@b': 5, 'c@c': 4, 'd@d': 2, 'e@e': 4 },
+          two: { 'a@a': 4, 'b@b': 4, 'c@c': 3, 'd@d': 4, 'e@e': 3 },
+          three: { 'a@a': 2, 'b@b': 2, 'c@c': 5, 'd@d': 3, 'e@e': 5 },
+          four: { 'a@a': 1, 'b@b': 3, 'c@c': 2, 'd@d': 5, 'e@e': 2 },
+          five: { 'a@a': 3, 'b@b': 1, 'c@c': 1, 'd@d': 1, 'e@e': 1 },
+          six: { 'a@a': 0, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
+        }
+        @expected_unresponded = ['f@f']
+
+        @poll.expiration = 1
+      }
+
+      it_has_behavior('breakdown')
+      it_has_behavior('scores')
+    }
+
     context(':borda_split') {
       before(:each) {
-        choices = %w[one two three four five]
-        responders = %w[a@a b@b c@c d@d e@e]
+        choices = %w[one two three four five six]
+        responders = %w[a@a b@b c@c d@d e@e f@f]
         @poll = create(choices: choices,
                        responders: responders,
                        type: :borda_split)
@@ -187,69 +198,31 @@ RSpec.describe(Models::Poll) {
           'd@d': %w[five three two],
           'e@e': %w[one five]
         }
-
         responses.each { |email, chosen_ranks|
           responder = @poll.responder(email: email.to_s)
           @poll.choices.each { |choice|
             if chosen_ranks.include?(choice.text)
-              responder.add_response(choice_id: choice.id,
-                                     rank: chosen_ranks.index(choice.text),
-                                     chosen: true)
-            else
-              responder.add_response(choice_id: choice.id, chosen: false)
+              score = choices.length - chosen_ranks.index(choice.text)
+              responder.add_response(choice_id: choice.id, score: score)
             end
           }
         }
 
+        @expected_results = {
+          one: { 'a@a': 6, 'b@b': 6, 'c@c': 6, 'e@e': 6 },
+          two: { 'a@a': 5, 'b@b': 3, 'c@c': 3, 'd@d': 4 },
+          three: { 'c@c': 5, 'd@d': 5 },
+          four: { 'b@b': 4 },
+          five: { 'b@b': 5, 'c@c': 4, 'd@d': 6, 'e@e': 5 }
+        }
+        @expected_unresponded = ['f@f']
+
         @poll.expiration = 1
       }
 
-      it('computes scores properly') {
-        score_results = { one: 20, five: 16, two: 11, three: 8, four: 3 }
-        score_results.each_with_index { |result, index|
-          choice, score = *result
-          expect(@poll.scores[index].text).to(
-              eq(choice.to_s),
-              "expected #{choice} for position #{index} but got " \
-              "#{@poll.scores[index].text}")
-          expect(@poll.scores[index].score).to(
-              eq(score),
-              "expected #{score} for #{choice} but got " \
-              "#{@poll.scores[index].score}")
-        }
-      }
-
-      it('computes counts properly') {
-        count_results = { one: 4, five: 4, two: 4, three: 2, four: 1 }
-        count_results.each_with_index { |result, index|
-          choice, count = *result
-          expect(@poll.counts[index].text).to(eq(choice.to_s))
-          expect(@poll.counts[index].count).to(eq(count))
-        }
-      }
-
-      it('computes breakdown properly') {
-        expected_results = {
-          one: { 'a@a': 5, 'b@b': 5, 'c@c': 5, 'd@d': 0, 'e@e': 5 },
-          two: { 'a@a': 4, 'b@b': 2, 'c@c': 2, 'd@d': 3, 'e@e': 0 },
-          three: { 'a@a': 0, 'b@b': 0, 'c@c': 4, 'd@d': 4, 'e@e': 0 },
-          four: { 'a@a': 0, 'b@b': 3, 'c@c': 0, 'd@d': 0, 'e@e': 0 },
-          five: { 'a@a': 0, 'b@b': 4, 'c@c': 3, 'd@d': 5, 'e@e': 4 }
-        }
-
-        breakdown, unresponded = @poll.breakdown
-        expect(unresponded).to(be_empty)
-        breakdown.each { |choice, results|
-          results.each { |result|
-            expected_result = expected_results[choice.text.to_sym]
-            email = result.responder.email
-            expect(result.score).to(
-                eq(expected_result[email.to_sym]),
-                "expected #{expected_result[email.to_sym]} for #{choice.text}" \
-                " => #{email} but got #{result.score}")
-          }
-        }
-      }
+      it_has_behavior('breakdown')
+      it_has_behavior('scores')
+      it_has_behavior('counts')
     }
 
     context(':choose_one') {
@@ -271,33 +244,19 @@ RSpec.describe(Models::Poll) {
         responses.each { |email, choice|
           responder = @poll.responder(email: email.to_s)
           choice = @poll.choice(text: choice)
-          responder.add_response(choice_id: choice.id, chosen: true)
+          responder.add_response(choice_id: choice.id)
         }
+
+        @expected_results = {
+          yes: { 'a@a': nil, 'c@c': nil, 'e@e': nil },
+          maybe: { 'd@d': nil, 'f@f': nil },
+          no: { 'b@b': nil }
+        }
+        @expected_unresponded = ['g@g']
       }
 
-      it('computes breakdown properly') {
-        results_expected = {
-          yes: ['a@a', 'c@c', 'e@e'],
-          maybe: ['d@d', 'f@f'],
-          no: ['b@b']
-        }
-        unresponded_expected = ['g@g']
-        breakdown, unresponded = @poll.breakdown
-        expect(unresponded_expected).to(match_array(unresponded.map(&:email)))
-        breakdown.each { |choice, results|
-          expect(results_expected[choice.text.to_sym]).to(
-              match_array(results.map { |result| result[:responder].email }))
-        }
-      }
-
-      it('computes counts properly') {
-        count_results = { yes: 3, maybe: 2, no: 1 }
-        count_results.each_with_index { |result, index|
-          choice, count = *result
-          expect(@poll.counts[index].text).to(eq(choice.to_s))
-          expect(@poll.counts[index].count).to(eq(count))
-        }
-      }
+      it_has_behavior('breakdown')
+      it_has_behavior('counts')
     }
   }
 }

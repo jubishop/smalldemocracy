@@ -50,19 +50,13 @@ RSpec.describe(Models::Responder) {
     }
 
     it('returns only response if only one') {
-      response = @responder.add_response(choice_id: @poll.choices.first.id,
-                                         chosen: true)
+      response = @responder.add_response(choice_id: @poll.choices.first.id)
       expect(@responder.response).to(eq(response))
     }
 
-    it('raises error if only response is not chosen') {
-      @responder.add_response(choice_id: @poll.choices.first.id, chosen: false)
-      expect { @responder.response }.to(raise_error(Models::RangeError))
-    }
-
     it('raises error if more than one response exists') {
-      @responder.add_response(choice_id: @poll.choices.first.id, chosen: true)
-      @responder.add_response(choice_id: @poll.choices.last.id, chosen: true)
+      @responder.add_response(choice_id: @poll.choices.first.id)
+      @responder.add_response(choice_id: @poll.choices.last.id)
       expect { @responder.response }.to(raise_error(Models::RangeError))
     }
   }

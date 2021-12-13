@@ -10,12 +10,12 @@ module Utils
     def self.email(poll, responder)
       if poll.expiration < Time.now
         raise ArgumentError, "Cannot send email to #{responder.email} " \
-                             "because poll: #{poll.title} has expired"
+                             "because poll: #{poll} has expired"
       end
 
       from = SendGrid::Email.new(name: 'JubiVote', email: "support@#{HOSTNAME}")
       to = SendGrid::Email.new(email: responder.email)
-      subject = "Poll: #{poll.title}"
+      subject = "Poll: #{poll}"
 
       url = "https://www.#{HOSTNAME}#{responder.url}"
       slim = Tony::Slim.new(views: 'lib/utils')

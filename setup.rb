@@ -12,26 +12,27 @@ Slim::Engine.set_options(
     pretty: ENV.fetch('APP_ENV') != 'production')
 
 DB = case ENV.fetch('APP_ENV')
-     when 'development'
-       Sequel.postgres(database: 'smalldemocracy_dev',
-                       user: 'jubishop',
-                       host: 'localhost',
-                       port: 5432)
      when 'production'
        Sequel.postgres(ENV.fetch('DATABASE_URL'))
+     when 'development'
+       Sequel.postgres(database: 'smalldemocracy_dev')
      when 'test'
-       if ENV.key?('CI') # Remote CI
+       if ENV.key?('CI') # Github Actions
          Sequel.postgres(database: 'smalldemocracy',
                          user: 'postgres',
                          host: 'localhost',
                          port: 5432)
-       else
-         Sequel.postgres # Local
+       else # Local
+         Sequel.postgres(database: 'smalldemocracy_test')
        end
      end
 
-DB.extension(:pg_enum)
 Sequel.extension(:migration)
+DB.extension(:pg_enum)
+
+if ENV.fetch('APP_ENV') == 'test'
+  Sequel::Migrator.run(DB, 'db/migrations', target: 0)
+end
 Sequel::Migrator.run(DB, 'db/migrations')
 
 require_relative 'lib/admin'

@@ -1,5 +1,5 @@
 = content_for :head
-  title =poll.title
+  title =poll
   - case poll.type
   - when :borda_single, :borda_split
     ==javascript_include_tag "https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"
@@ -9,7 +9,7 @@
     ==javascript_include_tag 'choose/one'
     ==stylesheet_link_tag 'choose/one'
 
-h1 =poll.title
+h1 =poll
 
 p
   | Hello #{responder.email} (

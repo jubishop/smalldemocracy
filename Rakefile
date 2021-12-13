@@ -6,14 +6,15 @@ namespace :db do
     Sequel.extension(:migration)
     version = args[:version].to_i if args[:version]
 
-    Sequel.connect(adapter: :postgres,
-                   database: 'voteshark_dev',
-                   user: 'jubishop',
-                   host: 'localhost',
-                   port: 5432) do |db|
-      db.extension(:pg_enum)
-      Sequel::Migrator.run(db, 'db/migrations', target: version)
-    end
+    db = case ENV.fetch('APP_ENV')
+         when 'production'
+           Sequel.postgres(ENV.fetch('DATABASE_URL'))
+         when 'development'
+           Sequel.postgres(database: 'smalldemocracy_dev')
+         end
+
+    DB.extension(:pg_enum)
+    Sequel::Migrator.run(db, 'db/migrations', target: version)
   }
 
   desc 'Clear DB'
