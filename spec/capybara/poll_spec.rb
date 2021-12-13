@@ -92,8 +92,8 @@ RSpec.describe(Poll, type: :feature) {
         submit_choices('borda_split_view')
         goldens.verify('borda_split_responded')
         verify_finished_poll('borda_split_finished')
-        all('label.details')[1].click
-        all('label.details')[4].click
+        all('label.details')[0].click
+        all('label.details')[3].click
         goldens.verify('borda_split_details_expanded')
       }
     }
