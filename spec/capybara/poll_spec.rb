@@ -35,6 +35,7 @@ RSpec.describe(Poll, type: :feature) {
       expect(page).to(have_fontawesome)
       expect(page).to(have_sortable_js)
       values = page.evaluate_script('Poll.sortable.toArray()')
+      expect(values.length).to(be(order.length))
       values = order.map { |position| values[position] }
       page.execute_script("Poll.sortable.sort(#{values})")
       page.execute_script('Poll.updateScores()')
