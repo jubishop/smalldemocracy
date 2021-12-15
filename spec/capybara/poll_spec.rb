@@ -70,20 +70,12 @@ RSpec.describe(Poll, type: :feature) {
 
       it('executes borda_single') {
         submit_creation('borda_single_create')
-        rearrange_choices([1, 2, 0, 5, 3, 4])
+        rearrange_choices([4, 2, 0, 5, 3, 1])
         submit_choices
         set_cookie(:email, 'two@two')
         refresh_page
         rearrange_choices([5, 3, 2, 0, 4, 1])
-        submit_choices
-        set_cookie(:email, 'three@three')
-        refresh_page
-        rearrange_choices([5, 3, 4, 1, 2, 0])
         submit_choices('borda_single_view')
-        set_cookie(:email, 'four@four')
-        refresh_page
-        rearrange_choices([1, 2, 5, 3, 4, 0])
-        submit_choices
         goldens.verify('borda_single_responded')
         verify_finished_poll('borda_single_finished')
         all('label.details')[1].click
@@ -103,21 +95,9 @@ RSpec.describe(Poll, type: :feature) {
         set_cookie(:email, 'two@two')
         refresh_page
         drag_to_bottom('two')
-        rearrange_choices([1, 0, 3, 2, 4])
-        submit_choices('borda_split_view')
-        set_cookie(:email, 'three@three')
-        refresh_page
-        drag_to_bottom('two')
         drag_to_bottom('five')
         rearrange_choices([3, 1, 0, 2])
-        submit_choices
-        set_cookie(:email, 'four@four')
-        refresh_page
-        drag_to_bottom('two')
-        drag_to_bottom('four')
-        drag_to_bottom('six')
-        rearrange_choices([1, 0, 2])
-        submit_choices
+        submit_choices('borda_split_view')
         goldens.verify('borda_split_responded')
         verify_finished_poll('borda_split_finished')
         all('label.details')[0].click
@@ -138,10 +118,7 @@ RSpec.describe(Poll, type: :feature) {
         click_button('two')
         set_cookie(:email, 'three@three')
         refresh_page
-        click_button('one')
-        set_cookie(:email, 'five@five')
-        refresh_page
-        click_button('one')
+        click_button('two')
         verify_finished_poll('choose_one_finished')
       }
     }

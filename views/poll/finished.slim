@@ -50,6 +50,7 @@ ruby:
 - if poll.type == :choose_one
   - breakdown, unresponded = poll.breakdown
   h2 Choices
+  - breakdown = breakdown.sort_by { |choice, results| -results.length }
   - breakdown.each do |choice, results|
     h3
       | #{choice} (Chosen #{results.length} #{'time'.en.plural(results.length)})
