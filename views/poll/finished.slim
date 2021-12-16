@@ -1,8 +1,6 @@
 = content_for :head
   title Poll Finished
-  - case poll.type
-  - when :borda_single, :borda_split
-    ==stylesheet_link_tag 'borda/finished'
+  ==stylesheet_link_tag 'poll/finished'
 
 p Poll: #{poll}, is finished!
 
@@ -13,22 +11,22 @@ ruby:
     poll.responses.find { |response| response.choice == choice }
   }
 
-- if poll.type == :borda_split
-    h2 Participants
+- if [:borda_split, :choose_one].include?(poll.type)
+    h2 Choices
     ol
       - poll.counts.each do |result|
-        - count = "(#{result.count} #{'participant'.en.plural(result.count)})"
+        - count = "(#{result.count} #{'time'.en.plural(result.count)})"
         li.result
           | #{result} #{count}
           label.details for="count_#{result.choice.id}"
-            | (Participant Breakdown)
+            | (Choice Breakdown)
           <input id="count_#{result.choice.id}" type="checkbox" />
           ul.breakdown
             - breakdown[result.choice].each do |br|
               li =br.responder
       - rejected_choices.each do |choice|
         li.result
-          | #{choice} (0 participants)
+          | #{choice} (0 times)
 
 - if [:borda_split, :borda_single].include?(poll.type)
   h2 Borda Score
@@ -47,18 +45,7 @@ ruby:
       li.result
         | #{choice} (0 points)
 
-- if poll.type == :choose_one
-  - breakdown, unresponded = poll.breakdown
-  h2 Choices
-  - breakdown = breakdown.sort_by { |choice, results| -results.length }
-  - breakdown.each do |choice, results|
-    h3
-      | #{choice} (Chosen #{results.length} #{'time'.en.plural(results.length)})
-    ul
-      - results.each do |result|
-        li =result.responder
-
-  h2 Unresponded
-  ul
-    - unresponded.each do |responder|
-      li =responder
+h2 Unresponded
+ul
+  - unresponded.each do |responder|
+    li =responder
