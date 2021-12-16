@@ -2,12 +2,17 @@ doctype html
 html lang="en"
   head
     meta http-equiv="Content-Type" content="text/html; charset=utf-8"
-    meta name="viewport" content="width=device-width, initial-scale=0.8"
+    meta name="viewport" content="width=device-width, initial-scale=1"
+
     ==google_fonts "Fira Sans"
     ==font_awesome '9c18181028'
     ==favicon_link_tag
     ==stylesheet_link_tag :main
+    ==stylesheet_link_tag "https://unpkg.com/purecss/build/pure-min.css"
+    ==stylesheet_link_tag "https://unpkg.com/purecss/build/grids-responsive-min.css"
+
     ==yield_content :head
+
     javascript:
       document.fonts.load('1rem "Fira Sans"').then(() => {
         document.documentElement.classList.add('google-fonts-loaded');
