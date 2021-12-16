@@ -37,9 +37,10 @@ class Poll < Base
       poll = require_poll(req, resp)
 
       if poll.finished?
-        breakdown, = poll.breakdown
+        breakdown, unresponded = poll.breakdown
         resp.write(@slim.render('poll/finished', poll: poll,
-                                                 breakdown: breakdown))
+                                                 breakdown: breakdown,
+                                                 unresponded: unresponded))
         return
       end
 

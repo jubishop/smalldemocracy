@@ -120,6 +120,9 @@ RSpec.describe(Poll, type: :feature) {
         refresh_page
         click_button('two')
         verify_finished_poll('choose_one_finished')
+        all('label.details')[0].click
+        all('label.details')[1].click
+        goldens.verify('choose_one_details_expanded')
       }
     }
   }
