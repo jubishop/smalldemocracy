@@ -307,6 +307,8 @@ RSpec.describe(Poll, type: :rack_test) {
       poll = create
       post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
       expect(last_response.status).to(be(405))
+      expect(last_response.body).to(
+          eq('someone_else@hey.com is not a responder to this poll'))
     }
   }
 }
