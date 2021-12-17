@@ -13,7 +13,7 @@ Slim::Engine.set_options(
 
 DB = case ENV.fetch('APP_ENV')
      when 'production'
-       Sequel.postgres(ENV.fetch('DATABASE_URL'))
+       Sequel.connect(ENV.fetch('DATABASE_URL'))
      when 'development'
        Sequel.postgres(database: 'smalldemocracy_dev')
      when 'test'
