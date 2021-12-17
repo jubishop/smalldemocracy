@@ -139,22 +139,6 @@ RSpec.describe(Poll, type: :feature) {
       goldens.verify('email_get')
     }
 
-    it('sends email') {
-      poll = create
-      visit(poll.url)
-      fill_in('email', with: 'a@a')
-      click_button('Submit')
-      goldens.verify('email_sent')
-    }
-
-    it('complains when invalid email given') {
-      poll = create
-      visit(poll.url)
-      fill_in('email', with: 'poop@hey')
-      click_button('Submit')
-      goldens.verify('email_responder_not_found')
-    }
-
     it('responds when poll not found') {
       visit('/poll/view/does_not_exist')
       goldens.verify('not_found')

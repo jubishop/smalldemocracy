@@ -1,4 +1,3 @@
-require_relative '../../lib/utils/email'
 require_relative '../helpers/poll/expectations'
 require_relative '../helpers/poll/matchers'
 
@@ -110,17 +109,6 @@ RSpec.describe(Poll, type: :rack_test) {
       expect_choose_one_finished_page
     }
 
-    it('stores cookie if responder is in poll') {
-      poll = create
-      # rubocop:disable Style/StringHashKeys
-      get poll.responders.first.url, {}, { 'HTTPS' => 'on' }
-      # rubocop:enable Style/StringHashKeys
-      expect(last_response.redirect?).to(be(true))
-      expect(get_cookie(:email)).to(eq('a@a'))
-      follow_redirect!
-      expect_view_borda_single_page
-    }
-
     it('asks for email if not logged in and no responder param') {
       poll = create
       get poll.url
@@ -163,42 +151,6 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
-  context('post /send') {
-    it('sends email successfully') {
-      poll = create
-      expect(Utils::Email).to(receive(:email)).with(
-          poll, poll.responders.first)
-      post "/poll/send?poll_id=#{poll.id}&email=a@a"
-      expect_email_sent_page
-    }
-
-    it('rejects sending to nonexistent poll') {
-      post '/poll/send'
-      expect(last_response.status).to(be(400))
-
-      post '/poll/send?poll_id=does_not_exist'
-      expect_not_found_page
-    }
-
-    it('rejects sending to an email not in the response list') {
-      poll = create
-      post "/poll/send?poll_id=#{poll.id}"
-      expect(last_response.status).to(be(400))
-
-      post "/poll/send?poll_id=#{poll.id}&email=does_not_exist"
-      expect_email_not_found_page
-    }
-
-    it('rejects sending email for expired poll') {
-      ENV['APP_ENV'] = 'development'
-      poll = create(expiration: 1)
-      post "/poll/send?poll_id=#{poll.id}&email=a@a"
-      expect(last_response.status).to(be(405))
-      expect(last_response.body).to(
-          eq('Cannot send email to a@a because poll: title has expired'))
-    }
-  }
-
   context('post /respond') {
     before(:each) {
       set_cookie(:email, 'a@a')
@@ -217,11 +169,7 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       it('saves posted results successfully') {
-        post_json({
-          poll_id: @poll.id,
-          responder: @poll.responders.first.salt,
-          choice: @poll.choices.first.id
-        })
+        post_json({ poll_id: @poll.id, choice: @poll.choices.first.id })
         expect(last_response.status).to(be(201))
 
         get "/poll/view/#{@poll.id}"
@@ -229,19 +177,12 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       it('rejects posting with an incorrect choice id') {
-        post_json({
-          poll_id: 'bad_id',
-          responder: @poll.responders.first.salt,
-          choice: @poll.choices.first.id
-        })
+        post_json({ poll_id: 'bad_id', choice: @poll.choices.first.id })
         expect(last_response.status).to(be(404))
       }
 
       it('rejects posting with no choice id') {
-        post_json({
-          responder: @poll.responders.first.salt,
-          choice: @poll.choices.first.id
-        })
+        post_json({ choice: @poll.choices.first.id })
         expect(last_response.status).to(be(400))
       }
     }
@@ -249,11 +190,7 @@ RSpec.describe(Poll, type: :rack_test) {
     context(':borda_single') {
       it('saves posted results successfully') {
         poll = create
-        post_json({
-          poll_id: poll.id,
-          responder: poll.responders.first.salt,
-          responses: poll.choices.map(&:id)
-        })
+        post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
         expect(last_response.status).to(be(201))
 
         get "/poll/view/#{poll.id}"
@@ -273,7 +210,6 @@ RSpec.describe(Poll, type: :rack_test) {
       it('saves posted results successfully') {
         post_json({
           poll_id: @poll.id,
-          responder: @poll.responders.first.salt,
           responses: [@poll.choices.first.id],
           bottom_responses: @poll.choices.drop(1).map(&:id)
         })
@@ -289,18 +225,13 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       it('rejects posting with no bottom responses') {
-        post_json({
-          poll_id: @poll.id,
-          responder: @poll.responders.first.salt,
-          responses: @poll.choices.map(&:id)
-        })
+        post_json({ poll_id: @poll.id, responses: @poll.choices.map(&:id) })
         expect(last_response.status).to(be(400))
       }
 
       it('rejects posting with invalid bottom responses') {
         post_json({
           poll_id: @poll.id,
-          responder: @poll.responders.first.salt,
           responses: @poll.choices.map(&:id),
           bottom_responses: [1, 2]
         })
@@ -310,13 +241,9 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('rejects posting to an already responded poll') {
       poll = create
-      responder, responses = poll.mock_response
+      responses = poll.mock_response
 
-      post_json({
-        poll_id: poll.id,
-        responder: responder.salt,
-        responses: responses
-      })
+      post_json({ poll_id: poll.id, responses: responses })
       expect(last_response.status).to(be(409))
     }
 
@@ -341,25 +268,15 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
     }
 
-    it('rejects posting with invalid responder') {
-      poll = create
-      post_json({ poll_id: poll.id, responder: 'does_not_exist' })
-      expect(last_response.status).to(be(404))
-    }
-
     it('rejects posting with no responses') {
       poll = create
-      post_json({ poll_id: poll.id, responder: poll.responders.first.salt })
+      post_json({ poll_id: poll.id })
       expect(last_response.status).to(be(400))
     }
 
     it('rejects posting with invalid responses') {
       poll = create
-      post_json({
-        poll_id: poll.id,
-        responder: poll.responders.first.salt,
-        responses: [1, 2]
-      })
+      post_json({ poll_id: poll.id, responses: [1, 2] })
       expect(last_response.status).to(be(406))
     }
 
@@ -367,21 +284,13 @@ RSpec.describe(Poll, type: :rack_test) {
       poll = create
       responses = poll.choices.map(&:id)
       responses[0] = responses[1]
-      post_json({
-        poll_id: poll.id,
-        responder: poll.responders.first.salt,
-        responses: responses
-      })
+      post_json({ poll_id: poll.id, responses: responses })
       expect(last_response.status).to(be(409))
     }
 
     it('rejects posting responses to expired poll') {
       poll = create(expiration: 1)
-      post_json({
-        poll_id: poll.id,
-        responder: poll.responders.first.salt,
-        responses: poll.choices.map(&:id)
-      })
+      post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
       expect(last_response.status).to(be(405))
       expect(last_response.body).to(eq('Poll has already finished'))
     }
@@ -389,22 +298,14 @@ RSpec.describe(Poll, type: :rack_test) {
     it('rejects posting if you are not logged in') {
       clear_cookies
       poll = create
-      post_json({
-        poll_id: poll.id,
-        responder: poll.responders.first.salt,
-        responses: poll.choices.map(&:id)
-      })
+      post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
       expect(last_response.status).to(be(404))
     }
 
     it('rejects posting if you are logged in as someone else') {
       set_cookie(:email, 'someone_else@hey.com')
       poll = create
-      post_json({
-        poll_id: poll.id,
-        responder: poll.responders.first.salt,
-        responses: poll.choices.map(&:id)
-      })
+      post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
       expect(last_response.status).to(be(405))
     }
   }

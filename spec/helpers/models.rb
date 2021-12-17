@@ -39,7 +39,7 @@ module Models
         responder.add_response(choice_id: choices.first.id)
       end
 
-      return responder, responses
+      return responses
     end
   end
 end

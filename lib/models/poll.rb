@@ -124,12 +124,8 @@ module Models
       return results, unresponded
     end
 
-    def url(responder = nil)
-      return "/poll/view/#{id}" unless responder
-
-      raise ArgumentError unless responders.include?(responder)
-
-      return "/poll/view/#{id}?responder=#{responder.salt}"
+    def url
+      return "/poll/view/#{id}"
     end
 
     def to_s

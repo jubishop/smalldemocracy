@@ -6,7 +6,6 @@ RSpec.describe(Models::Responder) {
       poll = create
       responder = poll.add_responder(email: 'yo@yo')
       expect(responder.email).to(eq('yo@yo'))
-      expect(responder.salt.length).to(be >= 8)
     }
 
     it('rejects making a responder with no poll associated') {
@@ -31,15 +30,6 @@ RSpec.describe(Models::Responder) {
       poll = create
       expect { poll.add_responder(email: 'not_an_email') }.to(
           raise_error(Sequel::HookFailed, 'Email: not_an_email, is invalid'))
-    }
-  }
-
-  context('#url') {
-    it('creates valid responder url') {
-      poll = create
-      responder = poll.add_responder(email: 'yo@yo')
-      expect(responder.url).to(
-          eq("/poll/view/#{poll.id}?responder=#{responder.salt}"))
     }
   }
 
