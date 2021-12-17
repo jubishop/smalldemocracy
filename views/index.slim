@@ -12,6 +12,6 @@ br
     a href="/logout" Logout
     | )
   a href="/poll/create" Create Poll
-
-br
-a href=Tony::Auth::Google.url(req, r: '/') Sign in with Google
+- else
+  br
+  a href=Tony::Auth::Google.url(req, r: '/') Sign in with Google
