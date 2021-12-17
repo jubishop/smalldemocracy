@@ -13,7 +13,7 @@ namespace :db do
            Sequel.postgres(database: 'smalldemocracy_dev')
          end
 
-    DB.extension(:pg_enum)
+    db.extension(:pg_enum)
     Sequel::Migrator.run(db, 'db/migrations', target: version)
   }
 
