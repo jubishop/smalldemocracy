@@ -49,7 +49,7 @@ module Setup
         use(Rack::Auth::Basic) { |_, pw|
           Rack::Utils.secure_compare(
               Base64.strict_encode64(OpenSSL::Digest.new('SHA256').digest(pw)),
-              ENV.fetch('JUBIVOTE_HASHED_PASSWORD'))
+              ENV.fetch('SMALLDEMOCRACY_HASHED_PASSWORD'))
         }
         run(Admin.new)
       }

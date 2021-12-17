@@ -4,9 +4,9 @@ require 'tony/test'
 
 ENV['APP_ENV'] = 'test'
 ENV['RACK_ENV'] = 'test'
-ENV['JUBIVOTE_HASHED_PASSWORD'] = 'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
-ENV['JUBIVOTE_COOKIE_SECRET'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
-ENV['SENDGRID_API_KEY'] = 'dummy_api_key'
+ENV['SMALLDEMOCRACY_HASHED_PASSWORD'] =
+  'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
+ENV['SMALLDEMOCRACY_COOKIE_SECRET'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 ENV['GOOGLE_CLIENT_ID'] = 'id'
 ENV['GOOGLE_SECRET'] = 'secret'
 
@@ -29,7 +29,7 @@ Capybara.default_driver = :apparition
 RSpec.shared_context(:capybara) do
   include_context(:tony_capybara)
 
-  let(:cookie_secret) { ENV.fetch('JUBIVOTE_COOKIE_SECRET') }
+  let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
 
   def set_timezone
     expect(page).to(have_timezone)
@@ -46,7 +46,7 @@ RSpec.shared_context(:rack_test) {
   include_context(:tony_rack_test)
 
   let(:app) { Capybara.app }
-  let(:cookie_secret) { ENV.fetch('JUBIVOTE_COOKIE_SECRET') }
+  let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
 }
 
 RSpec.configure do |config|

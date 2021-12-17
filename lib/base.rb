@@ -8,7 +8,7 @@ class Base < Tony::App
   include Helpers::Guard
 
   def initialize(slim = Tony::Slim.new(views: 'views', layout: 'views/layout'))
-    super(secret: ENV.fetch('JUBIVOTE_COOKIE_SECRET'))
+    super(secret: ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET'))
     @slim = slim
 
     not_found(->(_, resp) {
