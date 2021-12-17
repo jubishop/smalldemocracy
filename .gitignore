@@ -1,13 +1,5 @@
-.bash_profile
-.bundle
-.data
-.glitch-assets
-.irb_history
-.rbenv
 .rubocop-https*
-.sqlite_history
 
-Gemfile.lock
 rspec_n_iteration*
 tmp/
 
