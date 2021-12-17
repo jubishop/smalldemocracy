@@ -2,7 +2,7 @@
   title =poll
   - case poll.type
   - when :borda_single, :borda_split
-    ==javascript_include_tag "https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"
+    ==javascript_include_tag 'https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js'
     ==javascript_include_tag 'sortable/poll'
     ==stylesheet_link_tag 'sortable/poll'
   - when :choose_one
