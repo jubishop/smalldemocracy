@@ -79,21 +79,8 @@ RSpec.describe(Models::Poll) {
       @poll = create
     }
 
-    it('creates plain url with no responder') {
+    it('creates url') {
       expect(@poll.url).to(eq("/poll/view/#{@poll.id}"))
-    }
-
-    it('creates url with responder') {
-      responder = @poll.add_responder(email: 'yo@yo')
-      expect(@poll.url(responder)).to(
-          eq("/poll/view/#{@poll.id}?responder=#{responder.salt}"))
-    }
-
-    it('throws error if trying to create URL of responder not in poll') {
-      poll = create
-      another_poll = create
-      responder = another_poll.add_responder(email: 'yo@yo.com')
-      expect { poll.url(responder) }.to(raise_error(Models::ArgumentError))
     }
   }
 

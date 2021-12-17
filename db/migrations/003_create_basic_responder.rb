@@ -9,10 +9,6 @@ Sequel.migration {
       String :email, null: false, index: true
       unique(%i[poll_id email], name: :email_unique)
       constraint(:email_not_empty) { Sequel.char_length(email) >= 1 }
-
-      String :salt, null: false, index: true
-      unique(%i[poll_id salt], name: :salt_unique)
-      constraint(:salt_min_length) { Sequel.char_length(salt) >= 8 }
     }
   }
 }

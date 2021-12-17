@@ -5,14 +5,4 @@ h1 Need Email
 
 p Please login to take this survey.
 
-form action="/poll/send" method="post"
-  input name="poll_id" type="hidden" value=poll.id
-
-  label for="email" Email:
-  input name="email" type="text"
-  br
-
-  input value="Submit" type="submit"
-
-br
 a href=Tony::Auth::Google.url(req, r: poll.url) Sign in with Google

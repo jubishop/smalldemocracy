@@ -26,7 +26,6 @@ class Poll {
     }
 
     this.pollID = choicesElement.getAttribute('poll_id');
-    this.responderSalt = choicesElement.getAttribute('responder_salt');
 
     this.submitButton = document.getElementById('submit');
     this.submitButton.addEventListener('click', () => this.submitClicked());
@@ -64,7 +63,6 @@ class Poll {
       method: 'POST',
       body: JSON.stringify({
         poll_id: this.pollID,
-        responder: this.responderSalt,
         responses: this.sortable.toArray(),
         bottom_responses: this?.bottomSortable?.toArray()
       }),

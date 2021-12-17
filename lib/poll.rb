@@ -1,7 +1,6 @@
 require_relative 'base'
 require_relative 'models/choice'
 require_relative 'models/poll'
-require_relative 'utils/email'
 
 class Poll < Base
   include Helpers::Cookie
@@ -44,18 +43,6 @@ class Poll < Base
         return
       end
 
-      if req.params.key?(:responder)
-        responder = poll.responder(salt: req.params.fetch(:responder))
-        unless responder
-          resp.write(@slim.render('email/get', poll: poll, req: req))
-          return
-        end
-
-        resp.set_cookie(:email, responder.email)
-        resp.redirect(poll.url)
-        return
-      end
-
       email = fetch_email(req)
       unless email
         resp.write(@slim.render('email/get', poll: poll, req: req))
@@ -75,53 +62,14 @@ class Poll < Base
                                                   timezone: timezone))
     })
 
-    post('/poll/send', ->(req, resp) {
-      poll = require_poll(req, resp)
-
-      unless req.params.key?(:email)
-        resp.status = 400
-        resp.write('No responder provided')
-        return
-      end
-
-      responder = poll.responder(email: req.params.fetch(:email))
-      unless responder
-        resp.status = 404
-        resp.write(@slim.render('email/responder_not_found'))
-        return
-      end
-
-      begin
-        Utils::Email.email(poll, responder)
-      rescue Utils::ArgumentError => error
-        resp.status = 405
-        resp.write(error.message)
-        return
-      end
-
-      resp.write(@slim.render('email/sent'))
-    })
-
     post('/poll/respond', ->(req, resp) {
       poll = require_poll(req, resp)
       email = require_email(req, resp)
 
-      unless req.params.key?(:responder)
-        resp.status = 400
-        resp.write('No responder provided')
-        return
-      end
-
-      responder = poll.responder(salt: req.params.fetch(:responder))
+      responder = poll.responder(email: email)
       unless responder
-        resp.status = 404
-        resp.write('Responder not found')
-        return
-      end
-
-      if responder.email != email
         resp.status = 405
-        resp.write('Logged in user is not the responder in the form')
+        resp.write("#{email} is not a responder to this poll")
         return
       end
 

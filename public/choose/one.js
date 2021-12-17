@@ -2,7 +2,6 @@ class Poll {
   static domLoaded() {
     const choicesElement = document.getElementById('choices');
     this.pollID = choicesElement.getAttribute('poll_id');
-    this.responderSalt = choicesElement.getAttribute('responder_salt');
 
     this.choicesArray = Array.from(document.getElementsByClassName('choice'));
     this.choicesArray.forEach((choice) => {
@@ -19,7 +18,6 @@ class Poll {
       method: 'POST',
       body: JSON.stringify({
         poll_id: this.pollID,
-        responder: this.responderSalt,
         choice: choice.getAttribute('data-id'),
       }),
       headers: { 'Content-Type': 'application/json' }
