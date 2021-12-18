@@ -129,7 +129,7 @@ GEM
       slim
     tony-auth (0.9)
       base64
-    tony-test (0.50)
+    tony-test (0.53)
       capybara
       chunky_png
       colorize
