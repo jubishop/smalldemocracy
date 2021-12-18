@@ -43,16 +43,17 @@ RSpec::Core::RakeTask.new(:fspec) { |t|
   t.verbose
 }
 
-desc('Run rspec_n (count:20)')
-task(:rspec_n) {
+desc('Run rspec_n ')
+task(:rspec_n, [:count]) { |_, args|
   require 'colorize'
   require 'open3'
 
   ENV['FAIL_ON_GOLDEN'] = '1'
+  count = args[:count] ? args[:count].to_i : 20
 
   puts 'Now running...'
   results = ''
-  Open3.popen3('bundle exec rspec_n 20 -s') do |_, stderr, _, _|
+  Open3.popen3("bundle exec rspec_n #{count} -s") do |_, stderr, _, _|
     while (char = stderr.getc)
       results += char
       print(char)
