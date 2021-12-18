@@ -7,6 +7,14 @@ body {
   padding: 0 1em 1em 1em;
 }
 
+a, a:visited {
+  color: #4da6ff;
+}
+
+a.github {
+  font-size: 4em;
+}
+
 h1 {
   text-align: center;
 }

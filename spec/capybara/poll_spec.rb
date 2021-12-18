@@ -107,18 +107,23 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     context('choose') {
+      def submit_choice(choice)
+        set_timezone
+        expect(page).to(have_fontawesome)
+        click_button(choice)
+      end
+
       it('executes choose_one') {
         select('Choose One', from: 'type')
         submit_creation('choose_one_create')
-        set_timezone
-        click_button('one')
+        submit_choice('one')
         goldens.verify('choose_one_responded')
         set_cookie(:email, 'two@two')
         refresh_page
-        click_button('two')
+        submit_choice('two')
         set_cookie(:email, 'three@three')
         refresh_page
-        click_button('two')
+        submit_choice('two')
         verify_finished_poll('choose_one_finished')
         all('label.details')[0].click
         all('label.details')[1].click
@@ -147,8 +152,11 @@ RSpec.describe(Poll, type: :feature) {
     it('fails when creation form is incomplete') {
       set_cookie(:email, 'one@one')
       visit('/poll/create')
+      expect(page).to(have_fontawesome)
       click_button('Submit')
-      goldens.verify('poll_form_incomplete', expect_google_fonts: false)
+      goldens.verify('poll_form_incomplete',
+                     expect_googlefonts: false,
+                     expect_fontawesome: false)
     }
   }
 

@@ -3,14 +3,8 @@
 
 h1 Small Democracy Home
 
-a href="https://github.com/jubishop/smalldemocracy" Github
-br
-
 - if email
-  p
-    | Welcome #{email} (
-    a href="/logout" Logout
-    | )
+  p Welcome #{email} (<a href="/logout">Logout</a>)
   a href="/poll/create" Create Poll
 - else
   br

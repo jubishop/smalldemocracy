@@ -11,11 +11,7 @@
 
 h1 =poll
 
-p
-  | Hello #{responder.email} (
-  a href="/logout?r=#{poll.url}" Logout
-  | )
-  br
+p Hello #{responder.email} (<a href="/logout?r=#{poll.url}">Logout</a>)
 
 h2 =poll.question
 
