@@ -44,4 +44,5 @@ jobs:
           name: golden-failures
           path: |
             spec/**/failures/*.png
+            spec/**/diffs/*.png
           if-no-files-found: ignore
