@@ -115,6 +115,7 @@ RSpec.describe(Poll, type: :feature) {
       it('executes choose_one') {
         select('Choose One', from: 'type')
         submit_creation('choose_one_create')
+        goldens.verify('choose_one_view')
         submit_choice('one')
         goldens.verify('choose_one_responded')
         set_cookie(:email, 'two@two')
