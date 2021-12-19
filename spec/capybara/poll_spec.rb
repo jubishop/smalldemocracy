@@ -78,8 +78,8 @@ RSpec.describe(Poll, type: :feature) {
         submit_choices('borda_single_view')
         goldens.verify('borda_single_responded')
         verify_finished_poll('borda_single_finished')
-        all('label.details')[1].click
-        all('label.details')[3].click
+        all('details')[1].click
+        all('details')[3].click
         goldens.verify('borda_single_details_expanded')
       }
 
@@ -99,8 +99,8 @@ RSpec.describe(Poll, type: :feature) {
         submit_choices('borda_split_view')
         goldens.verify('borda_split_responded')
         verify_finished_poll('borda_split_finished')
-        all('label.details')[0].click
-        all('label.details')[3].click
+        all('details')[0].click
+        all('details')[3].click
         goldens.verify('borda_split_details_expanded')
       }
     }
@@ -125,8 +125,8 @@ RSpec.describe(Poll, type: :feature) {
         refresh_page
         submit_choice('two')
         verify_finished_poll('choose_one_finished')
-        all('label.details')[0].click
-        all('label.details')[1].click
+        all('details')[0].click
+        all('details')[1].click
         goldens.verify('choose_one_details_expanded')
       }
     }

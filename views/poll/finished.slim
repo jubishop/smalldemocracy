@@ -1,6 +1,5 @@
 = content_for :head
   title Poll Finished
-  ==stylesheet_link_tag 'poll/finished'
 
 = content_for :header
   h1 #{poll} Finished
@@ -18,16 +17,14 @@ ruby:
     ol
       - poll.counts.each do |result|
         - count = "(#{result.count} #{'time'.en.plural(result.count)})"
-        li.result
-          | #{result} #{count}
-          label.details for="count_#{result.choice.id}"
-            | (Choice Breakdown)
-          <input id="count_#{result.choice.id}" type="checkbox" />
-          ul.breakdown
-            - breakdown[result.choice].each do |br|
-              li =br.responder
+        li
+          details
+            summary = "#{result} #{count}"
+            ul
+              - breakdown[result.choice].each do |br|
+                li =br.responder
       - rejected_choices.each do |choice|
-        li.result
+        li
           | #{choice} (0 times)
 
 - if [:borda_split, :borda_single].include?(poll.type)
@@ -36,16 +33,15 @@ ruby:
     ol
       - poll.scores.each do |result|
         - score = "(#{result.score} #{'point'.en.plural(result.score)})"
-        li.result
-          | #{result} #{score}
-          label.details for="score_#{result.choice.id}"
-            | (Score Breakdown)
-          <input id="score_#{result.choice.id}" type="checkbox" />
-          ul.breakdown
-            - breakdown[result.choice].each do |br|
-              li ="#{br.responder} (#{br.score} #{'point'.en.plural(br.score)})"
+        li
+          details
+            summary ="#{result} #{score}"
+            ul
+              - breakdown[result.choice].each do |br|
+                - points = 'point'.en.plural(br.score)
+                li ="#{br.responder} (#{br.score} #{points})"
       - rejected_choices.each do |choice|
-        li.result
+        li
           | #{choice} (0 points)
 
 section
