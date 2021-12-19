@@ -9,7 +9,8 @@
     ==javascript_include_tag 'choose/one'
     ==stylesheet_link_tag 'choose/one'
 
-h1 =poll
+= content_for :header
+  h1 =poll
 
 p Hello #{responder.email} (<a href="/logout?r=#{poll.url}">Logout</a>)
 

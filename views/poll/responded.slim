@@ -1,7 +1,8 @@
 = content_for :head
   title Poll Completed
 
-h1 #{poll} Completed
+= content_for :header
+  h1 #{poll} Completed
 
 p Thanks #{responder.email}! (<a href="/logout?r=#{poll.url}">Logout</a>)
 

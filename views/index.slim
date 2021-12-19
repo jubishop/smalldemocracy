@@ -1,7 +1,8 @@
 = content_for :head
   title Small Democracy Home
 
-h1 Small Democracy Home
+= content_for :header
+  h1 Small Democracy
 
 - if email
   p Welcome #{email} (<a href="/logout">Logout</a>)

@@ -15,8 +15,6 @@ ul#bottom-choices {
 
 li.choice {
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.75);
-  border: solid white 1px;
   cursor: grab;
   display: flex;
   margin: 0.5em 0;

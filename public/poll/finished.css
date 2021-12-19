@@ -3,7 +3,6 @@ input {
 }
 
 label.details {
-  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   font-size: 0.8em;
   font-style: italic;
@@ -11,10 +10,6 @@ label.details {
   text-decoration: underline;
   user-select: none;
   -webkit-user-select: none;
-}
-
-label.details:hover {
-  color: chartreuse;
 }
 
 ul.breakdown {

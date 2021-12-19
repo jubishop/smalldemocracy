@@ -7,7 +7,8 @@ html lang="en"
     ==google_fonts 'Fira Sans'
     ==font_awesome '9c18181028'
     ==favicon_link_tag
-    ==stylesheet_link_tag :main
+    ==stylesheet_link_tag 'css/pico'
+    ==stylesheet_link_tag 'css/layout'
 
     ==yield_content :head
 
@@ -20,5 +21,17 @@ html lang="en"
       document.documentElement.classList.add('timezone-loaded');
 
   body
-    a.github href="https://github.com/jubishop/smalldemocracy" <i class="fab fa-github"></i>
-    ==yield
+    header
+      nav
+        ul
+          li
+            a.home href="/" <i class="fa-light fa-poll-people"></i>
+        ul
+          li
+            ==yield_content :header
+        ul
+          li
+            a.github href="https://github.com/jubishop/smalldemocracy" <i class="fab fa-github"></i>
+
+    main
+      ==yield
