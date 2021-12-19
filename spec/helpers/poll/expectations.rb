@@ -26,20 +26,20 @@ module RSpec
       expect(last_response.ok?).to(be(true))
       expect(last_response.body).to(have_content('Results:'))
       expect(last_response.body).to(have_selector('ol', count: 1))
-      expect(last_response.body).to(have_selector('h2', text: 'Unresponded'))
+      expect(last_response.body).to(have_selector('h3', text: 'Unresponded'))
     end
 
     def expect_borda_split_finished_page
       expect(last_response.ok?).to(be(true))
       expect(last_response.body).to(have_content('Results:'))
       expect(last_response.body).to(have_selector('ol', count: 2))
-      expect(last_response.body).to(have_selector('h2', text: 'Unresponded'))
+      expect(last_response.body).to(have_selector('h3', text: 'Unresponded'))
     end
 
     def expect_choose_one_finished_page
       expect(last_response.ok?).to(be(true))
       expect(last_response.body).to(have_content('Results:'))
-      expect(last_response.body).to(have_selector('h2', text: 'Unresponded'))
+      expect(last_response.body).to(have_selector('h3', text: 'Unresponded'))
     end
 
     def expect_not_found_page

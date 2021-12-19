@@ -5,7 +5,7 @@
 = content_for :header
   h1 #{poll} Finished
 
-p Results:
+h2 Results:
 
 ruby:
   rejected_choices = poll.choices.reject { |choice|
@@ -13,7 +13,8 @@ ruby:
   }
 
 - if [:borda_split, :choose_one].include?(poll.type)
-    h2 Choices
+  section
+    h3 Choices
     ol
       - poll.counts.each do |result|
         - count = "(#{result.count} #{'time'.en.plural(result.count)})"
@@ -30,23 +31,25 @@ ruby:
           | #{choice} (0 times)
 
 - if [:borda_split, :borda_single].include?(poll.type)
-  h2 Borda Score
-  ol
-    - poll.scores.each do |result|
-      - score = "(#{result.score} #{'point'.en.plural(result.score)})"
-      li.result
-        | #{result} #{score}
-        label.details for="score_#{result.choice.id}"
-          | (Score Breakdown)
-        <input id="score_#{result.choice.id}" type="checkbox" />
-        ul.breakdown
-          - breakdown[result.choice].each do |br|
-            li ="#{br.responder} (#{br.score} #{'point'.en.plural(br.score)})"
-    - rejected_choices.each do |choice|
-      li.result
-        | #{choice} (0 points)
+  section
+    h3 Borda Score
+    ol
+      - poll.scores.each do |result|
+        - score = "(#{result.score} #{'point'.en.plural(result.score)})"
+        li.result
+          | #{result} #{score}
+          label.details for="score_#{result.choice.id}"
+            | (Score Breakdown)
+          <input id="score_#{result.choice.id}" type="checkbox" />
+          ul.breakdown
+            - breakdown[result.choice].each do |br|
+              li ="#{br.responder} (#{br.score} #{'point'.en.plural(br.score)})"
+      - rejected_choices.each do |choice|
+        li.result
+          | #{choice} (0 points)
 
-h2 Unresponded
-ul
-  - unresponded.each do |responder|
-    li =responder
+section
+  h3 Unresponded
+  ul
+    - unresponded.each do |responder|
+      li =responder

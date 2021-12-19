@@ -25,15 +25,17 @@ include :expiration_text
   - if poll.type == :borda_split
     p Drag to red those in which you won't participate.
 
-  ul#choices poll_id=poll.id
-    - poll.shuffled_choices.each do |choice|
-      li.choice data-id=choice.id
-        i.grip.fas.fa-grip-lines
-        p.text =choice.text
-        p.score
+  section
+    ul#choices poll_id=poll.id
+      - poll.shuffled_choices.each do |choice|
+        li.choice data-id=choice.id
+          i.grip.fas.fa-grip-lines
+          p.text =choice.text
+          p.score
 
   - if poll.type == :borda_split
-    ul#bottom-choices
+    section
+      ul#bottom-choices
 
   button#submit type="submit" disabled=true Submit Choices
 

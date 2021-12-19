@@ -90,7 +90,6 @@ RSpec.describe(Poll, type: :feature) {
         drag_to_bottom('three')
         rearrange_choices([1, 0, 3, 2])
         expect(page).to(have_button(text: 'Submit Choices'))
-        goldens.verify('borda_split_before_input')
         submit_choices
         set_cookie(:email, 'two@two')
         refresh_page
