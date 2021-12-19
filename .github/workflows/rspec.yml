@@ -35,7 +35,7 @@ jobs:
           bundle exec rake spec
         env:
           APP_ENV: test
-          GOLDENS_PIXEL_TOLERANCE: 0.25
+          GOLDENS_PIXEL_TOLERANCE: 1
           RACK_ENV: test
       - name: Upload screenshots
         uses: actions/upload-artifact@v2
