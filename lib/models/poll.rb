@@ -1,3 +1,4 @@
+require 'date'
 require 'rstruct'
 require 'securerandom'
 require 'sequel'
@@ -40,9 +41,13 @@ module Models
         raise Models::ArgumentError, 'There must be some choices'
       end
 
-      expiration = Time.at(expiration.to_i) unless expiration.is_a?(Time)
+      if !expiration.is_a?(Time) && expiration.respond_to?(:to_i)
+        expiration = Time.at(expiration.to_i)
+      end
       raise Models::ArgumentError,
-            'There must be an expiration' if expiration.to_i.zero?
+            "#{expiration} is not a valid Time" unless expiration.is_a?(Time)
+      raise Models::ArgumentError,
+            'Poll xxpiration resolves to unix epoch' if expiration.to_i.zero?
 
       responders = responders.strip.split(/\s*,\s*/) if responders.is_a?(String)
       choices = choices.strip.split(/\s*,\s*/) if choices.is_a?(String)

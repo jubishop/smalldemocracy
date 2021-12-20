@@ -1,3 +1,6 @@
+require 'date'
+require 'tzinfo'
+
 require_relative 'base'
 require_relative 'models/choice'
 require_relative 'models/poll'
@@ -22,8 +25,26 @@ class Poll < Base
 
     post('/poll/create', ->(req, resp) {
       require_email(req, resp)
+
+      date_time = "#{req.params[:expiration]}:00"
+      hour_offset = timezone(req).utc_offset / 3600
+      utc_offset = hour_offset.abs.to_s
+      utc_offset.prepend('0') if hour_offset.abs < 10
+      utc_offset.prepend(hour_offset >= 0 ? '+' : '-')
+      utc_offset += ':00'
+      rfc3339_date = "#{date_time}#{utc_offset}"
       begin
-        poll = Models::Poll.create(**req.params.to_h.symbolize_keys)
+        # rubocop:disable Style/DateTime
+        req.params[:expiration] = DateTime.rfc3339(rfc3339_date).to_time
+        # rubocop:enable Style/DateTime
+      rescue Date::Error
+        resp.status = 406
+        resp.write("#{req.params[:expiration]} is invalid date")
+        return
+      end
+
+      begin
+        poll = Models::Poll.create(**req.params.symbolize_keys)
       rescue Models::ArgumentError => error
         resp.status = 406
         resp.write(error.message)
@@ -55,11 +76,10 @@ class Poll < Base
         return
       end
 
-      timezone = req.cookies.fetch('tz', 'America/Los_Angeles')
       template = responder.responses.empty? ? :view : :responded
       resp.write(@slim.render("poll/#{template}", poll: poll,
                                                   responder: responder,
-                                                  timezone: timezone))
+                                                  timezone: timezone(req)))
     })
 
     post('/poll/respond', ->(req, resp) {
@@ -94,6 +114,10 @@ class Poll < Base
   end
 
   private
+
+  def timezone(req)
+    return TZInfo::Timezone.get(req.cookies.fetch('tz', 'America/Los_Angeles'))
+  end
 
   def save_choose_one_poll(req, resp, responder)
     unless req.params.key?(:choice)

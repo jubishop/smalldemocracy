@@ -24,7 +24,7 @@ RSpec.describe(Poll, type: :rack_test) {
         question: 'question',
         choices: 'one, two, three',
         responders: 'test@example.com',
-        expiration: 10**10
+        expiration: '2050-06-06T06:06'
       }
     }
 
