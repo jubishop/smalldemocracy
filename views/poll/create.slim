@@ -6,23 +6,23 @@
 
 form action="create" method="post"
   label for="title" Title:
-  input name="title" type="text"
+  input name="title" type="text" required=true autofocus=true
 
   label for="question" Question:
-  input name="question" type="text"
+  input name="question" type="text" required=true
 
   label for="choices" Choices:
-  textarea name="choices"
+  textarea name="choices" required=true
 
   label for="responders" Responders:
-  textarea name="responders"
+  input name="responders" type="email" required=true multiple=true
 
   label for="expiration" Expiration:
-  input name="expiration" type="datetime-local"
+  input name="expiration" type="datetime-local" required=true
 
   label for="type" Type:
   select name="type"
-    option value='borda_single' Borda Single
+    option value='borda_single' selected=true Borda Single
     option value='borda_split' Borda Split
     option value='choose_one' Choose One
 
