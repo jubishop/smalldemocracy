@@ -32,20 +32,20 @@ class Poll < Base
         return
       end
 
-      date_time = "#{req.params[:expiration]}:00"
       hour_offset = timezone(req).utc_offset / 3600
       utc_offset = hour_offset.abs.to_s
       utc_offset.prepend('0') if hour_offset.abs < 10
       utc_offset.prepend(hour_offset >= 0 ? '+' : '-')
-      utc_offset += ':00'
-      rfc3339_date = "#{date_time}#{utc_offset}"
+      utc_offset += '00'
+      date_string = "#{req.params[:expiration]} #{utc_offset}"
       begin
         # rubocop:disable Style/DateTime
-        req.params[:expiration] = DateTime.rfc3339(rfc3339_date).to_time
+        req.params[:expiration] = DateTime.strptime(
+            date_string, '%Y-%m-%dT%H:%M %z').to_time
         # rubocop:enable Style/DateTime
       rescue Date::Error
         resp.status = 406
-        resp.write("#{req.params[:expiration]} is invalid date")
+        resp.write("#{date_string} is invalid date")
         return
       end
 
