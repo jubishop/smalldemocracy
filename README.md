@@ -4,6 +4,8 @@
 
 [![RSpec Status][rspec-badge]][rspec-yml]  [![Rubocop Status][rubocop-badge]][rubocop-yml]
 
+## Tools for a Small Democracy
+
 Small Democracy can be viewed online at [smalldemocracy.com](https://SmallDemocracy.com).
 
 ## Polls
