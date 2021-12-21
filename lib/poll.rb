@@ -26,6 +26,12 @@ class Poll < Base
     post('/poll/create', ->(req, resp) {
       require_email(req, resp)
 
+      if req.params[:expiration].nil? || req.params[:expiration].empty?
+        resp.status = 406
+        resp.write('No expiration date given')
+        return
+      end
+
       date_time = "#{req.params[:expiration]}:00"
       hour_offset = timezone(req).utc_offset / 3600
       utc_offset = hour_offset.abs.to_s

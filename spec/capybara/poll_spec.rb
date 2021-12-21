@@ -21,7 +21,7 @@ RSpec.describe(Poll, type: :feature) {
           'responders',
           with: 'one@one, two@two, three@three, four@four, five@five, six@six')
       fill_in('choices', with: 'one, two, three, four, five, six')
-      fill_in('expiration', with: current_time + 61)
+      fill_in('expiration', with: Time.at(current_time + 90))
     }
 
     def drag_to_bottom(choice)
