@@ -32,14 +32,12 @@ RuboCop::RakeTask.new(:rubocop)
 
 desc('Run all rspec tests')
 RSpec::Core::RakeTask.new(:spec) { |t|
-  Rake::Task[:sass].invoke
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.verbose
 }
 
 desc('Run spec excluding capybara tests')
 RSpec::Core::RakeTask.new(:fspec) { |t|
-  Rake::Task[:sass].invoke
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.rspec_opts = '-t ~type:feature'
   t.verbose
@@ -76,7 +74,7 @@ desc('Compile all scss files to compressed css')
 task(:sass, [:params]) { |_, args|
   params = args[:params].to_s
   params += ' --style compressed --embed-sources'
-  `sass #{params} public/scss:public/css`
+  `sass #{params} scss:public/css`
 }
 
 desc('Compile css and launch localhost:8989')
@@ -85,5 +83,5 @@ task(:run) {
   `bundle exec rackup -p 8989`
 }
 
-task default: %w[rubocop:auto_correct spec]
-task fast: %w[rubocop:auto_correct fspec]
+task default: %w[rubocop:auto_correct sass spec]
+task fast: %w[rubocop:auto_correct sass fspec]

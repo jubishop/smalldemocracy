@@ -1,1 +1,0 @@
-{"version":3,"sourceRoot":"","sources":["../scss/layout.scss"],"names":[],"mappings":"AAAQ,yEAER,MACE,uCAGF,gBACE","file":"layout.css","sourcesContent":["@import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');\n\n:root {\n  --font-family: 'Fira Sans', sans-serif;\n}\n\na.github, a.home {\n  font-size: 2em;\n}\n"]}

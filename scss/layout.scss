@@ -1,0 +1,13 @@
+@import "_google_fonts";
+@include google-font(Fira Sans);
+
+$body-font: "Fira Sans", sans-serif;
+
+:root {
+  --font-family: #{$body-font};
+}
+
+a.github,
+a.home {
+  font-size: 2em;
+}
