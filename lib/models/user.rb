@@ -15,14 +15,10 @@ module Models
     end
 
     def polls(cutoff = Time.now)
+      group_ids = Models::Member.where(email: email).select(:group_id)
       return Models::Poll.where(
           [
-            [
-              :group_id,
-              [
-                Models::Member.where(email: email).select(:group_id)
-              ]
-            ],
+            [:group_id, group_ids],
             [:expiration, cutoff..]
           ]).all
     end
