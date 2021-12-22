@@ -1,0 +1,1 @@
+{"version":3,"sourceRoot":"","sources":["../scss/layout.scss"],"names":[],"mappings":"AAAA,MACE,uCAGF,gBACE","file":"layout.css","sourcesContent":[":root {\n  --font-family: 'Fira Sans', sans-serif;\n}\n\na.github, a.home {\n  font-size: 2em;\n}\n"]}

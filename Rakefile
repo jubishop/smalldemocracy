@@ -70,5 +70,18 @@ task(:rspec_n, [:count]) { |_, args|
   `rm rspec_n_iteration*`
 }
 
+desc('Compile all scss files to compressed css')
+task(:sass, [:params]) { |_, args|
+  params = args[:params].to_s
+  params += ' --style compressed --embed-sources'
+  `sass #{params} public/scss:public/css`
+}
+
+desc('Compile css and launch localhost:8989')
+task(:run) {
+  Thread.new { Rake::Task[:sass].invoke('--watch') }
+  `bundle exec rackup -p 8989`
+}
+
 task default: %w[rubocop:auto_correct spec]
 task fast: %w[rubocop:auto_correct fspec]
