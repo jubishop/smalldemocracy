@@ -12,27 +12,24 @@ html lang="en"
     ==yield_content :head
 
     javascript:
-      document.fonts.load('1rem "Fira Sans"').then(() => {
-        document.documentElement.classList.add('google-fonts-loaded');
-      });
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       document.cookie = "tz="+tz+"; expires=31536000; path=/";
       document.documentElement.classList.add('timezone-loaded');
 
-  body
+  body.google-fonts-loaded
     header
       nav
         ul
           li
             a.home href="/"
-              i class="fa-light fa-poll-people"
+              i.fa-light.fa-poll-people
         ul
           li
             ==yield_content :header
         ul
           li
             a.github href="https://github.com/jubishop/smalldemocracy"
-              i class="fab fa-github"
+              i.fab.fa-github
 
     main
       ==yield
