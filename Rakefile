@@ -32,12 +32,14 @@ RuboCop::RakeTask.new(:rubocop)
 
 desc('Run all rspec tests')
 RSpec::Core::RakeTask.new(:spec) { |t|
+  Rake::Task[:sass].invoke
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.verbose
 }
 
 desc('Run spec excluding capybara tests')
 RSpec::Core::RakeTask.new(:fspec) { |t|
+  Rake::Task[:sass].invoke
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.rspec_opts = '-t ~type:feature'
   t.verbose
