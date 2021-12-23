@@ -29,10 +29,9 @@ module Models
           ]).all
     end
 
-    def add_group(name:)
-      group = super(name: name)
+    def _add_group(group)
+      super(group)
       group.add_member(email: email)
-      return group
     end
 
     def to_s

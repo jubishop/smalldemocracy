@@ -9,9 +9,9 @@ module Models
     one_to_many :members
     one_to_many :polls
 
-    def add_member(email:)
-      User.find_or_create(email: email)
-      return super(email: email)
+    def _add_member(member)
+      User.find_or_create(email: member.email)
+      super(member)
     end
 
     def creating_member
