@@ -111,6 +111,30 @@ RSpec.describe(Models::Group) {
     }
   }
 
+  context('member') {
+    it('finds a member properly') {
+      group = create_group
+      member = group.add_member
+      expect(group.member(email: member.email)).to(eq(member))
+    }
+  }
+
+  context('creating_member') {
+    it('finds creating member properly') {
+      user = create_user
+      group = user.add_group
+      expect(group.creating_member.email).to(eq(user.email))
+    }
+  }
+
+  context('creator') {
+    it('finds creator properly') {
+      user = create_user
+      group = user.add_group
+      expect(group.creator).to(eq(user))
+    }
+  }
+
   context('#url') {
     it('creates url') {
       group = create_group
