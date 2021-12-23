@@ -9,6 +9,7 @@ module Models
     one_to_many :polls
 
     alias creator user
+
     def add_member(email:)
       User.find_or_create(email: email)
       return super(email: email)

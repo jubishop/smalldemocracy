@@ -1,19 +1,14 @@
 require_relative '../../lib/models/poll'
+require_relative '../../lib/models/user'
 
 module RSpec
   module Models
-    def create(title: 'title',
-               question: 'question',
-               expiration: Time.now.to_i + 62,
-               choices: 'one, two, three',
-               responders: 'a@a',
-               type: nil)
-      return ::Models::Poll.create(title: title,
-                                   question: question,
-                                   expiration: expiration,
-                                   choices: choices,
-                                   responders: responders,
-                                   type: type)
+    def create_user(email: "#{rand}@#{rand}")
+      return ::Models::User.find_or_create(email: email)
+    end
+
+    def create_group(email: 'a@a', name: rand.to_s)
+      return create_user(email: email).add_group(name: name)
     end
   end
 end

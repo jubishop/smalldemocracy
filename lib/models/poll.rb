@@ -10,6 +10,8 @@ module Models
     many_to_one :group
     one_to_many :choices
 
+    plugin :timestamps, update_on_create: true
+
     def members
       return Models::Member.where(group_id: group_id).all
     end
