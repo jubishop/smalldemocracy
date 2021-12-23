@@ -6,7 +6,7 @@ RSpec.describe(Models::Group) {
       group = create_group
       group.add_member(email: 'a@a')
       group_id = group.id
-      expect(Models::Member.where(group_id: group_id).all.length).to(be(2))
+      expect(Models::Member.where(group_id: group_id).all).to_not(be_empty)
       group.destroy
       expect(Models::Member.where(group_id: group_id).all).to(be_empty)
     }
@@ -14,9 +14,8 @@ RSpec.describe(Models::Group) {
     it('will cascade destroy to polls') {
       group = create_group
       group.add_poll
-      group.add_poll
       group_id = group.id
-      expect(Models::Poll.where(group_id: group_id).all.length).to(be(2))
+      expect(Models::Poll.where(group_id: group_id).all).to_not(be_empty)
       group.destroy
       expect(Models::Member.where(group_id: group_id).all).to(be_empty)
     }
