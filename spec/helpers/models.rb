@@ -10,6 +10,17 @@ module RSpec
     def create_group(email: "#{rand}@#{rand}", name: rand.to_s)
       return create_user(email: email).add_group(name: name)
     end
+
+    def create_poll(email: "#{rand}@#{rand}",
+                    name: rand.to_s,
+                    title: 'title',
+                    question: 'question',
+                    expiration: Time.now)
+      return create_group(email: email, name: name).add_poll(
+          title: title,
+          question: question,
+          expiration: expiration)
+    end
   end
 end
 

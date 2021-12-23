@@ -14,6 +14,10 @@ module Models
       return super(email: email)
     end
 
+    def url
+      return "/group/view/#{id}"
+    end
+
     def to_s
       return name
     end

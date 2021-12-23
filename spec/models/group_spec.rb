@@ -85,4 +85,11 @@ RSpec.describe(Models::Group) {
       expect(poll.members).to(match_array(group.members))
     }
   }
+
+  context('#url') {
+    it('creates url') {
+      group = create_group
+      expect(group.url).to(eq("/group/view/#{group.id}"))
+    }
+  }
 }
