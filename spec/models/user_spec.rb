@@ -48,12 +48,9 @@ RSpec.describe(Models::User) {
       unrelated_group.add_poll(title: 'title',
                                question: 'question',
                                expiration: Time.now + 10)
-      my_group.add_poll(title: 'title', question: 'question',
-                        expiration: Time.now - 10)
-      my_poll = my_group.add_poll(title: 'title', question: 'question',
-                                  expiration: Time.now + 10)
-      other_poll = other_group.add_poll(title: 'title', question: 'question',
-                                        expiration: Time.now + 10)
+      my_group.add_poll(expiration: Time.now - 10)
+      my_poll = my_group.add_poll(expiration: Time.now + 10)
+      other_poll = other_group.add_poll(expiration: Time.now + 10)
       expect(user.polls).to(match_array([my_poll, other_poll]))
     }
   }

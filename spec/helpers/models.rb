@@ -14,6 +14,17 @@ module RSpec
 end
 
 module Models
+  class Group
+    include Test::Env
+
+    def add_poll(title: 'title',
+                 question: 'question',
+                 expiration: Time.now)
+      test_only!
+      super(title: title, question: question, expiration: expiration)
+    end
+  end
+
   class Poll
     include Test::Env
 

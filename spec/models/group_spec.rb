@@ -53,16 +53,14 @@ RSpec.describe(Models::Group) {
   context('add_poll') {
     it('can add a poll to a group') {
       group = create_group
-      poll = group.add_poll(title: 'title', question: 'question',
-                            expiration: Time.now)
+      poll = group.add_poll
       expect(poll.group).to(eq(group))
     }
 
     it('matches members from poll to its group') {
       group = create_group
       group.add_member(email: 'b@b')
-      poll = group.add_poll(title: 'title', question: 'question',
-                            expiration: Time.now)
+      poll = group.add_poll
       expect(poll.members).to(match_array(group.members))
     }
   }
