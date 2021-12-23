@@ -78,20 +78,6 @@ RSpec.describe(Models::Group) {
       expect(poll.group).to(eq(group))
     }
 
-    it('finds members from its group') {
-      group = create_group
-      group.add_member
-      poll = group.add_poll
-      expect(poll.members).to(match_array(group.members))
-    }
-
-    it('finds creator') {
-      user = create_user
-      group = user.add_group
-      poll = group.add_poll
-      expect(poll.creator).to(eq(user))
-    }
-
     it('defaults to creating a poll that is `borda_single` type') {
       group = create_group
       poll = group.add_poll

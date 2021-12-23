@@ -3,7 +3,7 @@ require 'sequel'
 module Models
   class Response < Sequel::Model
     many_to_one :choice
-    many_to_one :responder
+    many_to_one :member
     one_through_one :poll, join_table: :choices,
                            left_key: :id,
                            left_primary_key: :choice_id

@@ -9,7 +9,7 @@ Sequel.migration {
       foreign_key :email, :users, type: String
       String :name, null: false
       constraint(:name_not_empty) { Sequel.char_length(name) >= 1 }
-      unique(%i[name email], name: :name_unique)
+      unique(%i[name email], name: :group_unique)
     }
 
     create_table(:members) {
@@ -37,14 +37,14 @@ Sequel.migration {
       foreign_key :poll_id, :polls, type: :uuid, on_delete: :cascade
       String :text, null: false
       constraint(:text_not_empty) { Sequel.char_length(text) >= 1 }
-      unique(%i[poll_id text], name: :text_unique)
+      unique(%i[poll_id text], name: :choice_unique)
     }
 
     create_table(:responses) {
       primary_key :id
       foreign_key :choice_id, :choices, on_delete: :cascade
       foreign_key :member_id, :members, on_delete: :cascade
-      unique(%i[member_id choice_id], name: :choice_unique)
+      unique(%i[member_id choice_id], name: :response_unique)
       Integer :score
     }
   }

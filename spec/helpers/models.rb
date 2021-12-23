@@ -59,6 +59,12 @@ module Models
 
   class Poll
     include Test::Env
+    orig_add_choice = instance_method(:add_choice)
+    define_method(:add_choice) { |text: rand.to_s|
+      test_only!
+      orig_add_choice.bind_call(self, text: text)
+    }
+
     def mock_response
       test_only!
       responder = responder(email: 'a@a')

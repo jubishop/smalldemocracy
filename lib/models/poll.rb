@@ -19,6 +19,14 @@ module Models
       return Member.where(group_id: group_id).all
     end
 
+    def member(email:)
+      return Member.find(group_id: group_id, email: email)
+    end
+
+    def choice(text:)
+      return Choice.find(poll_id: id, text: text)
+    end
+
     def creator
       email = Group.where(id: group_id).select(:email)
       return User.find(email: email)

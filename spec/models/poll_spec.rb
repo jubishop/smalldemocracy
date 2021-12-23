@@ -16,6 +16,53 @@ RSpec.describe(Models::Poll) {
     }
   }
 
+  context('members') {
+    it('finds members from its group') {
+      group = create_group
+      group.add_member
+      poll = group.add_poll
+      expect(poll.members).to(match_array(group.members))
+    }
+  }
+
+  context('member') {
+    it('finds a member from its group') {
+      group = create_group
+      member = group.add_member
+      poll = group.add_poll
+      expect(poll.member(email: member.email)).to(eq(member))
+    }
+  }
+
+  context('choice') {
+    it('finds a choice') {
+      poll = create_poll
+      choice = poll.add_choice
+      expect(poll.choice(text: choice.text)).to(eq(choice))
+    }
+  }
+
+  context('creator') {
+    it('finds creator') {
+      user = create_user
+      group = user.add_group
+      poll = group.add_poll
+      expect(poll.creator).to(eq(user))
+    }
+  }
+
+  context('finished?') {
+    it('returns a unexpired poll as unfinished') {
+      poll = create_poll(expiration: Time.now + 10)
+      expect(poll.finished?).to(be(false))
+    }
+
+    it('returns an expired poll as finished') {
+      poll = create_poll(expiration: Time.now - 10)
+      expect(poll.finished?).to(be(true))
+    }
+  }
+
   context('url') {
     it('creates url') {
       poll = create_poll
@@ -90,7 +137,7 @@ RSpec.describe(Models::Poll) {
           'e@e': %w[three one two four five six]
         }
         responses.each { |email, ranks|
-          member = group.member(email: email.to_s)
+          member = @poll.member(email: email.to_s)
           @poll.choices.each { |choice|
             score = choices.length - ranks.index(choice.text) - 1
             member.add_response(choice_id: choice.id, score: score)
@@ -114,80 +161,86 @@ RSpec.describe(Models::Poll) {
       it_has_behavior('scores')
     }
 
-    # context(':borda_split') {
-    #   before(:each) {
-    #     choices = %w[one two three four five six]
-    #     responders = %w[a@a b@b c@c d@d e@e f@f]
-    #     @poll = create(choices: choices,
-    #                    responders: responders,
-    #                    type: :borda_split)
+    context(':borda_split') {
+      before(:each) {
+        choices = %w[one two three four five six]
+        members = %w[a@a b@b c@c d@d e@e f@f]
 
-    #     responses = {
-    #       'a@a': %w[one two],
-    #       'b@b': %w[one five four two],
-    #       'c@c': %w[one three five two],
-    #       'd@d': %w[five three two],
-    #       'e@e': %w[one five]
-    #     }
-    #     responses.each { |email, chosen_ranks|
-    #       responder = @poll.responder(email: email.to_s)
-    #       @poll.choices.each { |choice|
-    #         if chosen_ranks.include?(choice.text)
-    #           score = choices.length - chosen_ranks.index(choice.text)
-    #           responder.add_response(choice_id: choice.id, score: score)
-    #         end
-    #       }
-    #     }
+        group = create_group
+        members.each { |member| group.add_member(email: member) }
 
-    #     @expected_results = {
-    #       one: { 'a@a': 6, 'b@b': 6, 'c@c': 6, 'e@e': 6 },
-    #       two: { 'a@a': 5, 'b@b': 3, 'c@c': 3, 'd@d': 4 },
-    #       three: { 'c@c': 5, 'd@d': 5 },
-    #       four: { 'b@b': 4 },
-    #       five: { 'b@b': 5, 'c@c': 4, 'd@d': 6, 'e@e': 5 }
-    #     }
-    #     @expected_unresponded = ['f@f']
+        @poll = group.add_poll(type: :borda_split, expiration: Time.now + 10)
+        choices.each { |choice| @poll.add_choice(text: choice) }
 
-    #     @poll.expiration = 1
-    #   }
+        responses = {
+          'a@a': %w[one two],
+          'b@b': %w[one five four two],
+          'c@c': %w[one three five two],
+          'd@d': %w[five three two],
+          'e@e': %w[one five]
+        }
+        responses.each { |email, chosen_ranks|
+          member = @poll.member(email: email.to_s)
+          @poll.choices.each { |choice|
+            if chosen_ranks.include?(choice.text)
+              score = choices.length - chosen_ranks.index(choice.text)
+              member.add_response(choice_id: choice.id, score: score)
+            end
+          }
+        }
 
-    #   it_has_behavior('breakdown')
-    #   it_has_behavior('scores')
-    #   it_has_behavior('counts')
-    # }
+        @expected_results = {
+          one: { 'a@a': 6, 'b@b': 6, 'c@c': 6, 'e@e': 6 },
+          two: { 'a@a': 5, 'b@b': 3, 'c@c': 3, 'd@d': 4 },
+          three: { 'c@c': 5, 'd@d': 5 },
+          four: { 'b@b': 4 },
+          five: { 'b@b': 5, 'c@c': 4, 'd@d': 6, 'e@e': 5 }
+        }
+        @expected_unresponded = ['f@f', @poll.creator.email]
 
-    # context(':choose_one') {
-    #   before(:each) {
-    #     choices = %w[yes no maybe]
-    #     responders = %w[a@a b@b c@c d@d e@e f@f g@g]
-    #     @poll = create(choices: choices,
-    #                    responders: responders,
-    #                    type: :choose_one)
+        @poll.expiration = 1
+      }
 
-    #     responses = {
-    #       'a@a': 'yes',
-    #       'b@b': 'no',
-    #       'c@c': 'yes',
-    #       'd@d': 'maybe',
-    #       'e@e': 'yes',
-    #       'f@f': 'maybe'
-    #     }
-    #     responses.each { |email, choice|
-    #       responder = @poll.responder(email: email.to_s)
-    #       choice = @poll.choice(text: choice)
-    #       responder.add_response(choice_id: choice.id)
-    #     }
+      it_has_behavior('breakdown')
+      it_has_behavior('scores')
+      it_has_behavior('counts')
+    }
 
-    #     @expected_results = {
-    #       yes: { 'a@a': nil, 'c@c': nil, 'e@e': nil },
-    #       maybe: { 'd@d': nil, 'f@f': nil },
-    #       no: { 'b@b': nil }
-    #     }
-    #     @expected_unresponded = ['g@g']
-    #   }
+    context(':choose_one') {
+      before(:each) {
+        choices = %w[yes no maybe]
+        members = %w[a@a b@b c@c d@d e@e f@f g@g]
 
-    #   it_has_behavior('breakdown')
-    #   it_has_behavior('counts')
-    # }
+        group = create_group
+        members.each { |member| group.add_member(email: member) }
+
+        @poll = group.add_poll(type: :choose_one, expiration: Time.now + 10)
+        choices.each { |choice| @poll.add_choice(text: choice) }
+
+        responses = {
+          'a@a': 'yes',
+          'b@b': 'no',
+          'c@c': 'yes',
+          'd@d': 'maybe',
+          'e@e': 'yes',
+          'f@f': 'maybe'
+        }
+        responses.each { |email, choice|
+          member = @poll.member(email: email.to_s)
+          choice = @poll.choice(text: choice)
+          member.add_response(choice_id: choice.id)
+        }
+
+        @expected_results = {
+          yes: { 'a@a': nil, 'c@c': nil, 'e@e': nil },
+          maybe: { 'd@d': nil, 'f@f': nil },
+          no: { 'b@b': nil }
+        }
+        @expected_unresponded = ['g@g', @poll.creator.email]
+      }
+
+      it_has_behavior('breakdown')
+      it_has_behavior('counts')
+    }
   }
 }

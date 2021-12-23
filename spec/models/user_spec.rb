@@ -105,15 +105,9 @@ RSpec.describe(Models::User) {
       }.to(raise_error(Sequel::CheckConstraintViolation))
     }
 
-    it('can add a group and become the creator') {
-      user = create_user
-      group = user.add_group(name: 'creator_group')
-      expect(group.creator).to(eq(user))
-    }
-
     it('always adds itself as a member to any group') {
       user = create_user
-      group = user.add_group(name: 'name')
+      group = user.add_group
       expect(group.members.length).to(be(1))
       expect(group.members[0].email).to(eq(group.creator.email))
     }
