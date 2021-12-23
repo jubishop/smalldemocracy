@@ -1,5 +1,7 @@
 require_relative '../../lib/models/group'
 
+# TODO: Test add_response
+
 RSpec.describe(Models::Member) {
   context('delete or destroy') {
     it('will not allow removal of creator from group') {

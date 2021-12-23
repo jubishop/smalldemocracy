@@ -1,5 +1,6 @@
 require_relative '../../lib/models/response'
 
+# TODO: Go over this entirely
 RSpec.describe(Models::Response) {
   context('::create') {
     it('successfully makes a response') {
