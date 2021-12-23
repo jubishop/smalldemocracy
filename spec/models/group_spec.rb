@@ -1,6 +1,27 @@
 require_relative '../../lib/models/group'
 
 RSpec.describe(Models::Group) {
+  context('delete or destroy') {
+    it('will cascade destroy to members') {
+      group = create_group
+      group.add_member(email: 'a@a')
+      group_id = group.id
+      expect(Models::Member.where(group_id: group_id).all.length).to(be(2))
+      group.destroy
+      expect(Models::Member.where(group_id: group_id).all).to(be_empty)
+    }
+
+    it('will cascade destroy to polls') {
+      group = create_group
+      group.add_poll
+      group.add_poll
+      group_id = group.id
+      expect(Models::Poll.where(group_id: group_id).all.length).to(be(2))
+      group.destroy
+      expect(Models::Member.where(group_id: group_id).all).to(be_empty)
+    }
+  }
+
   context('add_member') {
     it('can add an existing user as a member to a group') {
       group = create_group
