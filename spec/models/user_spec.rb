@@ -81,13 +81,6 @@ RSpec.describe(Models::User) {
       expect(group.members[0].email).to(eq(group.creator.email))
     }
 
-    it('will not allow removal of creator from group') {
-      user = create_user
-      group = user.add_group(name: 'name')
-      member = group.members.first
-      expect { member.destroy }.to(raise_error(Sequel::HookFailed))
-    }
-
     it('throws error if adding duplicate groups') {
       user = create_user
       user.add_group(name: 'duplicate_name')
