@@ -14,6 +14,23 @@ RSpec.describe(Models::Poll) {
       expect { poll.add_choice(text: '') }.to(
           raise_error(Sequel::DatabaseError))
     }
+
+    it('successfully adds a choice') {
+      poll = create_poll
+      choice = poll.add_choice
+      expect(poll.choices).to(match_array(choice))
+    }
+  }
+
+  context('responses') {
+    it('finds all responses through join table') {
+      poll = create_poll(expiration: Time.now + 10)
+      choice_one = poll.add_choice
+      choice_two = poll.add_choice
+      response_one = choice_one.add_response(member_id: poll.members.sample.id)
+      response_two = choice_two.add_response(member_id: poll.members.sample.id)
+      expect(poll.responses).to(match_array([response_one, response_two]))
+    }
   }
 
   context('members') {
@@ -39,15 +56,6 @@ RSpec.describe(Models::Poll) {
       poll = create_poll
       choice = poll.add_choice
       expect(poll.choice(text: choice.text)).to(eq(choice))
-    }
-  }
-
-  context('creator') {
-    it('finds creator') {
-      user = create_user
-      group = user.add_group
-      poll = group.add_poll
-      expect(poll.creator).to(eq(user))
     }
   }
 
@@ -152,7 +160,7 @@ RSpec.describe(Models::Poll) {
           five: { 'a@a': 3, 'b@b': 1, 'c@c': 1, 'd@d': 1, 'e@e': 1 },
           six: { 'a@a': 0, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
         }
-        @expected_unresponded = ['f@f', @poll.creator.email]
+        @expected_unresponded = ['f@f', group.creator.email]
 
         @poll.expiration = 1
       }
@@ -196,7 +204,7 @@ RSpec.describe(Models::Poll) {
           four: { 'b@b': 4 },
           five: { 'b@b': 5, 'c@c': 4, 'd@d': 6, 'e@e': 5 }
         }
-        @expected_unresponded = ['f@f', @poll.creator.email]
+        @expected_unresponded = ['f@f', group.creator.email]
 
         @poll.expiration = 1
       }
@@ -236,7 +244,7 @@ RSpec.describe(Models::Poll) {
           maybe: { 'd@d': nil, 'f@f': nil },
           no: { 'b@b': nil }
         }
-        @expected_unresponded = ['g@g', @poll.creator.email]
+        @expected_unresponded = ['g@g', group.creator.email]
       }
 
       it_has_behavior('breakdown')

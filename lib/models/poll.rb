@@ -27,11 +27,6 @@ module Models
       return Choice.find(poll_id: id, text: text)
     end
 
-    def creator
-      email = Group.where(id: group_id).select(:email)
-      return User.find(email: email)
-    end
-
     def type
       return super.to_sym
     end
