@@ -1,34 +1,7 @@
 require_relative '../../lib/models/poll'
 
 RSpec.describe(Models::Poll) {
-  context('::create') {
-    it('creates a poll with comma strings') {
-      poll = create(choices: 'one, two, three', responders: 'a@b, b@c, c@d')
-      expect(poll.choices.map(&:text)).to(match_array(%w[one two three]))
-      expect(poll.responders.map(&:email)).to(match_array(%w[a@b b@c c@d]))
-    }
-
-    it('creates a poll with arrays') {
-      poll = create(choices: %w[four five six],
-                    responders: ['d@e', 'e@f', 'f@g'])
-      expect(poll.choices.map(&:text)).to(match_array(%w[four five six]))
-      expect(poll.responders.map(&:email)).to(match_array(%w[d@e e@f f@g]))
-    }
-
-    it('defaults to creating a poll that is `borda_single` type') {
-      poll = create
-      expect(poll.type).to(eq(:borda_single))
-    }
-
-    it('can be created with other valid types') {
-      poll = create(type: :borda_split)
-      expect(poll.type).to(eq(:borda_split))
-    }
-
-    it('rejects creation of invalid type') {
-      expect { create(type: :not_valid_type) }.to(
-          raise_error(Sequel::DatabaseError))
-    }
+  context('add_choice') {
 
     it('rejects creating two choices with the same text') {
       expect { create(choices: %w[one one]) }.to(

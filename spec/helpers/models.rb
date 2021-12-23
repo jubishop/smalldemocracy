@@ -15,11 +15,13 @@ module RSpec
                     name: rand.to_s,
                     title: rand.to_s,
                     question: rand.to_s,
-                    expiration: Time.now)
+                    expiration: Time.now,
+                    **attributes)
       return create_group(email: email, name: name).add_poll(
           title: title,
           question: question,
-          expiration: expiration)
+          expiration: expiration,
+          **attributes)
     end
   end
 end
@@ -39,11 +41,13 @@ module Models
     orig_add_poll = instance_method(:add_poll)
     define_method(:add_poll) { |title: rand.to_s,
                                 question: rand.to_s,
-                                expiration: Time.now|
+                                expiration: Time.now,
+                                **attributes|
       test_only!
       orig_add_poll.bind_call(self, title: title,
                                     question: question,
-                                    expiration: expiration)
+                                    expiration: expiration,
+                                    **attributes)
     }
   end
 

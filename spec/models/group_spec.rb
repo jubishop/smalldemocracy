@@ -83,6 +83,24 @@ RSpec.describe(Models::Group) {
       poll = group.add_poll
       expect(poll.members).to(match_array(group.members))
     }
+
+    it('defaults to creating a poll that is `borda_single` type') {
+      group = create_group
+      poll = group.add_poll
+      expect(poll.type).to(eq(:borda_single))
+    }
+
+    it('can create polls with other valid types') {
+      group = create_group
+      poll = group.add_poll(type: :borda_split)
+      expect(poll.type).to(eq(:borda_split))
+    }
+
+    it('rejects creation of polls of invalid type') {
+      group = create_group
+      expect { group.add_poll(type: :not_valid_type) }.to(
+          raise_error(Sequel::DatabaseError))
+    }
   }
 
   context('#url') {
