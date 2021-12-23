@@ -14,6 +14,10 @@ RSpec.describe(Models::User) {
       expect { create_user(email: nil) }.to(raise_error(Sequel::HookFailed))
     }
 
+    it('throws error if user has empty email') {
+      expect { create_user(email: '') }.to(raise_error(Sequel::HookFailed))
+    }
+
     it('throws error if user has invalid email') {
       expect {
         create_user(email: 'invalid@')
@@ -55,7 +59,7 @@ RSpec.describe(Models::User) {
       }.to(raise_error(Sequel::CheckConstraintViolation))
     }
 
-    it('can add a group as creator') {
+    it('can add a group and become the creator') {
       user = create_user
       group = user.add_group(name: 'creator_group')
       expect(group.creator).to(eq(user))
@@ -66,7 +70,6 @@ RSpec.describe(Models::User) {
       group = user.add_group(name: 'name')
       expect(group.members.length).to(be(1))
       expect(group.members[0].email).to(eq(group.creator.email))
-      expect(group.members[0].email).to(eq('a@a'))
     }
 
     it('throws error if adding duplicate groups') {

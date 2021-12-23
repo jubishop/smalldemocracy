@@ -7,7 +7,7 @@ module RSpec
       return ::Models::User.find_or_create(email: email)
     end
 
-    def create_group(email: 'a@a', name: rand.to_s)
+    def create_group(email: "#{rand}@#{rand}", name: rand.to_s)
       return create_user(email: email).add_group(name: name)
     end
   end
