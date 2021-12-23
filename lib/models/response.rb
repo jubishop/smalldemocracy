@@ -4,9 +4,9 @@ module Models
   class Response < Sequel::Model
     many_to_one :choice
     many_to_one :responder
-    one_through_one :poll, join_table: :responders,
+    one_through_one :poll, join_table: :choices,
                            left_key: :id,
-                           left_primary_key: :responder_id
+                           left_primary_key: :choice_id
 
     def before_validation
       unless poll.expiration >= Time.now

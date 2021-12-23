@@ -1,9 +1,10 @@
 require 'rstruct'
 require 'sequel'
 
+require_relative 'choice'
 require_relative 'helpers/poll_results'
 
-BreakdownResult = KVStruct.new(:responder, :score)
+BreakdownResult = KVStruct.new(:member, :score)
 
 module Models
   class Poll < Sequel::Model
@@ -12,7 +13,12 @@ module Models
     plugin :timestamps, update_on_create: true
 
     def members
-      return Models::Member.where(group_id: group_id).all
+      return Member.where(group_id: group_id).all
+    end
+
+    def creator
+      email = Group.where(id: group_id).select(:email)
+      return User.find(email: email)
     end
 
     def type
@@ -53,13 +59,13 @@ module Models
 
       results = Hash.new { |hash, key| hash[key] = [] }
       unresponded = []
-      responders.each { |responder|
-        if responder.responses.empty?
-          unresponded.push(responder)
+      members.each { |member|
+        if member.responses.empty?
+          unresponded.push(member)
         else
-          responder.responses.each { |response|
+          member.responses.each { |response|
             results[response.choice].push(BreakdownResult.new(
-                                              responder: responder,
+                                              member: member,
                                               score: response.score))
           }
         end

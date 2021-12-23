@@ -73,6 +73,25 @@ RSpec.describe(Models::User) {
     }
   }
 
+  context('groups') {
+    it('finds all groups it owns') {
+      user = create_user
+      group_one = user.add_group
+      group_two = user.add_group
+      expect(user.groups).to(match_array([group_one, group_two]))
+    }
+  }
+
+  context('members') {
+    it('finds all members') {
+      user = create_user
+      my_group = user.add_group
+      other_group = create_group
+      member = other_group.add_member(email: user.email)
+      expect(user.members).to(match_array(my_group.members + [member]))
+    }
+  }
+
   context('add_group') {
     it('throws error if group has no name') {
       expect {

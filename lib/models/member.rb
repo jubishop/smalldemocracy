@@ -1,9 +1,12 @@
 require 'sequel'
 
+require_relative 'response'
+
 module Models
   class Member < Sequel::Model
     many_to_one :group
     many_to_one :user, key: :email
+    one_to_many :responses
 
     def before_validation
       unless URI::MailTo::EMAIL_REGEXP.match?(email)

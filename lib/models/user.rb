@@ -5,7 +5,8 @@ require_relative 'group'
 module Models
   class User < Sequel::Model
     unrestrict_primary_key
-    one_to_many :groups
+    one_to_many :members, key: :email
+    one_to_many :groups, key: :email
     undef delete
 
     def before_validation

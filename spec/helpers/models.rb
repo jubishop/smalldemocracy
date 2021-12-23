@@ -49,6 +49,12 @@ module Models
                                     expiration: expiration,
                                     **attributes)
     }
+
+    orig_add_member = instance_method(:add_member)
+    define_method(:add_member) { |email: "#{rand}@#{rand}"|
+      test_only!
+      orig_add_member.bind_call(self, email: email)
+    }
   end
 
   class Poll

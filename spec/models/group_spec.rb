@@ -4,7 +4,7 @@ RSpec.describe(Models::Group) {
   context('delete or destroy') {
     it('will cascade destroy to members') {
       group = create_group
-      group.add_member(email: 'a@a')
+      group.add_member
       group_id = group.id
       expect(Models::Member.where(group_id: group_id).all).to_not(be_empty)
       group.destroy
@@ -39,14 +39,15 @@ RSpec.describe(Models::Group) {
 
     it('can add multiple members to a group') {
       group = create_group
-      member_one = group.add_member(email: 'a@a')
-      member_two = group.add_member(email: 'b@b')
+      member_one = group.add_member
+      member_two = group.add_member
       expect(group.members).to(include(member_one, member_two))
     }
 
     it('throws error if adding member has no email') {
       group = create_group
-      expect { group.add_member }.to(raise_error(ArgumentError))
+      expect { group.add_member(email: nil) }.to(
+          raise_error(Sequel::HookFailed))
     }
 
     it('throws error if adding member has empty email') {
@@ -77,11 +78,18 @@ RSpec.describe(Models::Group) {
       expect(poll.group).to(eq(group))
     }
 
-    it('matches members from poll to its group') {
+    it('finds members from its group') {
       group = create_group
-      group.add_member(email: 'b@b')
+      group.add_member
       poll = group.add_poll
       expect(poll.members).to(match_array(group.members))
+    }
+
+    it('finds creator') {
+      user = create_user
+      group = user.add_group
+      poll = group.add_poll
+      expect(poll.creator).to(eq(user))
     }
 
     it('defaults to creating a poll that is `borda_single` type') {

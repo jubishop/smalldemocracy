@@ -6,10 +6,10 @@ Sequel.migration {
 
     create_table(:groups) {
       primary_key :id
-      foreign_key :user_id, :users, type: String
+      foreign_key :email, :users, type: String
       String :name, null: false
       constraint(:name_not_empty) { Sequel.char_length(name) >= 1 }
-      unique(%i[name user_id], name: :name_unique)
+      unique(%i[name email], name: :name_unique)
     }
 
     create_table(:members) {
