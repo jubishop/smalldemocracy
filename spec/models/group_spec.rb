@@ -4,16 +4,16 @@ RSpec.describe(Models::Group) {
   context('delete or destroy') {
     it('will cascade destroy to members') {
       group = create_group
-      group.add_member
-      expect(group.members).to_not(be_empty)
+      member = group.add_member
+      expect(group.members).to(include(member))
       group.destroy
       expect(group.members(reload: true)).to(be_empty)
     }
 
     it('will cascade destroy to polls') {
       group = create_group
-      group.add_poll
-      expect(group.polls).to_not(be_empty)
+      poll = group.add_poll
+      expect(group.polls).to(include(poll))
       group.destroy
       expect(group.polls(reload: true)).to(be_empty)
     }
@@ -22,16 +22,16 @@ RSpec.describe(Models::Group) {
   context('add_member') {
     it('can add an existing user as a member to a group') {
       group = create_group
-      create_user(email: 'a@a')
-      member = group.add_member(email: 'a@a')
-      expect(member.user).to(eq(Models::User['a@a']))
+      user = create_user
+      member = group.add_member(email: user.email)
+      expect(member.user).to(eq(user))
       expect(group.members).to(include(member))
     }
 
     it('can add a new user as a member to a group') {
       group = create_group
-      member = group.add_member(email: 'a@a')
-      expect(member.user).to(eq(Models::User['a@a']))
+      member = group.add_member
+      expect(member.user).to(eq(Models::User.find(email: member.email)))
       expect(group.members).to(include(member))
     }
 

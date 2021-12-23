@@ -2,11 +2,9 @@ require_relative '../../lib/models/user'
 
 RSpec.describe(Models::User) {
   context('find_or_create') {
-    it('creates a user') {
-      new_user = create_user(email: 'a@a')
-      expect(new_user.email).to(eq('a@a'))
-
-      existing_user = create_user(email: 'a@a')
+    it('creates a user only once') {
+      new_user = create_user
+      existing_user = create_user(email: new_user.email)
       expect(existing_user).to(eq(new_user))
     }
 
@@ -39,11 +37,11 @@ RSpec.describe(Models::User) {
 
   context('polls') {
     before(:all) {
-      @user = create_user(email: 'me@me')
+      @user = create_user
       other_user = create_user
       my_group = @user.add_group
       other_group = other_user.add_group
-      other_group.add_member(email: 'me@me')
+      other_group.add_member(email: @user.email)
       unrelated_group = other_user.add_group
       unrelated_group.add_poll(expiration: Time.now + 10)
       unrelated_group.add_poll(expiration: Time.now - 10)
