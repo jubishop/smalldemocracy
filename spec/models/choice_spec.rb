@@ -1,29 +1,14 @@
 require_relative '../../lib/models/choice'
 
 RSpec.describe(Models::Choice) {
-  context('::create') {
-    it('successfully makes a basic choice') {
-      poll = create
-      choice = poll.add_choice(text: 'text')
-      expect(choice.text).to(eq('text'))
-    }
-
-    it('rejects making a choice with no poll associated') {
-      expect { Models::Choice.create(text: 'text') }.to(
-          raise_error(Sequel::ConstraintViolation))
-    }
-
-    it('rejects creating two choices with the same text') {
-      poll = create
-      poll.add_choice(text: 'text')
-      expect { poll.add_choice(text: 'text') }.to(
-          raise_error(Sequel::ConstraintViolation))
-    }
-
-    it('rejects creating a choice with empty text') {
-      poll = create
-      expect { poll.add_choice(text: '') }.to(
-          raise_error(Sequel::ConstraintViolation))
+  context('add_response') {
+    it('rejects adding a response without a member') {
+      choice = create_choice(expiration: Time.now + 10)
+      expect { choice.add_response }.to(
+          raise_error(Sequel::NotNullConstraintViolation))
     }
   }
+
+  # TODO: Test destroy removes all responses.
+  # TODO: Test can't add response to finished poll.
 }

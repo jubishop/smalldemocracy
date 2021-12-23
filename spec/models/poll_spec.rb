@@ -1,6 +1,8 @@
 require_relative '../../lib/models/poll'
 
 RSpec.describe(Models::Poll) {
+  # TODO: Test destroy deletes all choices and responses.
+
   context('add_choice') {
     it('rejects creating two choices with the same text') {
       poll = create_poll

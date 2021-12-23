@@ -23,6 +23,21 @@ module RSpec
           expiration: expiration,
           **attributes)
     end
+
+    def create_choice(email: "#{rand}@#{rand}",
+                      name: rand.to_s,
+                      title: rand.to_s,
+                      question: rand.to_s,
+                      expiration: Time.now,
+                      text: rand.to_s,
+                      **attributes)
+      return create_poll(email: email,
+                         name: name,
+                         title: title,
+                         question: question,
+                         expiration: expiration,
+                         **attributes).add_choice(text: text)
+    end
   end
 end
 
@@ -84,5 +99,14 @@ module Models
 
       return responses
     end
+  end
+
+  class Choice
+    include Test::Env
+    orig_add_response = instance_method(:add_response)
+    define_method(:add_response) { |score: rand(100), **attributes|
+      test_only!
+      orig_add_response.bind_call(self, score: score, **attributes)
+    }
   end
 end

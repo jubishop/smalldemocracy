@@ -6,7 +6,7 @@ Sequel.migration {
 
     create_table(:groups) {
       primary_key :id
-      foreign_key :email, :users, type: String
+      foreign_key :email, :users, type: String, null: false
       String :name, null: false
       constraint(:name_not_empty) { Sequel.char_length(name) >= 1 }
       unique(%i[name email], name: :group_unique)
@@ -14,8 +14,8 @@ Sequel.migration {
 
     create_table(:members) {
       primary_key :id
-      foreign_key :group_id, :groups, on_delete: :cascade
-      foreign_key :email, :users, type: String
+      foreign_key :group_id, :groups, null: false, on_delete: :cascade
+      foreign_key :email, :users, type: String, null: false
       unique(%i[email group_id], name: :member_unique)
     }
 
@@ -23,7 +23,7 @@ Sequel.migration {
 
     create_table(:polls) {
       uuid :id, primary_key: true, default: Sequel.function(:gen_random_uuid)
-      foreign_key :group_id, :groups, on_delete: :cascade
+      foreign_key :group_id, :groups, null: false, on_delete: :cascade
       String :title, null: false
       constraint(:title_not_empty) { Sequel.char_length(title) >= 1 }
       String :question, null: false
@@ -34,7 +34,9 @@ Sequel.migration {
 
     create_table(:choices) {
       primary_key :id
-      foreign_key :poll_id, :polls, type: :uuid, on_delete: :cascade
+      foreign_key :poll_id, :polls, type: :uuid,
+                                    null: false,
+                                    on_delete: :cascade
       String :text, null: false
       constraint(:text_not_empty) { Sequel.char_length(text) >= 1 }
       unique(%i[poll_id text], name: :choice_unique)
@@ -42,8 +44,8 @@ Sequel.migration {
 
     create_table(:responses) {
       primary_key :id
-      foreign_key :choice_id, :choices, on_delete: :cascade
-      foreign_key :member_id, :members, on_delete: :cascade
+      foreign_key :choice_id, :choices, null: false, on_delete: :cascade
+      foreign_key :member_id, :members, null: false, on_delete: :cascade
       unique(%i[member_id choice_id], name: :response_unique)
       Integer :score
     }
