@@ -13,8 +13,8 @@ module RSpec
 
     def create_poll(email: "#{rand}@#{rand}",
                     name: rand.to_s,
-                    title: 'title',
-                    question: 'question',
+                    title: rand.to_s,
+                    question: rand.to_s,
                     expiration: Time.now)
       return create_group(email: email, name: name).add_poll(
           title: title,
@@ -25,20 +25,30 @@ module RSpec
 end
 
 module Models
+  class User
+    include Test::Env
+    orig_add_group = instance_method(:add_group)
+    define_method(:add_group) { |name: rand.to_s|
+      test_only!
+      orig_add_group.bind_call(self, name: name)
+    }
+  end
+
   class Group
     include Test::Env
-
-    def add_poll(title: 'title',
-                 question: 'question',
-                 expiration: Time.now)
+    orig_add_poll = instance_method(:add_poll)
+    define_method(:add_poll) { |title: rand.to_s,
+                                question: rand.to_s,
+                                expiration: Time.now|
       test_only!
-      super(title: title, question: question, expiration: expiration)
-    end
+      orig_add_poll.bind_call(self, title: title,
+                                    question: question,
+                                    expiration: expiration)
+    }
   end
 
   class Poll
     include Test::Env
-
     def mock_response
       test_only!
       responder = responder(email: 'a@a')

@@ -38,20 +38,38 @@ RSpec.describe(Models::User) {
   }
 
   context('polls') {
-    it('finds all active polls') {
-      user = create_user(email: 'me@me')
+    before(:all) {
+      @user = create_user(email: 'me@me')
       other_user = create_user
-      my_group = user.add_group(name: 'my_group')
-      other_group = other_user.add_group(name: 'other_group')
+      my_group = @user.add_group
+      other_group = other_user.add_group
       other_group.add_member(email: 'me@me')
-      unrelated_group = other_user.add_group(name: 'unrelated_group')
-      unrelated_group.add_poll(title: 'title',
-                               question: 'question',
-                               expiration: Time.now + 10)
-      my_group.add_poll(expiration: Time.now - 10)
-      my_poll = my_group.add_poll(expiration: Time.now + 10)
-      other_poll = other_group.add_poll(expiration: Time.now + 10)
-      expect(user.polls).to(match_array([my_poll, other_poll]))
+      unrelated_group = other_user.add_group
+      unrelated_group.add_poll(expiration: Time.now + 10)
+      unrelated_group.add_poll(expiration: Time.now - 10)
+      @expired_poll = my_group.add_poll(expiration: Time.now - 10)
+      @my_poll = my_group.add_poll(expiration: Time.now + 10)
+      @other_poll = other_group.add_poll(expiration: Time.now + 10)
+      @expired_other_poll = other_group.add_poll(expiration: Time.now - 10)
+    }
+
+    it('finds all active polls with start_expiration') {
+      expect(@user.polls(start_expiration: Time.now)).to(
+          match_array([@my_poll, @other_poll]))
+    }
+
+    it('finds all expired by polls with end_expiration') {
+      expect(@user.polls(end_expiration: Time.now)).to(
+          match_array([@expired_poll, @expired_other_poll]))
+    }
+
+    it('finds all polls') {
+      expect(@user.polls).to(match_array([
+                                           @my_poll,
+                                           @other_poll,
+                                           @expired_poll,
+                                           @expired_other_poll
+                                         ]))
     }
   }
 

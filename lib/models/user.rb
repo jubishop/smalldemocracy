@@ -19,12 +19,12 @@ module Models
       cancel_action("Users (#{email}) cannot be removed")
     end
 
-    def polls(cutoff = Time.now)
+    def polls(start_expiration: nil, end_expiration: nil)
       group_ids = Models::Member.where(email: email).select(:group_id)
       return Models::Poll.where(
           [
             [:group_id, group_ids],
-            [:expiration, cutoff..]
+            [:expiration, start_expiration..end_expiration]
           ]).all
     end
 
