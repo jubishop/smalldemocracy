@@ -3,7 +3,7 @@ require_relative '../../lib/models/group'
 RSpec.describe(Models::Group) {
   context('add_member') {
     it('can add an existing user as a member to a group') {
-      group = create_group(email: 'a@a')
+      group = create_group
       create_user(email: 'b@b')
       member = group.add_member(email: 'b@b')
       expect(member.user).to(eq(Models::User['b@b']))
@@ -11,14 +11,14 @@ RSpec.describe(Models::Group) {
     }
 
     it('can add a new user as a member to a group') {
-      group = create_group(email: 'a@a')
+      group = create_group
       member = group.add_member(email: 'b@b')
       expect(member.user).to(eq(Models::User['b@b']))
       expect(group.members).to(include(member))
     }
 
     it('can add multiple members to a group') {
-      group = create_group(email: 'a@a')
+      group = create_group
       member_one = group.add_member(email: 'b@b')
       member_two = group.add_member(email: 'c@c')
       expect(group.members).to(include(member_one, member_two))
@@ -54,7 +54,7 @@ RSpec.describe(Models::Group) {
     }
 
     it('matches members from poll to its group') {
-      group = create_group(email: 'a@a')
+      group = create_group
       group.add_member(email: 'b@b')
       poll = group.add_poll(title: 'title', question: 'question',
                             expiration: Time.now)
