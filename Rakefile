@@ -23,7 +23,7 @@ namespace :db do
   }
 end
 
-return if ENV.fetch('APP_ENV') == 'production'
+return if ENV.fetch('APP_ENV', 'test') == 'production'
 
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
