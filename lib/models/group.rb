@@ -15,6 +15,10 @@ module Models
       return super(email: email)
     end
 
+    def creating_member
+      return member(email: email)
+    end
+
     def member(email:)
       return Member.find(group_id: id, email: email)
     end

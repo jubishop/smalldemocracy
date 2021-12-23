@@ -10,6 +10,9 @@ module Models
   class Poll < Sequel::Model
     many_to_one :group
     one_to_many :choices
+    many_to_many :responses, join_table: :choices,
+                             right_key: :id,
+                             right_primary_key: :choice_id
     plugin :timestamps, update_on_create: true
 
     def members

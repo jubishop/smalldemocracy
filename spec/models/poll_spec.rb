@@ -43,7 +43,7 @@ RSpec.describe(Models::Poll) {
         breakdown.each { |choice, results|
           expected_result = @expected_results[choice.to_s.to_sym]
           expect(expected_result.keys).to(
-              match_array(results.map { |r| r.responder.email.to_sym }))
+              match_array(results.map { |r| r.member.email.to_sym }))
           expect(expected_result.values).to(match_array(results.map(&:score)))
         }
       }
@@ -77,7 +77,7 @@ RSpec.describe(Models::Poll) {
         members = %w[a@a b@b c@c d@d e@e f@f]
 
         group = create_group
-      members.each { |member| group.add_member(email: member) }
+        members.each { |member| group.add_member(email: member) }
 
         @poll = group.add_poll(expiration: Time.now + 10)
         choices.each { |choice| @poll.add_choice(text: choice) }
@@ -105,7 +105,7 @@ RSpec.describe(Models::Poll) {
           five: { 'a@a': 3, 'b@b': 1, 'c@c': 1, 'd@d': 1, 'e@e': 1 },
           six: { 'a@a': 0, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
         }
-        @expected_unresponded = ['f@f']
+        @expected_unresponded = ['f@f', @poll.creator.email]
 
         @poll.expiration = 1
       }
