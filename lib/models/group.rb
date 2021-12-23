@@ -5,10 +5,9 @@ require_relative 'poll'
 
 module Models
   class Group < Sequel::Model
-    many_to_one :user, key: :email
+    many_to_one :creator, class: 'Models::User', key: :email
     one_to_many :members
     one_to_many :polls
-    alias creator user
 
     def add_member(email:)
       User.find_or_create(email: email)
