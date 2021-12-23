@@ -25,10 +25,22 @@ RSpec.describe(Models::User) {
     }
   }
 
+  context('delete or destroy') {
+    it('will not allow users to be deleted') {
+      user = create_user
+      expect { user.delete }.to(raise_error(NoMethodError))
+    }
+
+    it('will not allow users to be destroyed') {
+      user = create_user
+      expect { user.destroy }.to(raise_error(Sequel::HookFailed))
+    }
+  }
+
   context('polls') {
     it('finds all active polls') {
       user = create_user(email: 'me@me')
-      other_user = create_user(email: 'other@other')
+      other_user = create_user
       my_group = user.add_group(name: 'my_group')
       other_group = other_user.add_group(name: 'other_group')
       other_group.add_member(email: 'me@me')
@@ -66,10 +78,17 @@ RSpec.describe(Models::User) {
     }
 
     it('always adds itself as a member to any group') {
-      user = create_user(email: 'a@a')
+      user = create_user
       group = user.add_group(name: 'name')
       expect(group.members.length).to(be(1))
       expect(group.members[0].email).to(eq(group.creator.email))
+    }
+
+    it('will not allow removal of creator from group') {
+      user = create_user
+      group = user.add_group(name: 'name')
+      member = group.members.first
+      expect { member.destroy }.to(raise_error(Sequel::HookFailed))
     }
 
     it('throws error if adding duplicate groups') {

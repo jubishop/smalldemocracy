@@ -9,7 +9,7 @@ module Models
   class Poll < Sequel::Model
     many_to_one :group
     one_to_many :choices
-
+    undef delete
     plugin :timestamps, update_on_create: true
 
     def members

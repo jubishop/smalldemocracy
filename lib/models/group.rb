@@ -7,7 +7,7 @@ module Models
     many_to_one :user
     one_to_many :members
     one_to_many :polls
-
+    undef delete
     alias creator user
 
     def add_member(email:)

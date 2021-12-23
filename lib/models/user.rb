@@ -6,12 +6,17 @@ module Models
   class User < Sequel::Model
     unrestrict_primary_key
     one_to_many :groups
+    undef delete
 
     def before_validation
       unless URI::MailTo::EMAIL_REGEXP.match?(email)
         cancel_action("Email: #{email}, is invalid")
       end
       super
+    end
+
+    def before_destroy
+      cancel_action("Users (#{email}) cannot be removed")
     end
 
     def polls(cutoff = Time.now)
