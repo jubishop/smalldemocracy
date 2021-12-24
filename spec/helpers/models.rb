@@ -55,7 +55,7 @@ module Models
   class Group
     include Test::Env
     orig_add_poll = instance_method(:add_poll)
-    define_method(:add_poll) { |email: members.first.email,
+    define_method(:add_poll) { |email: members.sample.email,
                                 title: rand.to_s,
                                 question: rand.to_s,
                                 expiration: Time.now,
