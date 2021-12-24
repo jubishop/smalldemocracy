@@ -108,7 +108,7 @@ RSpec.describe(Models::User) {
       expect(user.created_polls).to(match_array(poll))
     }
 
-    it('rejects creating a poll if no group') {
+    it('rejects creating a poll with no group') {
       user = create_user
       expect { user.add_poll(group_id: nil) }.to(
           raise_error(Sequel::HookFailed))
