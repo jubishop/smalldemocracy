@@ -7,8 +7,7 @@ module Models
     unrestrict_primary_key
     one_to_many :members, key: :email
     one_to_many :groups, key: :email
-    one_to_many :created_polls, class: 'Models::Poll', key: email
-    undef delete
+    one_to_many :created_polls, class: 'Models::Poll', key: :email
 
     def before_validation
       unless URI::MailTo::EMAIL_REGEXP.match?(email)
@@ -17,6 +16,7 @@ module Models
       super
     end
 
+    undef_method :delete
     def before_destroy
       cancel_action("Users (#{email}) cannot be removed")
     end
