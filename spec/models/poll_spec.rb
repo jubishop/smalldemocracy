@@ -5,7 +5,7 @@ RSpec.describe(Models::Poll) {
   # TODO: Test about creator
   # TODO: Test creating_member
   # TODO: Test can't add a choice to expired poll.
-
+  # TODO: Test hashids
   # it('defaults to creating a poll that is `borda_single` type') {
   #   group = create_group
   #   poll = group.creator.add_poll

@@ -6,7 +6,7 @@ Sequel.migration {
     }
 
     create_table(:groups) {
-      primary_key :id
+      primary_key :id, type: :Bignum
       foreign_key :email, :users, type: String, null: false
       String :name, null: false
       constraint(:name_not_empty) { Sequel.char_length(name) >= 1 }
@@ -14,18 +14,22 @@ Sequel.migration {
     }
 
     create_table(:members) {
-      primary_key :id
+      primary_key :id, type: :Bignum
       foreign_key :email, :users, type: String, null: false
-      foreign_key :group_id, :groups, null: false, on_delete: :cascade
+      foreign_key :group_id, :groups, type: :Bignum,
+                                      null: false,
+                                      on_delete: :cascade
       unique(%i[email group_id], name: :member_unique)
     }
 
     create_enum(:poll_type, %w[borda_single borda_split choose_one])
 
     create_table(:polls) {
-      uuid :id, primary_key: true, default: Sequel.function(:gen_random_uuid)
+      primary_key :id, type: :Bignum
       foreign_key :email, :users, type: String, null: false
-      foreign_key :group_id, :groups, null: false, on_delete: :cascade
+      foreign_key :group_id, :groups, type: :Bignum,
+                                      null: false,
+                                      on_delete: :cascade
       String :title, null: false
       constraint(:title_not_empty) { Sequel.char_length(title) >= 1 }
       String :question, null: false
@@ -35,8 +39,8 @@ Sequel.migration {
     }
 
     create_table(:choices) {
-      primary_key :id
-      foreign_key :poll_id, :polls, type: :uuid,
+      primary_key :id, type: :Bignum
+      foreign_key :poll_id, :polls, type: :Bignum,
                                     null: false,
                                     on_delete: :cascade
       String :text, null: false
@@ -45,9 +49,13 @@ Sequel.migration {
     }
 
     create_table(:responses) {
-      primary_key :id
-      foreign_key :choice_id, :choices, null: false, on_delete: :cascade
-      foreign_key :member_id, :members, null: false, on_delete: :cascade
+      primary_key :id, type: :Bignum
+      foreign_key :choice_id, :choices, type: :Bignum,
+                                        null: false,
+                                        on_delete: :cascade
+      foreign_key :member_id, :members, type: :Bignum,
+                                        null: false,
+                                        on_delete: :cascade
       unique(%i[member_id choice_id], name: :response_unique)
       Integer :score
     }
