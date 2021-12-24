@@ -31,15 +31,13 @@ module Models
     end
 
     def groups
-      group_ids = Models::Member.where(email: email).select(:group_id)
-      return Models::Group.where(id: group_ids).all
+      return Models::Group.where(id: members_dataset.select(:group_id)).all
     end
 
     def polls(start_expiration: nil, end_expiration: nil)
-      group_ids = Models::Member.where(email: email).select(:group_id)
       return Models::Poll.where(
           [
-            [:group_id, group_ids],
+            [:group_id, members_dataset.select(:group_id)],
             [:expiration, start_expiration..end_expiration]
           ]).all
     end

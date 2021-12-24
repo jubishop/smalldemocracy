@@ -19,7 +19,7 @@ module Models
     end
 
     def member(email:)
-      return Member.find(group_id: id, email: email)
+      return members.find { |member| member.email == email }
     end
 
     def url
