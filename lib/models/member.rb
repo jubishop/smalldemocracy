@@ -22,6 +22,10 @@ module Models
       super
     end
 
+    def add_poll(**attributes)
+      group.add_poll(email: email, **attributes)
+    end
+
     def to_s
       return email
     end

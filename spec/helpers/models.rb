@@ -25,6 +25,11 @@ module RSpec
           **attributes)
     end
 
+    def create_member(email: "#{rand}@#{rand}",
+                      name: rand.to_s)
+      return create_group(email: email, name: name).add_member
+    end
+
     def create_choice(email: "#{rand}@#{rand}",
                       name: rand.to_s,
                       title: rand.to_s,
@@ -102,14 +107,5 @@ module Models
 
       return responses
     end
-  end
-
-  class Choice
-    include Test::Env
-    orig_add_response = instance_method(:add_response)
-    define_method(:add_response) { |score: rand(100), **attributes|
-      test_only!
-      orig_add_response.bind_call(self, score: score, **attributes)
-    }
   end
 end

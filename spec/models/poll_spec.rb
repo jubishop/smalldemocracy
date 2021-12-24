@@ -4,6 +4,7 @@ RSpec.describe(Models::Poll) {
   # TODO: Test destroy deletes all choices and responses.
   # TODO: Test about creator
   # TODO: Test creating_member
+  # TODO: Test creating a poll with all attributes
 
   context('add_choice') {
     it('rejects creating two choices with the same text') {

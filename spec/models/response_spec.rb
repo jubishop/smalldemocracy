@@ -16,14 +16,14 @@ RSpec.describe(Models::Response) {
     it('rejects making a response with no responder associated') {
       poll = create
       expect {
-        poll.choices.first.add_response
+        poll.choices.first.add_response({})
       }.to(raise_error(ArgumentError))
     }
 
     it('rejects making a response with no choice associated') {
       poll = create
       expect {
-        poll.responders.first.add_response
+        poll.responders.first.add_response({})
       }.to(raise_error(ArgumentError))
     }
 

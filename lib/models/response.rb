@@ -9,6 +9,7 @@ module Models
                            left_primary_key: :choice_id
 
     def before_validation
+      cancel_action('Poll does not exist') unless poll
       unless poll.expiration >= Time.now
         cancel_action('Poll has already finished')
       end
