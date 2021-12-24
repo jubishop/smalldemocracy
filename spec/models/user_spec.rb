@@ -1,5 +1,6 @@
 require_relative '../../lib/models/user'
 
+# Test created_polls
 RSpec.describe(Models::User) {
   context('find_or_create') {
     it('creates a user only once') {

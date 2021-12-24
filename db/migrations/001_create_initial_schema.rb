@@ -15,8 +15,8 @@ Sequel.migration {
 
     create_table(:members) {
       primary_key :id
-      foreign_key :group_id, :groups, null: false, on_delete: :cascade
       foreign_key :email, :users, type: String, null: false
+      foreign_key :group_id, :groups, null: false, on_delete: :cascade
       unique(%i[email group_id], name: :member_unique)
     }
 

@@ -7,6 +7,7 @@ module Models
     unrestrict_primary_key
     one_to_many :members, key: :email
     one_to_many :groups, key: :email
+    one_to_many :created_polls, class: 'Models::Poll', key: email
     undef delete
 
     def before_validation
