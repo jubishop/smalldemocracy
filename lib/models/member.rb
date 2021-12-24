@@ -9,14 +9,16 @@ module Models
     one_to_many :responses
 
     def before_validation
+      cancel_action('Member created with no email') unless email
+      cancel_action('Member created with empty email') if email.empty?
       unless URI::MailTo::EMAIL_REGEXP.match?(email)
-        cancel_action("Email: #{email}, is invalid")
+        cancel_action("Member created with invalid email: '#{email}'")
       end
       super
     end
 
     def before_destroy
-      if email == group.creator.email
+      if self == group.creating_member
         cancel_action("Creators (#{email}) cannot be removed from their groups")
       end
       super

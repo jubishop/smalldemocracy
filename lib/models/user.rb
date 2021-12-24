@@ -15,7 +15,7 @@ module Models
       cancel_action('User created with no email') unless email
       cancel_action('User created with empty email') if email.empty?
       unless URI::MailTo::EMAIL_REGEXP.match?(email)
-        cancel_action("Email: '#{email}', is invalid")
+        cancel_action("User created with invalid email: '#{email}'")
       end
       super
     end

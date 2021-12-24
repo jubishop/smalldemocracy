@@ -13,8 +13,8 @@ RSpec.describe(Models::Group) {
                       /null value in column "name"/))
     }
 
-    it('throws error if group has empty name') {
-      expect { create_group(name: '')}.to(
+    it('rejects creating group with empty name') {
+      expect { create_group(name: '') }.to(
           raise_error(Sequel::CheckConstraintViolation,
                       /violate.+"name_not_empty"/))
     }
@@ -110,7 +110,8 @@ RSpec.describe(Models::Group) {
 
     it('rejects adding member with invalid email') {
       expect { create_group.add_member(email: 'invalid@') }.to(
-          raise_error(Sequel::HookFailed, "Email: 'invalid@', is invalid"))
+          raise_error(Sequel::HookFailed,
+                      "User created with invalid email: 'invalid@'"))
     }
 
     it('rejects adding duplicate members') {

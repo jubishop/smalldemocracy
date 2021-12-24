@@ -9,8 +9,9 @@ module Models
                            left_primary_key: :choice_id
 
     def before_validation
-      cancel_action('Poll does not exist') unless poll
-      cancel_action('Poll has already finished') if poll.finished?
+      cancel_action('Response created with no choice') unless choice
+      cancel_action('Response created with no poll') unless poll
+      cancel_action('Response created for expired poll') if poll.finished?
       super
     end
 
