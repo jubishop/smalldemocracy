@@ -12,15 +12,17 @@ module Models
     alias add_poll add_created_poll
 
     def before_validation
+      cancel_action('User created with no email') unless email
+      cancel_action('User created with empty email') if email.empty?
       unless URI::MailTo::EMAIL_REGEXP.match?(email)
-        cancel_action("Email: #{email}, is invalid")
+        cancel_action("Email: '#{email}', is invalid")
       end
       super
     end
 
     undef_method :delete
     def before_destroy
-      cancel_action("Users (#{email}) cannot be removed")
+      cancel_action('Users cannot be destroyed')
     end
 
     def _add_created_group(group)

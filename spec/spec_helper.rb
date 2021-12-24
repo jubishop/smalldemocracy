@@ -58,6 +58,10 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.expect_with(:rspec) do |expect|
+    expect.max_formatted_output_length = 200
+  end
+
   config.shared_context_metadata_behavior = :apply_to_host_groups
   config.disable_monkey_patching!
   config.default_formatter = 'doc'

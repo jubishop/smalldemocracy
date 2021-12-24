@@ -1,5 +1,17 @@
 require_relative '../../lib/models/group'
 
+# TODO: Put these here.
+# it('throws error if group has no name') {
+#   expect {
+#     create_group(name: nil)
+#   }.to(raise_error(Sequel::NotNullConstraintViolation))
+# }
+
+# it('throws error if group has empty name') {
+#   expect {
+#     create_group(name: '')
+#   }.to(raise_error(Sequel::CheckConstraintViolation))
+# }
 RSpec.describe(Models::Group) {
   context('delete or destroy') {
     it('will cascade destroy to members') {

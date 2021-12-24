@@ -11,6 +11,11 @@ module RSpec
       return create_user(email: email).add_group(name: name)
     end
 
+    def create_member(email: "#{rand}@#{rand}",
+                      name: rand.to_s)
+      return create_group(email: email, name: name).add_member
+    end
+
     def create_poll(email: "#{rand}@#{rand}",
                     name: rand.to_s,
                     title: rand.to_s,
@@ -23,11 +28,6 @@ module RSpec
           question: question,
           expiration: expiration,
           **attributes)
-    end
-
-    def create_member(email: "#{rand}@#{rand}",
-                      name: rand.to_s)
-      return create_group(email: email, name: name).add_member
     end
 
     def create_choice(email: "#{rand}@#{rand}",
@@ -75,7 +75,7 @@ module Models
   class Group
     include Test::Env
     orig_add_poll = instance_method(:add_poll)
-    define_method(:add_poll) { |email: members.sample.email,
+    define_method(:add_poll) { |email: members.sample&.email,
                                 title: rand.to_s,
                                 question: rand.to_s,
                                 expiration: Time.now,

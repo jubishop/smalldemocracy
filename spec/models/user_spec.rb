@@ -8,43 +8,82 @@ RSpec.describe(Models::User) {
       expect(existing_user).to(eq(new_user))
     }
 
-    it('throws error if user has no email') {
-      expect { create_user(email: nil) }.to(raise_error(Sequel::HookFailed))
+    it('rejects creating user with no email') {
+      expect { create_user(email: nil) }.to(
+          raise_error(Sequel::HookFailed, 'User created with no email'))
     }
 
-    it('throws error if user has empty email') {
-      expect { create_user(email: '') }.to(raise_error(Sequel::HookFailed))
+    it('rejects creating user with empty email') {
+      expect { create_user(email: '') }.to(
+          raise_error(Sequel::HookFailed, 'User created with empty email'))
     }
 
-    it('throws error if user has invalid email') {
-      expect {
-        create_user(email: 'invalid@')
-      }.to(raise_error(Sequel::HookFailed))
+    it('rejects creating user with invalid email') {
+      expect { create_user(email: 'invalid@') }.to(
+          raise_error(Sequel::HookFailed, "Email: 'invalid@', is invalid"))
     }
   }
 
-  context('delete or destroy') {
-    it('will not allow users to be deleted') {
+  context('delete') {
+    it('rejects deleting users') {
       user = create_user
-      expect { user.delete }.to(raise_error(NoMethodError))
+      expect { user.delete }.to(
+          raise_error(NoMethodError, /undefined method `delete'/))
     }
+  }
 
-    it('will not allow users to be destroyed') {
+  context('destroy') {
+    it('rejects destroying users') {
       user = create_user
-      expect { user.destroy }.to(raise_error(Sequel::HookFailed))
+      expect { user.destroy }.to(
+          raise_error(Sequel::HookFailed, 'Users cannot be destroyed'))
+    }
+  }
+
+  context('members') {
+    it('finds all members from any group') {
+      user = create_user
+      group = user.add_group
+      member = create_group.add_member(email: user.email)
+      expect(user.members).to(match_array([group.creating_member] + [member]))
+    }
+  }
+
+  context('created_groups') {
+    it('finds all groups it created') {
+      user = create_user
+      group = user.add_group
+      expect(user.created_groups).to(match_array(group))
+    }
+  }
+
+  context('created_polls') {
+    it('finds all created polls from any group') {
+      user = create_user
+      my_poll = user.add_group.add_poll(email: user.email)
+      other_group = create_group
+      other_group.add_member(email: user.email)
+      other_poll = other_group.add_poll(email: user.email)
+      expect(user.created_polls).to(match_array([my_poll, other_poll]))
+    }
+  }
+
+  context('groups') {
+    it('finds all groups it is in from any creator') {
+      user = create_user
+      my_group = user.add_group
+      other_group = create_group
+      other_group.add_member(email: user.email)
+      expect(user.groups).to(match_array([my_group, other_group]))
     }
   }
 
   context('polls') {
     before(:all) {
       @user = create_user
-      other_user = create_user
       my_group = @user.add_group
-      other_group = other_user.add_group
+      other_group = create_group
       other_group.add_member(email: @user.email)
-      unrelated_group = other_user.add_group
-      unrelated_group.add_poll(expiration: Time.now + 10)
-      unrelated_group.add_poll(expiration: Time.now - 10)
       @expired_poll = my_group.add_poll(expiration: Time.now - 10)
       @my_poll = my_group.add_poll(expiration: Time.now + 10)
       @other_poll = other_group.add_poll(expiration: Time.now + 10)
@@ -71,70 +110,25 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('created_groups') {
-    it('finds all groups it owns') {
-      user = create_user
-      group = user.add_group
-      expect(user.created_groups).to(match_array(group))
-    }
-  }
-
-  context('groups') {
-    it('finds all groups it is in') {
-      user = create_user
-      my_group = user.add_group
-      other_group = create_user.add_group
-      other_group.add_member(email: user.email)
-      expect(user.groups).to(match_array([my_group, other_group]))
-    }
-  }
-
-  context('members') {
-    it('finds all members from any group') {
-      user = create_user
-      my_group = user.add_group
-      other_group = create_group
-      member = other_group.add_member(email: user.email)
-      expect(user.members).to(match_array(my_group.members + [member]))
-    }
-  }
-
-  context('created_polls') {
-    it('finds all created polls from any group') {
-      user = create_user
-      other_group = create_group
-      other_group.add_member(email: user.email)
-      my_poll = user.add_group.add_poll(email: user.email)
-      other_poll = other_group.add_poll(email: user.email)
-      expect(user.created_polls).to(match_array([my_poll, other_poll]))
-    }
-  }
-
   context('add_poll') {
     it('can add a poll to a user') {
       user = create_user
-      user.add_group
-      poll = user.add_poll
+      poll = user.add_group.add_poll
       expect(user.created_polls).to(match_array(poll))
     }
 
     it('rejects creating a poll with no group') {
       user = create_user
-      expect { user.add_poll }.to(raise_error(Sequel::HookFailed))
+      expect { user.add_poll }.to(
+          raise_error(Sequel::HookFailed, 'Poll created with no group'))
     }
   }
 
   context('add_group') {
-    it('throws error if group has no name') {
-      expect {
-        create_group(name: nil)
-      }.to(raise_error(Sequel::NotNullConstraintViolation))
-    }
-
-    it('throws error if group has empty name') {
-      expect {
-        create_group(name: '')
-      }.to(raise_error(Sequel::CheckConstraintViolation))
+    it('can add a group to a user') {
+      user = create_user
+      group = user.add_group
+      expect(user.created_groups).to(match_array(group))
     }
 
     it('always adds itself as a member to any group') {
@@ -143,12 +137,12 @@ RSpec.describe(Models::User) {
       expect(group.members.map(&:email)).to(match_array(group.creator.email))
     }
 
-    it('throws error if adding duplicate groups') {
+    it('rejects adding duplicate groups') {
       user = create_user
       user.add_group(name: 'duplicate_name')
-      expect {
-        user.add_group(name: 'duplicate_name')
-      }.to(raise_error(Sequel::UniqueConstraintViolation))
+      expect { user.add_group(name: 'duplicate_name') }.to(
+          raise_error(Sequel::UniqueConstraintViolation,
+                      /Key \(name, email\).+already exists/))
     }
   }
 }
