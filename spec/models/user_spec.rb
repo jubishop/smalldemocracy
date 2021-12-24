@@ -116,6 +116,14 @@ RSpec.describe(Models::User) {
     }
   }
 
+  context('add_member') {
+    it('rejects adding members directly from user') {
+      user = create_user
+      expect { user.add_member }.to(
+          raise_error(NoMethodError, /undefined method `add_member'/))
+    }
+  }
+
   context('add_poll') {
     it('adds a poll to a user') {
       user = create_user

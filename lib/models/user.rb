@@ -16,6 +16,7 @@ module Models
   class User < Sequel::Model
     unrestrict_primary_key
     one_to_many :members, key: :email
+    undef_method :add_member
     one_to_many :created_groups, class: 'Models::Group', key: :email
     alias add_group add_created_group
     one_to_many :created_polls, class: 'Models::Poll', key: :email
