@@ -26,8 +26,7 @@ GEM
     colorize (0.8.1)
     concurrent-ruby (1.1.9)
     cri (2.15.11)
-    diff-lcs (1.4.4)
-    ipaddr (1.2.3)
+    diff-lcs (1.5.0)
     linguistics (2.1.0)
       loggability (~> 0.11)
     loggability (0.18.2)
@@ -39,8 +38,7 @@ GEM
     nokogiri (1.12.5-x86_64-linux)
       racc (~> 1.4)
     open3 (0.1.1)
-    openssl (2.2.1)
-      ipaddr
+    openssl (3.0.0)
     parallel (1.21.0)
     parser (3.0.3.2)
       ast (~> 2.4.1)
@@ -76,13 +74,13 @@ GEM
     rspec_n (1.4.0)
       colorize (~> 0.8.0)
       cri (~> 2.15.3)
-    rubocop (1.23.0)
+    rubocop (1.24.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.12.0, < 2.0)
+      rubocop-ast (>= 1.15.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.15.0)
@@ -98,6 +96,8 @@ GEM
       rubocop (~> 1.0)
     ruby-progressbar (1.11.0)
     sequel (5.51.0)
+    sequel-annotate (1.7.0)
+      sequel (>= 4)
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
@@ -171,6 +171,7 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-sequel
   sequel
+  sequel-annotate
   slim
   tony!
   tony-auth!

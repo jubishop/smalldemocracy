@@ -1,18 +1,19 @@
+def connect_sequel_db # rubocop:disable Style/TopLevelMethodDefinition
+  case ENV.fetch('APP_ENV')
+  when 'production'
+    return Sequel.postgres(ENV.fetch('DATABASE_URL'))
+  when 'development'
+    return Sequel.postgres(database: 'smalldemocracy_dev')
+  end
+end
+
 namespace :db do
   desc 'Run migrations'
   task(:migrate, [:version]) { |_, args|
-    require 'sequel/core'
-
-    Sequel.extension(:migration)
     version = args[:version].to_i if args[:version]
-
-    db = case ENV.fetch('APP_ENV')
-         when 'production'
-           Sequel.postgres(ENV.fetch('DATABASE_URL'))
-         when 'development'
-           Sequel.postgres(database: 'smalldemocracy_dev')
-         end
-
+    require 'sequel/core'
+    Sequel.extension(:migration)
+    db = connect_sequel_db
     db.extension(:pg_enum)
     Sequel::Migrator.run(db, 'db/migrations', target: version)
   }
@@ -68,6 +69,16 @@ task(:rspec_n, [:count]) { |_, args|
   end
 
   `rm rspec_n_iteration*`
+}
+
+desc('Annotate sequel classes')
+task(:annotate) {
+  require 'sequel/core'
+  connect_sequel_db
+  Dir['lib/models/*.rb'].each { |file| require_relative file }
+  require 'sequel/annotate'
+  Sequel::Annotate.annotate(Dir['lib/models/*.rb'], namespace: 'Models',
+                                                    position: :before)
 }
 
 desc('Compile all scss files to compressed css')
