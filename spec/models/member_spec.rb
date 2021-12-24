@@ -1,17 +1,40 @@
 require_relative '../../lib/models/group'
 
-# TODO: Test add_response
 # TODO: Test add_poll
 
 RSpec.describe(Models::Member) {
+  context('create') {
+    it('creates a member') {
+      member = create_member(email: 'me@email')
+      expect(member.email).to(eq('me@email'))
+    }
+
+    it('rejects creating member with no email') {
+      expect { create_member(email: nil) }.to(
+          raise_error(Sequel::HookFailed, 'User created with no email'))
+    }
+
+    it('rejects creating member with empty email') {
+      expect { create_member(email: '') }.to(
+          raise_error(Sequel::HookFailed, 'User created with empty email'))
+    }
+
+    it('rejects creating member with invalid email') {
+      expect { create_member(email: 'invalid@') }.to(
+          raise_error(Sequel::HookFailed,
+                      "User created with invalid email: 'invalid@'"))
+    }
+  }
+
   context('destroy') {
     it('rejects destroying creating member from group') {
-      expect { create_group.creating_member.destroy }.to(
-          raise_error(Sequel::HookFailed))
+      expect { create_member.destroy }.to(
+          raise_error(Sequel::HookFailed,
+                      /Creators.+cannot be removed from their group/))
     }
 
     it('destroys any responses') {
-      member = create_member
+      member = create_group.add_member
       poll = member.add_poll(expiration: Time.now + 10)
       response = member.add_response(choice_id: poll.add_choice.id)
       expect(poll.responses).to(match_array(response))

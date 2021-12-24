@@ -98,22 +98,6 @@ RSpec.describe(Models::Group) {
       expect(group.members).to(match_array([group.creating_member, member]))
     }
 
-    it('rejects adding member with no email') {
-      expect { create_group.add_member(email: nil) }.to(
-          raise_error(Sequel::HookFailed, 'User created with no email'))
-    }
-
-    it('rejects adding member with empty email') {
-      expect { create_group.add_member(email: '') }.to(
-          raise_error(Sequel::HookFailed, 'User created with empty email'))
-    }
-
-    it('rejects adding member with invalid email') {
-      expect { create_group.add_member(email: 'invalid@') }.to(
-          raise_error(Sequel::HookFailed,
-                      "User created with invalid email: 'invalid@'"))
-    }
-
     it('rejects adding duplicate members') {
       group = create_group
       group.add_member(email: 'dup@dup')

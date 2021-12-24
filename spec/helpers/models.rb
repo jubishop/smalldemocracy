@@ -13,7 +13,7 @@ module RSpec
 
     def create_member(email: "#{rand}@#{rand}",
                       name: rand.to_s)
-      return create_group(email: email, name: name).add_member
+      return create_group(email: email, name: name).creating_member
     end
 
     def create_poll(email: "#{rand}@#{rand}",
