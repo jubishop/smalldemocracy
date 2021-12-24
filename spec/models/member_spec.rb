@@ -1,7 +1,5 @@
 require_relative '../../lib/models/group'
 
-# TODO: Test add_poll
-
 RSpec.describe(Models::Member) {
   context('create') {
     it('creates a member') {
@@ -64,6 +62,36 @@ RSpec.describe(Models::Member) {
       expect { member.add_response({}) }.to(
           raise_error(Sequel::HookFailed,
                       'Response created with no choice'))
+    }
+  }
+
+  context('add_poll') {
+    it('adds a poll to a member') {
+      member = create_member
+      poll = member.add_poll
+      expect(member.polls).to(match_array(poll))
+    }
+  }
+
+  context('polls') {
+    before(:all) {
+      @member = create_member
+      @expired_poll = @member.add_poll(expiration: Time.now - 10)
+      @my_poll = @member.add_poll(expiration: Time.now + 10)
+    }
+
+    it('finds all active polls with start_expiration') {
+      expect(@member.polls(start_expiration: Time.now)).to(
+          match_array(@my_poll))
+    }
+
+    it('finds all expired by polls with end_expiration') {
+      expect(@member.polls(end_expiration: Time.now)).to(
+          match_array(@expired_poll))
+    }
+
+    it('finds all polls') {
+      expect(@member.polls).to(match_array([@my_poll, @expired_poll]))
     }
   }
 }

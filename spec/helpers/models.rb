@@ -95,6 +95,21 @@ module Models
     }
   end
 
+  class Member
+    include Test::Env
+    orig_add_poll = instance_method(:add_poll)
+    define_method(:add_poll) { |title: rand.to_s,
+                                question: rand.to_s,
+                                expiration: Time.now,
+                                **attributes|
+      test_only!
+      orig_add_poll.bind_call(self, title: title,
+                                    question: question,
+                                    expiration: expiration,
+                                    **attributes)
+    }
+  end
+
   class Poll
     include Test::Env
     orig_add_choice = instance_method(:add_choice)

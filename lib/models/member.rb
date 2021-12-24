@@ -36,7 +36,15 @@ module Models
     end
 
     def add_poll(**attributes)
-      group.add_poll(email: email, **attributes)
+      return Models::Poll.create(group_id: group_id, email: email, **attributes)
+    end
+
+    def polls(start_expiration: nil, end_expiration: nil)
+      return Models::Poll.where(
+          [
+            [:group_id, group_id],
+            [:expiration, start_expiration..end_expiration]
+          ]).all
     end
 
     def to_s
