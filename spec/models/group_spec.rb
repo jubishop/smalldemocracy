@@ -83,6 +83,11 @@ RSpec.describe(Models::Group) {
           raise_error(Sequel::HookFailed))
     }
 
+    it('rejects creating a poll with no email') {
+      group = create_group
+      expect { group.add_poll(email: nil) }.to(raise_error(Sequel::HookFailed))
+    }
+
     it('defaults to creating a poll that is `borda_single` type') {
       group = create_group
       poll = group.add_poll

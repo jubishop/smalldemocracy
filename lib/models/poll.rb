@@ -17,6 +17,8 @@ module Models
     plugin :timestamps, update_on_create: true
 
     def before_validation
+      cancel_action('Poll created with no group') unless group_id
+      cancel_action('Poll created with no creator') unless email
       unless member(email: creator.email)
         cancel_action("Creator: #{email} is not a group member")
       end

@@ -55,6 +55,21 @@ module Models
       test_only!
       orig_add_group.bind_call(self, name: name)
     }
+
+    include Test::Env
+    orig_add_poll = instance_method(:add_poll)
+    define_method(:add_poll) { |group_id: groups.sample.id,
+                                title: rand.to_s,
+                                question: rand.to_s,
+                                expiration: Time.now,
+                                **attributes|
+      test_only!
+      orig_add_poll.bind_call(self, group_id: group_id,
+                                    title: title,
+                                    question: question,
+                                    expiration: expiration,
+                                    **attributes)
+    }
   end
 
   class Group

@@ -100,6 +100,21 @@ RSpec.describe(Models::User) {
     }
   }
 
+  context('add_poll') {
+    it('creates a poll successfully') {
+      user = create_user
+      user.add_group
+      poll = user.add_poll
+      expect(user.created_polls).to(match_array(poll))
+    }
+
+    it('rejects creating a poll if no group') {
+      user = create_user
+      expect { user.add_poll(group_id: nil) }.to(
+          raise_error(Sequel::HookFailed))
+    }
+  }
+
   context('add_group') {
     it('throws error if group has no name') {
       expect {

@@ -8,6 +8,7 @@ module Models
     one_to_many :members, key: :email
     one_to_many :groups, key: :email
     one_to_many :created_polls, class: 'Models::Poll', key: :email
+    alias add_poll add_created_poll
 
     def before_validation
       unless URI::MailTo::EMAIL_REGEXP.match?(email)
