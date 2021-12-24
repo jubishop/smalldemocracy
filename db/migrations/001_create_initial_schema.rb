@@ -1,5 +1,6 @@
 Sequel.migration {
   change {
+    # TODO: Test simple successful creation of every model's attributes.
     create_table(:users) {
       String :email, primary_key: true
     }

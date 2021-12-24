@@ -4,7 +4,6 @@ RSpec.describe(Models::Poll) {
   # TODO: Test destroy deletes all choices and responses.
   # TODO: Test about creator
   # TODO: Test creating_member
-  # TODO: Test creating a poll with all attributes
   # TODO: Test can't add a choice to expired poll.
 
   context('add_choice') {

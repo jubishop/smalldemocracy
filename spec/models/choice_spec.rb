@@ -28,6 +28,5 @@ RSpec.describe(Models::Choice) {
     }
   }
 
-  # TODO: Test destroy removes all responses.
   # TODO: Can't remove choice after poll has expired.
 }
