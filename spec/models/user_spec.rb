@@ -1,6 +1,5 @@
 require_relative '../../lib/models/user'
 
-# Test created_polls
 RSpec.describe(Models::User) {
   context('find_or_create') {
     it('creates a user only once') {
@@ -75,19 +74,29 @@ RSpec.describe(Models::User) {
   context('groups') {
     it('finds all groups it owns') {
       user = create_user
-      group_one = user.add_group
-      group_two = user.add_group
-      expect(user.groups).to(match_array([group_one, group_two]))
+      group = user.add_group
+      expect(user.groups).to(match_array(group))
     }
   }
 
   context('members') {
-    it('finds all members') {
+    it('finds all members from any group') {
       user = create_user
       my_group = user.add_group
       other_group = create_group
       member = other_group.add_member(email: user.email)
       expect(user.members).to(match_array(my_group.members + [member]))
+    }
+  }
+
+  context('created_polls') {
+    it('finds all created polls from any group') {
+      user = create_user
+      other_group = create_group
+      other_group.add_member(email: user.email)
+      my_poll = user.add_group.add_poll(email: user.email)
+      other_poll = other_group.add_poll(email: user.email)
+      expect(user.created_polls).to(match_array([my_poll, other_poll]))
     }
   }
 
@@ -107,8 +116,7 @@ RSpec.describe(Models::User) {
     it('always adds itself as a member to any group') {
       user = create_user
       group = user.add_group
-      expect(group.members.length).to(be(1))
-      expect(group.members[0].email).to(eq(group.creator.email))
+      expect(group.members.map(&:email)).to(match_array(group.creator.email))
     }
 
     it('throws error if adding duplicate groups') {
