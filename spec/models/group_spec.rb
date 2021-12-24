@@ -70,11 +70,17 @@ RSpec.describe(Models::Group) {
   }
 
   context('add_poll') {
-    # TODO: Ensure poll creator is part of members
     it('can add a poll to a group') {
       group = create_group
       poll = group.add_poll
       expect(poll.group).to(eq(group))
+    }
+
+    it('refuses to create a poll where member is not in group') {
+      group = create_group
+      user = create_user
+      expect { group.add_poll(email: user.email) }.to(
+          raise_error(Sequel::HookFailed))
     }
 
     it('defaults to creating a poll that is `borda_single` type') {

@@ -16,6 +16,13 @@ module Models
                              right_primary_key: :choice_id
     plugin :timestamps, update_on_create: true
 
+    def before_validation
+      unless member(email: creator.email)
+        cancel_action("Creator: #{email} is not a group member")
+      end
+      super
+    end
+
     def members
       return Member.where(group_id: group_id).all
     end
