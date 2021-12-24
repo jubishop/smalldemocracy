@@ -1,5 +1,7 @@
 require_relative '../../lib/models/choice'
 
+# TODO: Test can't remove a choice from expired poll.
+
 RSpec.describe(Models::Choice) {
   context('delete or destroy') {
     it('will remove any responses upon destroy') {
