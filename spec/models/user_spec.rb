@@ -101,7 +101,7 @@ RSpec.describe(Models::User) {
   }
 
   context('add_poll') {
-    it('creates a poll successfully') {
+    it('can add a poll to a user') {
       user = create_user
       user.add_group
       poll = user.add_poll
@@ -112,6 +112,24 @@ RSpec.describe(Models::User) {
       user = create_user
       expect { user.add_poll(group_id: nil) }.to(
           raise_error(Sequel::HookFailed))
+    }
+
+    it('defaults to creating a poll that is `borda_single` type') {
+      group = create_group
+      poll = group.creator.add_poll
+      expect(poll.type).to(eq(:borda_single))
+    }
+
+    it('can create polls with other valid types') {
+      group = create_group
+      poll = group.creator.add_poll(type: :borda_split)
+      expect(poll.type).to(eq(:borda_split))
+    }
+
+    it('rejects creation of polls of invalid type') {
+      group = create_group
+      expect { group.creator.add_poll(type: :not_valid_type) }.to(
+          raise_error(Sequel::DatabaseError))
     }
   }
 
