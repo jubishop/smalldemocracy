@@ -71,11 +71,21 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('groups') {
+  context('created_groups') {
     it('finds all groups it owns') {
       user = create_user
       group = user.add_group
-      expect(user.groups).to(match_array(group))
+      expect(user.created_groups).to(match_array(group))
+    }
+  }
+
+  context('groups') {
+    it('finds all groups it is in') {
+      user = create_user
+      my_group = user.add_group
+      other_group = create_user.add_group
+      other_group.add_member(email: user.email)
+      expect(user.groups).to(match_array([my_group, other_group]))
     }
   }
 
@@ -110,26 +120,7 @@ RSpec.describe(Models::User) {
 
     it('rejects creating a poll with no group') {
       user = create_user
-      expect { user.add_poll(group_id: nil) }.to(
-          raise_error(Sequel::HookFailed))
-    }
-
-    it('defaults to creating a poll that is `borda_single` type') {
-      group = create_group
-      poll = group.creator.add_poll
-      expect(poll.type).to(eq(:borda_single))
-    }
-
-    it('can create polls with other valid types') {
-      group = create_group
-      poll = group.creator.add_poll(type: :borda_split)
-      expect(poll.type).to(eq(:borda_split))
-    }
-
-    it('rejects creation of polls of invalid type') {
-      group = create_group
-      expect { group.creator.add_poll(type: :not_valid_type) }.to(
-          raise_error(Sequel::DatabaseError))
+      expect { user.add_poll }.to(raise_error(Sequel::HookFailed))
     }
   }
 

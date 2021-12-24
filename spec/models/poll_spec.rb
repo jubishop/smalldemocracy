@@ -6,6 +6,24 @@ RSpec.describe(Models::Poll) {
   # TODO: Test creating_member
   # TODO: Test can't add a choice to expired poll.
 
+  # it('defaults to creating a poll that is `borda_single` type') {
+  #   group = create_group
+  #   poll = group.creator.add_poll
+  #   expect(poll.type).to(eq(:borda_single))
+  # }
+
+  # it('can create polls with other valid types') {
+  #   group = create_group
+  #   poll = group.creator.add_poll(type: :borda_split)
+  #   expect(poll.type).to(eq(:borda_split))
+  # }
+
+  # it('rejects creation of polls of invalid type') {
+  #   group = create_group
+  #   expect { group.creator.add_poll(type: :not_valid_type) }.to(
+  #       raise_error(Sequel::DatabaseError))
+  # }
+
   context('add_choice') {
     it('rejects creating two choices with the same text') {
       poll = create_poll
