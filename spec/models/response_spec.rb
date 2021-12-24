@@ -1,6 +1,7 @@
 require_relative '../../lib/models/response'
 
 # TODO: Go over this entirely
+# TODO: Test can't remove response after poll expired.
 RSpec.describe(Models::Response) {
   context('::create') {
     it('successfully makes a response') {

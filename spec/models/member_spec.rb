@@ -23,9 +23,7 @@ RSpec.describe(Models::Member) {
       choice = poll.add_choice
       response = member.add_response(choice_id: choice.id)
       expect(poll.responses).to(match_array(response))
-      expect(choice.responses).to(match_array(response))
       member.destroy
-      expect(choice.responses(reload: true)).to(be_empty)
       expect(poll.responses(reload: true)).to(be_empty)
     }
   }

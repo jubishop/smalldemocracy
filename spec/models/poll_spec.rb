@@ -5,6 +5,7 @@ RSpec.describe(Models::Poll) {
   # TODO: Test about creator
   # TODO: Test creating_member
   # TODO: Test creating a poll with all attributes
+  # TODO: Test can't add a choice to expired poll.
 
   context('add_choice') {
     it('rejects creating two choices with the same text') {

@@ -1,6 +1,18 @@
 require_relative '../../lib/models/choice'
 
 RSpec.describe(Models::Choice) {
+  context('delete or destroy') {
+    it('will remove any responses upon destroy') {
+      choice = create_choice(expiration: Time.now + 10)
+      poll = choice.poll
+      member = poll.group.add_member
+      response = choice.add_response(member_id: member.id)
+      expect(poll.responses).to(match_array(response))
+      choice.destroy
+      expect(poll.responses(reload: true)).to(be_empty)
+    }
+  }
+
   context('add_response') {
     it('will not allow adding a response to an expired poll') {
       choice = create_choice(expiration: Time.now - 10)
@@ -17,5 +29,5 @@ RSpec.describe(Models::Choice) {
   }
 
   # TODO: Test destroy removes all responses.
-  # TODO: Test can't add response to finished poll.
+  # TODO: Can't remove choice after poll has expired.
 }
