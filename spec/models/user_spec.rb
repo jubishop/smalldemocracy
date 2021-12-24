@@ -2,6 +2,11 @@ require_relative '../../lib/models/user'
 
 RSpec.describe(Models::User) {
   context('find_or_create') {
+    it('creates a user') {
+      user = create_user(email: 'me@email')
+      expect(user.email).to(eq('me@email'))
+    }
+
     it('creates a user only once') {
       new_user = create_user
       existing_user = create_user(email: new_user.email)
@@ -111,7 +116,7 @@ RSpec.describe(Models::User) {
   }
 
   context('add_poll') {
-    it('can add a poll to a user') {
+    it('adds a poll to a user') {
       user = create_user
       poll = user.add_group.add_poll
       expect(user.created_polls).to(match_array(poll))
@@ -125,7 +130,7 @@ RSpec.describe(Models::User) {
   }
 
   context('add_group') {
-    it('can add a group to a user') {
+    it('adds a group to a user') {
       user = create_user
       group = user.add_group
       expect(user.created_groups).to(match_array(group))
