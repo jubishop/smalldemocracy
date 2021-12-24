@@ -18,6 +18,7 @@ module RSpec
                     expiration: Time.now,
                     **attributes)
       return create_group(email: email, name: name).add_poll(
+          email: email,
           title: title,
           question: question,
           expiration: expiration,
@@ -54,12 +55,14 @@ module Models
   class Group
     include Test::Env
     orig_add_poll = instance_method(:add_poll)
-    define_method(:add_poll) { |title: rand.to_s,
+    define_method(:add_poll) { |email: members.first.email,
+                                title: rand.to_s,
                                 question: rand.to_s,
                                 expiration: Time.now,
                                 **attributes|
       test_only!
-      orig_add_poll.bind_call(self, title: title,
+      orig_add_poll.bind_call(self, email: email,
+                                    title: title,
                                     question: question,
                                     expiration: expiration,
                                     **attributes)

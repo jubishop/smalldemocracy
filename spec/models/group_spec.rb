@@ -70,6 +70,7 @@ RSpec.describe(Models::Group) {
   }
 
   context('add_poll') {
+    # TODO: Ensure poll creator is part of members
     it('can add a poll to a group') {
       group = create_group
       poll = group.add_poll

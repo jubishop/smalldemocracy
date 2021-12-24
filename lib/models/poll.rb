@@ -8,6 +8,7 @@ BreakdownResult = KVStruct.new(:member, :score)
 
 module Models
   class Poll < Sequel::Model
+    many_to_one :creator, class: 'Models::User', key: :email
     many_to_one :group
     one_to_many :choices
     many_to_many :responses, join_table: :choices,
@@ -21,6 +22,10 @@ module Models
 
     def member(email:)
       return Member.find(group_id: group_id, email: email)
+    end
+
+    def creating_member
+      return member(email: creator.email)
     end
 
     def choice(text:)

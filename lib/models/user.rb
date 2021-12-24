@@ -20,6 +20,11 @@ module Models
       cancel_action("Users (#{email}) cannot be removed")
     end
 
+    def _add_group(group)
+      super(group)
+      group.add_member(email: email)
+    end
+
     def polls(start_expiration: nil, end_expiration: nil)
       group_ids = Models::Member.where(email: email).select(:group_id)
       return Models::Poll.where(
@@ -27,11 +32,6 @@ module Models
             [:group_id, group_ids],
             [:expiration, start_expiration..end_expiration]
           ]).all
-    end
-
-    def _add_group(group)
-      super(group)
-      group.add_member(email: email)
     end
 
     def to_s

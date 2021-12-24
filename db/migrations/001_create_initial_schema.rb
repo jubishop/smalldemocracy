@@ -23,6 +23,7 @@ Sequel.migration {
 
     create_table(:polls) {
       uuid :id, primary_key: true, default: Sequel.function(:gen_random_uuid)
+      foreign_key :email, :users, type: String, null: false
       foreign_key :group_id, :groups, null: false, on_delete: :cascade
       String :title, null: false
       constraint(:title_not_empty) { Sequel.char_length(title) >= 1 }
