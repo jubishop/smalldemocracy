@@ -91,7 +91,7 @@ RSpec.describe(Models::Group) {
       expect(group.members).to(match_array([group.creating_member, member]))
     }
 
-    it('adds a new user as a member to a group') {
+    it('creates a new user when adding member to a group') {
       group = create_group
       member = group.add_member
       expect(member.user.email).to(eq(member.email))
