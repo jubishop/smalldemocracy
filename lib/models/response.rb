@@ -4,9 +4,6 @@
 #  choice_id | bigint  | NOT NULL
 #  member_id | bigint  | NOT NULL
 #  score     | integer |
-# Indexes:
-#  responses_pkey  | PRIMARY KEY btree (id)
-#  response_unique | UNIQUE btree (member_id, choice_id)
 # Foreign key constraints:
 #  responses_choice_id_fkey | (choice_id) REFERENCES choices(id) ON DELETE CASCADE
 #  responses_member_id_fkey | (member_id) REFERENCES members(id) ON DELETE CASCADE

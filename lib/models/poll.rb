@@ -7,8 +7,6 @@
 #  question   | text                        | NOT NULL
 #  expiration | timestamp without time zone | NOT NULL
 #  type       | poll_type                   | NOT NULL DEFAULT 'borda_single'::poll_type
-# Indexes:
-#  polls_pkey | PRIMARY KEY btree (id)
 # Check constraints:
 #  question_not_empty | (char_length(question) >= 1)
 #  title_not_empty    | (char_length(title) >= 1)

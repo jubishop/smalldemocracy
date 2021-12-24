@@ -78,6 +78,7 @@ task(:annotate) {
   Dir['lib/models/*.rb'].each { |file| require_relative file }
   require 'sequel/annotate'
   Sequel::Annotate.annotate(Dir['lib/models/*.rb'], namespace: 'Models',
+                                                    indexes: false,
                                                     position: :before)
 }
 
