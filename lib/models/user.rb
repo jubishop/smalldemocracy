@@ -1,6 +1,8 @@
 # Table: users
 # Columns:
 #  email | text | PRIMARY KEY
+# Indexes:
+#  users_pkey | PRIMARY KEY btree (email)
 # Referenced By:
 #  groups  | groups_email_fkey  | (email) REFERENCES users(email)
 #  members | members_email_fkey | (email) REFERENCES users(email)
