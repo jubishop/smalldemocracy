@@ -1,7 +1,17 @@
 require_relative '../../lib/models/choice'
 
 # TODO: Test can't remove a choice from expired poll.
+# it('rejects creating a choice with no text') {
+#   poll = create_poll
+#   expect { poll.add_choice(text: '') }.to(
+#       raise_error(Sequel::DatabaseError))
+# }
 
+# it('rejects creating a choice with empty text') {
+#   poll = create_poll
+#   expect { poll.add_choice(text: '') }.to(
+#       raise_error(Sequel::DatabaseError))
+# }
 RSpec.describe(Models::Choice) {
   context('delete or destroy') {
     it('will remove any responses upon destroy') {

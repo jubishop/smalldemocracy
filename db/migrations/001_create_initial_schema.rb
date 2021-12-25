@@ -29,6 +29,8 @@ Sequel.migration {
       foreign_key :group_id, :groups, type: :Bignum,
                                       null: false,
                                       on_delete: :cascade
+      Time :created_at, null: false
+      Time :updated_at, null: false
       String :title, null: false
       constraint(:title_not_empty) { Sequel.char_length(title) >= 1 }
       String :question, null: false

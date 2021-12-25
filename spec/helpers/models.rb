@@ -142,4 +142,14 @@ module Models
       return responses
     end
   end
+
+  class Choice
+    include Test::Env
+    orig_add_response = instance_method(:add_response)
+    define_method(:add_response) { |member_id: poll.members.sample.id,
+                                    **attributes|
+      test_only!
+      orig_add_response.bind_call(self, member_id: member_id, **attributes)
+    }
+  end
 end

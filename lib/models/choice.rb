@@ -19,6 +19,11 @@ module Models
     many_to_one :poll
     one_to_many :responses
 
+    def before_validation
+      cancel_action('Choice created for expired poll') if poll.finished?
+      super
+    end
+
     def to_s
       text
     end

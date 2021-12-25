@@ -1,23 +1,21 @@
 require_relative '../../lib/models/poll'
 
 RSpec.describe(Models::Poll) {
-  # TODO: Test destroy deletes all choices
-  # TODO: Test about creator
-  # TODO: Test creating_member
-  # TODO: Test can't add a choice to expired poll.
+  # TODO: Test timestamps
   # TODO: Test hashids
 
   context('create') {
     it('creates a poll') {
+      now = Time.now
       poll = create_poll(email: 'me@email',
                          title: 'title',
                          question: 'question',
-                         expiration: Time.at(69),
+                         expiration: now,
                          type: :borda_split)
       expect(poll.email).to(eq('me@email'))
       expect(poll.title).to(eq('title'))
       expect(poll.question).to(eq('question'))
-      expect(poll.expiration).to(eq(Time.at(69)))
+      expect(poll.expiration).to(eq(now))
       expect(poll.type).to(eq(:borda_split))
     }
 
@@ -69,37 +67,29 @@ RSpec.describe(Models::Poll) {
   }
 
   context('destroy') {
-
-  }
-  context('add_choice') {
-    it('rejects creating two choices with the same text') {
-      poll = create_poll
-      poll.add_choice(text: 'one')
-      expect { poll.add_choice(text: 'one') }.to(
-          raise_error(Sequel::ConstraintViolation))
-    }
-
-    it('rejects creating a choice with empty text') {
-      poll = create_poll
-      expect { poll.add_choice(text: '') }.to(
-          raise_error(Sequel::DatabaseError))
-    }
-
-    it('successfully adds a choice') {
-      poll = create_poll
-      choice = poll.add_choice
-      expect(poll.choices).to(match_array(choice))
-    }
-  }
-
-  context('responses') {
-    it('finds all responses through join table') {
+    it('destroys any choices') {
       poll = create_poll(expiration: Time.now + 10)
-      choice_one = poll.add_choice
-      choice_two = poll.add_choice
-      response_one = choice_one.add_response(member_id: poll.members.sample.id)
-      response_two = choice_two.add_response(member_id: poll.members.sample.id)
-      expect(poll.responses).to(match_array([response_one, response_two]))
+      choice = poll.add_choice
+      expect(choice.exists?).to(be(true))
+      poll.destroy
+      expect(choice.exists?).to(be(false))
+    }
+  }
+
+  context('creator') {
+    it('finds its creator') {
+      user = create_user
+      group = user.add_group
+      poll = group.add_poll(email: user.email)
+      expect(poll.creator).to(eq(user))
+    }
+  }
+
+  context('group') {
+    it('finds its group') {
+      group = create_group
+      poll = group.add_poll
+      expect(poll.group).to(eq(group))
     }
   }
 
@@ -121,16 +111,25 @@ RSpec.describe(Models::Poll) {
     }
   }
 
+  context('creating_member') {
+    it('finds its creating member') {
+      group = create_group
+      member = group.add_member
+      poll = member.add_poll
+      expect(poll.creating_member).to(eq(member))
+    }
+  }
+
   context('choice') {
     it('finds a choice') {
-      poll = create_poll
+      poll = create_poll(expiration: Time.now + 10)
       choice = poll.add_choice
       expect(poll.choice(text: choice.text)).to(eq(choice))
     }
   }
 
   context('finished?') {
-    it('returns a unexpired poll as unfinished') {
+    it('returns an open poll as unfinished') {
       poll = create_poll(expiration: Time.now + 10)
       expect(poll.finished?).to(be(false))
     }
@@ -141,37 +140,17 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('url') {
-    it('creates url') {
-      poll = create_poll
-      expect(poll.url).to(eq("/poll/view/#{poll.id}"))
-    }
-  }
-
   context('results') {
     it('raises error if using scores on choose_* types') {
       poll = create_poll(type: :choose_one)
-      expect { poll.scores }.to(raise_error(TypeError))
+      expect { poll.scores }.to(
+          raise_error(TypeError, /must be one of borda_single or borda_split/))
     }
 
     it('raises an error if using counts on borda_single type') {
       poll = create_poll(type: :borda_single)
-      expect { poll.counts }.to(raise_error(TypeError))
-    }
-
-    shared_examples('breakdown') {
-      it('computes breakdown properly') {
-        breakdown, unresponded = @poll.breakdown
-        expect(unresponded.map(&:email)).to(match_array(@expected_unresponded))
-        expect(breakdown.keys.map(&:text)).to(
-            match_array(@expected_results.keys.map(&:to_s)))
-        breakdown.each { |choice, results|
-          expected_result = @expected_results[choice.to_s.to_sym]
-          expect(results.map { |r| r.member.email.to_sym }).to(
-              match_array(expected_result.keys))
-          expect(results.map(&:score)).to(match_array(expected_result.values))
-        }
-      }
+      expect { poll.counts }.to(
+          raise_error(TypeError, /must be one of borda_split or choose_one/))
     }
 
     shared_examples('scores') {
@@ -193,6 +172,21 @@ RSpec.describe(Models::Poll) {
             match_array(results.map { |r| r[0].to_s }))
         expect(@poll.counts.map(&:count)).to(
             match_array(results.map { |r| r[1] }))
+      }
+    }
+
+    shared_examples('breakdown') {
+      it('computes breakdown properly') {
+        breakdown, unresponded = @poll.breakdown
+        expect(unresponded.map(&:email)).to(match_array(@expected_unresponded))
+        expect(breakdown.keys.map(&:text)).to(
+            match_array(@expected_results.keys.map(&:to_s)))
+        breakdown.each { |choice, results|
+          expected_result = @expected_results[choice.to_s.to_sym]
+          expect(results.map { |r| r.member.email.to_sym }).to(
+              match_array(expected_result.keys))
+          expect(results.map(&:score)).to(match_array(expected_result.values))
+        }
       }
     }
 
@@ -319,6 +313,63 @@ RSpec.describe(Models::Poll) {
 
       it_has_behavior('breakdown')
       it_has_behavior('counts')
+    }
+  }
+
+  context('url') {
+    it('creates url') {
+      poll = create_poll
+      expect(poll.url).to(eq("/poll/view/#{poll.id}"))
+    }
+  }
+
+  context('add_choice') {
+    it('adds a choice') {
+      poll = create_poll(expiration: Time.now + 10)
+      choice = poll.add_choice
+      expect(poll.choices).to(match_array(choice))
+    }
+
+    it('rejects adding a choice to an expired poll') {
+      poll = create_poll(expiration: Time.now - 10)
+      expect { poll.add_choice }.to(
+          raise_error(Sequel::HookFailed, 'Choice created for expired poll'))
+    }
+
+    it('rejects creating two choices with the same text') {
+      poll = create_poll(expiration: Time.now + 10)
+      poll.add_choice(text: 'one')
+      expect { poll.add_choice(text: 'one') }.to(
+          raise_error(Sequel::ConstraintViolation,
+                      /violates unique constraint "choice_unique"/))
+    }
+  }
+
+  context('responses') {
+    it('finds all responses through join table') {
+      poll = create_poll(expiration: Time.now + 10)
+      response_one = poll.add_choice.add_response
+      response_two = poll.add_choice.add_response
+      expect(poll.responses).to(match_array([response_one, response_two]))
+    }
+  }
+
+  context('timestamps') {
+    it('sets updated_at and created_at upon creation') {
+      now = Time.at(rand(Time.now.to_i))
+      allow(Time).to(receive(:now).and_return(now))
+      poll = create_poll
+      expect(poll.created_at).to(eq(now))
+      expect(poll.updated_at).to(eq(now))
+    }
+
+    it('sets updated_at upon update') {
+      poll = create_poll(expiration: Time.now + 10)
+      now = Time.at(rand(Time.now.to_i))
+      allow(Time).to(receive(:now).and_return(now))
+      poll.update(title: 'title')
+      expect(poll.created_at).to_not(eq(poll.updated_at))
+      expect(poll.updated_at).to(eq(now))
     }
   }
 }
