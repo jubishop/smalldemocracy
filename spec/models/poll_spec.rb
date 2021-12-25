@@ -1,9 +1,6 @@
 require_relative '../../lib/models/poll'
 
 RSpec.describe(Models::Poll) {
-  # TODO: Test timestamps
-  # TODO: Test hashids
-
   context('create') {
     it('creates a poll') {
       now = Time.now

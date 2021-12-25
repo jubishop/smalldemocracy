@@ -3,7 +3,7 @@ require_relative '../../lib/models/choice'
 # TODO: Test can't remove a choice from expired poll.
 # it('rejects creating a choice with no text') {
 #   poll = create_poll
-#   expect { poll.add_choice(text: '') }.to(
+#   expect { poll.add_choice(text: nil) }.to(
 #       raise_error(Sequel::DatabaseError))
 # }
 
