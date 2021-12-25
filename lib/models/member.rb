@@ -11,7 +11,8 @@
 
 require 'sequel'
 
-require_relative 'response'
+require_relative 'group'
+require_relative 'user'
 
 module Models
   class Member < Sequel::Model

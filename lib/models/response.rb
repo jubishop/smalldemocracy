@@ -10,6 +10,9 @@
 
 require 'sequel'
 
+require_relative 'choice'
+require_relative 'member'
+
 module Models
   class Response < Sequel::Model
     many_to_one :choice

@@ -1,4 +1,8 @@
+require_relative '../../lib/models/choice'
+require_relative '../../lib/models/group'
+require_relative '../../lib/models/member'
 require_relative '../../lib/models/poll'
+require_relative '../../lib/models/response'
 require_relative '../../lib/models/user'
 
 module RSpec

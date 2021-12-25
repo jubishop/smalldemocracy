@@ -8,8 +8,6 @@
 
 require 'sequel'
 
-require_relative 'group'
-
 module Models
   class User < Sequel::Model
     unrestrict_primary_key
