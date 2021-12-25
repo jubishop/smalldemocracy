@@ -90,10 +90,10 @@ RSpec.describe(Models::User) {
       my_group = @user.add_group
       other_group = create_group
       other_group.add_member(email: @user.email)
-      @expired_poll = my_group.add_poll(expiration: Time.now - 10)
-      @my_poll = my_group.add_poll(expiration: Time.now + 10)
-      @other_poll = other_group.add_poll(expiration: Time.now + 10)
-      @expired_other_poll = other_group.add_poll(expiration: Time.now - 10)
+      @expired_poll = my_group.add_poll(expiration: past)
+      @my_poll = my_group.add_poll(expiration: future)
+      @other_poll = other_group.add_poll(expiration: future)
+      @expired_other_poll = other_group.add_poll(expiration: past)
     }
 
     it('finds all active polls with start_expiration') {

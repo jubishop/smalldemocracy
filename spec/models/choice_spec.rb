@@ -15,7 +15,7 @@ require_relative '../../lib/models/choice'
 RSpec.describe(Models::Choice) {
   context('delete or destroy') {
     it('will remove any responses upon destroy') {
-      choice = create_choice(expiration: Time.now + 10)
+      choice = create_choice(expiration: future)
       poll = choice.poll
       member = poll.group.add_member
       response = choice.add_response(member_id: member.id)
@@ -27,14 +27,14 @@ RSpec.describe(Models::Choice) {
 
   context('add_response') {
     it('will not allow adding a response to an expired poll') {
-      choice = create_choice(expiration: Time.now - 10)
+      choice = create_choice(expiration: past)
       member = choice.poll.group.add_member
       expect { choice.add_response(member_id: member.id) }.to(
           raise_error(Sequel::HookFailed))
     }
 
     it('rejects adding a response without a member') {
-      choice = create_choice(expiration: Time.now + 10)
+      choice = create_choice(expiration: future)
       expect { choice.add_response({}) }.to(
           raise_error(Sequel::NotNullConstraintViolation))
     }

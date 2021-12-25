@@ -68,7 +68,7 @@ RSpec.describe(Models::Poll) {
 
   context('destroy') {
     it('destroys any choices') {
-      poll = create_poll(expiration: Time.now + 10)
+      poll = create_poll(expiration: future)
       choice = poll.add_choice
       expect(choice.exists?).to(be(true))
       poll.destroy
@@ -122,7 +122,7 @@ RSpec.describe(Models::Poll) {
 
   context('choice') {
     it('finds a choice') {
-      poll = create_poll(expiration: Time.now + 10)
+      poll = create_poll(expiration: future)
       choice = poll.add_choice
       expect(poll.choice(text: choice.text)).to(eq(choice))
     }
@@ -130,12 +130,12 @@ RSpec.describe(Models::Poll) {
 
   context('finished?') {
     it('returns an open poll as unfinished') {
-      poll = create_poll(expiration: Time.now + 10)
+      poll = create_poll(expiration: future)
       expect(poll.finished?).to(be(false))
     }
 
     it('returns an expired poll as finished') {
-      poll = create_poll(expiration: Time.now - 10)
+      poll = create_poll(expiration: past)
       expect(poll.finished?).to(be(true))
     }
   }
@@ -198,7 +198,7 @@ RSpec.describe(Models::Poll) {
         group = create_group
         members.each { |member| group.add_member(email: member) }
 
-        @poll = group.add_poll(expiration: Time.now + 10)
+        @poll = group.add_poll(expiration: future)
         choices.each { |choice| @poll.add_choice(text: choice) }
 
         responses = {
@@ -241,7 +241,7 @@ RSpec.describe(Models::Poll) {
         group = create_group
         members.each { |member| group.add_member(email: member) }
 
-        @poll = group.add_poll(type: :borda_split, expiration: Time.now + 10)
+        @poll = group.add_poll(type: :borda_split, expiration: future)
         choices.each { |choice| @poll.add_choice(text: choice) }
 
         responses = {
@@ -286,7 +286,7 @@ RSpec.describe(Models::Poll) {
         group = create_group
         members.each { |member| group.add_member(email: member) }
 
-        @poll = group.add_poll(type: :choose_one, expiration: Time.now + 10)
+        @poll = group.add_poll(type: :choose_one, expiration: future)
         choices.each { |choice| @poll.add_choice(text: choice) }
 
         responses = {
@@ -325,19 +325,19 @@ RSpec.describe(Models::Poll) {
 
   context('add_choice') {
     it('adds a choice') {
-      poll = create_poll(expiration: Time.now + 10)
+      poll = create_poll(expiration: future)
       choice = poll.add_choice
       expect(poll.choices).to(match_array(choice))
     }
 
     it('rejects adding a choice to an expired poll') {
-      poll = create_poll(expiration: Time.now - 10)
+      poll = create_poll(expiration: past)
       expect { poll.add_choice }.to(
           raise_error(Sequel::HookFailed, 'Choice created for expired poll'))
     }
 
     it('rejects creating two choices with the same text') {
-      poll = create_poll(expiration: Time.now + 10)
+      poll = create_poll(expiration: future)
       poll.add_choice(text: 'one')
       expect { poll.add_choice(text: 'one') }.to(
           raise_error(Sequel::ConstraintViolation,
@@ -347,7 +347,7 @@ RSpec.describe(Models::Poll) {
 
   context('responses') {
     it('finds all responses through join table') {
-      poll = create_poll(expiration: Time.now + 10)
+      poll = create_poll(expiration: future)
       response_one = poll.add_choice.add_response
       response_two = poll.add_choice.add_response
       expect(poll.responses).to(match_array([response_one, response_two]))
@@ -364,7 +364,7 @@ RSpec.describe(Models::Poll) {
     }
 
     it('sets updated_at upon update') {
-      poll = create_poll(expiration: Time.now + 10)
+      poll = create_poll(expiration: future)
       now = Time.at(rand(Time.now.to_i))
       allow(Time).to(receive(:now).and_return(now))
       poll.update(title: 'title')

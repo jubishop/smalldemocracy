@@ -7,6 +7,14 @@ require_relative '../../lib/models/user'
 
 module RSpec
   module Models
+    def future
+      return Time.now + 10
+    end
+
+    def past
+      return Time.now - 10
+    end
+
     def create_user(email: "#{rand}@#{rand}")
       return ::Models::User.find_or_create(email: email)
     end

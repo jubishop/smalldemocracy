@@ -33,7 +33,7 @@ RSpec.describe(Models::Member) {
 
     it('destroys any responses') {
       member = create_group.add_member
-      poll = member.add_poll(expiration: Time.now + 10)
+      poll = member.add_poll(expiration: future)
       response = member.add_response(choice_id: poll.add_choice.id)
       expect(poll.responses).to_not(be_empty)
       expect(response.exists?).to(be(true))
@@ -71,8 +71,8 @@ RSpec.describe(Models::Member) {
   context('polls') {
     before(:all) {
       @member = create_member
-      @expired_poll = @member.add_poll(expiration: Time.now - 10)
-      @my_poll = @member.add_poll(expiration: Time.now + 10)
+      @expired_poll = @member.add_poll(expiration: past)
+      @my_poll = @member.add_poll(expiration: future)
     }
 
     it('finds all active polls with start_expiration') {
@@ -93,16 +93,16 @@ RSpec.describe(Models::Member) {
   context('add_response') {
     it('adds a response to a member') {
       member = create_member
-      choice = member.add_poll(expiration: Time.now + 10).add_choice
+      choice = member.add_poll(expiration: future).add_choice
       response = member.add_response(choice_id: choice.id)
       expect(member.responses).to(match_array(response))
     }
 
     it('rejects adding a response to an expired poll') {
       member = create_member
-      poll = member.add_poll(expiration: Time.now + 10)
+      poll = member.add_poll(expiration: future)
       choice = poll.add_choice
-      poll.update(expiration: Time.now - 10)
+      poll.update(expiration: past)
       expect { member.add_response(choice_id: choice.id) }.to(
           raise_error(Sequel::HookFailed,
                       'Response created for expired poll'))
