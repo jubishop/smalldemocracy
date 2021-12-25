@@ -34,10 +34,10 @@ RSpec.describe(Models::Member) {
     it('destroys any responses') {
       member = create_group.add_member
       poll = member.add_poll(expiration: Time.now + 10)
-      response = member.add_response(choice_id: poll.add_choice.id)
-      expect(poll.responses).to(match_array(response))
+      member.add_response(choice_id: poll.add_choice.id)
+      expect(member.responses).to_not(be_empty)
       member.destroy
-      expect(poll.responses(reload: true)).to(be_empty)
+      expect(member.responses(reload: true)).to(be_empty)
     }
   }
 

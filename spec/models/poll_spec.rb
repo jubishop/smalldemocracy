@@ -1,29 +1,76 @@
 require_relative '../../lib/models/poll'
 
 RSpec.describe(Models::Poll) {
-  # TODO: Test destroy deletes all choices and responses.
+  # TODO: Test destroy deletes all choices
   # TODO: Test about creator
   # TODO: Test creating_member
   # TODO: Test can't add a choice to expired poll.
   # TODO: Test hashids
-  # it('defaults to creating a poll that is `borda_single` type') {
-  #   group = create_group
-  #   poll = group.creator.add_poll
-  #   expect(poll.type).to(eq(:borda_single))
-  # }
 
-  # it('can create polls with other valid types') {
-  #   group = create_group
-  #   poll = group.creator.add_poll(type: :borda_split)
-  #   expect(poll.type).to(eq(:borda_split))
-  # }
+  context('create') {
+    it('creates a poll') {
+      poll = create_poll(email: 'me@email',
+                         title: 'title',
+                         question: 'question',
+                         expiration: Time.at(69),
+                         type: :borda_split)
+      expect(poll.email).to(eq('me@email'))
+      expect(poll.title).to(eq('title'))
+      expect(poll.question).to(eq('question'))
+      expect(poll.expiration).to(eq(Time.at(69)))
+      expect(poll.type).to(eq(:borda_split))
+    }
 
-  # it('rejects creation of polls of invalid type') {
-  #   group = create_group
-  #   expect { group.creator.add_poll(type: :not_valid_type) }.to(
-  #       raise_error(Sequel::DatabaseError))
-  # }
+    it('rejects creating poll with no title') {
+      expect { create_poll(title: nil) }.to(
+          raise_error(Sequel::NotNullConstraintViolation,
+                      /null value in column "title"/))
+    }
 
+    it('rejects creating poll with empty title') {
+      expect { create_poll(title: '') }.to(
+          raise_error(Sequel::CheckConstraintViolation,
+                      /violates check constraint "title_not_empty"/))
+    }
+
+    it('rejects creating poll with no question') {
+      expect { create_poll(question: nil) }.to(
+          raise_error(Sequel::NotNullConstraintViolation,
+                      /null value in column "question"/))
+    }
+
+    it('rejects creating poll with empty question') {
+      expect { create_poll(question: '') }.to(
+          raise_error(Sequel::CheckConstraintViolation,
+                      /violates check constraint "question_not_empty"/))
+    }
+
+    it('rejects creating poll with no expiration') {
+      expect { create_poll(expiration: nil) }.to(
+          raise_error(Sequel::NotNullConstraintViolation,
+                      /null value in column "expiration"/))
+    }
+
+    it('rejects creating a poll with expiration at unix epoch') {
+      expect { create_poll(expiration: Time.at(0)) }.to(
+          raise_error(Sequel::HookFailed,
+                      'Poll created with expiration at unix epoch'))
+    }
+
+    it('defaults to creating a poll that is `borda_single` type') {
+      expect(create_poll.type).to(eq(:borda_single))
+    }
+
+    it('rejects creating polls of invalid type') {
+      expect { create_poll(type: :not_valid_type) }.to(
+          raise_error(Sequel::DatabaseError,
+                      /invalid input value for enum poll_type/))
+    }
+  }
+
+  context('destroy') {
+
+  }
   context('add_choice') {
     it('rejects creating two choices with the same text') {
       poll = create_poll

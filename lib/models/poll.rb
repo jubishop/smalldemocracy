@@ -45,6 +45,9 @@ module Models
       unless member(email: creator.email)
         cancel_action("Creator: '#{email}', is not a member of '#{group.name}'")
       end
+      if !expiration.nil? && expiration.is_a?(Time) && expiration.to_i.zero?
+        cancel_action('Poll created with expiration at unix epoch')
+      end
       super
     end
 

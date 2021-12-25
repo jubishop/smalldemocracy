@@ -16,7 +16,7 @@ RSpec.describe(Models::Group) {
     it('rejects creating group with empty name') {
       expect { create_group(name: '') }.to(
           raise_error(Sequel::CheckConstraintViolation,
-                      /violate.+"name_not_empty"/))
+                      /violates check constraint "name_not_empty"/))
     }
   }
 
