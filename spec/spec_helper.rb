@@ -13,6 +13,7 @@ ENV['GOOGLE_SECRET'] = 'secret'
 require_relative '../setup'
 
 require_relative 'helpers/models'
+require_relative 'helpers/time'
 
 Capybara.server = :puma
 Capybara.app = Rack::Builder.parse_file('config.ru').first
@@ -71,6 +72,7 @@ RSpec.configure do |config|
   Kernel.srand(config.seed)
 
   config.include(RSpec::Models)
+  config.include(RSpec::Time)
   config.include_context(:capybara, type: :feature)
   config.include_context(:rack_test, type: :rack_test)
 

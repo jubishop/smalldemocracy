@@ -7,14 +7,6 @@ require_relative '../../lib/models/user'
 
 module RSpec
   module Models
-    def future
-      return Time.now + 10
-    end
-
-    def past
-      return Time.now - 10
-    end
-
     def create_user(email: "#{rand}@#{rand}")
       return ::Models::User.find_or_create(email: email)
     end
@@ -32,7 +24,7 @@ module RSpec
                     name: rand.to_s,
                     title: rand.to_s,
                     question: rand.to_s,
-                    expiration: Time.now,
+                    expiration: ::Time.now,
                     **attributes)
       return create_group(email: email, name: name).add_poll(
           email: email,
@@ -46,7 +38,7 @@ module RSpec
                       name: rand.to_s,
                       title: rand.to_s,
                       question: rand.to_s,
-                      expiration: Time.now,
+                      expiration: ::Time.now,
                       text: rand.to_s,
                       **attributes)
       return create_poll(email: email,
@@ -73,7 +65,7 @@ module Models
     define_method(:add_poll) { |group_id: groups.sample&.id,
                                 title: rand.to_s,
                                 question: rand.to_s,
-                                expiration: Time.now,
+                                expiration: ::Time.now,
                                 **attributes|
       test_only!
       orig_add_poll.bind_call(self, group_id: group_id,
@@ -90,7 +82,7 @@ module Models
     define_method(:add_poll) { |email: members.sample&.email,
                                 title: rand.to_s,
                                 question: rand.to_s,
-                                expiration: Time.now,
+                                expiration: ::Time.now,
                                 **attributes|
       test_only!
       orig_add_poll.bind_call(self, email: email,
@@ -112,7 +104,7 @@ module Models
     orig_add_poll = instance_method(:add_poll)
     define_method(:add_poll) { |title: rand.to_s,
                                 question: rand.to_s,
-                                expiration: Time.now,
+                                expiration: ::Time.now,
                                 **attributes|
       test_only!
       orig_add_poll.bind_call(self, title: title,
