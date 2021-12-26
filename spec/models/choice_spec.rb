@@ -68,5 +68,16 @@ RSpec.describe(Models::Choice) {
           raise_error(Sequel::NotNullConstraintViolation,
                       /null value in column "member_id"/))
     }
+
+    it('rejects adding two responses from same member') {
+      group = create_group
+      member = group.add_member
+      poll = group.add_poll(expiration: future)
+      choice = poll.add_choice
+      choice.add_response(member_id: member.id)
+      expect { choice.add_response(member_id: member.id) }.to(
+          raise_error(Sequel::ConstraintViolation,
+                      /violates unique constraint "response_unique"/))
+    }
   }
 }

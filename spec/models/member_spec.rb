@@ -121,9 +121,20 @@ RSpec.describe(Models::Member) {
 
     it('rejects adding a response without a choice') {
       member = create_member
-      expect { member.add_response({}) }.to(
+      expect { member.add_response(choice_id: nil) }.to(
           raise_error(Sequel::HookFailed,
                       'Response has no choice'))
+    }
+
+    it('rejects adding two responses to the same choice') {
+      group = create_group
+      member = group.add_member
+      poll = group.add_poll(expiration: future)
+      choice = poll.add_choice
+      member.add_response(choice_id: choice.id)
+      expect { member.add_response(choice_id: choice.id) }.to(
+          raise_error(Sequel::ConstraintViolation,
+                      /violates unique constraint "response_unique"/))
     }
   }
 }
