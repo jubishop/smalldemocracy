@@ -13,9 +13,14 @@ require 'sequel'
 module Models
   class User < Sequel::Model
     unrestrict_primary_key
-    one_to_many :members, key: :email, adder: nil
-    one_to_many :created_groups, class: 'Models::Group', key: :email
+    one_to_many :members, key: :email, adder: nil, remover: nil, clearer: nil
+    one_to_many :created_groups,
+                class: 'Models::Group',
+                key: :email,
+                remover: ->(group) { group.destroy },
+                clearer: nil
     alias add_group add_created_group
+    alias remove_group remove_created_group
     one_to_many :created_polls, class: 'Models::Poll', key: :email
     alias add_poll add_created_poll
 

@@ -21,7 +21,9 @@ module Models
   class Member < Sequel::Model
     many_to_one :group
     many_to_one :user, key: :email
-    one_to_many :responses
+    one_to_many :responses,
+                remover: ->(response) { response.destroy },
+                clearer: nil
 
     def before_validation
       cancel_action('Member created with no email') unless email

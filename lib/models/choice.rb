@@ -20,7 +20,9 @@ require_relative 'poll'
 module Models
   class Choice < Sequel::Model
     many_to_one :poll
-    one_to_many :responses
+    one_to_many :responses,
+                remover: ->(response) { response.destroy },
+                clearer: nil
 
     def before_validation
       cancel_action('Choice created for expired poll') if poll.finished?

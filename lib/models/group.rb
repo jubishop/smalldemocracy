@@ -21,8 +21,8 @@ require_relative 'user'
 module Models
   class Group < Sequel::Model
     many_to_one :creator, class: 'Models::User', key: :email
-    one_to_many :members
-    one_to_many :polls
+    one_to_many :members, remover: ->(member) { member.destroy }, clearer: nil
+    one_to_many :polls, remover: ->(poll) { poll.destroy }, clearer: nil
 
     def _add_member(member)
       User.find_or_create(email: member.email)

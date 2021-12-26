@@ -33,7 +33,7 @@ module Models
   class Poll < Sequel::Model
     many_to_one :creator, class: 'Models::User', key: :email
     many_to_one :group
-    one_to_many :choices
+    one_to_many :choices, remover: ->(choice) { choice.destroy }, clearer: nil
     many_to_many :responses, join_table: :choices,
                              right_key: :id,
                              right_primary_key: :choice_id

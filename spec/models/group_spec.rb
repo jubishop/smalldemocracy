@@ -21,15 +21,15 @@ RSpec.describe(Models::Group) {
   }
 
   context('destroy') {
-    it('destroys itself') {
+    it('destroys itself from user') {
       user = create_user
       group = user.add_group
       expect(user.groups).to_not(be_empty)
       expect(user.created_groups).to_not(be_empty)
       expect(group.exists?).to(be(true))
-      group.destroy
+      user.remove_group(group)
       expect(user.groups).to(be_empty)
-      expect(user.created_groups(reload: true)).to(be_empty)
+      expect(user.created_groups).to(be_empty)
       expect(group.exists?).to(be(false))
     }
 

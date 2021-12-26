@@ -23,13 +23,13 @@ RSpec.describe(Models::Choice) {
   }
 
   context('destroy') {
-    it('destroys itself') {
+    it('destroys itself from poll') {
       poll = create_poll
       choice = poll.add_choice
       expect(poll.choices).to_not(be_empty)
       expect(choice.exists?).to(be(true))
-      choice.destroy
-      expect(poll.choices(reload: true)).to(be_empty)
+      poll.remove_choice(choice)
+      expect(poll.choices).to(be_empty)
       expect(choice.exists?).to(be(false))
     }
 
@@ -47,11 +47,9 @@ RSpec.describe(Models::Choice) {
       member = poll.group.add_member
       response = choice.add_response(member_id: member.id)
       expect(poll.responses).to_not(be_empty)
-      expect(choice.responses).to_not(be_empty)
       expect(response.exists?).to(be(true))
       choice.destroy
       expect(poll.responses(reload: true)).to(be_empty)
-      expect(choice.responses(reload: true)).to(be_empty)
       expect(response.exists?).to(be(false))
     }
   }

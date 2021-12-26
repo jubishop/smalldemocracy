@@ -25,13 +25,13 @@ RSpec.describe(Models::Member) {
   }
 
   context('destroy') {
-    it('destroys itself') {
+    it('destroys itself from group') {
       group = create_group
       member = group.add_member
       expect(group.members).to(include(member))
       expect(member.exists?).to(be(true))
-      member.destroy
-      expect(group.members(reload: true)).to_not(include(member))
+      group.remove_member(member)
+      expect(group.members).to_not(include(member))
       expect(member.exists?).to(be(false))
     }
 

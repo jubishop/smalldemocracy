@@ -64,23 +64,21 @@ RSpec.describe(Models::Poll) {
   }
 
   context('destroy') {
-    it('destroys itself') {
+    it('destroys itself from group') {
       group = create_group
       poll = group.add_poll(expiration: future)
       expect(group.polls).to_not(be_empty)
       expect(poll.exists?).to(be(true))
-      poll.destroy
-      expect(group.polls(reload: true)).to(be_empty)
+      group.remove_poll(poll)
+      expect(group.polls).to(be_empty)
       expect(poll.exists?).to(be(false))
     }
 
     it('cascades destroy to choices') {
       poll = create_poll
       choice = poll.add_choice
-      expect(poll.choices).to_not(be_empty)
       expect(choice.exists?).to(be(true))
       poll.destroy
-      expect(poll.choices(reload: true)).to(be_empty)
       expect(choice.exists?).to(be(false))
     }
   }
