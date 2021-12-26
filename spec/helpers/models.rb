@@ -24,7 +24,7 @@ module RSpec
                     name: rand.to_s,
                     title: rand.to_s,
                     question: rand.to_s,
-                    expiration: ::Time.now,
+                    expiration: future,
                     **attributes)
       return create_group(email: email, name: name).add_poll(
           email: email,
@@ -38,7 +38,7 @@ module RSpec
                       name: rand.to_s,
                       title: rand.to_s,
                       question: rand.to_s,
-                      expiration: ::Time.now,
+                      expiration: future,
                       text: rand.to_s,
                       **attributes)
       return create_poll(email: email,

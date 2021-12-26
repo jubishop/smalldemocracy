@@ -64,11 +64,23 @@ RSpec.describe(Models::Poll) {
   }
 
   context('destroy') {
-    it('destroys any choices') {
-      poll = create_poll(expiration: future)
+    it('destroys itself') {
+      group = create_group
+      poll = group.add_poll(expiration: future)
+      expect(group.polls).to_not(be_empty)
+      expect(poll.exists?).to(be(true))
+      poll.destroy
+      expect(group.polls(reload: true)).to(be_empty)
+      expect(poll.exists?).to(be(false))
+    }
+
+    it('cascades destroy to choices') {
+      poll = create_poll
       choice = poll.add_choice
+      expect(poll.choices).to_not(be_empty)
       expect(choice.exists?).to(be(true))
       poll.destroy
+      expect(poll.choices(reload: true)).to(be_empty)
       expect(choice.exists?).to(be(false))
     }
   }
@@ -119,7 +131,7 @@ RSpec.describe(Models::Poll) {
 
   context('choice') {
     it('finds a choice') {
-      poll = create_poll(expiration: future)
+      poll = create_poll
       choice = poll.add_choice
       expect(poll.choice(text: choice.text)).to(eq(choice))
     }
@@ -127,7 +139,7 @@ RSpec.describe(Models::Poll) {
 
   context('finished?') {
     it('returns an open poll as unfinished') {
-      poll = create_poll(expiration: future)
+      poll = create_poll
       expect(poll.finished?).to(be(false))
     }
 
@@ -322,7 +334,7 @@ RSpec.describe(Models::Poll) {
 
   context('add_choice') {
     it('adds a choice') {
-      poll = create_poll(expiration: future)
+      poll = create_poll
       choice = poll.add_choice
       expect(poll.choices).to(match_array(choice))
     }
@@ -334,7 +346,7 @@ RSpec.describe(Models::Poll) {
     }
 
     it('rejects creating two choices with the same text') {
-      poll = create_poll(expiration: future)
+      poll = create_poll
       poll.add_choice(text: 'one')
       expect { poll.add_choice(text: 'one') }.to(
           raise_error(Sequel::ConstraintViolation,
@@ -344,7 +356,7 @@ RSpec.describe(Models::Poll) {
 
   context('responses') {
     it('finds all responses through join table') {
-      poll = create_poll(expiration: future)
+      poll = create_poll
       response_one = poll.add_choice.add_response
       response_two = poll.add_choice.add_response
       expect(poll.responses).to(match_array([response_one, response_two]))
@@ -360,7 +372,7 @@ RSpec.describe(Models::Poll) {
     }
 
     it('sets updated_at upon update') {
-      poll = create_poll(expiration: future)
+      poll = create_poll
       moment = freeze_time
       poll.update(title: 'title')
       expect(poll.created_at).to_not(eq(poll.updated_at))

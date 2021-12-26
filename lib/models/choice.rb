@@ -27,6 +27,11 @@ module Models
       super
     end
 
+    def before_destroy
+      cancel_action('Choice removed from expired poll') if poll.finished?
+      super
+    end
+
     def to_s
       text
     end

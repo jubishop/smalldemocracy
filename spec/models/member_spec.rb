@@ -25,14 +25,25 @@ RSpec.describe(Models::Member) {
   }
 
   context('destroy') {
+    it('destroys itself') {
+      group = create_group
+      member = group.add_member
+      expect(group.members).to(include(member))
+      expect(member.exists?).to(be(true))
+      member.destroy
+      expect(group.members(reload: true)).to_not(include(member))
+      expect(member.exists?).to(be(false))
+    }
+
     it('rejects destroying creating member from group') {
       expect { create_member.destroy }.to(
           raise_error(Sequel::HookFailed,
                       /Creators.+cannot be removed from their group/))
     }
 
-    it('destroys any responses') {
-      member = create_group.add_member
+    it('cascades destroy to responses') {
+      group = create_group
+      member = group.add_member
       poll = member.add_poll(expiration: future)
       response = member.add_response(choice_id: poll.add_choice.id)
       expect(poll.responses).to_not(be_empty)

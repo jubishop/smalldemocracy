@@ -21,7 +21,19 @@ RSpec.describe(Models::Group) {
   }
 
   context('destroy') {
-    it('will cascade destroy to members') {
+    it('destroys itself') {
+      user = create_user
+      group = user.add_group
+      expect(user.groups).to_not(be_empty)
+      expect(user.created_groups).to_not(be_empty)
+      expect(group.exists?).to(be(true))
+      group.destroy
+      expect(user.groups).to(be_empty)
+      expect(user.created_groups(reload: true)).to(be_empty)
+      expect(group.exists?).to(be(false))
+    }
+
+    it('cascades destroy to members') {
       user = create_user
       group = user.add_group
       member = group.add_member
@@ -32,7 +44,7 @@ RSpec.describe(Models::Group) {
       expect(member.exists?).to(be(false))
     }
 
-    it('will cascade destroy to polls') {
+    it('cascades destroy to polls') {
       user = create_user
       group = user.add_group
       poll = group.add_poll

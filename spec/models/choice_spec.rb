@@ -1,42 +1,76 @@
 require_relative '../../lib/models/choice'
 
 # TODO: Test can't remove a choice from expired poll.
-# it('rejects creating a choice with no text') {
-#   poll = create_poll
-#   expect { poll.add_choice(text: nil) }.to(
-#       raise_error(Sequel::DatabaseError))
-# }
 
-# it('rejects creating a choice with empty text') {
-#   poll = create_poll
-#   expect { poll.add_choice(text: '') }.to(
-#       raise_error(Sequel::DatabaseError))
-# }
 RSpec.describe(Models::Choice) {
-  context('delete or destroy') {
-    it('will remove any responses upon destroy') {
-      choice = create_choice(expiration: future)
+  context('create') {
+    it('creates a choice') {
+      choice = create_choice(text: 'text')
+      expect(choice.text).to(eq('text'))
+    }
+
+    it('rejects creating a choice with no text') {
+      expect { create_choice(text: nil) }.to(
+          raise_error(Sequel::NotNullConstraintViolation,
+                      /null value in column "text"/))
+    }
+
+    it('rejects creating a choice with empty text') {
+      expect { create_choice(text: '') }.to(
+          raise_error(Sequel::CheckConstraintViolation,
+                      /violates check constraint "text_not_empty"/))
+    }
+  }
+
+  context('destroy') {
+    it('destroys itself') {
+      poll = create_poll
+      choice = poll.add_choice
+      expect(poll.choices).to_not(be_empty)
+      expect(choice.exists?).to(be(true))
+      choice.destroy
+      expect(poll.choices(reload: true)).to(be_empty)
+      expect(choice.exists?).to(be(false))
+    }
+
+    it('rejects destroying from an expired poll') {
+      choice = create_choice
+      choice.poll.update(expiration: past)
+      expect { choice.destroy }.to(
+          raise_error(Sequel::HookFailed,
+                      'Choice removed from expired poll'))
+    }
+
+    it('cascades destroy to responses') {
+      choice = create_choice
       poll = choice.poll
       member = poll.group.add_member
       response = choice.add_response(member_id: member.id)
-      expect(poll.responses).to(match_array(response))
+      expect(poll.responses).to_not(be_empty)
+      expect(choice.responses).to_not(be_empty)
+      expect(response.exists?).to(be(true))
       choice.destroy
       expect(poll.responses(reload: true)).to(be_empty)
+      expect(choice.responses(reload: true)).to(be_empty)
+      expect(response.exists?).to(be(false))
     }
   }
 
   context('add_response') {
-    it('will not allow adding a response to an expired poll') {
-      choice = create_choice(expiration: past)
+    it('rejects adding a response to an expired poll') {
+      choice = create_choice
       member = choice.poll.group.add_member
+      choice.poll.update(expiration: past)
       expect { choice.add_response(member_id: member.id) }.to(
-          raise_error(Sequel::HookFailed))
+          raise_error(Sequel::HookFailed,
+                      'Response created for expired poll'))
     }
 
     it('rejects adding a response without a member') {
-      choice = create_choice(expiration: future)
-      expect { choice.add_response({}) }.to(
-          raise_error(Sequel::NotNullConstraintViolation))
+      choice = create_choice
+      expect { choice.add_response(member_id: nil) }.to(
+          raise_error(Sequel::NotNullConstraintViolation,
+                      /null value in column "member_id"/))
     }
   }
 
