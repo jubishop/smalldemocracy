@@ -74,6 +74,16 @@ RSpec.describe(Models::Poll) {
       expect(poll.exists?).to(be(false))
     }
 
+    it('destroys itself from user') {
+      user = create_user
+      poll = user.add_poll(group_id: user.add_group.id, expiration: future)
+      expect(user.polls).to_not(be_empty)
+      expect(poll.exists?).to(be(true))
+      user.remove_poll(poll)
+      expect(user.polls).to(be_empty)
+      expect(poll.exists?).to(be(false))
+    }
+
     it('cascades destroy to choices') {
       poll = create_poll
       choice = poll.add_choice

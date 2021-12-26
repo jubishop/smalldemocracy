@@ -21,8 +21,13 @@ module Models
                 clearer: nil
     alias add_group add_created_group
     alias remove_group remove_created_group
-    one_to_many :created_polls, class: 'Models::Poll', key: :email
+    one_to_many :created_polls,
+                class: 'Models::Poll',
+                key: :email,
+                remover: ->(poll) { poll.destroy },
+                clearer: nil
     alias add_poll add_created_poll
+    alias remove_poll remove_created_poll
 
     def before_validation
       cancel_action('User created with no email') unless email
