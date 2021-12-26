@@ -26,8 +26,7 @@ GEM
     colorize (0.8.1)
     concurrent-ruby (1.1.9)
     cri (2.15.11)
-    diff-lcs (1.4.4)
-    ipaddr (1.2.3)
+    diff-lcs (1.5.0)
     linguistics (2.1.0)
       loggability (~> 0.11)
     loggability (0.18.2)
@@ -39,8 +38,7 @@ GEM
     nokogiri (1.12.5-x86_64-linux)
       racc (~> 1.4)
     open3 (0.1.1)
-    openssl (2.2.1)
-      ipaddr
+    openssl (3.0.0)
     parallel (1.21.0)
     parser (3.0.3.2)
       ast (~> 2.4.1)
@@ -76,23 +74,23 @@ GEM
     rspec_n (1.4.0)
       colorize (~> 0.8.0)
       cri (~> 2.15.3)
-    rubocop (1.23.0)
+    rubocop (1.24.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.12.0, < 2.0)
+      rubocop-ast (>= 1.15.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.15.0)
       parser (>= 3.0.1.1)
-    rubocop-performance (1.12.0)
+    rubocop-performance (1.13.0)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
-    rubocop-rspec (2.6.0)
+    rubocop-rspec (2.7.0)
       rubocop (~> 1.19)
     rubocop-sequel (0.3.3)
       rubocop (~> 1.0)
@@ -129,7 +127,7 @@ GEM
       slim
     tony-auth (0.9)
       base64
-    tony-test (0.56)
+    tony-test (0.57)
       capybara
       chunky_png
       colorize
@@ -182,4 +180,4 @@ RUBY VERSION
    ruby 3.0.3p157
 
 BUNDLED WITH
-   2.2.32
+   2.3.0
