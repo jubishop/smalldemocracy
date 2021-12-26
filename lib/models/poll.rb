@@ -36,7 +36,10 @@ module Models
     one_to_many :choices, remover: ->(choice) { choice.destroy }, clearer: nil
     many_to_many :responses, join_table: :choices,
                              right_key: :id,
-                             right_primary_key: :choice_id
+                             right_primary_key: :choice_id,
+                             adder: nil,
+                             remover: nil,
+                             clearer: nil
     plugin :timestamps, update_on_create: true
 
     def before_validation
