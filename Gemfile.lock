@@ -91,7 +91,7 @@ GEM
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
-    rubocop-rspec (2.6.0)
+    rubocop-rspec (2.7.0)
       rubocop (~> 1.19)
     rubocop-sequel (0.3.3)
       rubocop (~> 1.0)
@@ -133,7 +133,7 @@ GEM
       slim
     tony-auth (0.9)
       base64
-    tony-test (0.56)
+    tony-test (0.57)
       capybara
       chunky_png
       colorize
