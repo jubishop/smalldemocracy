@@ -27,6 +27,7 @@ GEM
     concurrent-ruby (1.1.9)
     cri (2.15.11)
     diff-lcs (1.5.0)
+    hashids (1.0.6)
     linguistics (2.1.0)
       loggability (~> 0.11)
     loggability (0.18.2)
@@ -85,7 +86,7 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.15.0)
       parser (>= 3.0.1.1)
-    rubocop-performance (1.12.0)
+    rubocop-performance (1.13.0)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
@@ -98,6 +99,9 @@ GEM
     sequel (5.51.0)
     sequel-annotate (1.7.0)
       sequel (>= 4)
+    sequel-hash_id (0.1.2)
+      hashids (~> 1.0)
+      sequel (>= 4.0, < 6.0)
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
@@ -172,6 +176,7 @@ DEPENDENCIES
   rubocop-sequel
   sequel
   sequel-annotate
+  sequel-hash_id
   slim
   tony!
   tony-auth!

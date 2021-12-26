@@ -41,6 +41,7 @@ module Models
                              remover: nil,
                              clearer: nil
     plugin :timestamps, update_on_create: true
+    plugin :hash_id, salt: ENV.fetch('POLL_ID_SALT').freeze
 
     def before_validation
       cancel_action('Poll has no group') unless group_id
@@ -121,7 +122,7 @@ module Models
     end
 
     def url
-      return "/poll/view/#{id}"
+      return "/poll/view/#{hashid}"
     end
 
     def to_s

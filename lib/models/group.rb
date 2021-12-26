@@ -23,6 +23,7 @@ module Models
     many_to_one :creator, class: 'Models::User', key: :email
     one_to_many :members, remover: ->(member) { member.destroy }, clearer: nil
     one_to_many :polls, remover: ->(poll) { poll.destroy }, clearer: nil
+    plugin :hash_id, salt: ENV.fetch('GROUP_ID_SALT').freeze
 
     def _add_member(member)
       User.find_or_create(email: member.email)
@@ -38,7 +39,7 @@ module Models
     end
 
     def url
-      return "/group/view/#{id}"
+      return "/group/view/#{hashid}"
     end
 
     def to_s

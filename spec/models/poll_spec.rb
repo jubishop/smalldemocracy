@@ -336,7 +336,7 @@ RSpec.describe(Models::Poll) {
   context('url') {
     it('creates url') {
       poll = create_poll
-      expect(poll.url).to(eq("/poll/view/#{poll.id}"))
+      expect(poll.url).to(eq("/poll/view/#{poll.hashid}"))
     }
   }
 
@@ -385,6 +385,13 @@ RSpec.describe(Models::Poll) {
       poll.update(title: 'title')
       expect(poll.created_at).to_not(eq(poll.updated_at))
       expect(poll.updated_at).to(eq(moment))
+    }
+  }
+
+  context('hashid') {
+    it('works with hashid') {
+      poll = create_poll
+      expect(Models::Poll.with_hashid(poll.hashid)).to(eq(poll))
     }
   }
 }

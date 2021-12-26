@@ -99,7 +99,7 @@ RSpec.describe(Models::Group) {
   context('#url') {
     it('creates url') {
       group = create_group
-      expect(group.url).to(eq("/group/view/#{group.id}"))
+      expect(group.url).to(eq("/group/view/#{group.hashid}"))
     }
   }
 
@@ -157,6 +157,13 @@ RSpec.describe(Models::Group) {
       expect { group.add_poll(email: 'invalid') }.to(
           raise_error(Sequel::HookFailed,
                       "Poll has invalid creator email: 'invalid'"))
+    }
+  }
+
+  context('hashid') {
+    it('works with hashid') {
+      group = create_group
+      expect(Models::Group.with_hashid(group.hashid)).to(eq(group))
     }
   }
 }

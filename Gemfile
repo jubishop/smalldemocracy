@@ -10,6 +10,7 @@ gem 'rack-contrib'
 gem 'rack-protection'
 gem 'rake'
 gem 'sequel'
+gem 'sequel-hash_id'
 gem 'slim'
 gem 'tzinfo'
 
