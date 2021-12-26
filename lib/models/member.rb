@@ -26,10 +26,10 @@ module Models
                 clearer: nil
 
     def before_validation
-      cancel_action('Member created with no email') unless email
-      cancel_action('Member created with empty email') if email.empty?
+      cancel_action('Member has no email') unless email
+      cancel_action('Member has empty email') if email.empty?
       unless URI::MailTo::EMAIL_REGEXP.match?(email)
-        cancel_action("Member created with invalid email: '#{email}'")
+        cancel_action("Member has invalid email: '#{email}'")
       end
       super
     end

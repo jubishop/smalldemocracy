@@ -30,10 +30,10 @@ module Models
     alias remove_poll remove_created_poll
 
     def before_validation
-      cancel_action('User created with no email') unless email
-      cancel_action('User created with empty email') if email.empty?
+      cancel_action('User has no email') unless email
+      cancel_action('User has empty email') if email.empty?
       unless URI::MailTo::EMAIL_REGEXP.match?(email)
-        cancel_action("User created with invalid email: '#{email}'")
+        cancel_action("User has invalid email: '#{email}'")
       end
       super
     end

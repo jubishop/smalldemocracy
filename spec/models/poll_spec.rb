@@ -49,7 +49,7 @@ RSpec.describe(Models::Poll) {
     it('rejects creating a poll with expiration at unix epoch') {
       expect { create_poll(expiration: Time.at(0)) }.to(
           raise_error(Sequel::HookFailed,
-                      'Poll created with expiration at unix epoch'))
+                      'Poll has expiration at unix epoch'))
     }
 
     it('defaults to creating a poll that is `borda_single` type') {
@@ -350,7 +350,7 @@ RSpec.describe(Models::Poll) {
     it('rejects adding a choice to an expired poll') {
       poll = create_poll(expiration: past)
       expect { poll.add_choice }.to(
-          raise_error(Sequel::HookFailed, 'Choice created for expired poll'))
+          raise_error(Sequel::HookFailed, 'Choice modified in expired poll'))
     }
 
     it('rejects creating two choices with the same text') {

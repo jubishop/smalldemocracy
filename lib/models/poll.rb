@@ -43,17 +43,15 @@ module Models
     plugin :timestamps, update_on_create: true
 
     def before_validation
-      cancel_action('Poll created with no group') unless group_id
-      cancel_action('Poll created with no creator') unless email
-      cancel_action('Poll created with empty creator') if email.empty?
-      unless creator
-        cancel_action("Poll created with invalid creator email: '#{email}'")
-      end
+      cancel_action('Poll has no group') unless group_id
+      cancel_action('Poll has no creator') unless email
+      cancel_action('Poll has empty creator') if email.empty?
+      cancel_action("Poll has invalid creator email: '#{email}'") unless creator
       unless member(email: creator.email)
         cancel_action("Creator: '#{email}', is not a member of '#{group.name}'")
       end
       if !expiration.nil? && expiration.is_a?(Time) && expiration.to_i.zero?
-        cancel_action('Poll created with expiration at unix epoch')
+        cancel_action('Poll has expiration at unix epoch')
       end
       super
     end

@@ -59,7 +59,7 @@ RSpec.describe(Models::Choice) {
       choice.poll.update(expiration: past)
       expect { choice.add_response(member_id: member.id) }.to(
           raise_error(Sequel::HookFailed,
-                      'Response created for expired poll'))
+                      'Response modified in expired poll'))
     }
 
     it('rejects adding a response without a member') {

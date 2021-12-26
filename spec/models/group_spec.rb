@@ -143,20 +143,20 @@ RSpec.describe(Models::Group) {
     it('rejects creating a poll with no creator email') {
       group = create_group
       expect { group.add_poll(email: nil) }.to(
-          raise_error(Sequel::HookFailed, 'Poll created with no creator'))
+          raise_error(Sequel::HookFailed, 'Poll has no creator'))
     }
 
     it('rejects creating a poll with empty creator email') {
       group = create_group
       expect { group.add_poll(email: '') }.to(
-          raise_error(Sequel::HookFailed, 'Poll created with empty creator'))
+          raise_error(Sequel::HookFailed, 'Poll has empty creator'))
     }
 
     it('rejects creating a poll with invalid creator email') {
       group = create_group
       expect { group.add_poll(email: 'invalid') }.to(
           raise_error(Sequel::HookFailed,
-                      "Poll created with invalid creator email: 'invalid'"))
+                      "Poll has invalid creator email: 'invalid'"))
     }
   }
 }

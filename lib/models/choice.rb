@@ -25,7 +25,7 @@ module Models
                 clearer: nil
 
     def before_validation
-      cancel_action('Choice created for expired poll') if poll.finished?
+      cancel_action('Choice modified in expired poll') if poll.finished?
       super
     end
 

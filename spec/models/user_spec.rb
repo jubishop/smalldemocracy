@@ -15,18 +15,18 @@ RSpec.describe(Models::User) {
 
     it('rejects creating user with no email') {
       expect { create_user(email: nil) }.to(
-          raise_error(Sequel::HookFailed, 'User created with no email'))
+          raise_error(Sequel::HookFailed, 'User has no email'))
     }
 
     it('rejects creating user with empty email') {
       expect { create_user(email: '') }.to(
-          raise_error(Sequel::HookFailed, 'User created with empty email'))
+          raise_error(Sequel::HookFailed, 'User has empty email'))
     }
 
     it('rejects creating user with invalid email') {
       expect { create_user(email: 'invalid@') }.to(
           raise_error(Sequel::HookFailed,
-                      "User created with invalid email: 'invalid@'"))
+                      "User has invalid email: 'invalid@'"))
     }
   }
 
@@ -134,7 +134,7 @@ RSpec.describe(Models::User) {
     it('rejects creating a poll with no group') {
       user = create_user
       expect { user.add_poll }.to(
-          raise_error(Sequel::HookFailed, 'Poll created with no group'))
+          raise_error(Sequel::HookFailed, 'Poll has no group'))
     }
   }
 
