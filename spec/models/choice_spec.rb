@@ -1,7 +1,5 @@
 require_relative '../../lib/models/choice'
 
-# TODO: Test can't remove a choice from expired poll.
-
 RSpec.describe(Models::Choice) {
   context('create') {
     it('creates a choice') {
@@ -71,6 +69,4 @@ RSpec.describe(Models::Choice) {
                       /null value in column "member_id"/))
     }
   }
-
-  # TODO: Can't remove choice after poll has expired.
 }
