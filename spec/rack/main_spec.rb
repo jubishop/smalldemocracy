@@ -1,25 +1,21 @@
-require_relative '../helpers/main/expectations'
-
 RSpec.describe(Main, type: :rack_test) {
-  include RSpec::MainExpectations
-
   context('get /') {
-    it('displays logged out page when there is no email cookie') {
+    it('renders logged out page when there is no email cookie') {
       expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
       get '/'
       expect(last_response.ok?).to(be(true))
     }
 
-    it('displays logged in page when there is an email cookie') {
-      set_cookie(:email, 'test@example.com')
+    it('renders logged in page when there is an email cookie') {
+      set_cookie(:email, 'my@email')
+      expect_slim(:index, email: 'my@email', req: an_instance_of(Tony::Request))
       get '/'
-      expect_logged_in_index_page('test@example.com')
     }
 
     it('does not delete the email cookie') {
-      set_cookie(:email, 'nomnomnom')
+      set_cookie(:email, 'nom@nom')
       get '/'
-      expect(get_cookie(:email)).to(eq('nomnomnom'))
+      expect(get_cookie(:email)).to(eq('nom@nom'))
     }
   }
 
@@ -41,20 +37,20 @@ RSpec.describe(Main, type: :rack_test) {
       ENV['RACK_ENV'] = 'production'
     }
 
-    it('displays logged out page when there is no email cookie') {
+    it('renders logged out page when there is no email cookie') {
+      expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
       get_path('/')
-      expect_logged_out_index_page
     }
 
-    it('displays logged in page when there is an email cookie') {
-      set_cookie(:email, 'test@example.com')
+    it('renders logged in page when there is an email cookie') {
+      set_cookie(:email, 'my@email')
+      expect_slim(:index, email: 'my@email', req: an_instance_of(Tony::Request))
       get_path('/')
-      expect_logged_in_index_page('test@example.com')
     }
 
-    it('does not display raised error messages in production') {
+    it('does not reveal error message stack traces in production') {
+      expect_slim(:not_found)
       get_path('/throw_error')
-      expect_production_error_page
     }
 
     after(:all) {
@@ -101,8 +97,8 @@ RSpec.describe(Main, type: :rack_test) {
     }
   }
 
-  it('returns not found to unknown urls') {
+  it('renders not found to unknown urls') {
+    expect_slim(:not_found)
     get '/not_a_url'
-    expect_not_found_page
   }
 }
