@@ -120,6 +120,7 @@ module Models
   class Member
     include Test::Env
     orig_add_poll = instance_method(:add_poll)
+    undef_method(:add_poll)
     define_method(:add_poll) { |title: rand.to_s,
                                 question: rand.to_s,
                                 expiration: ::Time.now,
