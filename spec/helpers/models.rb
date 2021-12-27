@@ -72,49 +72,44 @@ end
 module Models
   class User
     include Test::Env
-    orig_add_group = instance_method(:add_group)
-    define_method(:add_group) { |name: rand.to_s|
+    def add_group(name: rand.to_s)
       test_only!
-      orig_add_group.bind_call(self, name: name)
-    }
+      add_created_group(name: name)
+    end
 
-    include Test::Env
-    orig_add_poll = instance_method(:add_poll)
-    define_method(:add_poll) { |group_id: groups.sample&.id,
-                                title: rand.to_s,
-                                question: rand.to_s,
-                                expiration: ::Time.now,
-                                **attributes|
+    def add_poll(group_id: groups.sample&.id,
+                 title: rand.to_s,
+                 question: rand.to_s,
+                 expiration: ::Time.now,
+                 **attributes)
       test_only!
-      orig_add_poll.bind_call(self, group_id: group_id,
-                                    title: title,
-                                    question: question,
-                                    expiration: expiration,
-                                    **attributes)
-    }
+      add_created_poll(group_id: group_id,
+                       title: title,
+                       question: question,
+                       expiration: expiration,
+                       **attributes)
+    end
   end
 
   class Group
     include Test::Env
-    orig_add_poll = instance_method(:add_poll)
-    define_method(:add_poll) { |email: members.sample&.email,
-                                title: rand.to_s,
-                                question: rand.to_s,
-                                expiration: ::Time.now,
-                                **attributes|
+    def add_poll(email: members.sample&.email,
+                 title: rand.to_s,
+                 question: rand.to_s,
+                 expiration: ::Time.now,
+                 **attributes)
       test_only!
-      orig_add_poll.bind_call(self, email: email,
-                                    title: title,
-                                    question: question,
-                                    expiration: expiration,
-                                    **attributes)
-    }
+      super(email: email,
+            title: title,
+            question: question,
+            expiration: expiration,
+            **attributes)
+    end
 
-    orig_add_member = instance_method(:add_member)
-    define_method(:add_member) { |email: "#{rand}@#{rand}"|
+    def add_member(email: "#{rand}@#{rand}")
       test_only!
-      orig_add_member.bind_call(self, email: email)
-    }
+      super(email: email)
+    end
   end
 
   class Member
@@ -132,30 +127,27 @@ module Models
                                     **attributes)
     }
 
-    orig_add_response = instance_method(:add_response)
-    define_method(:add_response) { |choice_id: polls.sample.choices.sample,
-                                    score: nil|
+    def add_response(choice_id: polls.sample.choices.sample,
+                     score: nil)
       test_only!
-      orig_add_response.bind_call(self, choice_id: choice_id, score: score)
-    }
+      super(choice_id: choice_id, score: score)
+    end
   end
 
   class Poll
     include Test::Env
-    orig_add_choice = instance_method(:add_choice)
-    define_method(:add_choice) { |text: rand.to_s|
+    def add_choice(text: rand.to_s)
       test_only!
-      orig_add_choice.bind_call(self, text: text)
-    }
+      super(text: text)
+    end
   end
 
   class Choice
     include Test::Env
-    orig_add_response = instance_method(:add_response)
-    define_method(:add_response) { |member_id: poll.members.sample.id,
-                                    **attributes|
+    def add_response(member_id: poll.members.sample.id,
+                     **attributes)
       test_only!
-      orig_add_response.bind_call(self, member_id: member_id, **attributes)
-    }
+      super(member_id: member_id, **attributes)
+    end
   end
 end
