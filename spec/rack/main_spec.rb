@@ -5,8 +5,9 @@ RSpec.describe(Main, type: :rack_test) {
 
   context('get /') {
     it('displays logged out page when there is no email cookie') {
+      expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
       get '/'
-      expect_logged_out_index_page
+      expect(last_response.ok?).to(be(true))
     }
 
     it('displays logged in page when there is an email cookie') {
