@@ -11,7 +11,6 @@ gem 'rack-protection'
 gem 'rake'
 gem 'sequel'
 gem 'slim'
-gem 'tzinfo'
 
 source 'https://www.jubigems.org' do
   gem 'core'

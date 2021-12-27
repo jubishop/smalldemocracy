@@ -120,14 +120,14 @@ GEM
       linguistics
     rstruct (1.5)
       core
-    tony (0.45)
+    tony (0.47)
       base64
       rack
       rack-contrib
       slim
-    tony-auth (0.9)
+    tony-auth (0.10)
       base64
-    tony-test (0.58)
+    tony-test (0.59)
       capybara
       chunky_png
       colorize
@@ -136,6 +136,7 @@ GEM
       rack-contrib
       rack-test
       rspec
+      tzinfo
 
 PLATFORMS
   x86_64-darwin-19
@@ -173,7 +174,6 @@ DEPENDENCIES
   tony!
   tony-auth!
   tony-test!
-  tzinfo
   websocket-driver
 
 RUBY VERSION
