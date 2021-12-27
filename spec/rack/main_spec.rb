@@ -49,7 +49,7 @@ RSpec.describe(Main, type: :rack_test) {
     }
 
     it('does not reveal error message stack traces in production') {
-      expect_slim(:not_found)
+      expect_slim(:error)
       get_path('/throw_error')
     }
 
