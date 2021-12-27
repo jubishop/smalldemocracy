@@ -12,7 +12,6 @@ gem 'rake'
 gem 'sequel'
 gem 'sequel-hash_id'
 gem 'slim'
-gem 'tzinfo'
 
 source 'https://www.jubigems.org' do
   gem 'core'
