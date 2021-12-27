@@ -4,6 +4,9 @@ RSpec.describe(Main, type: :rack_test) {
       expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
       get '/'
       expect(last_response.ok?).to(be(true))
+      puts last_response.body
+      expect(last_response.body).to(
+          have_link('Sign in with Google', :href => 'actual link'))
     }
 
     it('renders logged in page when there is an email cookie') {
@@ -40,17 +43,20 @@ RSpec.describe(Main, type: :rack_test) {
     it('renders logged out page when there is no email cookie') {
       expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
       get_path('/')
+      expect(last_response.ok?).to(be(true))
     }
 
     it('renders logged in page when there is an email cookie') {
       set_cookie(:email, 'my@email')
       expect_slim(:index, email: 'my@email', req: an_instance_of(Tony::Request))
       get_path('/')
+      expect(last_response.ok?).to(be(true))
     }
 
     it('does not reveal error message stack traces in production') {
       expect_slim(:error)
       get_path('/throw_error')
+      expect(last_response.status).to(be(500))
     }
 
     after(:all) {
@@ -61,13 +67,16 @@ RSpec.describe(Main, type: :rack_test) {
   }
 
   context('get /logout') {
-    it('deletes the email cookie') {
+    it('deletes the email cookie and redirects to / by default') {
       set_cookie(:email, 'nomnomnom')
       get '/logout'
       expect(get_cookie(:email)).to(be_nil)
+      expect(last_response.redirect?).to(be(true))
+      expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
+      follow_redirect!
     }
 
-    it('redirects after logging out') {
+    it('redirects to ?r= when present') {
       get '/logout?r=/somewhere_else'
       expect(last_response.redirect?).to(be(true))
       expect(last_response.location).to(eq('/somewhere_else'))
@@ -76,7 +85,7 @@ RSpec.describe(Main, type: :rack_test) {
 
   context('get /auth/google') {
     before(:each) {
-      @login_info = Tony::Auth::LoginInfo.new(email: 'jubi@github.com',
+      @login_info = Tony::Auth::LoginInfo.new(email: 'me@email',
                                               state: { r: '/onward' })
     }
 
@@ -85,7 +94,7 @@ RSpec.describe(Main, type: :rack_test) {
       # rubocop:disable Style/StringHashKeys
       get '/auth/google', {}, { 'login_info' => @login_info }
       # rubocop:enable Style/StringHashKeys
-      expect(get_cookie(:email)).to(eq('jubi@github.com'))
+      expect(get_cookie(:email)).to(eq('me@email'))
     }
 
     it('redirects to :r in state') {
@@ -100,5 +109,6 @@ RSpec.describe(Main, type: :rack_test) {
   it('renders not found to unknown urls') {
     expect_slim(:not_found)
     get '/not_a_url'
+    expect(last_response.status).to(be(404))
   }
 }
