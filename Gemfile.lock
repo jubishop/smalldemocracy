@@ -126,14 +126,15 @@ GEM
       linguistics
     rstruct (1.5)
       core
-    tony (0.49)
+    tony (0.51)
       base64
       rack
       rack-contrib
       slim
+      tzinfo
     tony-auth (0.10)
       base64
-    tony-test (0.60)
+    tony-test (0.61)
       capybara
       chunky_png
       colorize
@@ -142,7 +143,6 @@ GEM
       rack-contrib
       rack-test
       rspec
-      tzinfo
 
 PLATFORMS
   x86_64-darwin-19
