@@ -34,36 +34,12 @@ module RSpec
           **attributes)
     end
 
-    def create_choice(email: "#{rand}@#{rand}",
-                      name: rand.to_s,
-                      title: rand.to_s,
-                      question: rand.to_s,
-                      expiration: future,
-                      text: rand.to_s,
-                      **attributes)
-      return create_poll(email: email,
-                         name: name,
-                         title: title,
-                         question: question,
-                         expiration: expiration,
-                         **attributes).add_choice(text: text)
+    def create_choice(text: rand.to_s, **attributes)
+      return create_poll(**attributes).add_choice(text: text)
     end
 
-    def create_response(email: "#{rand}@#{rand}",
-                        name: rand.to_s,
-                        title: rand.to_s,
-                        question: rand.to_s,
-                        expiration: future,
-                        text: rand.to_s,
-                        score: nil,
-                        **attributes)
-      choice = create_choice(email: email,
-                             name: name,
-                             title: title,
-                             question: question,
-                             expiration: expiration,
-                             text: text,
-                             **attributes)
+    def create_response(score: nil, **attributes)
+      choice = create_choice(**attributes)
       return choice.add_response(score: score)
     end
   end
