@@ -120,14 +120,14 @@ GEM
       linguistics
     rstruct (1.5)
       core
-    tony (0.44)
+    tony (0.45)
       base64
       rack
       rack-contrib
       slim
     tony-auth (0.9)
       base64
-    tony-test (0.57)
+    tony-test (0.58)
       capybara
       chunky_png
       colorize

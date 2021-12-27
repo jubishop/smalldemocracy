@@ -8,13 +8,8 @@ html lang="en"
     ==favicon_link_tag
     ==stylesheet_link_tag 'css/pico'
     ==stylesheet_link_tag 'css/layout'
-
     ==yield_content :head
-
-    javascript:
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      document.cookie = "tz="+tz+"; expires=31536000; path=/";
-      document.documentElement.classList.add('timezone-loaded');
+    ==timezone_script
 
   body
     header

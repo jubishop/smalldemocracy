@@ -1,5 +1,4 @@
 require 'date'
-require 'tzinfo'
 
 require_relative 'base'
 require_relative 'models/choice'
@@ -32,7 +31,7 @@ class Poll < Base
         return
       end
 
-      hour_offset = timezone(req).utc_offset / 3600
+      hour_offset = req.timezone.utc_offset / 3600
       utc_offset = hour_offset.abs.to_s
       utc_offset.prepend('0') if hour_offset.abs < 10
       utc_offset.prepend(hour_offset >= 0 ? '+' : '-')
@@ -85,7 +84,7 @@ class Poll < Base
       template = responder.responses.empty? ? :view : :responded
       resp.write(@slim.render("poll/#{template}", poll: poll,
                                                   responder: responder,
-                                                  timezone: timezone(req)))
+                                                  timezone: req.timezone))
     })
 
     post('/poll/respond', ->(req, resp) {
@@ -120,10 +119,6 @@ class Poll < Base
   end
 
   private
-
-  def timezone(req)
-    return TZInfo::Timezone.get(req.cookies.fetch('tz', 'America/Los_Angeles'))
-  end
 
   def save_choose_one_poll(req, resp, responder)
     unless req.params.key?(:choice)
