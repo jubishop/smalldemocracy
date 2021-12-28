@@ -23,8 +23,12 @@ class Base < Tony::App
 
     # For testing only
     get('/throw_error', ->(req, resp) {
-      resp.redirect('/') if on_prod?(req)
-      raise(RuntimeError, 'Fuck you') # rubocop:disable Style/RedundantException
+      if on_prod?(req)
+        resp.redirect('/')
+        return
+      end
+
+      raise(ZeroDivisionError, 'Fuck you')
     })
   end
 
