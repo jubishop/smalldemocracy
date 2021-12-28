@@ -17,18 +17,21 @@ class Poll < Base
                            ]
                          }))
 
-    get('/poll/create', ->(req, resp) {
-      require_email(req, resp)
-      resp.write(@slim.render('poll/create'))
+    get('/poll/create', ->(req, _) {
+      require_email(req)
+      return 200, @slim.render('poll/create')
     })
 
     post('/poll/create', ->(req, resp) {
-      require_email(req, resp)
+      require_email(req)
 
       if req.params[:expiration].nil? || req.params[:expiration].empty?
-        resp.status = 406
-        resp.write('No expiration date given')
-        return
+        return 406, 'No expiration date given'
+      end
+
+      unless req.params[:choices].is_a?(Enumerable) &&
+             !req.params[:choices].empty?
+        return 406, 'No choices given'
       end
 
       hour_offset = req.timezone.utc_offset / 3600
@@ -43,112 +46,90 @@ class Poll < Base
             date_string, '%Y-%m-%dT%H:%M %z').to_time
         # rubocop:enable Style/DateTime
       rescue Date::Error
-        resp.status = 406
-        resp.write("#{date_string} is invalid date")
-        return
+        return 406, "#{date_string} is invalid date"
       end
 
       begin
         poll = Models::Poll.create(**req.params.symbolize_keys)
-      rescue Models::ArgumentError => error
-        resp.status = 406
-        resp.write(error.message)
+      rescue Sequel::Error => error
+        return 406, error.message
       else
         resp.redirect(poll.url)
       end
     })
 
-    get(%r{^/poll/view/(?<poll_id>.+)$}, ->(req, resp) {
-      poll = require_poll(req, resp)
+    get(%r{^/poll/view/(?<poll_id>.+)$}, ->(req, _) {
+      poll = require_poll(req)
 
       if poll.finished?
         breakdown, unresponded = poll.breakdown
-        resp.write(@slim.render('poll/finished', poll: poll,
-                                                 breakdown: breakdown,
-                                                 unresponded: unresponded))
-        return
+        return 200, @slim.render('poll/finished', poll: poll,
+                                                  breakdown: breakdown,
+                                                  unresponded: unresponded)
       end
 
       email = fetch_email(req)
-      unless email
-        resp.write(@slim.render('email/get', poll: poll, req: req))
-        return
-      end
+      return 200, @slim.render('email/get', poll: poll, req: req) unless email
 
       responder = poll.responder(email: email)
       unless responder
-        resp.write(@slim.render('email/get', poll: poll, req: req))
-        return
+        return 200, @slim.render('email/get', poll: poll, req: req)
       end
 
       template = responder.responses.empty? ? :view : :responded
-      resp.write(@slim.render("poll/#{template}", poll: poll,
-                                                  responder: responder,
-                                                  timezone: req.timezone))
+      return 200, @slim.render("poll/#{template}", poll: poll,
+                                                   responder: responder,
+                                                   timezone: req.timezone)
     })
 
-    post('/poll/respond', ->(req, resp) {
-      poll = require_poll(req, resp)
-      email = require_email(req, resp)
+    post('/poll/respond', ->(req, _) {
+      poll = require_poll(req)
+      email = require_email(req)
 
       responder = poll.responder(email: email)
-      unless responder
-        resp.status = 405
-        resp.write("#{email} is not a responder to this poll")
-        return
-      end
+      return 405, "#{email} is not a responder to this poll" unless responder
 
       begin
         case poll.type
         when :borda_single, :borda_split
-          save_borda_poll(req, resp, poll, responder)
+          save_borda_poll(req, poll, responder)
         when :choose_one
-          save_choose_one_poll(req, resp, responder)
+          save_choose_one_poll(req, responder)
         end
       rescue Sequel::UniqueConstraintViolation
-        resp.status = 409
-        resp.write('Duplicate response or choice found')
+        return 409, 'Duplicate response or choice found'
       rescue Sequel::HookFailed => error
-        resp.status = 405
-        resp.write(error.message)
+        return 405, error.message
       else
-        resp.status = 201
-        resp.write('Poll created')
+        return 201, 'Poll created'
       end
     })
   end
 
   private
 
-  def save_choose_one_poll(req, resp, responder)
+  def save_choose_one_poll(req, responder)
     unless req.params.key?(:choice)
-      resp.status = 400
-      resp.write('No choice provided')
-      throw(:response)
+      throw(:response, [400, 'No choice provided'])
     end
     choice_id = req.params.fetch(:choice)
     responder.add_response(choice_id: choice_id)
   end
 
-  def save_borda_poll(req, resp, poll, responder)
+  def save_borda_poll(req, poll, responder)
     unless req.params.key?(:responses)
-      resp.status = 400
-      resp.write('No responses provided')
-      throw(:response)
+      throw(:response, [400, 'No responses provided'])
     end
     responses = req.params.fetch(:responses)
 
     if poll.type == :borda_split && !req.params.key?(:bottom_responses)
-      resp.status = 400
-      resp.write('No bottom response array provided for a borda_split poll')
-      throw(:response)
+      throw(:response,
+            [400, 'No bottom response array provided for a borda_split poll'])
     end
 
     bottom_responses = req.params.fetch(:bottom_responses, [])
     unless responses.length + bottom_responses.length == poll.choices.length
-      resp.status = 406
-      resp.write('Response set does not match number of choices')
-      throw(:response)
+      throw(:response, [406, 'Response set does not match number of choices'])
     end
 
     responses.each_with_index { |choice_id, rank|

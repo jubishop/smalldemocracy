@@ -18,3 +18,9 @@ module RSpec
     end
   end
 end
+
+class Time
+  def form
+    return strftime('%Y-%m-%dT%H:%M')
+  end
+end

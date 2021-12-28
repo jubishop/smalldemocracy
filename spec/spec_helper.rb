@@ -14,6 +14,7 @@ ENV['GROUP_ID_SALT'] = 'groupsalt'
 
 require_relative '../setup'
 
+require_relative 'helpers/matchers'
 require_relative 'helpers/models'
 require_relative 'helpers/time'
 

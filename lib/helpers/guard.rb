@@ -4,11 +4,9 @@ module Helpers
   module Guard
     include Cookie
 
-    def require_poll(req, resp)
+    def require_poll(req)
       unless req.params.key?(:poll_id)
-        resp.status = 400
-        resp.write('No poll_id provided')
-        throw(:response)
+        throw(:response, [400, 'No poll_id provided'])
       end
 
       begin
@@ -16,46 +14,30 @@ module Helpers
       rescue Sequel::DatabaseError => error
         puts error
       end
-
-      unless poll
-        resp.status = 404
-        resp.write(@slim.render('poll/not_found'))
-        throw(:response)
-      end
+      throw(:response, [404, @slim.render('poll/not_found')]) unless poll
 
       return poll
     end
 
-    def require_finished_poll(req, resp)
-      poll = require_poll(req, resp)
-
+    def require_finished_poll(req)
+      poll = require_poll(req)
       unless poll.finished?
-        resp.status = 403
-        resp.write(@slim.render('poll/not_finished'))
-        throw(:response)
+        throw(:response, [403, @slim.render('poll/not_finished')])
       end
-
       return poll
     end
 
-    def require_choice(req, resp)
+    def require_choice(req)
       choice = Models::Choice[req.params.fetch(:choice_id)]
       unless choice
-        resp.status = 404
-        resp.write(@slim.render('poll/choice_not_found'))
-        throw(:response)
+        throw(:response, [404, @slim.render('poll/choice_not_found')])
       end
-
       return choice
     end
 
-    def require_email(req, resp)
+    def require_email(req)
       email = fetch_email(req)
-      unless email
-        resp.status = 404
-        resp.write(@slim.render('email/not_found'))
-        throw(:response)
-      end
+      throw(:response, [404, @slim.render('email/not_found')]) unless email
       return email
     end
   end

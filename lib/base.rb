@@ -11,14 +11,14 @@ class Base < Tony::App
     super(secret: ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET'))
     @slim = slim
 
-    not_found(->(_, resp) {
-      resp.write(@slim.render(:not_found))
+    not_found(->(_, _) {
+      return 404, @slim.render(:not_found)
     })
 
     error(->(_, resp) {
       raise resp.error unless ENV['APP_ENV'] == 'production'
 
-      resp.write(@slim.render(:error))
+      return 500, @slim.render(:error)
     })
 
     # For testing only
