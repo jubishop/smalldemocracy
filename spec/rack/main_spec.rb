@@ -4,9 +4,6 @@ RSpec.describe(Main, type: :rack_test) {
       expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
       get '/'
       expect(last_response.ok?).to(be(true))
-      puts last_response.body
-      expect(last_response.body).to(
-          have_link('Sign in with Google', :href => 'actual link'))
     }
 
     it('renders logged in page when there is an email cookie') {
