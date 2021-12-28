@@ -12,7 +12,7 @@ RSpec.describe(Main, type: :rack_test) {
       get '/'
     }
 
-    it('does not delete the email cookie') {
+    it('does not delete any existing email cookie') {
       set_cookie(:email, 'nom@nom')
       get '/'
       expect(get_cookie(:email)).to(eq('nom@nom'))
