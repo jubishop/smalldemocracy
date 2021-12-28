@@ -23,7 +23,7 @@ class Base < Tony::App
 
     # For testing only
     get('/throw_error', ->(req, resp) {
-      resp.redirect('/') if req.base_url.contains('smalldemocracy')
+      resp.redirect('/') if req.host_authority == 'smalldemocracy.com'
       raise(RuntimeError, 'Fuck you') # rubocop:disable Style/RedundantException
     })
   end
