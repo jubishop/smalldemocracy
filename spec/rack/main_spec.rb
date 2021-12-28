@@ -43,23 +43,27 @@ RSpec.describe(Main, type: :rack_test) {
   }
 
   context('get /auth/google') {
-    before(:each) {
-      @login_info = Tony::Auth::LoginInfo.new(email: 'me@email',
-                                              state: { r: '/onward' })
-    }
+    def auth_google(login_info)
+      # rubocop:disable Style/StringHashKeys
+      get('/auth/google', {}, { 'login_info' => login_info })
+      # rubocop:enable Style/StringHashKeys
+    end
 
     it('sets the email address') {
-      set_cookie(:email, 'nomnomnom')
-      # rubocop:disable Style/StringHashKeys
-      get '/auth/google', {}, { 'login_info' => @login_info }
-      # rubocop:enable Style/StringHashKeys
+      set_cookie(:email, 'nom@nom')
+      auth_google(Tony::Auth::LoginInfo.new(email: 'me@email'))
       expect(get_cookie(:email)).to(eq('me@email'))
     }
 
+    it('redirects to / by default') {
+      auth_google(Tony::Auth::LoginInfo.new(email: 'me@email'))
+      expect(last_response.redirect?).to(be(true))
+      expect(last_response.location).to(eq('/'))
+    }
+
     it('redirects to :r in state') {
-      # rubocop:disable Style/StringHashKeys
-      get '/auth/google', {}, { 'login_info' => @login_info }
-      # rubocop:enable Style/StringHashKeys
+      auth_google(Tony::Auth::LoginInfo.new(email: 'me@email',
+                                            state: { r: '/onward' }))
       expect(last_response.redirect?).to(be(true))
       expect(last_response.location).to(eq('/onward'))
     }
