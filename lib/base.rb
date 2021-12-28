@@ -29,7 +29,6 @@ class Base < Tony::App
   end
 
   def on_prod?(req)
-    puts req.host_authority
-    return req.host_authority == 'smalldemocracy.com'
+    return req.host_authority == 'www.smalldemocracy.com'
   end
 end
