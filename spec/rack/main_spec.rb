@@ -20,13 +20,19 @@ RSpec.describe(Main, type: :rack_test) {
   }
 
   context('get /logout') {
-    it('deletes the email cookie and redirects to / by default') {
+    it('deletes the email cookie') {
       set_cookie(:email, 'nomnomnom')
       get '/logout'
       expect(get_cookie(:email)).to(be_nil)
       expect(last_response.redirect?).to(be(true))
       expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
       follow_redirect!
+    }
+
+    it('redirects to / by default') {
+      get '/logout'
+      expect(last_response.redirect?).to(be(true))
+      expect(last_response.location).to(eq('/'))
     }
 
     it('redirects to ?r= when present') {
