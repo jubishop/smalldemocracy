@@ -23,8 +23,12 @@ class Base < Tony::App
 
     # For testing only
     get('/throw_error', ->(req, resp) {
-      resp.redirect('/') if req.host_authority == 'smalldemocracy.com'
+      resp.redirect('/') if on_prod?(req)
       raise(RuntimeError, 'Fuck you') # rubocop:disable Style/RedundantException
     })
+  end
+
+  def on_prod?(req)
+    return req.host_authority == 'smalldemocracy.com'
   end
 end
