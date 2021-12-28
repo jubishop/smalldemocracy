@@ -28,7 +28,7 @@ class Base < Tony::App
         return
       end
 
-      raise(RuntimeError, 'Fuck you') # rubocop:disable Style/RedundantException
+      raise(ZeroDivisionError, 'Fuck you')
     })
   end
 
