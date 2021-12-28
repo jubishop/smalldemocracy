@@ -16,6 +16,7 @@ RSpec.describe(Base, type: :rack_test) {
       expect_slim(:error)
       get_path('/throw_error')
       expect(last_response.status).to(be(500))
+      expect(last_response.body).to_not(include('Fuck you'))
     }
 
     after(:all) {
