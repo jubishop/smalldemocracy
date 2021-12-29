@@ -161,29 +161,37 @@ RSpec.describe(Models::Poll) {
 
   context('results') {
     it('raises error if using scores on choose_* types') {
-      poll = create_poll(type: :choose_one)
+      poll = create_poll(type: :choose_one, expiration: past)
       expect { poll.scores }.to(
           raise_error(TypeError, /must be one of borda_single or borda_split/))
     }
 
     it('raises an error if using counts on borda_single type') {
-      poll = create_poll(type: :borda_single)
+      poll = create_poll(type: :borda_single, expiration: past)
       expect { poll.counts }.to(
           raise_error(TypeError, /must be one of borda_split or choose_one/))
     }
 
     shared_examples('scores') {
       it('computes scores properly') {
+        @poll.expiration = past
         results = @expected_results.transform_values { |v| v.values.sum }
         results = results.sort_by { |_, v| -v }
         expect(@poll.scores.map(&:to_s)).to(
             match_array(results.map { |r| r[0].to_s }))
         expect(@poll.scores).to(match_array(results.map { |r| r[1] }))
       }
+
+      it('rejects computing scores if unfinished') {
+        @poll.expiration = future
+        expect { @poll.scores }.to(
+            raise_error(SecurityError, /is not finished/))
+      }
     }
 
     shared_examples('counts') {
       it('computes counts properly') {
+        @poll.expiration = past
         results = @expected_results.transform_values(&:length).sort_by { |k, v|
           [-v, -@expected_results[k].values.sum(&:to_i)]
         }
@@ -192,10 +200,17 @@ RSpec.describe(Models::Poll) {
         expect(@poll.counts.map(&:count)).to(
             match_array(results.map { |r| r[1] }))
       }
+
+      it('rejects computing counts if unfinished') {
+        @poll.expiration = future
+        expect { @poll.counts }.to(
+            raise_error(SecurityError, /is not finished/))
+      }
     }
 
     shared_examples('breakdown') {
       it('computes breakdown properly') {
+        @poll.expiration = past
         breakdown, unresponded = @poll.breakdown
         expect(unresponded.map(&:email)).to(match_array(@expected_unresponded))
         expect(breakdown.keys.map(&:text)).to(
@@ -206,6 +221,12 @@ RSpec.describe(Models::Poll) {
               match_array(expected_result.keys))
           expect(results.map(&:score)).to(match_array(expected_result.values))
         }
+      }
+
+      it('rejects computing breakdown if unfinished') {
+        @poll.expiration = future
+        expect { @poll.breakdown }.to(
+            raise_error(SecurityError, /is not finished/))
       }
     }
 
@@ -244,8 +265,6 @@ RSpec.describe(Models::Poll) {
           six: { 'a@a': 0, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
         }
         @expected_unresponded = ['f@f', group.creator.email]
-
-        @poll.expiration = 1
       }
 
       it_has_behavior('breakdown')
@@ -288,8 +307,6 @@ RSpec.describe(Models::Poll) {
           five: { 'b@b': 5, 'c@c': 4, 'd@d': 6, 'e@e': 5 }
         }
         @expected_unresponded = ['f@f', group.creator.email]
-
-        @poll.expiration = 1
       }
 
       it_has_behavior('breakdown')

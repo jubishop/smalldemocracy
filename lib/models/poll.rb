@@ -78,12 +78,14 @@ module Models
     end
 
     def scores
+      assert_finished
       assert_type(:borda_single, :borda_split)
 
       return Helpers::PollResults.new(responses, &:score).to_a
     end
 
     def counts
+      assert_finished
       assert_type(:borda_split, :choose_one)
 
       point_results = Helpers::PollResults.new(responses)
@@ -99,6 +101,7 @@ module Models
     end
 
     def breakdown
+      assert_finished
       assert_type(:choose_one, :borda_single, :borda_split)
 
       results = Hash.new { |hash, key| hash[key] = [] }
@@ -130,6 +133,12 @@ module Models
     end
 
     private
+
+    def assert_finished
+      return if finished?
+
+      raise SecurityError, "#{title} is not finished"
+    end
 
     def assert_type(*types)
       return if types.include?(type)
