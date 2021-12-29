@@ -188,6 +188,20 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.body).to(eq('No email found'))
     }
 
+    it('rejects posting if you are not a member of the poll') {
+      set_cookie(:email, 'me@email')
+      post_json('/poll/respond', { hash_id: poll.hashid })
+      expect(last_response.status).to(be(404))
+      expect(last_response.body).to(eq('Poll not found'))
+    }
+
+    it('rejects posting responses to expired poll') {
+      poll.update(expiration: past)
+      post_json('/poll/respond', { hash_id: poll.hashid })
+      expect(last_response.status).to(be(405))
+      expect(last_response.body).to(eq('Poll has already finished'))
+    }
+
     context(':choose_one') {
       let(:poll) { create_poll(type: :choose_one) }
 

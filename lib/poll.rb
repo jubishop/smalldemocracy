@@ -85,8 +85,10 @@ class Poll < Base
       poll = require_poll(req)
       email = require_email(req)
 
+      return 405, 'Poll has already finished' if poll.finished?
+
       member = poll.member(email: email)
-      return 404, @slim.render('poll/not_found') unless member
+      return 404, 'Poll not found' unless member
 
       if member.responded?(poll_id: poll.id)
         return 409, "Member has already responded to #{poll}"
@@ -99,9 +101,7 @@ class Poll < Base
         when :choose_one
           save_choose_one_poll_response(req, member)
         end
-      rescue Sequel::UniqueConstraintViolation
-        return 409, 'Duplicate response or choice found'
-      rescue Sequel::HookFailed, Sequel::DatabaseError => error
+      rescue Sequel::Error => error
         return 400, error.message
       else
         return 201, 'Poll response added'
