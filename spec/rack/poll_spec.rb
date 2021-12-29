@@ -38,6 +38,7 @@ RSpec.describe(Poll, type: :rack_test) {
                                poll: an_instance_of(Models::Poll),
                                timezone: an_instance_of(TZInfo::DataTimezone))
       follow_redirect!
+      expect(last_response.ok?).to(be(true))
     }
 
   #   it('creates a new :borda_split poll successfully') {
