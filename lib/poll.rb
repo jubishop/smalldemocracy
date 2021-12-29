@@ -53,10 +53,10 @@ class Poll < Base
 
       begin
         poll = Models::Poll.create(**req.params.symbolize_keys)
+        choices.each { |choice| poll.add_choice(text: choice) }
       rescue Sequel::Error => error
         return 406, error.message
       else
-        choices.each { |choice| poll.add_choice(text: choice) }
         resp.redirect(poll.url)
       end
     })
