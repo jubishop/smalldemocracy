@@ -1,9 +1,9 @@
 RSpec.describe(Poll, type: :rack_test) {
   context('get /create') {
-    it('rejects any access without a cookie') {
-      expect_slim('email/not_found')
+    it('requests email if you have no cookie') {
+      expect_slim('email/get', req: an_instance_of(Tony::Request))
       get '/poll/create'
-      expect(last_response.status).to(be(404))
+      expect(last_response.ok?).to(be(true))
     }
 
     it('shows poll creation form if you have an email cookie') {
