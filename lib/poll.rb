@@ -25,16 +25,20 @@ class Poll < Base
     post('/poll/create', ->(req, resp) {
       require_email(req)
 
+      unless req.params[:type]
+        return 400, 'Type must be specified'
+      end
+
       if req.params[:expiration].nil? || req.params[:expiration].empty?
-        return 406, 'No expiration date given'
+        return 400, 'No expiration date given'
       end
 
       choices = req.params[:choices]
       req.params.delete(:choices)
-      return 406, 'Invalid choices given' unless choices.is_a?(Enumerable)
+      return 400, 'Invalid choices given' unless choices.is_a?(Enumerable)
 
       choices = choices.compact.delete_if(&:empty?)
-      return 406, 'No choices given' if choices.empty?
+      return 400, 'No choices given' if choices.empty?
 
       hour_offset = req.timezone.utc_offset / 3600
       utc_offset = hour_offset.abs.to_s
@@ -48,14 +52,14 @@ class Poll < Base
             date_string, '%Y-%m-%dT%H:%M %z').to_time
         # rubocop:enable Style/DateTime
       rescue Date::Error
-        return 406, "#{date_string} is invalid date"
+        return 400, "#{date_string} is invalid date"
       end
 
       begin
         poll = Models::Poll.create(**req.params.symbolize_keys)
         choices.each { |choice| poll.add_choice(text: choice) }
       rescue Sequel::Error => error
-        return 406, error.message
+        return 400, error.message
       else
         resp.redirect(poll.url)
       end

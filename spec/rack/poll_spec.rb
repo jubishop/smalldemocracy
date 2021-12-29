@@ -14,25 +14,9 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
-  shared_examples('create') {
-    it('creates a new poll') {
-      post '/poll/create', **valid_params
-      expect(last_response.redirect?).to(be(true))
-      expect_slim(
-          'poll/view',
-          member: group.creating_member,
-          poll: an_instance_of(Models::Poll).and(
-              have_attributes(email: group.creator.email,
-                              group_id: group.id,
-                              type: type)),
-          timezone: an_instance_of(TZInfo::DataTimezone))
-      follow_redirect!
-      expect(last_response.ok?).to(be(true))
-    }
-  }
-
   context('post /create') {
     let(:group) { create_group }
+    let(:type) { :choose_one }
     let(:valid_params) {
       {
         email: group.creator.email,
@@ -45,8 +29,22 @@ RSpec.describe(Poll, type: :rack_test) {
       }
     }
 
-    before(:each) {
-      set_cookie(:email, group.creator.email)
+    shared_examples('create') {
+      it('creates a new poll') {
+        set_cookie(:email, group.creator.email)
+        post '/poll/create', **valid_params
+        expect(last_response.redirect?).to(be(true))
+        expect_slim(
+            'poll/view',
+            member: group.creating_member,
+            poll: an_instance_of(Models::Poll).and(
+                have_attributes(email: group.creator.email,
+                                group_id: group.id,
+                                type: type)),
+            timezone: an_instance_of(TZInfo::DataTimezone))
+        follow_redirect!
+        expect(last_response.ok?).to(be(true))
+      }
     }
 
     context(':borda_single') {
@@ -63,31 +61,39 @@ RSpec.describe(Poll, type: :rack_test) {
       let(:type) { :choose_one }
       it_has_behavior('create')
     }
+
+    it('rejects any post without a cookie') {
+      expect_slim('email/not_found')
+      post '/poll/create', **valid_params
+    }
+
+    it('fails if post body is nonexistent') {
+      set_cookie(:email, group.creator.email)
+      post '/poll/create'
+      expect(last_response.status).to(be(400))
+      puts(last_response.body)
+    }
+
+    it('fails if type is invalid') {
+      set_cookie(:email, group.creator.email)
+      valid_params[:type] = :invalid_type
+      post '/poll/create', **valid_params
+      expect(last_response.status).to(be(400))
+    }
+
+    it('fails if any field is missing or empty') {
+      set_cookie(:email, group.creator.email)
+      valid_params.each_key { |key|
+        params = valid_params.clone
+        params[key] = ''
+        post '/poll/create', **params
+        expect(last_response.status).to(be(400))
+        params.delete(key)
+        post '/poll/create', **params
+        expect(last_response.status).to(be(400))
+      }
+    }
   }
-
-  #   it('rejects any post without a cookie') {
-  #     clear_cookies
-  #     post '/poll/create'
-  #     expect_email_not_found_page
-  #   }
-
-  #   it('fails if post body is nonexistent') {
-  #     post '/poll/create'
-  #     expect(last_response.status).to(be(406))
-  #   }
-
-  #   it('fails if any fields are empty or missing') {
-  #     @valid_params.each_key { |key|
-  #       params = @valid_params.clone
-  #       params[key] = ''
-  #       post '/poll/create', **params
-  #       expect(last_response.status).to(be(406))
-  #       params.delete(key)
-  #       post '/poll/create', **params
-  #       expect(last_response.status).to(be(406))
-  #     }
-  #   }
-  # }
 
   # context('get /view') {
   #   def respond_to_poll(poll)
