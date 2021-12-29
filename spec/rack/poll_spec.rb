@@ -14,24 +14,8 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
-  context('post /create') {
-    let(:group) { create_group }
-    let(:valid_params) {
-      return {
-        email: group.creator.email,
-        title: 'title',
-        question: 'question',
-        choices: %w[one two three],
-        group_id: group.id,
-        expiration: future.form
-      }
-    }
-
-    before(:each) {
-      set_cookie(:email, group.creator.email)
-    }
-
-    it('creates a new :borda_single poll successfully') {
+  shared_examples('create') {
+    it('creates a new poll') {
       post '/poll/create', **valid_params
       expect(last_response.redirect?).to(be(true))
       expect_slim(
@@ -40,29 +24,46 @@ RSpec.describe(Poll, type: :rack_test) {
           poll: an_instance_of(Models::Poll).and(
               have_attributes(email: group.creator.email,
                               group_id: group.id,
-                              type: :borda_single)),
+                              type: type)),
           timezone: an_instance_of(TZInfo::DataTimezone))
       follow_redirect!
       expect(last_response.ok?).to(be(true))
     }
+  }
 
-  #   it('creates a new :borda_split poll successfully') {
-  #     params = @valid_params.clone
-  #     params[:type] = :borda_split
-  #     post '/poll/create', **params
-  #     expect(last_response.redirect?).to(be(true))
-  #     follow_redirect!
-  #     expect_view_borda_split_page
-  #   }
+  context('post /create') {
+    let(:group) { create_group }
+    let(:valid_params) {
+      {
+        email: group.creator.email,
+        title: 'title',
+        question: 'question',
+        choices: %w[one two three],
+        group_id: group.id,
+        expiration: future.form,
+        type: type
+      }
+    }
 
-  #   it('creates a new :choose_one poll successfully') {
-  #     params = @valid_params.clone
-  #     params[:type] = :choose_one
-  #     post '/poll/create', **params
-  #     expect(last_response.redirect?).to(be(true))
-  #     follow_redirect!
-  #     expect_view_choose_one_page
-  #   }
+    before(:each) {
+      set_cookie(:email, group.creator.email)
+    }
+
+    context(':borda_single') {
+      let(:type) { :borda_single }
+      it_has_behavior('create')
+    }
+
+    context(':borda_split') {
+      let(:type) { :borda_split }
+      it_has_behavior('create')
+    }
+
+    context(':choose_one') {
+      let(:type) { :choose_one }
+      it_has_behavior('create')
+    }
+  }
 
   #   it('rejects any post without a cookie') {
   #     clear_cookies
@@ -86,7 +87,7 @@ RSpec.describe(Poll, type: :rack_test) {
   #       expect(last_response.status).to(be(406))
   #     }
   #   }
-  }
+  # }
 
   # context('get /view') {
   #   def respond_to_poll(poll)
