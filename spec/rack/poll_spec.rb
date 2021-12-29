@@ -99,16 +99,16 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows poll not found if logged in but not in this poll') {
-      set_cookie(:email, 'me@email')
       poll = create_poll
+      set_cookie(:email, 'me@email')
       expect_slim('poll/not_found')
       get poll.url
       expect(last_response.status).to(be(404))
     }
 
     it('shows poll not found if logged in but not in this finished poll') {
-      set_cookie(:email, 'me@email')
       poll = create_poll(expiration: past)
+      set_cookie(:email, 'me@email')
       expect_slim('poll/not_found')
       get poll.url
       expect(last_response.status).to(be(404))
@@ -123,12 +123,12 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('shows poll if you have not responded') {
       poll = create_poll
+      set_cookie(:email, poll.creating_member.email)
       expect_slim(
           'poll/view',
           poll: poll,
           member: poll.creating_member,
           timezone: timezone)
-      set_cookie(:email, poll.creating_member.email)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }
@@ -136,12 +136,12 @@ RSpec.describe(Poll, type: :rack_test) {
     it('shows your answers if you have responded') {
       poll = create_poll
       poll.creating_member.add_response(choice_id: poll.add_choice.id)
+      set_cookie(:email, poll.creating_member.email)
       expect_slim(
           'poll/responded',
           poll: poll,
           member: poll.creating_member,
           timezone: timezone)
-      set_cookie(:email, poll.creating_member.email)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }
@@ -151,12 +151,12 @@ RSpec.describe(Poll, type: :rack_test) {
       poll.creating_member.add_response(choice_id: poll.add_choice.id)
       poll.update(expiration: past)
       breakdown, unresponded = poll.breakdown
+      set_cookie(:email, poll.creating_member.email)
       expect_slim(
           'poll/finished',
           poll: poll,
           breakdown: breakdown,
           unresponded: unresponded)
-      set_cookie(:email, poll.creating_member.email)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }
