@@ -18,7 +18,7 @@ RSpec.describe(Poll, type: :rack_test) {
     let(:group) { create_group }
     let(:valid_params) {
       return {
-        email: group.creator,
+        email: group.creator.email,
         title: 'title',
         question: 'question',
         choices: %w[one two three],
@@ -28,15 +28,17 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     before(:each) {
-      set_cookie(:email, 'test@example.com')
+      set_cookie(:email, group.creator.email)
     }
 
-    # it('creates a new :borda_single poll successfully') {
-    #   post '/poll/create', **valid_params
-    #   expect(last_response.redirect?).to(be(true))
-    #   expect_slim('poll/view')
-    #   follow_redirect!
-    # }
+    it('creates a new :borda_single poll successfully') {
+      post '/poll/create', **valid_params
+      expect(last_response.redirect?).to(be(true))
+      expect_slim('poll/view', member: group.creating_member,
+                               poll: an_instance_of(Models::Poll),
+                               timezone: an_instance_of(TZInfo::DataTimezone))
+      follow_redirect!
+    }
 
   #   it('creates a new :borda_split poll successfully') {
   #     params = @valid_params.clone

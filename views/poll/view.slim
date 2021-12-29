@@ -12,7 +12,7 @@
 = content_for :header
   h1 =poll
 
-p Hello #{responder.email} (<a href="/logout?r=#{poll.url}">Logout</a>)
+p Hello #{member.email} (<a href="/logout?r=#{poll.url}">Logout</a>)
 
 h2 =poll.question
 
@@ -27,7 +27,7 @@ include :expiration_text
 
   section
     ul#choices poll_id=poll.id
-      - poll.shuffled_choices.each do |choice|
+      - poll.choices.shuffle.each do |choice|
         li.choice data-id=choice.id
           i.grip.fas.fa-grip-lines
           p.text =choice.text
@@ -43,6 +43,6 @@ include :expiration_text
   p Click on your choice.
 
   ul#choices poll_id=poll.id
-    - poll.shuffled_choices.each do |choice|
+    - poll.choices.shuffle.each do |choice|
       li.choice data-id=choice.id
         button.text disabled=true =choice.text

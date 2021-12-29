@@ -5,12 +5,12 @@ module Helpers
     include Cookie
 
     def require_poll(req)
-      unless req.params.key?(:poll_id)
-        throw(:response, [400, 'No poll_id provided'])
+      unless req.params.key?(:hash_id)
+        throw(:response, [400, 'No poll hash_id provided'])
       end
 
       begin
-        poll = Models::Poll[req.params.fetch(:poll_id)]
+        poll = Models::Poll.with_hashid(req.params.fetch(:hash_id))
       rescue Sequel::DatabaseError => error
         puts error
       end

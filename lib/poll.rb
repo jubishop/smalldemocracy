@@ -29,10 +29,12 @@ class Poll < Base
         return 406, 'No expiration date given'
       end
 
-      unless req.params[:choices].is_a?(Enumerable) &&
-             !req.params[:choices].empty?
-        return 406, 'No choices given'
-      end
+      choices = req.params[:choices]
+      req.params.delete(:choices)
+      return 406, 'Invalid choices given' unless choices.is_a?(Enumerable)
+
+      choices = choices.compact.delete_if(&:empty?)
+      return 406, 'No choices given' if choices.empty?
 
       hour_offset = req.timezone.utc_offset / 3600
       utc_offset = hour_offset.abs.to_s
@@ -54,11 +56,12 @@ class Poll < Base
       rescue Sequel::Error => error
         return 406, error.message
       else
+        choices.each { |choice| poll.add_choice(text: choice) }
         resp.redirect(poll.url)
       end
     })
 
-    get(%r{^/poll/view/(?<poll_id>.+)$}, ->(req, _) {
+    get(%r{^/poll/view/(?<hash_id>.+)$}, ->(req, _) {
       poll = require_poll(req)
 
       if poll.finished?
@@ -71,14 +74,12 @@ class Poll < Base
       email = fetch_email(req)
       return 200, @slim.render('email/get', poll: poll, req: req) unless email
 
-      responder = poll.responder(email: email)
-      unless responder
-        return 200, @slim.render('email/get', poll: poll, req: req)
-      end
+      member = poll.member(email: email)
+      return 200, @slim.render('email/get', poll: poll, req: req) unless member
 
-      template = responder.responses.empty? ? :view : :responded
+      template = member.responded?(poll_id: poll.id) ? :responded : :view
       return 200, @slim.render("poll/#{template}", poll: poll,
-                                                   responder: responder,
+                                                   member: member,
                                                    timezone: req.timezone)
     })
 

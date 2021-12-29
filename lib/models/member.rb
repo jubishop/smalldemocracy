@@ -41,8 +41,18 @@ module Models
       super
     end
 
+    def responded?(poll_id:)
+      choices = Models::Choice.where(poll_id: poll_id).select(:id)
+      return responses_dataset.where(choice_id: choices).count.positive?
+    end
+
     def add_poll(**attributes)
       return Models::Poll.create(group_id: group_id, email: email, **attributes)
+    end
+
+    def poll_responses(poll_id:)
+      choices = Models::Choice.where(poll_id: poll_id).select(:id)
+      return responses_dataset.where(choice_id: choices).all
     end
 
     def polls(start_expiration: nil, end_expiration: nil)

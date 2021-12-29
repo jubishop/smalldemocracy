@@ -71,11 +71,37 @@ RSpec.describe(Models::Member) {
     }
   }
 
+  context('responded?') {
+    it('reports not responding to a poll') {
+      member = create_member
+      poll = member.add_poll
+      expect(member.responded?(poll_id: poll.id)).to(be(false))
+    }
+
+    it('reports responding to a poll') {
+      member = create_member
+      poll = member.add_poll(expiration: future)
+      member.add_response(choice_id: poll.add_choice.id)
+      expect(member.responded?(poll_id: poll.id)).to(be(true))
+    }
+  }
+
   context('add_poll') {
     it('adds a poll to a member') {
       member = create_member
       poll = member.add_poll
       expect(member.polls).to(match_array(poll))
+    }
+  }
+
+  context('poll_responses') {
+    it('returns only responses for a specific poll') {
+      member = create_member
+      poll = member.add_poll(expiration: future)
+      response = member.add_response(choice_id: poll.add_choice.id)
+      member.add_response(
+          choice_id: member.add_poll(expiration: future).add_choice.id)
+      expect(member.poll_responses(poll_id: poll.id)).to(match_array(response))
     }
   }
 
