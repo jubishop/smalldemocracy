@@ -50,12 +50,14 @@ module Models
       return Models::Poll.create(group_id: group_id, email: email, **attributes)
     end
 
-    def poll_response(poll_id:)
+    def response(poll_id:)
       choices = Models::Choice.where(poll_id: poll_id).select(:id)
       return responses_dataset.where(choice_id: choices).first
     end
 
-    def poll_responses(poll_id:)
+    def responses(poll_id: nil)
+      return super unless poll_id
+
       choices = Models::Choice.where(poll_id: poll_id).select(:id)
       return responses_dataset.where(choice_id: choices).all
     end

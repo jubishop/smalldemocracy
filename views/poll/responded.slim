@@ -11,7 +11,7 @@ include :expiration_text
 - case poll.type
 - when :borda_single
   ruby:
-    responses = member.poll_responses(poll_id: poll.id)
+    responses = member.responses(poll_id: poll.id)
 
   p Here's your recorded responses.
   ol
@@ -21,7 +21,7 @@ include :expiration_text
 
 - when :borda_split
   ruby:
-    positive_responses = member.poll_responses(poll_id: poll.id)
+    positive_responses = member.responses(poll_id: poll.id)
     rejected_choices = poll.choices.reject { |choice|
       positive_responses.find { |response| response.choice == choice }
     }
@@ -35,4 +35,4 @@ include :expiration_text
       li ="#{choice} ❌ (0 points)"
 
 - when :choose_one
-  p You responded: #{member.poll_response(poll_id: poll.id).choice.text}
+  p You responded: #{member.response(poll_id: poll.id).choice.text}

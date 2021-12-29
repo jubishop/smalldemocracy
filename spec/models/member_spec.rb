@@ -94,24 +94,31 @@ RSpec.describe(Models::Member) {
     }
   }
 
-  context('poll_response') {
+  context('response') {
     it('returns only first response for a specific poll') {
       member = create_member
       poll = member.add_poll(expiration: future)
       response = member.add_response(choice_id: poll.add_choice.id)
       member.add_response(choice_id: poll.add_choice.id)
-      expect(member.poll_response(poll_id: poll.id)).to(eq(response))
+      expect(member.response(poll_id: poll.id)).to(eq(response))
     }
   }
 
-  context('poll_responses') {
-    it('returns only responses for a specific poll') {
-      member = create_member
-      poll = member.add_poll(expiration: future)
-      response = member.add_response(choice_id: poll.add_choice.id)
-      member.add_response(
-          choice_id: member.add_poll(expiration: future).add_choice.id)
-      expect(member.poll_responses(poll_id: poll.id)).to(match_array(response))
+  context('responses') {
+    before(:each) {
+      @member = create_member
+      @poll = @member.add_poll(expiration: future)
+      @response = @member.add_response(choice_id: @poll.add_choice.id)
+      @other_response = @member.add_response(
+          choice_id: @member.add_poll(expiration: future).add_choice.id)
+    }
+
+    it('returns only responses for a specific poll when poll_id: passed') {
+      expect(@member.responses(poll_id: @poll.id)).to(match_array(@response))
+    }
+
+    it('returns all responses when poll_id: nil') {
+      expect(@member.responses).to(match_array([@response, @other_response]))
     }
   }
 
