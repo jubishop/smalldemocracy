@@ -34,9 +34,14 @@ RSpec.describe(Poll, type: :rack_test) {
     it('creates a new :borda_single poll successfully') {
       post '/poll/create', **valid_params
       expect(last_response.redirect?).to(be(true))
-      expect_slim('poll/view', member: group.creating_member,
-                               poll: an_instance_of(Models::Poll),
-                               timezone: an_instance_of(TZInfo::DataTimezone))
+      expect_slim(
+          'poll/view',
+          member: group.creating_member,
+          poll: an_instance_of(Models::Poll).and(
+              have_attributes(email: group.creator.email,
+                              group_id: group.id,
+                              type: :borda_single)),
+          timezone: an_instance_of(TZInfo::DataTimezone))
       follow_redirect!
       expect(last_response.ok?).to(be(true))
     }
