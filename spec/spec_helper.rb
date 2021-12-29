@@ -37,7 +37,7 @@ RSpec.shared_context(:capybara) do
 
   def set_timezone
     expect(page).to(have_timezone)
-    page.driver.set_cookie(:tz, 'America/New_York')
+    page.driver.set_cookie(:tz, 'America/Los_Angeles')
   end
 
   def refresh_page

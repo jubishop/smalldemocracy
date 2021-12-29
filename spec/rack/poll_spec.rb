@@ -56,7 +56,6 @@ RSpec.describe(Poll, type: :rack_test) {
       set_cookie(:email, member.email)
       post '/poll/create'
       expect(last_response.status).to(be(400))
-      puts(last_response.body)
     }
 
     it('fails if type is invalid') {
@@ -81,9 +80,41 @@ RSpec.describe(Poll, type: :rack_test) {
   }
 
   context('get /view') {
-    it('shows poll not found') {
+    let(:tz_name) { 'Africa/Djibouti' }
+    let(:timezone) { TZInfo::Timezone.get(tz_name) }
+
+    before(:each) {
+      rack_mock_session.cookie_jar['tz'] = tz_name
+    }
+
+    it('asks for email if not logged in') {
+      poll = create_poll
+      expect_slim('email/get', req: an_instance_of(Tony::Request))
+      get poll.url
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('shows poll not found if logged in but not in this poll') {
+      set_cookie(:email, 'me@email')
+      poll = create_poll
+      expect_slim('poll/not_found')
+      get poll.url
+      expect(last_response.status).to(be(404))
+    }
+
+    it('shows poll not found if logged in but not in this finished poll') {
+      set_cookie(:email, 'me@email')
+      poll = create_poll(expiration: past)
+      expect_slim('poll/not_found')
+      get poll.url
+      expect(last_response.status).to(be(404))
+    }
+
+    it('shows poll not found for invalid urls') {
+      set_cookie(:email, 'me@email')
       expect_slim('poll/not_found')
       get 'poll/view/does_not_exist'
+      expect(last_response.status).to(be(404))
     }
 
     it('shows poll if you have not responded') {
@@ -92,9 +123,10 @@ RSpec.describe(Poll, type: :rack_test) {
           'poll/view',
           poll: poll,
           member: poll.creating_member,
-          timezone: an_instance_of(TZInfo::DataTimezone))
+          timezone: timezone)
       set_cookie(:email, poll.creating_member.email)
       get poll.url
+      expect(last_response.ok?).to(be(true))
     }
 
     it('shows your answers if you have responded') {
@@ -104,9 +136,10 @@ RSpec.describe(Poll, type: :rack_test) {
           'poll/responded',
           poll: poll,
           member: poll.creating_member,
-          timezone: an_instance_of(TZInfo::DataTimezone))
+          timezone: timezone)
       set_cookie(:email, poll.creating_member.email)
       get poll.url
+      expect(last_response.ok?).to(be(true))
     }
 
     it('shows results of poll when finished') {
@@ -121,32 +154,8 @@ RSpec.describe(Poll, type: :rack_test) {
           unresponded: unresponded)
       set_cookie(:email, poll.creating_member.email)
       get poll.url
+      expect(last_response.ok?).to(be(true))
     }
-
-  #   it('asks for email if not logged in and no responder param') {
-  #     poll = create
-  #     get poll.url
-  #     expect_email_get_page
-  #   }
-
-  #   it('asks for email if logged in but not in this poll') {
-  #     set_cookie(:email, 'b@b')
-  #     poll = create
-  #     get poll.url
-  #     expect_email_get_page
-  #   }
-
-  #   it('shows expiration time respecting timezone') {
-  #     current_time = 388341770 # 11:43 AM EST
-  #     allow(Time).to(receive(:now).and_return(Time.at(current_time)))
-
-  #     set_cookie(:email, 'a@a')
-  #     poll = create
-
-  #     rack_mock_session.cookie_jar[:tz] = 'Africa/Djibouti'
-  #     get poll.url
-  #     expect(last_response.body).to(have_content('7:43 PM EAT'))
-  #   }
   }
 
   # context('post /respond') {

@@ -62,7 +62,11 @@ class Poll < Base
     })
 
     get(%r{^/poll/view/(?<hash_id>.+)$}, ->(req, _) {
+      email = require_email(req)
       poll = require_poll(req)
+
+      member = poll.member(email: email)
+      return 404, @slim.render('poll/not_found') unless member
 
       if poll.finished?
         breakdown, unresponded = poll.breakdown
@@ -70,12 +74,6 @@ class Poll < Base
                                                   breakdown: breakdown,
                                                   unresponded: unresponded)
       end
-
-      email = fetch_email(req)
-      return 200, @slim.render('email/get', poll: poll, req: req) unless email
-
-      member = poll.member(email: email)
-      return 200, @slim.render('email/get', poll: poll, req: req) unless member
 
       template = member.responded?(poll_id: poll.id) ? :responded : :view
       return 200, @slim.render("poll/#{template}", poll: poll,
