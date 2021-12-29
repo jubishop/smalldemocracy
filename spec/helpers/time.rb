@@ -1,15 +1,15 @@
 module RSpec
   module Time
     def future
-      return ::Time.now + 99
+      return ::Time.at((::Time.now + 99).to_i / 60 * 60)
     end
 
     def past
-      return ::Time.now - 99
+      return ::Time.at((::Time.now - 99).to_i / 60 * 60)
     end
 
     def random_time
-      return ::Time.at(rand(::Time.now.to_i))
+      return ::Time.at(rand(::Time.now.to_i) / 60 * 60)
     end
 
     def freeze_time(moment: random_time)

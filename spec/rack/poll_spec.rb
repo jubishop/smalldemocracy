@@ -17,49 +17,34 @@ RSpec.describe(Poll, type: :rack_test) {
   context('post /create') {
     let(:group) { create_group }
     let(:type) { :choose_one }
+    let(:expiration) { future }
+    let(:choices) { %w[one two three] }
+    let(:member) { group.creating_member }
     let(:valid_params) {
       {
-        email: group.creator.email,
+        email: member.email,
         title: 'title',
         question: 'question',
-        choices: %w[one two three],
+        choices: choices,
         group_id: group.id,
-        expiration: future.form,
+        expiration: expiration.form,
         type: type
       }
     }
+    let(:poll) { group.polls.first }
 
-    shared_examples('create') {
-      it('creates a new poll') {
-        set_cookie(:email, group.creator.email)
-        post '/poll/create', **valid_params
-        expect(last_response.redirect?).to(be(true))
-        expect_slim(
-            'poll/view',
-            member: group.creating_member,
-            poll: an_instance_of(Models::Poll).and(
-                have_attributes(email: group.creator.email,
-                                group_id: group.id,
-                                type: type)),
-            timezone: an_instance_of(TZInfo::DataTimezone))
-        follow_redirect!
-        expect(last_response.ok?).to(be(true))
-      }
-    }
-
-    context(':borda_single') {
-      let(:type) { :borda_single }
-      it_has_behavior('create')
-    }
-
-    context(':borda_split') {
-      let(:type) { :borda_split }
-      it_has_behavior('create')
-    }
-
-    context(':choose_one') {
-      let(:type) { :choose_one }
-      it_has_behavior('create')
+    it('creates a new poll with choices') {
+      set_cookie(:email, member.email)
+      post '/poll/create', **valid_params
+      expect(last_response.redirect?).to(be(true))
+      expect(poll.choices.map(&:text)).to(match_array(choices))
+      expect_slim(
+          'poll/view',
+          member: member,
+          poll: poll,
+          timezone: an_instance_of(TZInfo::DataTimezone))
+      follow_redirect!
+      expect(last_response.ok?).to(be(true))
     }
 
     it('rejects any post without a cookie') {
@@ -68,21 +53,21 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('fails if post body is nonexistent') {
-      set_cookie(:email, group.creator.email)
+      set_cookie(:email, member.email)
       post '/poll/create'
       expect(last_response.status).to(be(400))
       puts(last_response.body)
     }
 
     it('fails if type is invalid') {
-      set_cookie(:email, group.creator.email)
+      set_cookie(:email, member.email)
       valid_params[:type] = :invalid_type
       post '/poll/create', **valid_params
       expect(last_response.status).to(be(400))
     }
 
     it('fails if any field is missing or empty') {
-      set_cookie(:email, group.creator.email)
+      set_cookie(:email, member.email)
       valid_params.each_key { |key|
         params = valid_params.clone
         params[key] = ''
