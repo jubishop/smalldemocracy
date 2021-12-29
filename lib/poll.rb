@@ -126,7 +126,7 @@ class Poll < Base
 
     if poll.type == :borda_split && !req.params.key?(:bottom_responses)
       throw(:response,
-            [400, 'No bottom response array provided for a borda_split poll'])
+            [400, 'No bottom responses provided for a borda_split poll'])
     end
 
     bottom_responses = req.params.fetch(:bottom_responses, [])
