@@ -23,9 +23,9 @@ module Helpers
       email = fetch_email(req)
       unless email
         if req.get?
-          throw(:response, [200, @slim.render('email/get', req: req)])
+          throw(:response, [401, @slim.render('email/get', req: req)])
         else
-          throw(:response, [404, @slim.render('email/not_found')])
+          throw(:response, [401, @slim.render('email/not_found')])
         end
       end
       return email

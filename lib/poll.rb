@@ -85,8 +85,8 @@ class Poll < Base
       poll = require_poll(req)
       email = require_email(req)
 
-      responder = poll.responder(email: email)
-      return 405, "#{email} is not a responder to this poll" unless responder
+      member = poll.member(email: email)
+      return 404, @slim.render('poll/not_found') unless member
 
       begin
         case poll.type
@@ -98,7 +98,7 @@ class Poll < Base
       rescue Sequel::UniqueConstraintViolation
         return 409, 'Duplicate response or choice found'
       rescue Sequel::HookFailed => error
-        return 405, error.message
+        return 400, error.message
       else
         return 201, 'Poll created'
       end
@@ -128,7 +128,7 @@ class Poll < Base
 
     bottom_responses = req.params.fetch(:bottom_responses, [])
     unless responses.length + bottom_responses.length == poll.choices.length
-      throw(:response, [406, 'Response set does not match number of choices'])
+      throw(:response, [400, 'Response set does not match number of choices'])
     end
 
     responses.each_with_index { |choice_id, rank|

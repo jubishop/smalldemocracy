@@ -3,7 +3,7 @@ RSpec.describe(Poll, type: :rack_test) {
     it('requests email if you have no cookie') {
       expect_slim('email/get', req: an_instance_of(Tony::Request))
       get '/poll/create'
-      expect(last_response.ok?).to(be(true))
+      expect(last_response.status).to(be(401))
     }
 
     it('shows poll creation form if you have an email cookie') {
@@ -95,7 +95,7 @@ RSpec.describe(Poll, type: :rack_test) {
       poll = create_poll
       expect_slim('email/get', req: an_instance_of(Tony::Request))
       get poll.url
-      expect(last_response.ok?).to(be(true))
+      expect(last_response.status).to(be(401))
     }
 
     it('shows poll not found if logged in but not in this poll') {
