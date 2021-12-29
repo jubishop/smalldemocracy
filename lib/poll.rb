@@ -129,7 +129,7 @@ class Poll < Base
       throw(:response, [400, "Invalid #{key} given"])
     end
     items = items.compact.delete_if { |item| item.to_s.empty? }
-    return items if default && items == default
+    return items if items == default
 
     throw(:response, [400, "No #{key} given"]) if items.empty?
 
@@ -138,7 +138,7 @@ class Poll < Base
 
   def param(req, key, default = nil)
     if req.params[key].nil? || req.params[key].to_s.empty?
-      return default if default
+      return default unless default.nil?
 
       throw(:response, [400, "No #{key} given"])
     end

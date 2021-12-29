@@ -257,7 +257,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     context(':borda') {
-      let(:choices) { [choice, poll.add_choice, poll.add_choice] }
+      let(:choices) { Array.new(10).fill { poll.add_choice } }
 
       context(':borda_single') {
         let(:poll) { create_poll(type: :borda_single) }
@@ -280,18 +280,6 @@ RSpec.describe(Poll, type: :rack_test) {
           get poll.url
         }
       }
-    #   it('saves rankings successfully') {
-    #     poll = create
-    #     post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
-    #     expect(last_response.status).to(be(201))
-
-    #     get "/poll/view/#{poll.id}"
-    #     expect_borda_responded_page
-
-    #     poll.expiration = 1
-    #     expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
-    #     expect(poll.scores.map(&:score)).to(eq([2, 1, 0]))
-    #   }
     }
   #   it('rejects posting with no responses') {
   #     poll = create
