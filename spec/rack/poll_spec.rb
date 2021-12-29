@@ -37,6 +37,12 @@ RSpec.describe(Poll, type: :rack_test) {
       set_cookie(:email, member.email)
       post '/poll/create', **valid_params
       expect(last_response.redirect?).to(be(true))
+      expect(poll).to(have_attributes(email: member.email,
+                                      title: 'title',
+                                      question: 'question',
+                                      group_id: group.id,
+                                      expiration: expiration,
+                                      type: type))
       expect(poll.choices.map(&:text)).to(match_array(choices))
       expect_slim(
           'poll/view',
