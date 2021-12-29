@@ -98,7 +98,7 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(401))
     }
 
-    it('shows poll not found if logged in but not in this poll') {
+    it('shows poll not found if logged in but not in this open poll') {
       poll = create_poll
       set_cookie(:email, 'me@email')
       expect_slim('poll/not_found')
@@ -146,7 +146,7 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.ok?).to(be(true))
     }
 
-    it('shows results of poll when finished') {
+    it('shows results if poll is finished') {
       poll = create_poll
       poll.creating_member.add_response(choice_id: poll.add_choice.id)
       poll.update(expiration: past)
