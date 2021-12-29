@@ -5,16 +5,18 @@ module Helpers
     include Cookie
 
     def require_poll(req)
-      unless req.params.key?(:hash_id)
-        throw(:response, [400, 'No poll hash_id provided'])
-      end
-
       begin
-        poll = Models::Poll.with_hashid(req.params.fetch(:hash_id))
+        poll = Models::Poll.with_hashid(req.params[:hash_id])
       rescue Hashids::InputError
         # Ignore
       end
-      throw(:response, [404, @slim.render('poll/not_found')]) unless poll
+      unless poll
+        if req.get?
+          throw(:response, [404, @slim.render('poll/not_found')])
+        else
+          throw(:response, [404, 'No poll found'])
+        end
+      end
 
       return poll
     end
@@ -23,11 +25,12 @@ module Helpers
       email = fetch_email(req)
       unless email
         if req.get?
-          throw(:response, [401, @slim.render('email/get', req: req)])
+          throw(:response, [401, @slim.render(:get_email, req: req)])
         else
-          throw(:response, [401, @slim.render('email/not_found')])
+          throw(:response, [401, 'No email found'])
         end
       end
+
       return email
     end
   end

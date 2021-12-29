@@ -1,7 +1,7 @@
 RSpec.describe(Poll, type: :rack_test) {
   context('get /create') {
     it('requests email if you have no cookie') {
-      expect_slim('email/get', req: an_instance_of(Tony::Request))
+      expect_slim(:get_email, req: an_instance_of(Tony::Request))
       get '/poll/create'
       expect(last_response.status).to(be(401))
     }
@@ -35,7 +35,7 @@ RSpec.describe(Poll, type: :rack_test) {
     before(:each) { set_cookie(:email, member.email) }
 
     it('creates a new poll with choices and redirects to view') {
-      post '/poll/create', **valid_params
+      post_json('/poll/create', valid_params)
       expect(last_response.redirect?).to(be(true))
       expect(poll).to(have_attributes(email: member.email,
                                       title: 'title',
@@ -55,9 +55,9 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('rejects any post without a cookie') {
       clear_cookies
-      expect_slim('email/not_found')
-      post '/poll/create', **valid_params
+      post_json('/poll/create', valid_params)
       expect(last_response.status).to(be(401))
+      expect(last_response.body).to(eq('No email found'))
     }
 
     it('fails if post body is nonexistent') {
@@ -67,7 +67,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('fails if type is invalid') {
       valid_params[:type] = :invalid_type
-      post '/poll/create', **valid_params
+      post_json('/poll/create', valid_params)
       expect(last_response.status).to(be(400))
     }
 
@@ -75,10 +75,10 @@ RSpec.describe(Poll, type: :rack_test) {
       valid_params.each_key { |key|
         params = valid_params.clone
         params[key] = ''
-        post '/poll/create', **params
+        post_json('/poll/create', params)
         expect(last_response.status).to(be(400))
         params.delete(key)
-        post '/poll/create', **params
+        post_json('/poll/create', params)
         expect(last_response.status).to(be(400))
       }
     }
@@ -94,7 +94,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('asks for email if not logged in') {
       poll = create_poll
-      expect_slim('email/get', req: an_instance_of(Tony::Request))
+      expect_slim(:get_email, req: an_instance_of(Tony::Request))
       get poll.url
       expect(last_response.status).to(be(401))
     }
@@ -169,43 +169,59 @@ RSpec.describe(Poll, type: :rack_test) {
       set_cookie(:email, poll.email)
     }
 
-    # rubocop:disable Style/StringHashKeys
-    def post_json(data = {})
-      post('/poll/respond', data.to_json,
-           { 'CONTENT_TYPE' => 'application/json' })
-    end
-    # rubocop:enable Style/StringHashKeys
-
-    it('rejects posting to an already responded poll') {
-      choice = poll.add_choice
-      choice.add_response(member_id: poll.creating_member.id)
-      another_choice = poll.add_choice
-
-      post_json({ hash_id: poll.hashid, choice: another_choice })
-      puts last_response.body
-      expect(last_response.status).to(be(409))
+    it('rejects an empty post body') {
+      post_json('/poll/respond')
+      expect(last_response.status).to(be(404))
+      expect(last_response.body).to(eq('No poll found'))
     }
 
-  #   it('rejects an empty post body') {
-  #     post '/poll/respond'
-  #     expect(last_response.status).to(be(400))
-  #   }
+    it('rejects posting to invalid poll') {
+      post_json('/poll/respond', { hash_id: 'does_not_exist' })
+      expect(last_response.status).to(be(404))
+      expect(last_response.body).to(eq('No poll found'))
+    }
 
-  #   it('rejects posting with empty data object') {
-  #     post_json
-  #     expect(last_response.status).to(be(400))
-  #   }
+    it('rejects posting if you are not logged in') {
+      clear_cookies
+      post_json('/poll/respond', { hash_id: poll.hashid })
+      expect(last_response.status).to(be(401))
+      expect(last_response.body).to(eq('No email found'))
+    }
 
-  #   it('rejects posting to invalid poll') {
-  #     post_json({ poll_id: 'does_not_exist' })
-  #     expect(last_response.status).to(be(404))
-  #   }
+    context(':choose_one') {
+      let(:poll) { create_poll(type: :choose_one) }
 
-  #   it('rejects posting with no responder') {
-  #     poll = create
-  #     post_json({ poll_id: poll.id })
-  #     expect(last_response.status).to(be(400))
-  #   }
+      it('rejects posting to an already responded poll') {
+        choice = poll.add_choice
+        choice.add_response(member_id: poll.creating_member.id)
+        another_choice = poll.add_choice
+
+        post_json('/poll/respond',
+                  { hash_id: poll.hashid, choice_id: another_choice.id })
+        expect(last_response.status).to(be(409))
+        expect(last_response.body).to(match(/Member has already responded/))
+      }
+
+      it('rejects posting with no choice') {
+        post_json('/poll/respond', { hash_id: poll.hashid })
+        expect(last_response.status).to(be(400))
+        expect(last_response.body).to(eq('No choice provided'))
+      }
+
+      it('rejects posting with invalid choice id') {
+        post_json('/poll/respond',
+                  { hash_id: poll.hashid, choice_id: 'invalid' })
+        expect(last_response.status).to(be(400))
+        expect(last_response.body).to(match(/PG::InvalidTextRepresentation/))
+      }
+
+      it('rejects posting with non existent choice id') {
+        post_json('/poll/respond',
+                  { hash_id: poll.hashid, choice_id: 987654321 })
+        expect(last_response.status).to(be(400))
+        expect(last_response.body).to(eq('Response has no choice'))
+      }
+    }
 
   #   it('rejects posting with no responses') {
   #     poll = create
@@ -232,13 +248,6 @@ RSpec.describe(Poll, type: :rack_test) {
   #     post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
   #     expect(last_response.status).to(be(405))
   #     expect(last_response.body).to(eq('Poll has already finished'))
-  #   }
-
-  #   it('rejects posting if you are not logged in') {
-  #     clear_cookies
-  #     poll = create
-  #     post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
-  #     expect(last_response.status).to(be(404))
   #   }
 
   #   it('rejects posting if you are logged in as someone else') {

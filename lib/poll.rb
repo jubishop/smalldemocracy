@@ -95,13 +95,13 @@ class Poll < Base
       begin
         case poll.type
         when :borda_single, :borda_split
-          save_borda_poll(req, poll, member)
+          save_borda_poll_response(req, poll, member)
         when :choose_one
-          save_choose_one_poll(req, member)
+          save_choose_one_poll_response(req, member)
         end
       rescue Sequel::UniqueConstraintViolation
         return 409, 'Duplicate response or choice found'
-      rescue Sequel::HookFailed => error
+      rescue Sequel::HookFailed, Sequel::DatabaseError => error
         return 400, error.message
       else
         return 201, 'Poll response added'
@@ -111,15 +111,14 @@ class Poll < Base
 
   private
 
-  def save_choose_one_poll(req, member)
-    unless req.params.key?(:choice)
+  def save_choose_one_poll_response(req, member)
+    unless req.params.key?(:choice_id)
       throw(:response, [400, 'No choice provided'])
     end
-    choice_id = req.params.fetch(:choice)
-    member.add_response(choice_id: choice_id)
+    member.add_response(choice_id: req.params.fetch(:choice_id))
   end
 
-  def save_borda_poll(req, poll, member)
+  def save_borda_poll_response(req, poll, member)
     unless req.params.key?(:responses)
       throw(:response, [400, 'No responses provided'])
     end
