@@ -100,7 +100,7 @@ class Poll < Base
       rescue Sequel::HookFailed => error
         return 400, error.message
       else
-        return 201, 'Poll created'
+        return 201, 'Poll response added'
       end
     })
   end
