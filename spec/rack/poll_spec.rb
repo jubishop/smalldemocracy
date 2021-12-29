@@ -32,9 +32,9 @@ RSpec.describe(Poll, type: :rack_test) {
       }
     }
     let(:poll) { group.polls.first }
+    before(:each) { set_cookie(:email, member.email) }
 
     it('creates a new poll with choices and redirects to view') {
-      set_cookie(:email, member.email)
       post '/poll/create', **valid_params
       expect(last_response.redirect?).to(be(true))
       expect(poll).to(have_attributes(email: member.email,
@@ -54,25 +54,23 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects any post without a cookie') {
+      clear_cookies
       expect_slim('email/not_found')
       post '/poll/create', **valid_params
     }
 
     it('fails if post body is nonexistent') {
-      set_cookie(:email, member.email)
       post '/poll/create'
       expect(last_response.status).to(be(400))
     }
 
     it('fails if type is invalid') {
-      set_cookie(:email, member.email)
       valid_params[:type] = :invalid_type
       post '/poll/create', **valid_params
       expect(last_response.status).to(be(400))
     }
 
     it('fails if any field is missing or empty') {
-      set_cookie(:email, member.email)
       valid_params.each_key { |key|
         params = valid_params.clone
         params[key] = ''
