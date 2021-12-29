@@ -24,11 +24,7 @@ class Poll < Base
 
     post('/poll/create', ->(req, resp) {
       require_email(req)
-
-      unless req.params[:type]
-        return 400, 'Type must be specified'
-      end
-
+      return 400, 'Type must be specified' unless req.params[:type]
       if req.params[:expiration].nil? || req.params[:expiration].empty?
         return 400, 'No expiration date given'
       end

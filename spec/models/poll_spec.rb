@@ -53,7 +53,7 @@ RSpec.describe(Models::Poll) {
     }
 
     it('rejects creating polls with no type') {
-      expect{ create_poll(type: nil) }.to(
+      expect { create_poll(type: nil) }.to(
           raise_error(Sequel::NotNullConstraintViolation,
                       /null value in column "type"/))
     }
