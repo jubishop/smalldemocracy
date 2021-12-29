@@ -24,24 +24,17 @@ class Poll < Base
 
     post('/poll/create', ->(req, resp) {
       require_email(req)
-      return 400, 'Type must be specified' unless req.params[:type]
-      if req.params[:expiration].nil? || req.params[:expiration].empty?
-        return 400, 'No expiration date given'
-      end
 
-      choices = req.params[:choices]
+      expiration = param(req, :expiration)
+      choices = list_param(req, :choices)
       req.params.delete(:choices)
-      return 400, 'Invalid choices given' unless choices.is_a?(Enumerable)
-
-      choices = choices.compact.delete_if(&:empty?)
-      return 400, 'No choices given' if choices.empty?
 
       hour_offset = req.timezone.utc_offset / 3600
       utc_offset = hour_offset.abs.to_s
       utc_offset.prepend('0') if hour_offset.abs < 10
       utc_offset.prepend(hour_offset >= 0 ? '+' : '-')
       utc_offset += '00'
-      date_string = "#{req.params[:expiration]} #{utc_offset}"
+      date_string = "#{expiration} #{utc_offset}"
       begin
         # rubocop:disable Style/DateTime
         req.params[:expiration] = DateTime.strptime(
@@ -112,24 +105,12 @@ class Poll < Base
   private
 
   def save_choose_one_poll_response(req, member)
-    unless req.params.key?(:choice_id)
-      throw(:response, [400, 'No choice provided'])
-    end
-    member.add_response(choice_id: req.params.fetch(:choice_id))
+    member.add_response(choice_id: param(req, :choice_id))
   end
 
   def save_borda_poll_response(req, poll, member)
-    unless req.params.key?(:responses)
-      throw(:response, [400, 'No responses provided'])
-    end
-    responses = req.params.fetch(:responses)
-
-    if poll.type == :borda_split && !req.params.key?(:bottom_responses)
-      throw(:response,
-            [400, 'No bottom responses provided for a borda_split poll'])
-    end
-
-    bottom_responses = req.params.fetch(:bottom_responses, [])
+    responses = list_param(req, :responses)
+    bottom_responses = list_param(req, :bottom_responses, [])
     unless responses.length + bottom_responses.length == poll.choices.length
       throw(:response, [400, 'Response set does not match number of choices'])
     end
@@ -139,5 +120,29 @@ class Poll < Base
       score -= 1 if poll.type == :borda_single
       member.add_response(choice_id: choice_id, score: score)
     }
+  end
+
+  def list_param(req, key, default = nil)
+    items = param(req, key, default)
+
+    unless items.is_a?(Enumerable)
+      throw(:response, [400, "Invalid #{key} given"])
+    end
+    items = items.compact.delete_if { |item| item.to_s.empty? }
+    return items if default && items == default
+
+    throw(:response, [400, "No #{key} given"]) if items.empty?
+
+    return items
+  end
+
+  def param(req, key, default = nil)
+    if req.params[key].nil? || req.params[key].to_s.empty?
+      return default if default
+
+      throw(:response, [400, "No #{key} given"])
+    end
+
+    return req.params.fetch(key)
   end
 end

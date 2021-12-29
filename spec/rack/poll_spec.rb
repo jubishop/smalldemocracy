@@ -165,6 +165,9 @@ RSpec.describe(Poll, type: :rack_test) {
 
   context('post /respond') {
     let(:poll) { create_poll }
+    let(:choice) { poll.add_choice }
+    let(:member) { poll.creating_member }
+
     before(:each) {
       set_cookie(:email, poll.email)
     }
@@ -205,6 +208,22 @@ RSpec.describe(Poll, type: :rack_test) {
     context(':choose_one') {
       let(:poll) { create_poll(type: :choose_one) }
 
+      it('saves choice successfully') {
+        expect(member.responses).to(be_empty)
+        post_json('/poll/respond',
+                  { hash_id: poll.hashid, choice_id: choice.id })
+        expect(last_response.status).to(be(201))
+        expect(last_response.body).to(eq('Poll response added'))
+        expect(member.response(poll_id: poll.id).choice).to(eq(choice))
+
+        expect_slim(
+            'poll/responded',
+            poll: poll,
+            member: member,
+            timezone: an_instance_of(TZInfo::DataTimezone))
+        get poll.url
+      }
+
       it('rejects posting to an already responded poll') {
         choice = poll.add_choice
         choice.add_response(member_id: poll.creating_member.id)
@@ -216,10 +235,10 @@ RSpec.describe(Poll, type: :rack_test) {
         expect(last_response.body).to(match(/Member has already responded/))
       }
 
-      it('rejects posting with no choice') {
+      it('rejects posting with no choice_id') {
         post_json('/poll/respond', { hash_id: poll.hashid })
         expect(last_response.status).to(be(400))
-        expect(last_response.body).to(eq('No choice provided'))
+        expect(last_response.body).to(eq('No choice_id given'))
       }
 
       it('rejects posting with invalid choice id') {
@@ -237,6 +256,43 @@ RSpec.describe(Poll, type: :rack_test) {
       }
     }
 
+    context(':borda') {
+      let(:choices) { [choice, poll.add_choice, poll.add_choice] }
+
+      context(':borda_single') {
+        let(:poll) { create_poll(type: :borda_single) }
+        let(:responses) { choices.shuffle.map(&:id) }
+
+        it('saves rankings successfully') {
+          expect(member.responses).to(be_empty)
+          post_json('/poll/respond',
+                    { hash_id: poll.hashid, responses: responses })
+          expect(last_response.status).to(be(201))
+          expect(last_response.body).to(eq('Poll response added'))
+          expect(member.responses(poll_id: poll.id).map(&:choice_id)).to(
+              match_array(responses))
+
+          expect_slim(
+              'poll/responded',
+              poll: poll,
+              member: member,
+              timezone: an_instance_of(TZInfo::DataTimezone))
+          get poll.url
+        }
+      }
+    #   it('saves rankings successfully') {
+    #     poll = create
+    #     post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
+    #     expect(last_response.status).to(be(201))
+
+    #     get "/poll/view/#{poll.id}"
+    #     expect_borda_responded_page
+
+    #     poll.expiration = 1
+    #     expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
+    #     expect(poll.scores.map(&:score)).to(eq([2, 1, 0]))
+    #   }
+    }
   #   it('rejects posting with no responses') {
   #     poll = create
   #     post_json({ poll_id: poll.id })
@@ -273,42 +329,6 @@ RSpec.describe(Poll, type: :rack_test) {
   #         eq('someone_else@hey.com is not a responder to this poll'))
   #   }
   # }
-
-    # context(':choose_one') {
-    #   it('saves posted results successfully') {
-    #     poll = create_poll(type: :choose_one)
-    #     post_json({ poll_id: @poll.id, choice: @poll.choices.first.id })
-    #     expect(last_response.status).to(be(201))
-
-    #     get "/poll/view/#{@poll.id}"
-    #     expect_choose_responded_page
-    #   }
-
-    #   it('rejects posting with an incorrect choice id') {
-    #     post_json({ poll_id: 'bad_id', choice: @poll.choices.first.id })
-    #     expect(last_response.status).to(be(404))
-    #   }
-
-    #   it('rejects posting with no choice id') {
-    #     post_json({ choice: @poll.choices.first.id })
-    #     expect(last_response.status).to(be(400))
-    #   }
-    # }
-
-  #   context(':borda_single') {
-  #     it('saves posted results successfully') {
-  #       poll = create
-  #       post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
-  #       expect(last_response.status).to(be(201))
-
-  #       get "/poll/view/#{poll.id}"
-  #       expect_borda_responded_page
-
-  #       poll.expiration = 1
-  #       expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
-  #       expect(poll.scores.map(&:score)).to(eq([2, 1, 0]))
-  #     }
-  #   }
 
   #   context(':borda_split') {
   #     before(:each) {
