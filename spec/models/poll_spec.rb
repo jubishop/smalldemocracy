@@ -52,8 +52,10 @@ RSpec.describe(Models::Poll) {
                       'Poll has expiration at unix epoch'))
     }
 
-    it('defaults to creating a poll that is `borda_single` type') {
-      expect(create_poll.type).to(eq(:borda_single))
+    it('rejects creating polls with no type') {
+      expect{ create_poll(type: nil) }.to(
+          raise_error(Sequel::NotNullConstraintViolation,
+                      /null value in column "type"/))
     }
 
     it('rejects creating polls of invalid type') {
@@ -215,7 +217,7 @@ RSpec.describe(Models::Poll) {
         group = create_group
         members.each { |member| group.add_member(email: member) }
 
-        @poll = group.add_poll(expiration: future)
+        @poll = group.add_poll(type: :borda_single, expiration: future)
         choices.each { |choice| @poll.add_choice(text: choice) }
 
         responses = {

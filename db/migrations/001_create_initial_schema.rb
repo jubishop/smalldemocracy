@@ -36,7 +36,7 @@ Sequel.migration {
       String :question, null: false
       constraint(:question_not_empty) { Sequel.char_length(question) >= 1 }
       Time :expiration, null: false
-      poll_type :type, null: false, default: 'borda_single'
+      poll_type :type, null: false
     }
 
     create_table(:choices) {

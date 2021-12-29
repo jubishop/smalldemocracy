@@ -25,13 +25,13 @@ module RSpec
                     title: rand.to_s,
                     question: rand.to_s,
                     expiration: future,
-                    **attributes)
+                    type: :choose_one)
       return create_group(email: email, name: name).add_poll(
           email: email,
           title: title,
           question: question,
           expiration: expiration,
-          **attributes)
+          type: type)
     end
 
     def create_choice(text: rand.to_s, **attributes)
@@ -57,13 +57,13 @@ module Models
                  title: rand.to_s,
                  question: rand.to_s,
                  expiration: ::Time.now,
-                 **attributes)
+                 type: :choose_one)
       test_only!
       add_created_poll(group_id: group_id,
                        title: title,
                        question: question,
                        expiration: expiration,
-                       **attributes)
+                       type: type)
     end
   end
 
@@ -73,13 +73,13 @@ module Models
                  title: rand.to_s,
                  question: rand.to_s,
                  expiration: ::Time.now,
-                 **attributes)
+                 type: :choose_one)
       test_only!
       super(email: email,
             title: title,
             question: question,
             expiration: expiration,
-            **attributes)
+            type: type)
     end
 
     def add_member(email: "#{rand}@#{rand}")
@@ -95,12 +95,12 @@ module Models
     define_method(:add_poll) { |title: rand.to_s,
                                 question: rand.to_s,
                                 expiration: ::Time.now,
-                                **attributes|
+                                type: :choose_one|
       test_only!
       orig_add_poll.bind_call(self, title: title,
                                     question: question,
                                     expiration: expiration,
-                                    **attributes)
+                                    type: type)
     }
 
     def add_response(choice_id: polls.sample.choices.sample,
