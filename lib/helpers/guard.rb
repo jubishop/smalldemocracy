@@ -11,8 +11,8 @@ module Helpers
 
       begin
         poll = Models::Poll.with_hashid(req.params.fetch(:hash_id))
-      rescue Sequel::DatabaseError => error
-        puts error
+      rescue Hashids::InputError
+        # Ignore
       end
       throw(:response, [404, @slim.render('poll/not_found')]) unless poll
 

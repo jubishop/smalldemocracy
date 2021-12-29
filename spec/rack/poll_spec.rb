@@ -33,15 +33,15 @@ RSpec.describe(Poll, type: :rack_test) {
     }
     let(:poll) { group.polls.first }
 
-    it('creates a new poll with choices') {
+    it('creates a new poll with choices and redirects to view') {
       set_cookie(:email, member.email)
       post '/poll/create', **valid_params
       expect(last_response.redirect?).to(be(true))
       expect(poll.choices.map(&:text)).to(match_array(choices))
       expect_slim(
           'poll/view',
-          member: member,
           poll: poll,
+          member: member,
           timezone: an_instance_of(TZInfo::DataTimezone))
       follow_redirect!
       expect(last_response.ok?).to(be(true))
@@ -80,33 +80,48 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
-  # context('get /view') {
-  #   def respond_to_poll(poll)
-  #     poll.mock_response
-  #     poll.expiration = Time.at(1)
-  #     poll.save
-  #     get(poll.url)
-  #   end
+  context('get /view') {
+    it('shows poll not found') {
+      expect_slim('poll/not_found')
+      get 'poll/view/does_not_exist'
+    }
 
-  #   it('shows poll not found') {
-  #     get 'poll/view/does_not_exist'
-  #     expect_not_found_page
-  #   }
+    it('shows poll if you have not responded') {
+      poll = create_poll
+      expect_slim(
+          'poll/view',
+          poll: poll,
+          member: poll.creating_member,
+          timezone: an_instance_of(TZInfo::DataTimezone))
+      set_cookie(:email, poll.creating_member.email)
+      get poll.url
+    }
 
-  #   it('shows results of :borda_single polls when finished') {
-  #     respond_to_poll(create)
-  #     expect_borda_single_finished_page
-  #   }
+    it('shows your answers if you have responded') {
+      poll = create_poll
+      poll.creating_member.add_response(choice_id: poll.add_choice.id)
+      expect_slim(
+          'poll/responded',
+          poll: poll,
+          member: poll.creating_member,
+          timezone: an_instance_of(TZInfo::DataTimezone))
+      set_cookie(:email, poll.creating_member.email)
+      get poll.url
+    }
 
-  #   it('shows results of :borda_split polls when finished') {
-  #     respond_to_poll(create(type: :borda_split))
-  #     expect_borda_split_finished_page
-  #   }
-
-  #   it('shows results of :choose_one polls when finished') {
-  #     respond_to_poll(create(type: :choose_one))
-  #     expect_choose_one_finished_page
-  #   }
+    it('shows results of poll when finished') {
+      poll = create_poll
+      poll.creating_member.add_response(choice_id: poll.add_choice.id)
+      poll.update(expiration: past)
+      breakdown, unresponded = poll.breakdown
+      expect_slim(
+          'poll/finished',
+          poll: poll,
+          breakdown: breakdown,
+          unresponded: unresponded)
+      set_cookie(:email, poll.creating_member.email)
+      get poll.url
+    }
 
   #   it('asks for email if not logged in and no responder param') {
   #     poll = create
@@ -121,13 +136,6 @@ RSpec.describe(Poll, type: :rack_test) {
   #     expect_email_get_page
   #   }
 
-  #   it('shows poll if you have not responded to it yet') {
-  #     set_cookie(:email, 'a@a')
-  #     poll = create
-  #     get poll.url
-  #     expect_view_borda_single_page
-  #   }
-
   #   it('shows expiration time respecting timezone') {
   #     current_time = 388341770 # 11:43 AM EST
   #     allow(Time).to(receive(:now).and_return(Time.at(current_time)))
@@ -139,16 +147,7 @@ RSpec.describe(Poll, type: :rack_test) {
   #     get poll.url
   #     expect(last_response.body).to(have_content('7:43 PM EAT'))
   #   }
-
-  #   it('shows your answers if you have already responded') {
-  #     set_cookie(:email, 'a@a')
-  #     poll = create
-  #     poll.mock_response
-
-  #     get poll.url
-  #     expect_borda_responded_page
-  #   }
-  # }
+  }
 
   # context('post /respond') {
   #   before(:each) {

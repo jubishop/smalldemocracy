@@ -94,6 +94,16 @@ RSpec.describe(Models::Member) {
     }
   }
 
+  context('poll_response') {
+    it('returns only first response for a specific poll') {
+      member = create_member
+      poll = member.add_poll(expiration: future)
+      response = member.add_response(choice_id: poll.add_choice.id)
+      member.add_response(choice_id: poll.add_choice.id)
+      expect(member.poll_response(poll_id: poll.id)).to(eq(response))
+    }
+  }
+
   context('poll_responses') {
     it('returns only responses for a specific poll') {
       member = create_member

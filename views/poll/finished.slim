@@ -22,7 +22,7 @@ ruby:
             summary = "#{result} #{count}"
             ul
               - breakdown[result.choice].each do |br|
-                li =br.responder
+                li =br.member
       - rejected_choices.each do |choice|
         li
           | #{choice} (0 times)
@@ -39,7 +39,7 @@ ruby:
             ul
               - breakdown[result.choice].each do |br|
                 - points = 'point'.en.plural(br.score)
-                li ="#{br.responder} (#{br.score} #{points})"
+                li ="#{br.member} (#{br.score} #{points})"
       - rejected_choices.each do |choice|
         li
           | #{choice} (0 points)
@@ -47,5 +47,5 @@ ruby:
 section
   h3 Unresponded
   ul
-    - unresponded.each do |responder|
-      li =responder
+    - unresponded.each do |member|
+      li =member
