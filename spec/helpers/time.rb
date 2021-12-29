@@ -1,15 +1,15 @@
 module RSpec
   module Time
     def future
-      return ::Time.at((::Time.now + 99).to_i / 60 * 60)
+      return (::Time.now + 99).round_down
     end
 
     def past
-      return ::Time.at((::Time.now - 99).to_i / 60 * 60)
+      return (::Time.now - 99).round_down
     end
 
     def random_time
-      return ::Time.at(rand(::Time.now.to_i) / 60 * 60)
+      return ::Time.at(rand(::Time.now.to_i)).round_down
     end
 
     def freeze_time(moment: random_time)
@@ -22,5 +22,9 @@ end
 class Time
   def form
     return strftime('%Y-%m-%dT%H:%M')
+  end
+
+  def round_down
+    return self.class.at(to_i / 60 * 60)
   end
 end
