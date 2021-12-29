@@ -88,12 +88,16 @@ class Poll < Base
       member = poll.member(email: email)
       return 404, @slim.render('poll/not_found') unless member
 
+      if member.responded?(poll_id: poll.id)
+        return 409, "Member has already responded to #{poll}"
+      end
+
       begin
         case poll.type
         when :borda_single, :borda_split
-          save_borda_poll(req, poll, responder)
+          save_borda_poll(req, poll, member)
         when :choose_one
-          save_choose_one_poll(req, responder)
+          save_choose_one_poll(req, member)
         end
       rescue Sequel::UniqueConstraintViolation
         return 409, 'Duplicate response or choice found'
@@ -107,15 +111,15 @@ class Poll < Base
 
   private
 
-  def save_choose_one_poll(req, responder)
+  def save_choose_one_poll(req, member)
     unless req.params.key?(:choice)
       throw(:response, [400, 'No choice provided'])
     end
     choice_id = req.params.fetch(:choice)
-    responder.add_response(choice_id: choice_id)
+    member.add_response(choice_id: choice_id)
   end
 
-  def save_borda_poll(req, poll, responder)
+  def save_borda_poll(req, poll, member)
     unless req.params.key?(:responses)
       throw(:response, [400, 'No responses provided'])
     end
@@ -134,7 +138,7 @@ class Poll < Base
     responses.each_with_index { |choice_id, rank|
       score = poll.choices.length - rank
       score -= 1 if poll.type == :borda_single
-      responder.add_response(choice_id: choice_id, score: score)
+      member.add_response(choice_id: choice_id, score: score)
     }
   end
 end

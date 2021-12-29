@@ -57,6 +57,7 @@ RSpec.describe(Poll, type: :rack_test) {
       clear_cookies
       expect_slim('email/not_found')
       post '/poll/create', **valid_params
+      expect(last_response.status).to(be(401))
     }
 
     it('fails if post body is nonexistent') {
@@ -162,101 +163,28 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
-  # context('post /respond') {
-  #   before(:each) {
-  #     set_cookie(:email, 'a@a')
-  #   }
+  context('post /respond') {
+    let(:poll) { create_poll }
+    before(:each) {
+      set_cookie(:email, poll.email)
+    }
 
-  #   # rubocop:disable Style/StringHashKeys
-  #   def post_json(data = {})
-  #     post('/poll/respond', data.to_json,
-  #          { 'CONTENT_TYPE' => 'application/json' })
-  #   end
-  #   # rubocop:enable Style/StringHashKeys
+    # rubocop:disable Style/StringHashKeys
+    def post_json(data = {})
+      post('/poll/respond', data.to_json,
+           { 'CONTENT_TYPE' => 'application/json' })
+    end
+    # rubocop:enable Style/StringHashKeys
 
-  #   context(':choose_one') {
-  #     before(:each) {
-  #       @poll = create(type: :choose_one)
-  #     }
+    it('rejects posting to an already responded poll') {
+      choice = poll.add_choice
+      choice.add_response(member_id: poll.creating_member.id)
+      another_choice = poll.add_choice
 
-  #     it('saves posted results successfully') {
-  #       post_json({ poll_id: @poll.id, choice: @poll.choices.first.id })
-  #       expect(last_response.status).to(be(201))
-
-  #       get "/poll/view/#{@poll.id}"
-  #       expect_choose_responded_page
-  #     }
-
-  #     it('rejects posting with an incorrect choice id') {
-  #       post_json({ poll_id: 'bad_id', choice: @poll.choices.first.id })
-  #       expect(last_response.status).to(be(404))
-  #     }
-
-  #     it('rejects posting with no choice id') {
-  #       post_json({ choice: @poll.choices.first.id })
-  #       expect(last_response.status).to(be(400))
-  #     }
-  #   }
-
-  #   context(':borda_single') {
-  #     it('saves posted results successfully') {
-  #       poll = create
-  #       post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
-  #       expect(last_response.status).to(be(201))
-
-  #       get "/poll/view/#{poll.id}"
-  #       expect_borda_responded_page
-
-  #       poll.expiration = 1
-  #       expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
-  #       expect(poll.scores.map(&:score)).to(eq([2, 1, 0]))
-  #     }
-  #   }
-
-  #   context(':borda_split') {
-  #     before(:each) {
-  #       @poll = create(type: :borda_split)
-  #     }
-
-  #     it('saves posted results successfully') {
-  #       post_json({
-  #         poll_id: @poll.id,
-  #         responses: [@poll.choices.first.id],
-  #         bottom_responses: @poll.choices.drop(1).map(&:id)
-  #       })
-  #       expect(last_response.status).to(be(201))
-
-  #       get "/poll/view/#{@poll.id}"
-  #       expect_borda_responded_page
-
-  #       @poll.expiration = 1
-  #       expect(@poll.scores.length).to(be(1))
-  #       expect(@poll.scores.first.text).to(eq('one'))
-  #       expect(@poll.scores.first.score).to(be(3))
-  #     }
-
-  #     it('rejects posting with no bottom responses') {
-  #       post_json({ poll_id: @poll.id, responses: @poll.choices.map(&:id) })
-  #       expect(last_response.status).to(be(400))
-  #     }
-
-  #     it('rejects posting with invalid bottom responses') {
-  #       post_json({
-  #         poll_id: @poll.id,
-  #         responses: @poll.choices.map(&:id),
-  #         bottom_responses: [1, 2]
-  #       })
-  #       expect(last_response.status).to(be(406))
-  #     }
-  #   }
-
-  #   it('rejects posting to an already responded poll') {
-  #     poll = create
-  #     responses = poll.mock_response
-
-  #     post_json({ poll_id: poll.id, responses: responses })
-  #     expect(last_response.status).to(be(409))
-  #   }
+      post_json({ hash_id: poll.hashid, choice: another_choice })
+      puts last_response.body
+      expect(last_response.status).to(be(409))
+    }
 
   #   it('rejects an empty post body') {
   #     post '/poll/respond'
@@ -322,4 +250,77 @@ RSpec.describe(Poll, type: :rack_test) {
   #         eq('someone_else@hey.com is not a responder to this poll'))
   #   }
   # }
+
+    # context(':choose_one') {
+    #   it('saves posted results successfully') {
+    #     poll = create_poll(type: :choose_one)
+    #     post_json({ poll_id: @poll.id, choice: @poll.choices.first.id })
+    #     expect(last_response.status).to(be(201))
+
+    #     get "/poll/view/#{@poll.id}"
+    #     expect_choose_responded_page
+    #   }
+
+    #   it('rejects posting with an incorrect choice id') {
+    #     post_json({ poll_id: 'bad_id', choice: @poll.choices.first.id })
+    #     expect(last_response.status).to(be(404))
+    #   }
+
+    #   it('rejects posting with no choice id') {
+    #     post_json({ choice: @poll.choices.first.id })
+    #     expect(last_response.status).to(be(400))
+    #   }
+    # }
+
+  #   context(':borda_single') {
+  #     it('saves posted results successfully') {
+  #       poll = create
+  #       post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
+  #       expect(last_response.status).to(be(201))
+
+  #       get "/poll/view/#{poll.id}"
+  #       expect_borda_responded_page
+
+  #       poll.expiration = 1
+  #       expect(poll.scores.map(&:text)).to(eq(poll.choices.map(&:text)))
+  #       expect(poll.scores.map(&:score)).to(eq([2, 1, 0]))
+  #     }
+  #   }
+
+  #   context(':borda_split') {
+  #     before(:each) {
+  #       @poll = create(type: :borda_split)
+  #     }
+
+  #     it('saves posted results successfully') {
+  #       post_json({
+  #         poll_id: @poll.id,
+  #         responses: [@poll.choices.first.id],
+  #         bottom_responses: @poll.choices.drop(1).map(&:id)
+  #       })
+  #       expect(last_response.status).to(be(201))
+
+  #       get "/poll/view/#{@poll.id}"
+  #       expect_borda_responded_page
+
+  #       @poll.expiration = 1
+  #       expect(@poll.scores.length).to(be(1))
+  #       expect(@poll.scores.first.text).to(eq('one'))
+  #       expect(@poll.scores.first.score).to(be(3))
+  #     }
+
+  #     it('rejects posting with no bottom responses') {
+  #       post_json({ poll_id: @poll.id, responses: @poll.choices.map(&:id) })
+  #       expect(last_response.status).to(be(400))
+  #     }
+
+  #     it('rejects posting with invalid bottom responses') {
+  #       post_json({
+  #         poll_id: @poll.id,
+  #         responses: @poll.choices.map(&:id),
+  #         bottom_responses: [1, 2]
+  #       })
+  #       expect(last_response.status).to(be(406))
+  #     }
+  }
 }
