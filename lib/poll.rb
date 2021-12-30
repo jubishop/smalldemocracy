@@ -116,6 +116,19 @@ class Poll < Base
       throw(:response, [400, 'Response set does not match number of choices'])
     end
 
+    unless (responses & bottom_responses).empty?
+      throw(:response,
+            [400, 'Same response found in responses and bottom_responses'])
+    end
+
+    if bottom_responses.uniq.length != bottom_responses.length
+      throw(:response, [400, 'Duplicate entries in bottom_responses'])
+    end
+
+    unless (bottom_responses - poll.choices.map(&:id)).empty?
+      throw(:response, [400, 'Invalid entries in bottom_responses'])
+    end
+
     responses.each_with_index { |choice_id, rank|
       score = poll.choices.length - rank
       score -= 1 if poll.type == :borda_single

@@ -282,7 +282,7 @@ RSpec.describe(Poll, type: :rack_test) {
             '/poll/respond',
             {
               hash_id: poll.hashid,
-              responses: Array.new(choices.length).fill { rand(10000) }
+              responses: responses.fill { rand(10000) }
             })
         expect(last_response.status).to(be(400))
         expect(last_response.body).to(eq('Response has no poll'))
@@ -325,43 +325,123 @@ RSpec.describe(Poll, type: :rack_test) {
               eq('Response set does not match number of choices'))
         }
       }
+
+      context(':borda_split') {
+        let(:poll) { create_poll(type: :borda_split) }
+        let(:all_responses) { choices.shuffle.map(&:id) }
+        let(:responses) { all_responses.drop(4) }
+        let(:bottom_responses) { all_responses[0, 4] }
+
+        it('saves rankings successfully with bottom_responses') {
+          expect(member.responses).to(be_empty)
+          post_json(
+              '/poll/respond',
+              {
+                hash_id: poll.hashid,
+                responses: responses,
+                bottom_responses: bottom_responses
+              })
+          expect(last_response.status).to(be(201))
+          expect(last_response.body).to(eq('Poll response added'))
+          expect(member.responses(poll_id: poll.id).map(&:choice_id)).to(
+              match_array(responses))
+
+          expect_slim(
+              'poll/responded',
+              poll: poll,
+              member: member,
+              timezone: an_instance_of(TZInfo::DataTimezone))
+          get poll.url
+        }
+
+        it('saves rankings successfully with no bottom_responses') {
+          expect(member.responses).to(be_empty)
+          post_json(
+              '/poll/respond',
+              {
+                hash_id: poll.hashid,
+                responses: all_responses
+              })
+          expect(last_response.status).to(be(201))
+          expect(last_response.body).to(eq('Poll response added'))
+          expect(member.responses(poll_id: poll.id).map(&:choice_id)).to(
+              match_array(all_responses))
+
+          expect_slim(
+              'poll/responded',
+              poll: poll,
+              member: member,
+              timezone: an_instance_of(TZInfo::DataTimezone))
+          get poll.url
+        }
+
+        it('rejects posting with incorrect number of responses') {
+          post_json(
+              '/poll/respond',
+              {
+                hash_id: poll.hashid,
+                responses: responses.drop(1),
+                bottom_responses: bottom_responses
+              })
+          expect(last_response.status).to(be(400))
+          expect(last_response.body).to(
+              eq('Response set does not match number of choices'))
+        }
+
+        it('rejects posting with incorrect number of bottom_responses') {
+          post_json(
+              '/poll/respond',
+              {
+                hash_id: poll.hashid,
+                responses: responses,
+                bottom_responses: bottom_responses.drop(1)
+              })
+          expect(last_response.status).to(be(400))
+          expect(last_response.body).to(
+              eq('Response set does not match number of choices'))
+        }
+
+        it('rejects posting with overrlapping responses and bottom_responses') {
+          bottom_responses[0] = responses[0]
+          post_json(
+              '/poll/respond',
+              {
+                hash_id: poll.hashid,
+                responses: responses,
+                bottom_responses: bottom_responses
+              })
+          expect(last_response.status).to(be(400))
+          expect(last_response.body).to(
+              eq('Same response found in responses and bottom_responses'))
+        }
+
+        it('rejects posting with duplicate bottom_responses') {
+          bottom_responses[0] = bottom_responses[1]
+          post_json(
+              '/poll/respond',
+              {
+                hash_id: poll.hashid,
+                responses: responses,
+                bottom_responses: bottom_responses
+              })
+          expect(last_response.status).to(be(400))
+          expect(last_response.body).to(
+              eq('Duplicate entries in bottom_responses'))
+        }
+
+        it('rejects posting with invalid bottom_responses') {
+          post_json(
+              '/poll/respond',
+              {
+                hash_id: poll.hashid,
+                responses: responses,
+                bottom_responses: bottom_responses.fill { rand(10000) }
+              })
+          expect(last_response.status).to(be(400))
+          expect(last_response.body).to(
+              eq('Invalid entries in bottom_responses'))
+        }
+      }
     }
-  # }
-
-  #   context(':borda_split') {
-  #     before(:each) {
-  #       @poll = create(type: :borda_split)
-  #     }
-
-  #     it('saves posted results successfully') {
-  #       post_json({
-  #         poll_id: @poll.id,
-  #         responses: [@poll.choices.first.id],
-  #         bottom_responses: @poll.choices.drop(1).map(&:id)
-  #       })
-  #       expect(last_response.status).to(be(201))
-
-  #       get "/poll/view/#{@poll.id}"
-  #       expect_borda_responded_page
-
-  #       @poll.expiration = 1
-  #       expect(@poll.scores.length).to(be(1))
-  #       expect(@poll.scores.first.text).to(eq('one'))
-  #       expect(@poll.scores.first.score).to(be(3))
-  #     }
-
-  #     it('rejects posting with no bottom responses') {
-  #       post_json({ poll_id: @poll.id, responses: @poll.choices.map(&:id) })
-  #       expect(last_response.status).to(be(400))
-  #     }
-
-  #     it('rejects posting with invalid bottom responses') {
-  #       post_json({
-  #         poll_id: @poll.id,
-  #         responses: @poll.choices.map(&:id),
-  #         bottom_responses: [1, 2]
-  #       })
-  #       expect(last_response.status).to(be(406))
-  #     }
   }
 }
