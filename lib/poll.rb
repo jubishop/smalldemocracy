@@ -110,23 +110,9 @@ class Poll < Base
 
   def save_borda_poll_response(req, poll, member)
     responses = list_param(req, :responses)
-    bottom_responses = list_param(req, :bottom_responses, [])
 
-    unless responses.length + bottom_responses.length == poll.choices.length
+    if poll.type == :borda_single && responses.length != poll.choices.length
       throw(:response, [400, 'Response set does not match number of choices'])
-    end
-
-    unless (responses & bottom_responses).empty?
-      throw(:response,
-            [400, 'Same response found in responses and bottom_responses'])
-    end
-
-    if bottom_responses.uniq.length != bottom_responses.length
-      throw(:response, [400, 'Duplicate entries in bottom_responses'])
-    end
-
-    unless (bottom_responses - poll.choices.map(&:id)).empty?
-      throw(:response, [400, 'Invalid entries in bottom_responses'])
     end
 
     responses.each_with_index { |choice_id, rank|
