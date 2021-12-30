@@ -7,7 +7,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('shows poll creation form if you have an email cookie') {
-      set_cookie(:email, 'test@example.com')
+      set_cookie(:email, 'my@email')
       expect_slim('poll/create')
       get '/poll/create'
       expect(last_response.ok?).to(be(true))
