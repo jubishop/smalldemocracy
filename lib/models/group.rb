@@ -35,7 +35,7 @@ module Models
     end
 
     def member(email:)
-      return Member.find(group_id: id, email: email)
+      return Member.where(group_id: id, email: email).first
     end
 
     def url

@@ -62,7 +62,7 @@ module Models
     end
 
     def member(email:)
-      return Member.find(group_id: group_id, email: email)
+      return Member.where(group_id: group_id, email: email).first
     end
 
     def creating_member
@@ -70,7 +70,7 @@ module Models
     end
 
     def choice(text:)
-      return Choice.find(poll_id: id, text: text)
+      return choices_dataset.where(text: text).first
     end
 
     def finished?

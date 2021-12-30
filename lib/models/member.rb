@@ -42,8 +42,7 @@ module Models
     end
 
     def responded?(poll_id:)
-      choices = Models::Choice.where(poll_id: poll_id).select(:id)
-      return responses_dataset.where(choice_id: choices).count.positive?
+      return poll_dataset(poll_id: poll_id).count.positive?
     end
 
     def add_poll(**attributes)
@@ -51,15 +50,11 @@ module Models
     end
 
     def response(poll_id:)
-      choices = Models::Choice.where(poll_id: poll_id).select(:id)
-      return responses_dataset.where(choice_id: choices).first
+      return poll_dataset(poll_id: poll_id).first
     end
 
     def responses(poll_id: nil)
-      return super unless poll_id
-
-      choices = Models::Choice.where(poll_id: poll_id).select(:id)
-      return responses_dataset.where(choice_id: choices).all
+      return poll_id ? poll_dataset(poll_id: poll_id).all : super
     end
 
     def polls(start_expiration: nil, end_expiration: nil)
@@ -72,6 +67,13 @@ module Models
 
     def to_s
       return email
+    end
+
+    private
+
+    def poll_dataset(poll_id:)
+      choices = Models::Choice.where(poll_id: poll_id).select(:id)
+      return responses_dataset.where(choice_id: choices)
     end
   end
 end
