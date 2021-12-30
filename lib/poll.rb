@@ -1,11 +1,9 @@
 require 'date'
 
 require_relative 'base'
-require_relative 'models/choice'
 require_relative 'models/poll'
 
 class Poll < Base
-  include Helpers::Cookie
   include Helpers::Guard
 
   def initialize
