@@ -1,7 +1,7 @@
 require_relative '../../lib/models/choice'
 
 RSpec.describe(Models::Choice) {
-  context('create') {
+  context('.create') {
     it('creates a choice') {
       choice = create_choice(text: 'text')
       expect(choice.text).to(eq('text'))
@@ -20,7 +20,7 @@ RSpec.describe(Models::Choice) {
     }
   }
 
-  context('destroy') {
+  context('#destroy') {
     it('destroys itself from poll') {
       poll = create_poll
       choice = poll.add_choice
@@ -52,7 +52,7 @@ RSpec.describe(Models::Choice) {
     }
   }
 
-  context('responses') {
+  context('#responses') {
     it('finds all its responses') {
       choice = create_choice
       response = choice.add_response(member_id: choice.poll.creating_member.id)
@@ -60,7 +60,7 @@ RSpec.describe(Models::Choice) {
     }
   }
 
-  context('add_response') {
+  context('#add_response') {
     it('rejects adding a response to an expired poll') {
       choice = create_choice
       member = choice.poll.group.add_member

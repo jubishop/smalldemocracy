@@ -1,7 +1,7 @@
 require_relative '../../lib/models/response'
 
 RSpec.describe(Models::Response) {
-  context('create') {
+  context('.create') {
     it('creates a response with no score') {
       response = create_response
       expect(response.score).to(be(nil))
@@ -13,7 +13,7 @@ RSpec.describe(Models::Response) {
     }
   }
 
-  context('destroy') {
+  context('#destroy') {
     it('destroys itself from choice') {
       response = create_response
       choice = response.choice
@@ -43,7 +43,7 @@ RSpec.describe(Models::Response) {
     }
   }
 
-  context('choice') {
+  context('#choice') {
     it('finds its choice') {
       choice = create_choice
       response = choice.add_response(member_id: choice.poll.creating_member.id)
@@ -51,7 +51,7 @@ RSpec.describe(Models::Response) {
     }
   }
 
-  context('member') {
+  context('#member') {
     it('finds its member') {
       poll = create_poll
       response = poll.creating_member.add_response(
@@ -60,7 +60,7 @@ RSpec.describe(Models::Response) {
     }
   }
 
-  context('poll') {
+  context('#poll') {
     it('finds its poll through join table') {
       poll = create_poll
       response = poll.creating_member.add_response(

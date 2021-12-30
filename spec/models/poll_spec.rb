@@ -1,7 +1,7 @@
 require_relative '../../lib/models/poll'
 
 RSpec.describe(Models::Poll) {
-  context('create') {
+  context('.create') {
     it('creates a poll') {
       now = Time.now
       poll = create_poll(email: 'me@email',
@@ -64,7 +64,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('destroy') {
+  context('#destroy') {
     it('destroys itself from group') {
       group = create_group
       poll = group.add_poll(expiration: future)
@@ -94,7 +94,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('creator') {
+  context('#creator') {
     it('finds its creator') {
       user = create_user
       group = user.add_group
@@ -103,7 +103,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('group') {
+  context('#group') {
     it('finds its group') {
       group = create_group
       poll = group.add_poll
@@ -111,7 +111,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('choices') {
+  context('#choices') {
     it('finds its choices') {
       poll = create_poll
       choice = poll.add_choice
@@ -119,7 +119,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('responses') {
+  context('#responses') {
     it('finds all responses through join table') {
       poll = create_poll
       response_one = poll.add_choice.add_response
@@ -145,14 +145,14 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('hashid') {
+  context('#hashid') {
     it('works with hashid') {
       poll = create_poll
       expect(Models::Poll.with_hashid(poll.hashid)).to(eq(poll))
     }
   }
 
-  context('members') {
+  context('#members') {
     it('finds members from its group') {
       group = create_group
       group.add_member
@@ -161,7 +161,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('member') {
+  context('#member') {
     it('finds a member from its group') {
       group = create_group
       member = group.add_member
@@ -170,7 +170,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('creating_member') {
+  context('#creating_member') {
     it('finds its creating member') {
       group = create_group
       member = group.add_member
@@ -179,7 +179,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('choice') {
+  context('#choice') {
     it('finds a choice') {
       poll = create_poll
       choice = poll.add_choice
@@ -187,7 +187,7 @@ RSpec.describe(Models::Poll) {
     }
   }
 
-  context('finished?') {
+  context('#finished?') {
     it('returns an open poll as unfinished') {
       poll = create_poll
       expect(poll.finished?).to(be(false))
@@ -212,7 +212,7 @@ RSpec.describe(Models::Poll) {
           raise_error(TypeError, /must be one of borda_split or choose_one/))
     }
 
-    shared_examples('scores') {
+    shared_examples('#scores') {
       it('computes scores properly') {
         @poll.expiration = past
         results = @expected_results.transform_values { |v| v.values.sum }
@@ -229,7 +229,7 @@ RSpec.describe(Models::Poll) {
       }
     }
 
-    shared_examples('counts') {
+    shared_examples('#counts') {
       it('computes counts properly') {
         @poll.expiration = past
         results = @expected_results.transform_values(&:length).sort_by { |k, v|
@@ -248,7 +248,7 @@ RSpec.describe(Models::Poll) {
       }
     }
 
-    shared_examples('breakdown') {
+    shared_examples('#breakdown') {
       it('computes breakdown properly') {
         @poll.expiration = past
         breakdown, unresponded = @poll.breakdown
@@ -307,8 +307,8 @@ RSpec.describe(Models::Poll) {
         @expected_unresponded = ['f@f', group.creator.email]
       }
 
-      it_has_behavior('breakdown')
-      it_has_behavior('scores')
+      it_has_behavior('#breakdown')
+      it_has_behavior('#scores')
     }
 
     context(':borda_split') {
@@ -349,9 +349,9 @@ RSpec.describe(Models::Poll) {
         @expected_unresponded = ['f@f', group.creator.email]
       }
 
-      it_has_behavior('breakdown')
-      it_has_behavior('scores')
-      it_has_behavior('counts')
+      it_has_behavior('#breakdown')
+      it_has_behavior('#scores')
+      it_has_behavior('#counts')
     }
 
     context(':choose_one') {
@@ -387,19 +387,19 @@ RSpec.describe(Models::Poll) {
         @expected_unresponded = ['g@g', group.creator.email]
       }
 
-      it_has_behavior('breakdown')
-      it_has_behavior('counts')
+      it_has_behavior('#breakdown')
+      it_has_behavior('#counts')
     }
   }
 
-  context('url') {
+  context('#url') {
     it('creates url') {
       poll = create_poll
       expect(poll.url).to(eq("/poll/view/#{poll.hashid}"))
     }
   }
 
-  context('add_choice') {
+  context('#add_choice') {
     it('adds a choice') {
       poll = create_poll
       choice = poll.add_choice

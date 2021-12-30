@@ -1,7 +1,7 @@
 require_relative '../../lib/models/user'
 
 RSpec.describe(Models::User) {
-  context('find_or_create') {
+  context('.find_or_create') {
     it('creates a user') {
       user = create_user(email: 'me@email')
       expect(user.email).to(eq('me@email'))
@@ -30,7 +30,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('delete') {
+  context('#delete') {
     it('rejects deleting users') {
       user = create_user
       expect { user.delete }.to(
@@ -38,7 +38,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('destroy') {
+  context('#destroy') {
     it('rejects destroying users') {
       user = create_user
       expect { user.destroy }.to(
@@ -46,7 +46,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('members') {
+  context('#members') {
     it('finds all members from any group') {
       user = create_user
       group = user.add_group
@@ -55,7 +55,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('created_groups') {
+  context('#created_groups') {
     it('finds all groups it created') {
       user = create_user
       group = user.add_group
@@ -63,7 +63,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('created_polls') {
+  context('#created_polls') {
     it('finds all created polls from any group') {
       user = create_user
       my_poll = user.add_group.add_poll(email: user.email)
@@ -74,7 +74,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('groups') {
+  context('#groups') {
     it('finds all groups it is in from any creator') {
       user = create_user
       my_group = user.add_group
@@ -84,7 +84,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('polls') {
+  context('#polls') {
     before(:all) {
       @user = create_user
       my_group = @user.add_group
@@ -116,7 +116,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('add_member') {
+  context('#add_member') {
     it('rejects adding members directly from user') {
       user = create_user
       expect { user.add_member }.to(
@@ -124,7 +124,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('add_poll') {
+  context('#add_poll') {
     it('adds a poll to a user') {
       user = create_user
       poll = user.add_group.add_poll
@@ -138,7 +138,7 @@ RSpec.describe(Models::User) {
     }
   }
 
-  context('add_group') {
+  context('#add_group') {
     it('adds a group to a user') {
       user = create_user
       group = user.add_group

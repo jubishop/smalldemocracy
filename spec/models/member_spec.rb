@@ -1,7 +1,7 @@
 require_relative '../../lib/models/group'
 
 RSpec.describe(Models::Member) {
-  context('create') {
+  context('.create') {
     it('creates a member') {
       member = create_member(email: 'me@email')
       expect(member.email).to(eq('me@email'))
@@ -24,7 +24,7 @@ RSpec.describe(Models::Member) {
     }
   }
 
-  context('destroy') {
+  context('#destroy') {
     it('destroys itself from group') {
       group = create_group
       member = group.add_member
@@ -54,7 +54,7 @@ RSpec.describe(Models::Member) {
     }
   }
 
-  context('group') {
+  context('#group') {
     it('finds its group') {
       group = create_group
       member = group.add_member
@@ -62,7 +62,7 @@ RSpec.describe(Models::Member) {
     }
   }
 
-  context('user') {
+  context('#user') {
     it('finds its user') {
       user = create_user
       group = create_group
@@ -71,7 +71,7 @@ RSpec.describe(Models::Member) {
     }
   }
 
-  context('responded?') {
+  context('#responded?') {
     it('reports not responding to a poll') {
       member = create_member
       poll = member.add_poll
@@ -86,7 +86,7 @@ RSpec.describe(Models::Member) {
     }
   }
 
-  context('add_poll') {
+  context('#add_poll') {
     it('adds a poll to a member') {
       member = create_member
       poll = member.add_poll
@@ -94,7 +94,7 @@ RSpec.describe(Models::Member) {
     }
   }
 
-  context('response') {
+  context('#response') {
     it('returns only first response for a specific poll') {
       member = create_member
       poll = member.add_poll(expiration: future)
@@ -104,47 +104,45 @@ RSpec.describe(Models::Member) {
     }
   }
 
-  context('responses') {
-    before(:each) {
-      @member = create_member
-      @poll = @member.add_poll(expiration: future)
-      @response = @member.add_response(choice_id: @poll.add_choice.id)
-      @other_response = @member.add_response(
-          choice_id: @member.add_poll(expiration: future).add_choice.id)
+  context('#responses') {
+    let(:member) { create_member }
+    let(:poll) { member.add_poll(expiration: future) }
+    let!(:response) { member.add_response(choice_id: poll.add_choice.id) }
+    let(:other_response) {
+      member.add_response(
+          choice_id: member.add_poll(expiration: future).add_choice.id)
     }
 
     it('returns only responses for a specific poll when poll_id: passed') {
-      expect(@member.responses(poll_id: @poll.id)).to(match_array(@response))
+      expect(member.responses(poll_id: poll.id)).to(match_array(response))
     }
 
     it('returns all responses when poll_id: nil') {
-      expect(@member.responses).to(match_array([@response, @other_response]))
+      expect(member.responses).to(match_array([response, other_response]))
     }
   }
 
-  context('polls') {
-    before(:all) {
-      @member = create_member
-      @expired_poll = @member.add_poll(expiration: past)
-      @my_poll = @member.add_poll(expiration: future)
-    }
+  context('#polls') {
+    let(:member) {  create_member }
+    let!(:expired_poll) { member.add_poll(expiration: past) }
+    let!(:my_poll) { member.add_poll(expiration: future) }
 
     it('finds all active polls with start_expiration') {
-      expect(@member.polls(start_expiration: Time.now)).to(
-          match_array(@my_poll))
+      expect(member.polls(start_expiration: Time.now)).to(
+          match_array(my_poll))
     }
 
     it('finds all expired by polls with end_expiration') {
-      expect(@member.polls(end_expiration: Time.now)).to(
-          match_array(@expired_poll))
+      expect(member.polls(end_expiration: Time.now)).to(
+          match_array(expired_poll))
     }
 
     it('finds all polls') {
-      expect(@member.polls).to(match_array([@my_poll, @expired_poll]))
+      expect(member.polls).to(match_array([my_poll, expired_poll]))
     }
   }
 
-  context('add_response') {
+  context('#add_response') {
     it('adds a response to a member') {
       member = create_member
       choice = member.add_poll(expiration: future).add_choice

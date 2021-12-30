@@ -1,7 +1,7 @@
 require_relative '../../lib/models/group'
 
 RSpec.describe(Models::Group) {
-  context('create') {
+  context('.create') {
     it('creates a group') {
       group = create_group(name: 'group_name')
       expect(group.name).to(eq('group_name'))
@@ -20,7 +20,7 @@ RSpec.describe(Models::Group) {
     }
   }
 
-  context('destroy') {
+  context('#destroy') {
     it('destroys itself from user') {
       user = create_user
       group = user.add_group
@@ -56,7 +56,7 @@ RSpec.describe(Models::Group) {
     }
   }
 
-  context('creator') {
+  context('#creator') {
     it('finds its creator') {
       user = create_user
       group = user.add_group
@@ -64,7 +64,7 @@ RSpec.describe(Models::Group) {
     }
   }
 
-  context('members') {
+  context('#members') {
     it('finds all its members') {
       group = create_group
       member = group.add_member
@@ -72,7 +72,7 @@ RSpec.describe(Models::Group) {
     }
   }
 
-  context('polls') {
+  context('#polls') {
     it('finds all its polls') {
       group = create_group
       poll = group.add_poll
@@ -80,14 +80,14 @@ RSpec.describe(Models::Group) {
     }
   }
 
-  context('hashid') {
+  context('#hashid') {
     it('works with hashid') {
       group = create_group
       expect(Models::Group.with_hashid(group.hashid)).to(eq(group))
     }
   }
 
-  context('creating_member') {
+  context('#creating_member') {
     it('finds its creating member') {
       user = create_user
       group = user.add_group
@@ -95,7 +95,7 @@ RSpec.describe(Models::Group) {
     }
   }
 
-  context('member') {
+  context('#member') {
     it('finds a member') {
       group = create_group
       member = group.add_member
@@ -110,7 +110,7 @@ RSpec.describe(Models::Group) {
     }
   }
 
-  context('add_member') {
+  context('#add_member') {
     it('adds an existing user as a member to a group') {
       group = create_group
       member = group.add_member(email: create_user.email)
@@ -133,7 +133,7 @@ RSpec.describe(Models::Group) {
     }
   }
 
-  context('add_poll') {
+  context('#add_poll') {
     it('adds a poll to a group') {
       group = create_group
       poll = group.add_poll
