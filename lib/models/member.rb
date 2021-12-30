@@ -14,11 +14,14 @@
 
 require 'sequel'
 
+require_relative '../helpers/email'
 require_relative 'group'
 require_relative 'user'
 
 module Models
   class Member < Sequel::Model
+    include ::Helpers::Email
+
     many_to_one :group
     many_to_one :user, key: :email
     one_to_many :responses,
@@ -26,10 +29,8 @@ module Models
                 clearer: nil
 
     def before_validation
-      cancel_action('Member has no email') unless email
-      cancel_action('Member has empty email') if email.to_s.empty?
-      unless URI::MailTo::EMAIL_REGEXP.match?(email.to_s)
-        cancel_action("Member has invalid email: '#{email}'")
+      if (message = invalid_email(email: email, name: 'Member'))
+        cancel_action(message)
       end
       super
     end

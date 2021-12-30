@@ -42,8 +42,7 @@ RSpec.describe(Models::Poll) {
 
     it('rejects creating poll with no expiration') {
       expect { create_poll(expiration: nil) }.to(
-          raise_error(Sequel::NotNullConstraintViolation,
-                      /null value in column "expiration"/))
+          raise_error(Sequel::HookFailed, 'Expiration value is invalid'))
     }
 
     it('rejects creating a poll with expiration at unix epoch') {

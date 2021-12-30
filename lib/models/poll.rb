@@ -23,6 +23,7 @@
 require 'rstruct'
 require 'sequel'
 
+require_relative '../helpers/email'
 require_relative 'helpers/poll_results'
 require_relative 'group'
 require_relative 'user'
@@ -31,6 +32,8 @@ BreakdownResult = KVStruct.new(:member, :score)
 
 module Models
   class Poll < Sequel::Model
+    include ::Helpers::Email
+
     many_to_one :creator, class: 'Models::User', key: :email
     many_to_one :group
     one_to_many :choices, remover: ->(choice) { choice.destroy }, clearer: nil
@@ -45,13 +48,14 @@ module Models
 
     def before_validation
       cancel_action('Poll has no group') unless group_id
-      cancel_action('Poll has no creator') unless email
-      cancel_action('Poll has empty creator') if email.to_s.empty?
-      cancel_action("Poll has invalid creator email: '#{email}'") unless creator
+      if (message = invalid_email(email: email, name: 'Poll'))
+        cancel_action(message)
+      end
       unless member(email: creator.email)
         cancel_action("Creator: '#{email}', is not a member of '#{group.name}'")
       end
-      if !expiration.nil? && expiration.is_a?(Time) && expiration.to_i.zero?
+      cancel_action('Expiration value is invalid') unless expiration.is_a?(Time)
+      if expiration.to_i.zero?
         cancel_action('Poll has expiration at unix epoch')
       end
       super

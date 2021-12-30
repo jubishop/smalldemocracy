@@ -1,4 +1,5 @@
 require_relative '../models/poll'
+require_relative 'cookie'
 
 module Helpers
   module Guard

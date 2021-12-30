@@ -10,8 +10,12 @@
 
 require 'sequel'
 
+require_relative '../helpers/email'
+
 module Models
   class User < Sequel::Model
+    include ::Helpers::Email
+
     unrestrict_primary_key
     one_to_many :members, key: :email, adder: nil, remover: nil, clearer: nil
     one_to_many :created_groups,
@@ -30,10 +34,8 @@ module Models
     alias remove_poll remove_created_poll
 
     def before_validation
-      cancel_action('User has no email') unless email
-      cancel_action('User has empty email') if email.to_s.empty?
-      unless URI::MailTo::EMAIL_REGEXP.match?(email.to_s)
-        cancel_action("User has invalid email: '#{email}'")
+      if (message = invalid_email(email: email, name: 'User'))
+        cancel_action(message)
       end
       super
     end
