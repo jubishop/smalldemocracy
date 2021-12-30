@@ -28,5 +28,15 @@ class Group < Base
         resp.redirect(group.url)
       end
     })
+
+    get(%r{^/group/view/(?<hash_id>.+)$}, ->(req, _) {
+      email = require_email(req)
+      group = require_group(req)
+
+      member = group.member(email: email)
+      return 404, @slim.render('group/not_found') unless member
+
+      return 200, @slim.render('group/view', group: group, member: member)
+    })
   end
 end

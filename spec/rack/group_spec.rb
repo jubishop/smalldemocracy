@@ -30,13 +30,11 @@ RSpec.describe(Poll, type: :rack_test) {
     it('creates a new poll with choices and redirects to view') {
       post_json('/group/create', valid_params)
       expect(last_response.redirect?).to(be(true))
-      puts user.groups
-      puts user
       expect(group).to(have_attributes(email: user.email, name: 'name'))
       expect(group.members.map(&:email)).to(match_array(members + [user.email]))
-      # expect_slim('group/view', group: group, member: member)
-      # follow_redirect!
-      # expect(last_response.ok?).to(be(true))
+      expect_slim('group/view', group: group, member: group.creating_member)
+      follow_redirect!
+      expect(last_response.ok?).to(be(true))
     }
   }
 }
