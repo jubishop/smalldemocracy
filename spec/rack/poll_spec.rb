@@ -259,6 +259,7 @@ RSpec.describe(Poll, type: :rack_test) {
     context(':borda') {
       let(:poll) { create_poll(type: :borda_single) }
       let(:choices) { Array.new(10).fill { poll.add_choice } }
+      let(:responses) { choices.shuffle.map(&:id) }
 
       it('rejects posting to an already responded poll') {
         choice = poll.add_choice
@@ -276,9 +277,28 @@ RSpec.describe(Poll, type: :rack_test) {
         expect(last_response.body).to(eq('No responses given'))
       }
 
+      it('rejects posting with invalid responses') {
+        post_json(
+            '/poll/respond',
+            {
+              hash_id: poll.hashid,
+              responses: Array.new(choices.length).fill { rand(10000) }
+            })
+        expect(last_response.status).to(be(400))
+        expect(last_response.body).to(eq('Response has no poll'))
+      }
+
+      it('rejects posting with duplicate choices') {
+        responses[0] = responses[1]
+        post_json('/poll/respond',
+                  { hash_id: poll.hashid, responses: responses })
+        expect(last_response.status).to(be(400))
+        expect(last_response.body).to(
+            match(/violates unique constraint "response_unique"/))
+      }
+
       context(':borda_single') {
         let(:poll) { create_poll(type: :borda_single) }
-        let(:responses) { choices.shuffle.map(&:id) }
 
         it('saves rankings successfully') {
           expect(member.responses).to(be_empty)
@@ -296,38 +316,16 @@ RSpec.describe(Poll, type: :rack_test) {
               timezone: an_instance_of(TZInfo::DataTimezone))
           get poll.url
         }
+
+        it('rejects posting with incorrect number of responses') {
+          post_json('/poll/respond',
+                    { hash_id: poll.hashid, responses: responses.drop(1) })
+          expect(last_response.status).to(be(400))
+          expect(last_response.body).to(
+              eq('Response set does not match number of choices'))
+        }
       }
     }
-
-  #   it('rejects posting with invalid responses') {
-  #     poll = create
-  #     post_json({ poll_id: poll.id, responses: [1, 2] })
-  #     expect(last_response.status).to(be(406))
-  #   }
-
-  #   it('rejects posting with duplicate choices') {
-  #     poll = create
-  #     responses = poll.choices.map(&:id)
-  #     responses[0] = responses[1]
-  #     post_json({ poll_id: poll.id, responses: responses })
-  #     expect(last_response.status).to(be(409))
-  #   }
-
-  #   it('rejects posting responses to expired poll') {
-  #     poll = create(expiration: 1)
-  #     post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
-  #     expect(last_response.status).to(be(405))
-  #     expect(last_response.body).to(eq('Poll has already finished'))
-  #   }
-
-  #   it('rejects posting if you are logged in as someone else') {
-  #     set_cookie(:email, 'someone_else@hey.com')
-  #     poll = create
-  #     post_json({ poll_id: poll.id, responses: poll.choices.map(&:id) })
-  #     expect(last_response.status).to(be(405))
-  #     expect(last_response.body).to(
-  #         eq('someone_else@hey.com is not a responder to this poll'))
-  #   }
   # }
 
   #   context(':borda_split') {
