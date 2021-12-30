@@ -1,12 +1,10 @@
 # Small Democracy
 
-[![CC Shield][cc-by-nc-nd-shield]][cc-by-nc-nd]
-
 [![RSpec Status][rspec-badge]][rspec-yml]  [![Rubocop Status][rubocop-badge]][rubocop-yml]
 
 ## Tools for a Small Democracy
 
-Small Democracy can be viewed online at [smalldemocracy.com](https://SmallDemocracy.com).
+Small Democracy can be viewed online at [smalldemocracy.com][small-democracy].
 
 ## Polls
 
@@ -17,19 +15,15 @@ Small Democracy currently supports:
 
 ## License
 
-This work is licensed under a
-[Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License][cc-by-nc-nd].
-
-[![CC Badge][cc-by-nc-nd-badge]][cc-by-nc-nd]
+This work is licensed under the [Fair Source License](https://fair.io) as [Fair Source 10][license].
 
 <!-- Badge Shortcuts -->
 [rspec-badge]: https://github.com/jubishop/smalldemocracy/workflows/RSpec/badge.svg
 [rspec-yml]: https://github.com/jubishop/smalldemocracy/actions/workflows/rspec.yml
 [rubocop-badge]: https://github.com/jubishop/smalldemocracy/workflows/Rubocop/badge.svg
 [rubocop-yml]: https://github.com/jubishop/smalldemocracy/actions/workflows/rubocop.yml
-[cc-by-nc-nd]: http://creativecommons.org/licenses/by-nc-nd/4.0/
-[cc-by-nc-nd-badge]: https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png
-[cc-by-nc-nd-shield]: https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg
 
-<!-- Poll Info Shortcuts -->
+<!-- Link Shortcuts -->
+[license]: https://github.com/jubishop/smalldemocracy/blob/main/LICENSE.md
+[small-democracy]: https://smalldemocracy.com
 [borda-count]: https://en.wikipedia.org/wiki/Borda_count
