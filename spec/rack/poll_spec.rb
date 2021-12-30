@@ -22,7 +22,6 @@ RSpec.describe(Poll, type: :rack_test) {
     let(:member) { group.creating_member }
     let(:valid_params) {
       {
-        email: member.email,
         title: 'title',
         question: 'question',
         choices: choices,

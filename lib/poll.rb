@@ -1,3 +1,4 @@
+require 'core'
 require 'date'
 
 require_relative 'base'
@@ -21,12 +22,13 @@ class Poll < Base
     })
 
     post('/poll/create', ->(req, resp) {
-      require_email(req)
+      email = require_email(req)
+      req.params[:email] = email
 
-      expiration = param(req, :expiration)
       choices = list_param(req, :choices)
       req.params.delete(:choices)
 
+      expiration = param(req, :expiration)
       hour_offset = req.timezone.utc_offset / 3600
       utc_offset = hour_offset.abs.to_s
       utc_offset.prepend('0') if hour_offset.abs < 10
