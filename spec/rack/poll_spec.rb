@@ -226,7 +226,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
       it('rejects posting to an already responded poll') {
         choice = poll.add_choice
-        choice.add_response(member_id: poll.creating_member.id)
+        member.add_response(choice_id: choice.id)
         another_choice = poll.add_choice
 
         post_json('/poll/respond',
@@ -257,7 +257,24 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     context(':borda') {
+      let(:poll) { create_poll(type: :borda_single) }
       let(:choices) { Array.new(10).fill { poll.add_choice } }
+
+      it('rejects posting to an already responded poll') {
+        choice = poll.add_choice
+        member.add_response(choice_id: choice.id)
+
+        post_json('/poll/respond',
+                  { hash_id: poll.hashid, responses: [choice.id] })
+        expect(last_response.status).to(be(409))
+        expect(last_response.body).to(match(/Member has already responded/))
+      }
+
+      it('rejects posting with no responses') {
+        post_json('/poll/respond', { hash_id: poll.hashid })
+        expect(last_response.status).to(be(400))
+        expect(last_response.body).to(eq('No responses given'))
+      }
 
       context(':borda_single') {
         let(:poll) { create_poll(type: :borda_single) }
@@ -281,11 +298,6 @@ RSpec.describe(Poll, type: :rack_test) {
         }
       }
     }
-  #   it('rejects posting with no responses') {
-  #     poll = create
-  #     post_json({ poll_id: poll.id })
-  #     expect(last_response.status).to(be(400))
-  #   }
 
   #   it('rejects posting with invalid responses') {
   #     poll = create

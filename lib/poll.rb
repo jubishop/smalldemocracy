@@ -121,28 +121,4 @@ class Poll < Base
       member.add_response(choice_id: choice_id, score: score)
     }
   end
-
-  def list_param(req, key, default = nil)
-    items = param(req, key, default)
-
-    unless items.is_a?(Enumerable)
-      throw(:response, [400, "Invalid #{key} given"])
-    end
-    items = items.compact.delete_if { |item| item.to_s.empty? }
-    return items if items == default
-
-    throw(:response, [400, "No #{key} given"]) if items.empty?
-
-    return items
-  end
-
-  def param(req, key, default = nil)
-    if req.params[key].nil? || req.params[key].to_s.empty?
-      return default unless default.nil?
-
-      throw(:response, [400, "No #{key} given"])
-    end
-
-    return req.params.fetch(key)
-  end
 end
