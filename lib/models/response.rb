@@ -25,7 +25,6 @@ module Models
                            left_primary_key: :choice_id
 
     def before_validation
-      cancel_action('Response has no choice') unless choice
       cancel_action('Response has no poll') unless poll
       cancel_action('Response modified in expired poll') if poll.finished?
       super

@@ -158,15 +158,13 @@ RSpec.describe(Models::Member) {
       choice = poll.add_choice
       poll.update(expiration: past)
       expect { member.add_response(choice_id: choice.id) }.to(
-          raise_error(Sequel::HookFailed,
-                      'Response modified in expired poll'))
+          raise_error(Sequel::HookFailed, 'Response modified in expired poll'))
     }
 
     it('rejects adding a response without a choice') {
       member = create_member
       expect { member.add_response(choice_id: nil) }.to(
-          raise_error(Sequel::HookFailed,
-                      'Response has no choice'))
+          raise_error(Sequel::HookFailed, 'Response has no poll'))
     }
 
     it('rejects adding two responses to the same choice') {

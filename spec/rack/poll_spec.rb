@@ -252,7 +252,7 @@ RSpec.describe(Poll, type: :rack_test) {
         post_json('/poll/respond',
                   { hash_id: poll.hashid, choice_id: 987654321 })
         expect(last_response.status).to(be(400))
-        expect(last_response.body).to(eq('Response has no choice'))
+        expect(last_response.body).to(eq('Response has no poll'))
       }
     }
 

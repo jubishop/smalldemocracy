@@ -60,7 +60,6 @@ RSpec.describe(Models::Choice) {
     }
   }
 
-
   context('add_response') {
     it('rejects adding a response to an expired poll') {
       choice = create_choice

@@ -27,8 +27,8 @@ module Models
 
     def before_validation
       cancel_action('Member has no email') unless email
-      cancel_action('Member has empty email') if email.empty?
-      unless URI::MailTo::EMAIL_REGEXP.match?(email)
+      cancel_action('Member has empty email') if email.to_s.empty?
+      unless URI::MailTo::EMAIL_REGEXP.match?(email.to_s)
         cancel_action("Member has invalid email: '#{email}'")
       end
       super

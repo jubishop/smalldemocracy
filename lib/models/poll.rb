@@ -46,7 +46,7 @@ module Models
     def before_validation
       cancel_action('Poll has no group') unless group_id
       cancel_action('Poll has no creator') unless email
-      cancel_action('Poll has empty creator') if email.empty?
+      cancel_action('Poll has empty creator') if email.to_s.empty?
       cancel_action("Poll has invalid creator email: '#{email}'") unless creator
       unless member(email: creator.email)
         cancel_action("Creator: '#{email}', is not a member of '#{group.name}'")
