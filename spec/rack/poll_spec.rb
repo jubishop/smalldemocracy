@@ -297,9 +297,7 @@ RSpec.describe(Poll, type: :rack_test) {
             match(/violates unique constraint "response_unique"/))
       }
 
-      context(':borda_single') {
-        let(:poll) { create_poll(type: :borda_single) }
-
+      shared_examples('saves rankings') {
         it('saves rankings successfully') {
           expect(member.responses).to(be_empty)
           post_json('/poll/respond',
@@ -312,7 +310,7 @@ RSpec.describe(Poll, type: :rack_test) {
             poll_response = poll_responses.find { |response|
               response.choice_id == choice_id
             }
-            expect(poll_response.score).to(eq(poll.choices.length - rank - 1))
+            expect(poll_response.score).to(eq(rank_calculation.call(rank)))
           }
 
           expect_slim(
@@ -322,6 +320,15 @@ RSpec.describe(Poll, type: :rack_test) {
               timezone: an_instance_of(TZInfo::DataTimezone))
           get poll.url
         }
+      }
+
+      context(':borda_single') {
+        let(:poll) { create_poll(type: :borda_single) }
+        let(:rank_calculation) {
+          ->(rank) { poll.choices.length - rank - 1 }
+        }
+
+        it_has_behavior('saves rankings')
 
         it('rejects posting with incorrect number of responses') {
           post_json('/poll/respond',
@@ -335,33 +342,11 @@ RSpec.describe(Poll, type: :rack_test) {
       context(':borda_split') {
         let(:poll) { create_poll(type: :borda_split) }
         let(:responses) { choices.shuffle.map(&:id).drop(4) }
-
-        it('saves rankings successfully') {
-          expect(member.responses).to(be_empty)
-          post_json(
-              '/poll/respond',
-              {
-                hash_id: poll.hashid,
-                responses: responses
-              })
-          expect(last_response.status).to(be(201))
-          expect(last_response.body).to(eq('Poll response added'))
-          poll_responses = member.responses(poll_id: poll.id)
-          expect((poll_responses).map(&:choice_id)).to(match_array(responses))
-          responses.each_with_index { |choice_id, rank|
-            poll_response = poll_responses.find { |response|
-              response.choice_id == choice_id
-            }
-            expect(poll_response.score).to(eq(poll.choices.length - rank))
-          }
-
-          expect_slim(
-              'poll/responded',
-              poll: poll,
-              member: member,
-              timezone: an_instance_of(TZInfo::DataTimezone))
-          get poll.url
+        let(:rank_calculation) {
+          ->(rank) { poll.choices.length - rank }
         }
+
+        it_has_behavior('saves rankings')
       }
     }
   }
