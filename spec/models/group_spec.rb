@@ -80,6 +80,13 @@ RSpec.describe(Models::Group) {
     }
   }
 
+  context('hashid') {
+    it('works with hashid') {
+      group = create_group
+      expect(Models::Group.with_hashid(group.hashid)).to(eq(group))
+    }
+  }
+
   context('creating_member') {
     it('finds its creating member') {
       user = create_user
@@ -157,13 +164,6 @@ RSpec.describe(Models::Group) {
       expect { group.add_poll(email: 'invalid') }.to(
           raise_error(Sequel::HookFailed,
                       "Poll has invalid creator email: 'invalid'"))
-    }
-  }
-
-  context('hashid') {
-    it('works with hashid') {
-      group = create_group
-      expect(Models::Group.with_hashid(group.hashid)).to(eq(group))
     }
   }
 }

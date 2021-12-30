@@ -112,6 +112,47 @@ RSpec.describe(Models::Poll) {
     }
   }
 
+  context('choices') {
+    it('finds its choices') {
+      poll = create_poll
+      choice = poll.add_choice
+      expect(poll.choices).to(match_array(choice))
+    }
+  }
+
+  context('responses') {
+    it('finds all responses through join table') {
+      poll = create_poll
+      response_one = poll.add_choice.add_response
+      response_two = poll.add_choice.add_response
+      expect(poll.responses).to(match_array([response_one, response_two]))
+    }
+  }
+
+  context('timestamps') {
+    it('sets updated_at and created_at upon creation') {
+      moment = freeze_time
+      poll = create_poll
+      expect(poll.created_at).to(eq(moment))
+      expect(poll.updated_at).to(eq(moment))
+    }
+
+    it('sets updated_at upon update') {
+      poll = create_poll
+      moment = freeze_time
+      poll.update(title: 'title')
+      expect(poll.created_at).to_not(eq(poll.updated_at))
+      expect(poll.updated_at).to(eq(moment))
+    }
+  }
+
+  context('hashid') {
+    it('works with hashid') {
+      poll = create_poll
+      expect(Models::Poll.with_hashid(poll.hashid)).to(eq(poll))
+    }
+  }
+
   context('members') {
     it('finds members from its group') {
       group = create_group
@@ -378,39 +419,6 @@ RSpec.describe(Models::Poll) {
       expect { poll.add_choice(text: 'one') }.to(
           raise_error(Sequel::ConstraintViolation,
                       /violates unique constraint "choice_unique"/))
-    }
-  }
-
-  context('responses') {
-    it('finds all responses through join table') {
-      poll = create_poll
-      response_one = poll.add_choice.add_response
-      response_two = poll.add_choice.add_response
-      expect(poll.responses).to(match_array([response_one, response_two]))
-    }
-  }
-
-  context('timestamps') {
-    it('sets updated_at and created_at upon creation') {
-      moment = freeze_time
-      poll = create_poll
-      expect(poll.created_at).to(eq(moment))
-      expect(poll.updated_at).to(eq(moment))
-    }
-
-    it('sets updated_at upon update') {
-      poll = create_poll
-      moment = freeze_time
-      poll.update(title: 'title')
-      expect(poll.created_at).to_not(eq(poll.updated_at))
-      expect(poll.updated_at).to(eq(moment))
-    }
-  }
-
-  context('hashid') {
-    it('works with hashid') {
-      poll = create_poll
-      expect(Models::Poll.with_hashid(poll.hashid)).to(eq(poll))
     }
   }
 }

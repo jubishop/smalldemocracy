@@ -111,13 +111,13 @@ class Poll < Base
   def save_borda_poll_response(req, poll, member)
     responses = list_param(req, :responses)
     bottom_responses = list_param(req, :bottom_responses, [])
-    num_choices = poll.choices_dataset.count
-    unless responses.length + bottom_responses.length == num_choices
+
+    unless responses.length + bottom_responses.length == poll.choices.length
       throw(:response, [400, 'Response set does not match number of choices'])
     end
 
     responses.each_with_index { |choice_id, rank|
-      score = num_choices - rank
+      score = poll.choices.length - rank
       score -= 1 if poll.type == :borda_single
       member.add_response(choice_id: choice_id, score: score)
     }

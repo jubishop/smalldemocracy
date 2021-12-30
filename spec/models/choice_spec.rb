@@ -52,6 +52,15 @@ RSpec.describe(Models::Choice) {
     }
   }
 
+  context('responses') {
+    it('finds all its responses') {
+      choice = create_choice
+      response = choice.add_response(member_id: choice.poll.creating_member.id)
+      expect(choice.responses).to(match_array(response))
+    }
+  }
+
+
   context('add_response') {
     it('rejects adding a response to an expired poll') {
       choice = create_choice

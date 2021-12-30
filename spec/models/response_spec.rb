@@ -1,8 +1,5 @@
 require_relative '../../lib/models/response'
 
-# TODO: Go over this entirely
-# TODO: Test can't remove response after poll expired.
-
 RSpec.describe(Models::Response) {
   context('create') {
     it('creates a response with no score') {
@@ -43,6 +40,32 @@ RSpec.describe(Models::Response) {
       expect { response.destroy }.to(
           raise_error(Sequel::HookFailed,
                       'Response removed from expired poll'))
+    }
+  }
+
+  context('choice') {
+    it('finds its choice') {
+      choice = create_choice
+      response = choice.add_response(member_id: choice.poll.creating_member.id)
+      expect(response.choice).to(eq(choice))
+    }
+  }
+
+  context('member') {
+    it('finds its member') {
+      poll = create_poll
+      response = poll.creating_member.add_response(
+          choice_id: poll.add_choice.id)
+      expect(response.member).to(eq(poll.creating_member))
+    }
+  }
+
+  context('poll') {
+    it('finds its poll through join table') {
+      poll = create_poll
+      response = poll.creating_member.add_response(
+          choice_id: poll.add_choice.id)
+      expect(response.poll).to(eq(poll))
     }
   }
 }
