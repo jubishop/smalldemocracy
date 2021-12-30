@@ -17,7 +17,7 @@ class Group < Base
       req.params[:email] = email
 
       members = list_param(req, :members)
-      members.delete(email)
+      req.params.delete(:members)
 
       begin
         group = Models::Group.create(**req.params.symbolize_keys)

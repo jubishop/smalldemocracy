@@ -35,6 +35,10 @@ module Models
       super
     end
 
+    def before_create
+      User.find_or_create(email: email)
+    end
+
     def before_destroy
       if self == group.creating_member
         cancel_action("Creators (#{email}) cannot be removed from their groups")

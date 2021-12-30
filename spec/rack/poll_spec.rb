@@ -31,6 +31,7 @@ RSpec.describe(Poll, type: :rack_test) {
       }
     }
     let(:poll) { group.polls.first }
+
     before(:each) { set_cookie(:email, member.email) }
 
     it('creates a new poll with choices and redirects to view') {

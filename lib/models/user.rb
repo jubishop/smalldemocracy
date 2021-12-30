@@ -45,11 +45,6 @@ module Models
       cancel_action('Users cannot be destroyed')
     end
 
-    def _add_created_group(group)
-      super(group)
-      group.add_member(email: email)
-    end
-
     def groups
       return Models::Group.where(id: members_dataset.select(:group_id)).all
     end
