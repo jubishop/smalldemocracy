@@ -1,5 +1,4 @@
 require 'capybara/apparition'
-require 'securerandom'
 require 'tony/test'
 
 ENV['APP_ENV'] = 'test'
@@ -7,8 +6,6 @@ ENV['RACK_ENV'] = 'test'
 ENV['SMALLDEMOCRACY_HASHED_PASSWORD'] =
   'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
 ENV['SMALLDEMOCRACY_COOKIE_SECRET'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
-ENV['GOOGLE_CLIENT_ID'] = 'id'
-ENV['GOOGLE_SECRET'] = 'secret'
 ENV['POLL_ID_SALT'] = 'pollsalt'
 ENV['GROUP_ID_SALT'] = 'groupsalt'
 
@@ -60,17 +57,14 @@ RSpec.shared_context(:rack_test) {
 }
 
 RSpec.configure do |config|
-  config.expect_with(:rspec) do |expectations|
-    expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+  config.expect_with(:rspec) do |expect|
+    expect.include_chain_clauses_in_custom_matcher_descriptions = true
+    expect.max_formatted_output_length = 200
   end
 
   config.mock_with(:rspec) do |mocks|
     mocks.verify_partial_doubles = true
     mocks.verify_doubled_constant_names = true
-  end
-
-  config.expect_with(:rspec) do |expect|
-    expect.max_formatted_output_length = 200
   end
 
   config.shared_context_metadata_behavior = :apply_to_host_groups
@@ -87,8 +81,7 @@ RSpec.configure do |config|
   config.include_context(:rack_test, type: :rack_test)
 
   config.before(:each) {
-    allow(Tony::Auth::Google).to(receive(:url)).and_return(
-        SecureRandom.alphanumeric(24))
+    allow(Tony::Auth::Google).to(receive(:url))
   }
 
   config.after(:each) {
