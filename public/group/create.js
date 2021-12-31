@@ -1,6 +1,7 @@
 class Group {
   static domLoaded() {
-    alert("hello world");
+    let listable = new Listable(document.getElementById('member-list'),
+                                document.getElementById('add-member'));
   }
 }
 

@@ -8,8 +8,8 @@ class Group < Base
     super
 
     get('/group/create', ->(req, _) {
-      require_email(req)
-      return 200, @slim.render('group/create')
+      email = require_email(req)
+      return 200, @slim.render('group/create', email: email)
     })
 
     post('/group/create', ->(req, resp) {

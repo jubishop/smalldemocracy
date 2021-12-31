@@ -1,3 +1,14 @@
 = content_for :head
   title Create Group
+  ==javascript_include_tag 'js/listable'
   ==javascript_include_tag 'group/create'
+
+label for="name" Group Name:
+input name="name" type="text" required=true autofocus=true
+
+ul#member-list
+  li =email
+
+button#add-member Add Member
+
+button#create-group Create Group
