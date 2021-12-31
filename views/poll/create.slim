@@ -1,5 +1,6 @@
 = content_for :head
   title Create Poll
+  ==javascript_include_tag 'poll/create'
 
 = content_for :header
   h1 Create Poll
@@ -30,4 +31,4 @@ form action="create" method="post"
     option value='borda_split' Borda Split
     option value='choose_one' Choose One
 
-  input value="Submit" type="submit"
+  button value="Submit" type="submit"

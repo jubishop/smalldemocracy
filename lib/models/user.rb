@@ -11,6 +11,9 @@
 require 'sequel'
 
 require_relative '../helpers/email'
+require_relative 'group'
+require_relative 'member'
+require_relative 'poll'
 
 module Models
   class User < Sequel::Model

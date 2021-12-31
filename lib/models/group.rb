@@ -16,6 +16,8 @@
 
 require 'sequel'
 
+require_relative 'member'
+require_relative 'poll'
 require_relative 'user'
 
 module Models

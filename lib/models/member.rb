@@ -16,6 +16,7 @@ require 'sequel'
 
 require_relative '../helpers/email'
 require_relative 'group'
+require_relative 'response'
 require_relative 'user'
 
 module Models

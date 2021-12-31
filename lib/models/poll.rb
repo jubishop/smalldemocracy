@@ -25,7 +25,9 @@ require 'sequel'
 
 require_relative '../helpers/email'
 require_relative 'helpers/poll_results'
+require_relative 'choice'
 require_relative 'group'
+require_relative 'response'
 require_relative 'user'
 
 BreakdownResult = KVStruct.new(:member, :score)

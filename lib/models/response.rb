@@ -15,6 +15,7 @@ require 'sequel'
 
 require_relative 'choice'
 require_relative 'member'
+require_relative 'poll'
 
 module Models
   class Response < Sequel::Model
