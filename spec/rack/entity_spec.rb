@@ -48,5 +48,12 @@ RSpec.shared_examples('entity') { |path|
       get "#{path}/view/does_not_exist"
       expect(last_response.status).to(be(404))
     }
+
+    it('asks for email if not logged in') {
+      clear_cookies
+      expect_slim(:get_email, req: an_instance_of(Tony::Request))
+      get entity.url
+      expect(last_response.status).to(be(401))
+    }
   }
 }

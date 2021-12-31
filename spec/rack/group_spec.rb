@@ -9,6 +9,7 @@ RSpec.describe(Group, type: :rack_test) {
     }
   }
 
+  let(:entity) { create_group(email: email) }
   it_behaves_like('entity', 'group')
 
   context('post /create') {
@@ -24,6 +25,33 @@ RSpec.describe(Group, type: :rack_test) {
       expect_slim('group/view', group: group, member: group.creating_member)
       follow_redirect!
       expect(last_response.ok?).to(be(true))
+    }
+  }
+
+  context('get /view') {
+    let(:group) { create_group }
+
+    it('shows group for creator') {
+      member = group.creating_member
+      set_cookie(:email, member.email)
+      expect_slim('group/view', group: group, member: member)
+      get group.url
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('shows group for member') {
+      member = group.add_member
+      set_cookie(:email, member.email)
+      expect_slim('group/view', group: group, member: member)
+      get group.url
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('shows group not found if logged in but not in this group') {
+      set_cookie(:email, 'me@email')
+      expect_slim('group/not_found')
+      get group.url
+      expect(last_response.status).to(be(404))
     }
   }
 }

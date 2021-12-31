@@ -16,6 +16,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
+  let(:entity) { create_poll(email: email) }
   it_behaves_like('entity', 'poll')
 
   context('post /create') {
@@ -53,16 +54,7 @@ RSpec.describe(Poll, type: :rack_test) {
     let(:tz_name) { 'Africa/Djibouti' }
     let(:timezone) { TZInfo::Timezone.get(tz_name) }
 
-    before(:each) {
-      rack_mock_session.cookie_jar['tz'] = tz_name
-    }
-
-    it('asks for email if not logged in') {
-      poll = create_poll
-      expect_slim(:get_email, req: an_instance_of(Tony::Request))
-      get poll.url
-      expect(last_response.status).to(be(401))
-    }
+    before(:each) { rack_mock_session.cookie_jar['tz'] = tz_name }
 
     it('shows poll not found if logged in but not in this open poll') {
       poll = create_poll
@@ -126,9 +118,7 @@ RSpec.describe(Poll, type: :rack_test) {
     let(:choice) { poll.add_choice }
     let(:member) { poll.creating_member }
 
-    before(:each) {
-      set_cookie(:email, poll.email)
-    }
+    before(:each) { set_cookie(:email, poll.email) }
 
     it('rejects an empty post body') {
       post_json('/poll/respond')
