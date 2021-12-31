@@ -16,7 +16,6 @@ require_relative '../setup'
 
 require_relative 'helpers/matchers'
 require_relative 'helpers/models'
-require_relative 'helpers/rack'
 require_relative 'helpers/time'
 
 Capybara.server = :puma
@@ -52,6 +51,12 @@ RSpec.shared_context(:rack_test) {
 
   let(:app) { Capybara.app }
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
+
+  # rubocop:disable Style/StringHashKeys
+  def post_json(path, data = {})
+    post(path, data.to_json, { 'CONTENT_TYPE' => 'application/json' })
+  end
+  # rubocop:enable Style/StringHashKeys
 }
 
 RSpec.configure do |config|
@@ -78,7 +83,6 @@ RSpec.configure do |config|
 
   config.include(RSpec::Models)
   config.include(RSpec::Time)
-  config.include(RSpec::Rack)
   config.include_context(:capybara, type: :feature)
   config.include_context(:rack_test, type: :rack_test)
 
