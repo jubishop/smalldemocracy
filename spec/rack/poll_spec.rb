@@ -1,38 +1,27 @@
 RSpec.describe(Poll, type: :rack_test) {
-  context('get /create') {
-    it('requests email if you have no cookie') {
-      expect_slim(:get_email, req: an_instance_of(Tony::Request))
-      get '/poll/create'
-      expect(last_response.status).to(be(401))
-    }
-
-    it('shows poll creation form if you have an email cookie') {
-      set_cookie(:email, 'my@email')
-      expect_slim('poll/create')
-      get '/poll/create'
-      expect(last_response.ok?).to(be(true))
+  let(:group) { create_group }
+  let(:type) { :choose_one }
+  let(:expiration) { future }
+  let(:choices) { %w[one two three] }
+  let(:member) { group.creating_member }
+  let(:email) { member.email }
+  let(:valid_params) {
+    {
+      title: 'title',
+      question: 'question',
+      choices: choices,
+      group_id: group.id,
+      expiration: expiration.form,
+      type: type
     }
   }
 
+  it_behaves_like('entity', 'poll')
+
   context('post /create') {
-    let(:group) { create_group }
-    let(:type) { :choose_one }
-    let(:expiration) { future }
-    let(:choices) { %w[one two three] }
-    let(:member) { group.creating_member }
-    let(:valid_params) {
-      {
-        title: 'title',
-        question: 'question',
-        choices: choices,
-        group_id: group.id,
-        expiration: expiration.form,
-        type: type
-      }
-    }
     let(:poll) { group.polls.first }
 
-    before(:each) { set_cookie(:email, member.email) }
+    before(:each) { set_cookie(:email, email) }
 
     it('creates a new poll with choices and redirects to view') {
       post_json('/poll/create', valid_params)
@@ -53,34 +42,10 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.ok?).to(be(true))
     }
 
-    it('rejects any post without a cookie') {
-      clear_cookies
-      post_json('/poll/create', valid_params)
-      expect(last_response.status).to(be(401))
-      expect(last_response.body).to(eq('No email found'))
-    }
-
-    it('fails if post body is nonexistent') {
-      post '/poll/create'
-      expect(last_response.status).to(be(400))
-    }
-
     it('fails if type is invalid') {
       valid_params[:type] = :invalid_type
       post_json('/poll/create', valid_params)
       expect(last_response.status).to(be(400))
-    }
-
-    it('fails if any field is missing or empty') {
-      valid_params.each_key { |key|
-        params = valid_params.clone
-        params[key] = ''
-        post_json('/poll/create', params)
-        expect(last_response.status).to(be(400))
-        params.delete(key)
-        post_json('/poll/create', params)
-        expect(last_response.status).to(be(400))
-      }
     }
   }
 
@@ -112,13 +77,6 @@ RSpec.describe(Poll, type: :rack_test) {
       set_cookie(:email, 'me@email')
       expect_slim('poll/not_found')
       get poll.url
-      expect(last_response.status).to(be(404))
-    }
-
-    it('shows poll not found for invalid urls') {
-      set_cookie(:email, 'me@email')
-      expect_slim('poll/not_found')
-      get 'poll/view/does_not_exist'
       expect(last_response.status).to(be(404))
     }
 
