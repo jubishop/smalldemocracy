@@ -3,6 +3,7 @@ require 'date'
 
 require_relative 'base'
 require_relative 'models/poll'
+require_relative 'models/user'
 
 class Poll < Base
   include Helpers::Guard
@@ -16,9 +17,15 @@ class Poll < Base
                            ]
                          }))
 
-    get('/poll/create', ->(req, _) {
-      require_email(req)
-      return 200, @slim.render('poll/create')
+    get('/poll/create', ->(req, resp) {
+      email = require_email(req)
+      user = Models::User.find_or_create(email: email)
+
+      unless user.groups.empty?
+        return 200, @slim.render('poll/create', user: user)
+      end
+
+      resp.redirect('/group/create')
     })
 
     post('/poll/create', ->(req, resp) {

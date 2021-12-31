@@ -1,3 +1,5 @@
+require_relative 'common/entity_guards'
+
 RSpec.describe(Poll, type: :rack_test) {
   let(:group) { create_group }
   let(:type) { :choose_one }
@@ -17,7 +19,27 @@ RSpec.describe(Poll, type: :rack_test) {
   }
 
   let(:entity) { create_poll(email: email) }
-  it_behaves_like('entity', 'poll')
+  it_has_behavior('entity guards', 'poll')
+
+  context('get /create') {
+    let(:user) { create_user }
+    before(:each) { set_cookie(:email, user.email) }
+
+    it('redirects to /group/create if user has no groups') {
+      get '/poll/create'
+      expect(last_response.redirect?).to(be(true))
+      expect_slim('group/create')
+      follow_redirect!
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('shows creation page if user has a group') {
+      user.add_group
+      expect_slim('poll/create', user: user)
+      get 'poll/create'
+      expect(last_response.ok?).to(be(true))
+    }
+  }
 
   context('post /create') {
     before(:each) { set_cookie(:email, email) }

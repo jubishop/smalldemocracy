@@ -1,3 +1,5 @@
+require_relative 'common/entity_guards'
+
 RSpec.describe(Group, type: :rack_test) {
   let(:user) { create_user }
   let(:email) { user.email }
@@ -10,7 +12,17 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   let(:entity) { create_group(email: email) }
-  it_behaves_like('entity', 'group')
+  it_has_behavior('entity guards', 'group')
+
+  context('get /create') {
+    before(:each) { set_cookie(:email, email) }
+
+    it('shows creation page if you have an email cookie') {
+      expect_slim('group/create')
+      get 'group/create'
+      expect(last_response.ok?).to(be(true))
+    }
+  }
 
   context('post /create') {
     before(:each) { set_cookie(:email, email) }

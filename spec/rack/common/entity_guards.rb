@@ -1,4 +1,4 @@
-RSpec.shared_examples('entity') { |path|
+RSpec.shared_examples('entity guards') { |path|
   before(:each) { set_cookie(:email, email) }
 
   context('get /create') {
@@ -7,12 +7,6 @@ RSpec.shared_examples('entity') { |path|
       expect_slim(:get_email, req: an_instance_of(Tony::Request))
       get "/#{path}/create"
       expect(last_response.status).to(be(401))
-    }
-
-    it('shows creation page if you have an email cookie') {
-      expect_slim("#{path}/create")
-      get "/#{path}/create"
-      expect(last_response.ok?).to(be(true))
     }
   }
 

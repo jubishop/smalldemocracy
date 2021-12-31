@@ -14,7 +14,11 @@ form action="create" method="post"
   label for="choices" Choices:
   textarea name="choices" required=true
 
-  label for="responders" Responders:
+  label for="group" Group:
+  select name="group"
+    - user.groups.each do |group|
+      option value=group.id #{group.name}
+
   input name="responders" type="email" required=true multiple=true
 
   label for="expiration" Expiration:
