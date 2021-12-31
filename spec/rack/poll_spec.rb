@@ -1,4 +1,4 @@
-require_relative 'common/entity_guards'
+require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :rack_test) {
   let(:group) { create_group }

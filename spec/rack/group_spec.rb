@@ -1,4 +1,4 @@
-require_relative 'common/entity_guards'
+require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Group, type: :rack_test) {
   let(:user) { create_user }
