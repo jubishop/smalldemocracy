@@ -20,13 +20,12 @@ RSpec.describe(Poll, type: :rack_test) {
   it_behaves_like('entity', 'poll')
 
   context('post /create') {
-    let(:poll) { group.polls.first }
-
     before(:each) { set_cookie(:email, email) }
 
     it('creates a new poll with choices and redirects to view') {
       post_json('/poll/create', valid_params)
       expect(last_response.redirect?).to(be(true))
+      poll = group.polls.first
       expect(poll).to(have_attributes(email: member.email,
                                       title: 'title',
                                       question: 'question',
