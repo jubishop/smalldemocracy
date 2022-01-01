@@ -2,13 +2,15 @@
   title Create Group
   ==javascript_include_tag 'js/listable'
   ==javascript_include_tag 'group/create'
+  ==stylesheet_link_tag 'css/listable'
 
-label for="name" Group Name:
-input name="name" type="text" required=true autofocus=true
+form action="create" method="post"
+  label for="name" Group Name:
+  input name="name" type="text" required=true autofocus=true
 
-ul#member-list
-  li =email
+  ul#member-list
+    li.listable.default =email
 
-button#add-member Add Member
+  button#add-member.secondary Add Member
 
-button#create-group Create Group
+  button#create-group value="Submit" type="submit" Create Group

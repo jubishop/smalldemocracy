@@ -1,0 +1,27 @@
+ul#member-list {
+  padding: 0;
+}
+
+li.listable {
+  align-items: center;
+  display: flex;
+}
+
+li.listable.default {
+  color: var(--muted-color);
+  margin-left: 1rem;
+  font-style: italic;
+}
+
+li.listable .text {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+li.listable .delete-button {
+  --fa-primary-color: var(--del-color);
+  --fa-secondary-color: var(--contrast);
+  cursor: pointer;
+  font-size: 3rem;
+  margin: 0 1rem;
+}
