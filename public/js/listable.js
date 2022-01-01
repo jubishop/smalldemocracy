@@ -13,8 +13,7 @@ class Listable {
   }
 
   addButtonClicked() {
-    const emptyItem = this.items.find(
-        (item) => item.inputElement.value.length == 0);
+    const emptyItem = this.items.find((item) => !item.inputElement.value);
     if (emptyItem) {
       emptyItem.inputElement.focus();
       return;
@@ -38,7 +37,6 @@ class Listable {
   deleteButtonClicked(item) {
     this.items.splice(this.items.indexOf(item), 1);
     item.listItem.remove();
-    listItem.remove();
   }
 
   buildListItem() {
