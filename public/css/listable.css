@@ -7,10 +7,8 @@ li.listable {
   display: flex;
 }
 
-li.listable.default {
-  color: var(--muted-color);
-  margin-left: 1rem;
-  font-style: italic;
+li.listable.default .delete-button {
+  cursor: not-allowed;
 }
 
 li.listable .text {

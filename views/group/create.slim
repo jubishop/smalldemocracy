@@ -9,8 +9,10 @@ form action="create" method="post"
   input name="name" type="text" required=true autofocus=true
 
   ul#member-list
-    li.listable.default =email
+    li.listable.default
+      input.text type="email" value=email readonly=true
+      i.delete-button.fa-duotone.fa-trash-can-xmark
 
-  button#add-member.secondary Add Member
+  button#add-member.secondary type="button" Add Member
 
-  button#create-group value="Submit" type="submit" Create Group
+  button#create-group type="submit" Create Group

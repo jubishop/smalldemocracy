@@ -8,7 +8,8 @@ h2 Tools for a Small Democracy
 
 - if email
   p Welcome #{email} (<a href="/logout">Logout</a>)
+  a href="/group/create" Create Group
+  br
   a href="/poll/create" Create Poll
 - else
-  br
   a href=Tony::Auth::Google.url(req, r: '/') Sign in with Google
