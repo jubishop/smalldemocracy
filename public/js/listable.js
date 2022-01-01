@@ -3,6 +3,7 @@ class Listable {
     this.listElement = listElement;
     this.buttonElement = buttonElement;
     this.options = options;
+    this.items = [];
     this.buttonElement.addEventListener('click',
                                         () => this.addButtonClicked());
   }
@@ -12,29 +13,42 @@ class Listable {
   }
 
   addButtonClicked() {
-    let listItem = this.buildListItem();
-    let inputElement = this.buildInputElement();
-    let deleteButton = this.buildDeleteButton();
-    deleteButton.addEventListener('click',
-                                  () => this.deleteButtonClicked(listItem));
+    const emptyItem = this.items.find(
+        (item) => item.inputElement.value.length == 0);
+    if (emptyItem) {
+      emptyItem.inputElement.focus();
+      return;
+    }
+
+    const listItem = this.buildListItem();
+    const inputElement = this.buildInputElement();
+    const deleteButton = this.buildDeleteButton();
     listItem.appendChild(inputElement);
     listItem.appendChild(deleteButton);
     this.listElement.appendChild(listItem);
+
+    const item = {listItem, inputElement};
+    this.items.push(item);
+
+    deleteButton.addEventListener('click',
+                                  () => this.deleteButtonClicked(item));
     inputElement.focus();
   }
 
-  deleteButtonClicked(listItem) {
+  deleteButtonClicked(item) {
+    this.items.splice(this.items.indexOf(item), 1);
+    item.listItem.remove();
     listItem.remove();
   }
 
   buildListItem() {
-    let listItem = document.createElement('li');
+    const listItem = document.createElement('li');
     listItem.classList.add(...this.option('listItemClasses', ['listable']));
     return listItem;
   }
 
   buildInputElement() {
-    let inputElement = document.createElement('input');
+    const inputElement = document.createElement('input');
     inputElement.classList.add(...this.option('textClasses', ['text']));
     inputElement.setAttribute('type', this.option('inputType', 'text'));
     inputElement.setAttribute('name', this.option('inputName', 'item[]'))
@@ -55,8 +69,8 @@ class Listable {
   }
 
   buildDeleteButton() {
-    let deleteButton = document.createElement('div');
-    let deleteIcon = document.createElement('i');
+    const deleteButton = document.createElement('div');
+    const deleteIcon = document.createElement('i');
     deleteIcon.classList.add(
         ...this.option('deleteButtonClasses',
                        ['delete-button', 'fa-duotone', 'fa-trash-can']));
