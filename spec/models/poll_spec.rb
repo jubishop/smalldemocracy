@@ -312,7 +312,7 @@ RSpec.describe(Models::Poll) {
     }
 
     context(':borda_split') {
-      before(:each) {
+      before(:all) {
         choices = %w[one two three four five six]
         members = %w[a@a b@b c@c d@d e@e f@f]
 
@@ -355,7 +355,7 @@ RSpec.describe(Models::Poll) {
     }
 
     context(':choose_one') {
-      before(:each) {
+      before(:all) {
         choices = %w[yes no maybe]
         members = %w[a@a b@b c@c d@d e@e f@f g@g]
 
