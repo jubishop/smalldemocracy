@@ -49,5 +49,12 @@ RSpec.shared_examples('entity guards') { |path|
       get entity.url
       expect(last_response.status).to(be(401))
     }
+
+    it('shows not found if logged in but not a member of this entity') {
+      set_cookie(:email, 'me@email')
+      expect_slim("#{path}/not_found")
+      get entity.url
+      expect(last_response.status).to(be(404))
+    }
   }
 }

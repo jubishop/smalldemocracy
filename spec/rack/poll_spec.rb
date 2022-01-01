@@ -21,14 +21,16 @@ RSpec.describe(Poll, type: :rack_test) {
   let(:entity) { create_poll(email: email) }
   it_has_behavior('entity guards', 'poll')
 
+  before(:each) { set_cookie(:email, email) }
+
   context('get /create') {
     let(:user) { create_user }
-    before(:each) { set_cookie(:email, user.email) }
+    let(:email) { user.email }
 
     it('redirects to /group/create if user has no groups') {
       get '/poll/create'
       expect(last_response.redirect?).to(be(true))
-      expect_slim('group/create')
+      expect_slim('group/create', email: email)
       follow_redirect!
       expect(last_response.ok?).to(be(true))
     }
@@ -42,13 +44,11 @@ RSpec.describe(Poll, type: :rack_test) {
   }
 
   context('post /create') {
-    before(:each) { set_cookie(:email, email) }
-
     it('creates a new poll with choices and redirects to view') {
       post_json('/poll/create', valid_params)
       expect(last_response.redirect?).to(be(true))
       poll = group.polls.first
-      expect(poll).to(have_attributes(email: member.email,
+      expect(poll).to(have_attributes(email: email,
                                       title: 'title',
                                       question: 'question',
                                       group_id: group.id,
@@ -74,56 +74,35 @@ RSpec.describe(Poll, type: :rack_test) {
   context('get /view') {
     let(:tz_name) { 'Africa/Djibouti' }
     let(:timezone) { TZInfo::Timezone.get(tz_name) }
+    let(:poll) { create_poll }
+    let(:member) { poll.creating_member }
+    let(:email) { member.email }
 
-    before(:each) { rack_mock_session.cookie_jar['tz'] = tz_name }
-
-    it('shows poll not found if logged in but not in this open poll') {
-      poll = create_poll
-      set_cookie(:email, 'me@email')
-      expect_slim('poll/not_found')
-      get poll.url
-      expect(last_response.status).to(be(404))
-    }
-
-    it('shows poll not found if logged in but not in this finished poll') {
-      poll = create_poll(expiration: past)
-      set_cookie(:email, 'me@email')
-      expect_slim('poll/not_found')
-      get poll.url
-      expect(last_response.status).to(be(404))
+    before(:each) {
+      rack_mock_session.cookie_jar['tz'] = tz_name
     }
 
     it('shows poll if you have not responded') {
-      poll = create_poll
-      set_cookie(:email, poll.creating_member.email)
-      expect_slim(
-          'poll/view',
-          poll: poll,
-          member: poll.creating_member,
-          timezone: timezone)
+      expect_slim('poll/view', poll: poll, member: member, timezone: timezone)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }
 
     it('shows your answers if you have responded') {
-      poll = create_poll
-      poll.creating_member.add_response(choice_id: poll.add_choice.id)
-      set_cookie(:email, poll.creating_member.email)
+      member.add_response(choice_id: poll.add_choice.id)
       expect_slim(
           'poll/responded',
           poll: poll,
-          member: poll.creating_member,
+          member: member,
           timezone: timezone)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }
 
     it('shows results if poll is finished') {
-      poll = create_poll
-      poll.creating_member.add_response(choice_id: poll.add_choice.id)
+      member.add_response(choice_id: poll.add_choice.id)
       poll.update(expiration: past)
       breakdown, unresponded = poll.breakdown
-      set_cookie(:email, poll.creating_member.email)
       expect_slim(
           'poll/finished',
           poll: poll,
@@ -136,10 +115,9 @@ RSpec.describe(Poll, type: :rack_test) {
 
   context('post /respond') {
     let(:poll) { create_poll }
+    let(:email) { poll.email }
     let(:choice) { poll.add_choice }
     let(:member) { poll.creating_member }
-
-    before(:each) { set_cookie(:email, poll.email) }
 
     it('rejects an empty post body') {
       post_json('/poll/respond')
