@@ -13,13 +13,13 @@ RSpec.shared_examples('entity guards') { |path|
   context('post /create') {
     it('rejects any post without a cookie') {
       clear_cookies
-      post_json("/#{path}/create", valid_params)
+      post "/#{path}/create", valid_params
       expect(last_response.status).to(be(401))
       expect(last_response.body).to(eq('No email found'))
     }
 
     it('fails if post body is nonexistent') {
-      post_json("#{path}/create")
+      post "#{path}/create"
       expect(last_response.status).to(be(400))
     }
 
@@ -27,10 +27,10 @@ RSpec.shared_examples('entity guards') { |path|
       valid_params.each_key { |key|
         params = valid_params.clone
         params[key] = params[key].is_a?(Enumerable) ? [] : ''
-        post_json("/#{path}/create", params)
+        post "/#{path}/create", params
         expect(last_response.status).to(be(400))
         params.delete(key)
-        post_json("/#{path}/create", params)
+        post "/#{path}/create", params
         expect(last_response.status).to(be(400))
       }
     }

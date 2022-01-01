@@ -45,7 +45,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
   context('post /create') {
     it('creates a new poll with choices and redirects to view') {
-      post_json('/poll/create', valid_params)
+      post '/poll/create', valid_params
       expect(last_response.redirect?).to(be(true))
       poll = group.polls.first
       expect(poll).to(have_attributes(email: email,
@@ -66,7 +66,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('fails if type is invalid') {
       valid_params[:type] = :invalid_type
-      post_json('/poll/create', valid_params)
+      post '/poll/create', valid_params
       expect(last_response.status).to(be(400))
     }
   }

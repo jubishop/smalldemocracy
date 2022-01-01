@@ -26,7 +26,7 @@ RSpec.describe(Group, type: :rack_test) {
 
   context('post /create') {
     it('creates a new group with members and redirects to view') {
-      post_json('/group/create', valid_params)
+      post '/group/create', valid_params
       expect(last_response.redirect?).to(be(true))
       group = user.groups.first
       expect(group).to(have_attributes(email: user.email, name: 'name'))
