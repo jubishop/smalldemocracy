@@ -152,4 +152,14 @@ RSpec.describe(Poll, type: :feature) {
       goldens.verify('not_found')
     }
   }
+
+  context('no group') {
+    it('displays a modal and redirects you if no group') {
+      set_cookie(:email, 'me@email')
+      visit('/poll/create')
+      expect(find('#group-modal')).to(
+          have_link('Create Group', href: '/group/create'))
+      goldens.verify('no_group_modal')
+    }
+  }
 }

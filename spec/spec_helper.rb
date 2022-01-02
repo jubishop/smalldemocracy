@@ -81,7 +81,7 @@ RSpec.configure do |config|
   config.include_context(:rack_test, type: :rack_test)
 
   config.before(:each) {
-    allow(Tony::Auth::Google).to(receive(:url))
+    allow(Tony::Auth::Google).to(receive(:url)).and_return('')
   }
 
   config.after(:each) {

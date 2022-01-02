@@ -38,9 +38,16 @@ RSpec::Core::RakeTask.new(:spec) { |t|
 }
 
 desc('Run spec excluding capybara tests')
-RSpec::Core::RakeTask.new(:fspec) { |t|
+RSpec::Core::RakeTask.new(:rspec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.rspec_opts = '-t ~type:feature'
+  t.verbose
+}
+
+desc('Run spec only capybara tests')
+RSpec::Core::RakeTask.new(:cspec) { |t|
+  t.pattern = Dir.glob('spec/**/*_spec.rb')
+  t.rspec_opts = '-t type:feature'
   t.verbose
 }
 
@@ -95,4 +102,5 @@ task(:run) {
 }
 
 task default: %w[rubocop:auto_correct sass spec]
-task fast: %w[rubocop:auto_correct sass fspec]
+task rack: %w[rubocop:auto_correct sass rspec]
+task capybara: %w[rubocop:auto_correct sass cspec]

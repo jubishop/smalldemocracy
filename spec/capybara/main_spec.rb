@@ -4,12 +4,15 @@ RSpec.describe(Main, type: :feature) {
   context('index') {
     it('displays logged out index') {
       visit('/')
+      expect(page).to(have_link('Sign in with Google'))
       goldens.verify('index_logged_out')
     }
 
     it('displays logged in index') {
       set_cookie(:email, 'my@email')
       visit('/')
+      expect(page).to(have_link('Create Poll', href: '/poll/create'))
+      expect(page).to(have_link('Create Group', href: '/group/create'))
       goldens.verify('index_logged_in')
     }
   }
