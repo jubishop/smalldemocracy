@@ -17,17 +17,13 @@ class Poll < Base
                            ]
                          }))
 
-    get('/poll/create', ->(req, resp) {
+    get('/poll/create', ->(req, _resp) {
       email = require_email(req)
       user = Models::User.find_or_create(email: email)
 
-      unless user.groups.empty?
-        return 200, @slim.render('poll/create',
-                                 user: user,
-                                 group_id: req.params.fetch(:group_id, 0).to_i)
-      end
-
-      resp.redirect('/group/create')
+      return 200, @slim.render('poll/create',
+                               user: user,
+                               group_id: req.params.fetch(:group_id, 0).to_i)
     })
 
     post('/poll/create', ->(req, resp) {

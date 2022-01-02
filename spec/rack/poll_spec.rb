@@ -26,24 +26,15 @@ RSpec.describe(Poll, type: :rack_test) {
   context('get /create') {
     let(:user) { create_user }
     let(:email) { user.email }
+    let(:group) { user.add_group }
 
-    it('redirects to /group/create if user has no groups') {
-      get '/poll/create'
-      expect(last_response.redirect?).to(be(true))
-      expect_slim('group/create', email: email)
-      follow_redirect!
-      expect(last_response.ok?).to(be(true))
-    }
-
-    it('shows creation page if user has a group') {
-      user.add_group
+    it('shows creation page') {
       expect_slim('poll/create', user: user, group_id: 0)
       get 'poll/create'
       expect(last_response.ok?).to(be(true))
     }
 
     it('shows creation page and propagates :group_id parameter') {
-      group = user.add_group
       expect_slim('poll/create', user: user, group_id: group.id)
       get 'poll/create', group_id: group.id
       expect(last_response.ok?).to(be(true))

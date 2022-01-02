@@ -8,6 +8,13 @@
 = content_for :header
   h1 Create Poll
 
+dialog#group-modal open=(user.groups.empty?)
+  article
+    h4 Group Needed
+    p You must first have a group before you can create a poll.
+    footer
+      a role="button" href="/group/create" Create Group
+
 form action="create" method="post"
   label for="title" Title:
   input name="title" type="text" required=true autofocus=true
