@@ -37,6 +37,7 @@ module Models
     end
 
     def before_create
+      super
       User.find_or_create(email: email)
     end
 
