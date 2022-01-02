@@ -24,7 +24,7 @@ class Poll < Base
       unless user.groups.empty?
         return 200, @slim.render('poll/create',
                                  user: user,
-                                 group_id: req.params[:group_id].to_i)
+                                 group_id: req.params.fetch(:group_id, 0).to_i)
       end
 
       resp.redirect('/group/create')
