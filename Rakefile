@@ -84,7 +84,7 @@ task(:annotate) {
 desc('Compile all scss files to compressed css')
 task(:sass, [:params]) { |_, args|
   params = args[:params].to_s
-  params += ' --style compressed --embed-sources'
+  params += ' --style=compressed --no-source-map'
   `sass #{params} scss:public/css`
 }
 
