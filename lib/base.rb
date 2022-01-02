@@ -44,7 +44,9 @@ class Base < Tony::App
     unless items.is_a?(Enumerable)
       throw(:response, [400, "Invalid #{key} given"])
     end
-    items = items.compact.delete_if { |item| item.to_s.empty? }
+    items.uniq!
+    items.compact!
+    items = items.delete_if { |item| item.to_s.empty? }
     return items if items == default
 
     throw(:response, [400, "No #{key} given"]) if items.empty?

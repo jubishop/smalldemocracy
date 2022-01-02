@@ -233,15 +233,6 @@ RSpec.describe(Poll, type: :rack_test) {
         expect(last_response.body).to(eq('Response has no poll'))
       }
 
-      it('rejects posting with duplicate choices') {
-        responses[0] = responses[1]
-        post_json('/poll/respond',
-                  { hash_id: poll.hashid, responses: responses })
-        expect(last_response.status).to(be(400))
-        expect(last_response.body).to(
-            match(/violates unique constraint "response_unique"/))
-      }
-
       shared_examples('saves rankings') {
         it('saves rankings successfully') {
           expect(member.responses).to(be_empty)
