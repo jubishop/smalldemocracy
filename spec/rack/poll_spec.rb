@@ -37,8 +37,15 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('shows creation page if user has a group') {
       user.add_group
-      expect_slim('poll/create', user: user)
+      expect_slim('poll/create', user: user, group_id: 0)
       get 'poll/create'
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('shows creation page and propagates :group_id parameter') {
+      group = user.add_group
+      expect_slim('poll/create', user: user, group_id: group.id)
+      get 'poll/create', group_id: group.id
       expect(last_response.ok?).to(be(true))
     }
   }

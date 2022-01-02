@@ -22,7 +22,9 @@ class Poll < Base
       user = Models::User.find_or_create(email: email)
 
       unless user.groups.empty?
-        return 200, @slim.render('poll/create', user: user)
+        return 200, @slim.render('poll/create',
+                                 user: user,
+                                 group_id: req.params[:group_id].to_i)
       end
 
       resp.redirect('/group/create')

@@ -22,7 +22,7 @@ form action="create" method="post"
   label for="group_id" Group:
   select name="group_id"
     - user.groups.each do |group|
-      option value=group.id #{group.name}
+      option value=group.id selected=(group.id == group_id) #{group.name}
 
   label for="expiration" Expiration:
   input name="expiration" type="datetime-local" required=true
