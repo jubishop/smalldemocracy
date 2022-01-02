@@ -29,6 +29,7 @@ module Models
 
     def after_create
       add_member(email: email)
+      super
     end
 
     def creating_member
