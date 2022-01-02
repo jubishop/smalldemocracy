@@ -16,6 +16,9 @@ RSpec.shared_examples('entity guards') { |path|
   context('not found') {
     it('displays a not found page') {
       visit("/#{path}/invalid_hash_id")
+      expect(page).to(
+          have_link('report',
+                    href: 'https://github.com/jubishop/smalldemocracy/issues'))
       goldens.verify('not_found')
     }
   }

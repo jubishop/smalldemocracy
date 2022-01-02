@@ -5,7 +5,7 @@ RSpec.describe(Main, type: :feature) {
     it('displays logged out index') {
       visit('/')
       expect(page).to(have_link('Sign in with Google', href: '/'))
-      goldens.verify('index_logged_out')
+      goldens.verify('logged_out')
     }
 
     it('displays logged in index') {
@@ -13,7 +13,7 @@ RSpec.describe(Main, type: :feature) {
       visit('/')
       expect(page).to(have_link('Create Poll', href: '/poll/create'))
       expect(page).to(have_link('Create Group', href: '/group/create'))
-      goldens.verify('index_logged_in')
+      goldens.verify('logged_in')
     }
   }
 
@@ -23,7 +23,7 @@ RSpec.describe(Main, type: :feature) {
       expect(page).to(
           have_link('report',
                     href: 'https://github.com/jubishop/smalldemocracy/issues'))
-      goldens.verify('page_not_found')
+      goldens.verify('not_found')
     }
   }
 }
