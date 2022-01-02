@@ -17,7 +17,7 @@ class Poll < Base
                            ]
                          }))
 
-    get('/poll/create', ->(req, _resp) {
+    get('/poll/create', ->(req, _) {
       email = require_email(req)
       user = Models::User.find_or_create(email: email)
 
