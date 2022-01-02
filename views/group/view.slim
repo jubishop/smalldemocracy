@@ -1,3 +1,9 @@
+= content_for :head
+  title =group.name
+
+= content_for :header
+  h1 =group.name
+
 ul
   - group.members.each do |member|
     li =member.email

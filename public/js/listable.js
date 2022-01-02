@@ -4,15 +4,14 @@ class Listable {
     this.buttonElement = buttonElement;
     this.options = options;
     this.items = [];
-    this.buttonElement.addEventListener('click',
-                                        () => this.addButtonClicked());
+    this.buttonElement.addEventListener('click', () => this.addItem());
   }
 
   option(key, fallback = '') {
     return this.options.hasOwnProperty(key) ? this.options[key] : fallback;
   }
 
-  addButtonClicked() {
+  addItem() {
     const emptyItem = this.items.find((item) => !item.inputElement.value);
     if (emptyItem) {
       emptyItem.inputElement.focus();
@@ -29,12 +28,11 @@ class Listable {
     const item = {listItem, inputElement};
     this.items.push(item);
 
-    deleteButton.addEventListener('click',
-                                  () => this.deleteButtonClicked(item));
+    deleteButton.addEventListener('click', () => this.deleteItem(item));
     inputElement.focus();
   }
 
-  deleteButtonClicked(item) {
+  deleteItem(item) {
     this.items.splice(this.items.indexOf(item), 1);
     item.listItem.remove();
   }
@@ -60,7 +58,9 @@ class Listable {
     });
     inputElement.addEventListener("keyup", (event) => {
       if (event.key == "Enter" && inputElement.reportValidity()) {
-        this.addButtonClicked();
+        event.preventDefault();
+        this.addItem();
+        return false;
       }
     });
     return inputElement;

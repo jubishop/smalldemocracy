@@ -5,6 +5,9 @@
   ==stylesheet_link_tag 'css/listable'
   ==stylesheet_link_tag 'group/create'
 
+= content_for :header
+  h1 Create Group
+
 form action="create" method="post"
   label for="name" Group Name:
   input name="name" type="text" required=true autofocus=true
