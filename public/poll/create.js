@@ -1,6 +1,12 @@
 class Poll {
   static domLoaded() {
-    alert("hello world");
+    let listable = new Listable(
+        document.getElementById('choice-list'),
+        document.getElementById('add-choice'),
+        {
+          placeholderText: 'Enter choice...',
+          inputName: 'choices[]',
+        });
   }
 }
 

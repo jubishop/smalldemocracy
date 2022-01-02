@@ -1,14 +1,6 @@
-ul#member-list {
-  padding: 0;
-}
-
 li.listable {
   align-items: center;
   display: flex;
-}
-
-li.listable.default .delete-button {
-  cursor: not-allowed;
 }
 
 li.listable .text {

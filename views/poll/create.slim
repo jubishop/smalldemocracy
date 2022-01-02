@@ -1,6 +1,9 @@
 = content_for :head
   title Create Poll
+  ==javascript_include_tag 'js/listable'
   ==javascript_include_tag 'poll/create'
+  ==stylesheet_link_tag 'css/listable'
+  ==stylesheet_link_tag 'poll/create'
 
 = content_for :header
   h1 Create Poll
@@ -13,14 +16,13 @@ form action="create" method="post"
   input name="question" type="text" required=true
 
   label for="choices" Choices:
-  textarea name="choices" required=true
+  ul#choice-list
+  button#add-choice.secondary type="button" Add Choice
 
-  label for="group" Group:
-  select name="group"
+  label for="group_id" Group:
+  select name="group_id"
     - user.groups.each do |group|
       option value=group.id #{group.name}
-
-  input name="responders" type="email" required=true multiple=true
 
   label for="expiration" Expiration:
   input name="expiration" type="datetime-local" required=true
@@ -31,4 +33,4 @@ form action="create" method="post"
     option value='borda_split' Borda Split
     option value='choose_one' Choose One
 
-  button value="Submit" type="submit"
+  button type="submit" Create Poll
