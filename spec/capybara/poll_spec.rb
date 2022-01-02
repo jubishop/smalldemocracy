@@ -136,12 +136,14 @@ RSpec.describe(Poll, type: :feature) {
   context('logged out') {
     it('asks for email for create') {
       visit('/poll/create')
+      expect(page).to(have_link('Sign in with Google', href: '/poll/create'))
       goldens.verify('create_get_email')
     }
 
     it('asks for email for view') {
       poll = create_poll
       visit(poll.url)
+      expect(page).to(have_link('Sign in with Google', href: poll.url))
       goldens.verify('view_get_email')
     }
   }

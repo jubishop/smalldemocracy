@@ -4,7 +4,7 @@ RSpec.describe(Main, type: :feature) {
   context('index') {
     it('displays logged out index') {
       visit('/')
-      expect(page).to(have_link('Sign in with Google'))
+      expect(page).to(have_link('Sign in with Google', href: '/'))
       goldens.verify('index_logged_out')
     }
 
@@ -20,6 +20,9 @@ RSpec.describe(Main, type: :feature) {
   context('not found') {
     it('displays a not found page') {
       visit('/does_not_exist')
+      expect(page).to(
+          have_link('report',
+                    href: 'https://github.com/jubishop/smalldemocracy/issues'))
       goldens.verify('page_not_found')
     }
   }
