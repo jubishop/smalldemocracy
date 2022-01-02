@@ -1,8 +1,23 @@
 require 'duration'
 
+require_relative 'shared_examples/entity_guards'
+
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
   let(:current_time) { Time.new(1982, 6, 6, 11, 30) }
+
+  let(:entity) { create_poll }
+  it_has_behavior('entity guards', 'poll')
+
+  context('no group') {
+    it('displays a modal and redirects you if no group') {
+      set_cookie(:email, 'me@email')
+      visit('/poll/create')
+      expect(find('#group-modal')).to(
+          have_link('Create Group', href: '/group/create'))
+      goldens.verify('no_group_modal')
+    }
+  }
 
   # context('poll lifecycles') {
   #   before(:each) {
@@ -132,36 +147,4 @@ RSpec.describe(Poll, type: :feature) {
   #     }
   #   }
   # }
-
-  context('logged out') {
-    it('asks for email for create') {
-      visit('/poll/create')
-      expect(page).to(have_link('Sign in with Google', href: '/poll/create'))
-      goldens.verify('create_get_email')
-    }
-
-    it('asks for email for view') {
-      poll = create_poll
-      visit(poll.url)
-      expect(page).to(have_link('Sign in with Google', href: poll.url))
-      goldens.verify('view_get_email')
-    }
-  }
-
-  context('not found') {
-    it('displays a not found page') {
-      visit('/poll/invalid_hash_id')
-      goldens.verify('not_found')
-    }
-  }
-
-  context('no group') {
-    it('displays a modal and redirects you if no group') {
-      set_cookie(:email, 'me@email')
-      visit('/poll/create')
-      expect(find('#group-modal')).to(
-          have_link('Create Group', href: '/group/create'))
-      goldens.verify('no_group_modal')
-    }
-  }
 }
