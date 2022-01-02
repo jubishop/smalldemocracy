@@ -8,7 +8,7 @@ RSpec.describe(Main, type: :feature) {
     }
 
     it('displays logged in index') {
-      set_cookie(:email, 'test@example.com')
+      set_cookie(:email, 'my@email')
       visit('/')
       goldens.verify('index_logged_in')
     }
@@ -16,7 +16,7 @@ RSpec.describe(Main, type: :feature) {
 
   context('not found') {
     it('displays a not found page') {
-      visit('does_not_exist')
+      visit('/does_not_exist')
       goldens.verify('page_not_found')
     }
   }
