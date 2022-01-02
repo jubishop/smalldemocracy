@@ -41,6 +41,11 @@ module Models
       User.find_or_create(email: email)
     end
 
+    def before_update
+      cancel_action('Members are immutable')
+      super
+    end
+
     def before_destroy
       if self == group.creating_member
         cancel_action("Creators (#{email}) cannot be removed from their groups")

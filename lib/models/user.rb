@@ -43,9 +43,15 @@ module Models
       super
     end
 
+    def before_update
+      cancel_action('Users are immutable')
+      super
+    end
+
     undef_method :delete
     def before_destroy
       cancel_action('Users cannot be destroyed')
+      super
     end
 
     def groups

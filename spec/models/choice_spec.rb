@@ -52,6 +52,14 @@ RSpec.describe(Models::Choice) {
     }
   }
 
+  context('#update') {
+    it('rejects any updates') {
+      choice = create_choice
+      expect { choice.update(text: 'New text') }.to(
+          raise_error(Sequel::HookFailed, 'Choices are immutable'))
+    }
+  }
+
   context('#responses') {
     it('finds all its responses') {
       choice = create_choice

@@ -54,6 +54,14 @@ RSpec.describe(Models::Member) {
     }
   }
 
+  context('#update') {
+    it('rejects any updates') {
+      member = create_member
+      expect { member.update(email: 'new@email') }.to(
+          raise_error(Sequel::HookFailed, 'Members are immutable'))
+    }
+  }
+
   context('#group') {
     it('finds its group') {
       group = create_group

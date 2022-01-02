@@ -46,6 +46,14 @@ RSpec.describe(Models::User) {
     }
   }
 
+  context('#update') {
+    it('rejects any updates') {
+      user = create_user
+      expect { user.save }.to(
+          raise_error(Sequel::HookFailed, 'Users are immutable'))
+    }
+  }
+
   context('#members') {
     it('finds all members from any group') {
       user = create_user
