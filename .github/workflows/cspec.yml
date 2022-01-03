@@ -39,4 +39,15 @@ jobs:
           bundler-cache: true
       - name: Run tests
         run: |
-          bundle exec rake rspec
+          bundle exec rake cspec
+        env:
+          GOLDENS_PIXEL_TOLERANCE: 1
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: golden-failures
+          path: |
+            spec/**/failures/*.png
+            spec/**/diffs/*.png
+          if-no-files-found: ignore
