@@ -37,10 +37,17 @@ RSpec::Core::RakeTask.new(:spec) { |t|
   t.verbose
 }
 
-desc('Run spec excluding capybara tests')
+desc('Run spec only model tests')
+RSpec::Core::RakeTask.new(:mspec) { |t|
+  t.pattern = Dir.glob('spec/**/*_spec.rb')
+  t.rspec_opts = '-t type:model'
+  t.verbose
+}
+
+desc('Run spec only rack tests')
 RSpec::Core::RakeTask.new(:rspec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
-  t.rspec_opts = '-t ~type:feature'
+  t.rspec_opts = '-t type:rack_test'
   t.verbose
 }
 

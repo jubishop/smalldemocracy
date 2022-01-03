@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: Run Rack Tests
+    name: Run Model Tests
     runs-on: macos-latest
     steps:
       - name: Start PostgreSQL on MacOS
@@ -39,4 +39,4 @@ jobs:
           bundler-cache: true
       - name: Run tests
         run: |
-          bundle exec rake rspec
+          bundle exec rake mspec

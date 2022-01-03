@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: Run tests
+    name: Run Capybara Tests
     runs-on: macos-latest
     steps:
       - name: Start PostgreSQL on MacOS
