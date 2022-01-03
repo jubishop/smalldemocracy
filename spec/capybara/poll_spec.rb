@@ -73,9 +73,25 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
+  # before(:each) {
+  #   current_time = Time.new(1982, 6, 6, 11, 30)
+  #   freeze_time(current_time)
+
+  #   # Deterministic choice ordering
+  #   allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
+
+  #   # Create a poll
+  #   set_cookie(:email, 'one@one')
+  #   visit('/poll/create')
+  #   fill_in('title', with: 'this is my title')
+  #   fill_in('question', with: 'what is life')
+  #   fill_in(
+  #       'responders',
+  #       with: 'one@one, two@two, three@three, four@four, five@five, six@six')
+  #   fill_in('choices', with: 'one, two, three, four, five, six')
+  #   fill_in('expiration', with: Time.at(current_time + 90))
+  # }
   #
-  #     current_time = Time.new(1982, 6, 6, 11, 30)
-  #     freeze_time(current_time)
   #   def drag_to_bottom(choice)
   #     expect(page).to(have_fontawesome)
   #     expect(page).to(have_button(text: 'Submit Choices'))
