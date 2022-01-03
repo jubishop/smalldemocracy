@@ -63,9 +63,9 @@ RSpec.describe(Poll, type: :feature) {
       goldens.verify('no_group_modal')
     }
 
-    it('uses group_id to select a specific group option') {
-
-    }
+    # TODO
+    # it('uses group_id to select a specific group option') {
+    # }
   }
 
   #
@@ -98,7 +98,7 @@ RSpec.describe(Poll, type: :feature) {
   #     set_timezone
   #     click_button('Submit')
   #   end
-#       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
+  #       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
   #   def verify_finished_poll(page_name)
   #     allow(Time).to(receive(:now).and_return(Time.at(10**10)))
   #     refresh_page

@@ -122,7 +122,10 @@ RSpec.describe(Models::Member, type: :model) {
 
   context('#polls') {
     let(:member) {  create_member }
-    let!(:expired_poll) { member.add_poll(expiration: past) }
+    let!(:expired_poll) {
+      poll = member.add_poll
+      poll.update(expiration: past)
+    }
     let!(:my_poll) { member.add_poll(expiration: future) }
 
     it('finds all active polls with start_expiration') {

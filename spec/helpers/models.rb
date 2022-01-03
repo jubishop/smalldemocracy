@@ -4,6 +4,8 @@ require_relative '../../lib/models/member'
 require_relative '../../lib/models/poll'
 require_relative '../../lib/models/response'
 require_relative '../../lib/models/user'
+require_relative 'email'
+require_relative 'time'
 
 module RSpec
   module Models
@@ -47,6 +49,7 @@ end
 
 module Models
   class User
+    include RSpec::Time
     include Test::Env
 
     def add_group(name: rand.to_s)
@@ -57,7 +60,7 @@ module Models
     def add_poll(group_id: groups.sample&.id,
                  title: rand.to_s,
                  question: rand.to_s,
-                 expiration: ::Time.now,
+                 expiration: future,
                  type: :choose_one)
       test_only!
       add_created_poll(group_id: group_id,
@@ -70,12 +73,13 @@ module Models
 
   class Group
     include RSpec::EMail
+    include RSpec::Time
     include Test::Env
 
     def add_poll(email: members.sample&.email,
                  title: rand.to_s,
                  question: rand.to_s,
-                 expiration: ::Time.now,
+                 expiration: future,
                  type: :choose_one)
       test_only!
       super(email: email,
@@ -92,13 +96,14 @@ module Models
   end
 
   class Member
+    include RSpec::Time
     include Test::Env
 
     orig_add_poll = instance_method(:add_poll)
     undef_method(:add_poll)
     define_method(:add_poll) { |title: rand.to_s,
                                 question: rand.to_s,
-                                expiration: ::Time.now,
+                                expiration: future,
                                 type: :choose_one|
       test_only!
       orig_add_poll.bind_call(self, title: title,

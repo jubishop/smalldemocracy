@@ -3,16 +3,16 @@ require_relative '../../lib/models/poll'
 RSpec.describe(Models::Poll, type: :model) {
   context('.create') {
     it('creates a poll') {
-      now = Time.now
+      moment = future
       poll = create_poll(email: email,
                          title: 'title',
                          question: 'question',
-                         expiration: now,
+                         expiration: moment,
                          type: :borda_split)
       expect(poll.email).to(eq(email))
       expect(poll.title).to(eq('title'))
       expect(poll.question).to(eq('question'))
-      expect(poll.expiration).to(eq(now))
+      expect(poll.expiration).to(eq(moment))
       expect(poll.type).to(eq(:borda_split))
     }
 
@@ -45,10 +45,9 @@ RSpec.describe(Models::Poll, type: :model) {
           raise_error(Sequel::HookFailed, 'Expiration value is invalid'))
     }
 
-    it('rejects creating a poll with expiration at unix epoch') {
-      expect { create_poll(expiration: Time.at(0)) }.to(
-          raise_error(Sequel::HookFailed,
-                      'Poll has expiration at unix epoch'))
+    it('rejects creating a poll in the past') {
+      expect { create_poll(expiration: past) }.to(
+          raise_error(Sequel::HookFailed, 'Poll is created expired'))
     }
 
     it('rejects creating polls with no type') {
@@ -194,20 +193,23 @@ RSpec.describe(Models::Poll, type: :model) {
     }
 
     it('returns an expired poll as finished') {
-      poll = create_poll(expiration: past)
+      poll = create_poll
+      poll.update(expiration: past)
       expect(poll.finished?).to(be(true))
     }
   }
 
   context('results') {
     it('raises error if using scores on choose_* types') {
-      poll = create_poll(type: :choose_one, expiration: past)
+      poll = create_poll(type: :choose_one)
+      poll.update(expiration: past)
       expect { poll.scores }.to(
           raise_error(TypeError, /must be one of borda_single or borda_split/))
     }
 
     it('raises an error if using counts on borda_single type') {
-      poll = create_poll(type: :borda_single, expiration: past)
+      poll = create_poll(type: :borda_single)
+      poll.update(expiration: past)
       expect { poll.counts }.to(
           raise_error(TypeError, /must be one of borda_split or choose_one/))
     }
@@ -407,7 +409,8 @@ RSpec.describe(Models::Poll, type: :model) {
     }
 
     it('rejects adding a choice to an expired poll') {
-      poll = create_poll(expiration: past)
+      poll = create_poll
+      poll.update(expiration: past)
       expect { poll.add_choice }.to(
           raise_error(Sequel::HookFailed, 'Choice modified in expired poll'))
     }
