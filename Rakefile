@@ -58,17 +58,19 @@ RSpec::Core::RakeTask.new(:cspec) { |t|
   t.verbose
 }
 
-desc('Run rspec_n ')
-task(:rspec_n, [:count]) { |_, args|
+# rubocop:disable Style/TopLevelMethodDefinition
+def rspec_n(count: 50, type: nil)
   require 'colorize'
   require 'open3'
 
   ENV['FAIL_ON_GOLDEN'] = '1'
-  count = args[:count] ? args[:count].to_i : 20
+  count ||= 50
+  type = type ? " -t type:#{type}" : ''
 
   puts 'Now running...'
   results = ''
-  Open3.popen3("bundle exec rspec_n #{count} -s") do |_, stderr, _, _|
+  cmd = "bundle exec rspec_n #{count} -c 'bundle exec rspec#{type}' -s"
+  Open3.popen3(cmd) do |_, stderr, _, _|
     while (char = stderr.getc)
       results += char
       print(char)
@@ -81,8 +83,27 @@ task(:rspec_n, [:count]) { |_, args|
   else
     puts 'All runs pass'.green
   end
+end
+# rubocop:enable Style/TopLevelMethodDefinition
 
-  `rm rspec_n_iteration*`
+desc('Run rspec_n on all tests')
+task(:spec_n, [:count]) { |_, args|
+  rspec_n(count: args[:count])
+}
+
+desc('Run rspec_n on model tests')
+task(:mspec_n, [:count]) { |_, args|
+  rspec_n(count: args[:count], type: 'model')
+}
+
+desc('Run rspec_n on rack tests')
+task(:rspec_n, [:count]) { |_, args|
+  rspec_n(count: args[:count], type: 'rack_test')
+}
+
+desc('Run rspec_n on capybara tests')
+task(:cspec_n, [:count]) { |_, args|
+  rspec_n(count: args[:count], type: 'feature')
 }
 
 desc('Annotate sequel classes')
