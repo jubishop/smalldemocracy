@@ -1,6 +1,6 @@
 require_relative '../../lib/models/group'
 
-RSpec.describe(Models::Group) {
+RSpec.describe(Models::Group, type: :model) {
   context('.create') {
     it('creates a group') {
       group = create_group(name: 'group_name')
@@ -126,8 +126,8 @@ RSpec.describe(Models::Group) {
 
     it('rejects adding duplicate members') {
       group = create_group
-      group.add_member(email: 'dup@dup')
-      expect { group.add_member(email: 'dup@dup') }.to(
+      group.add_member(email: email)
+      expect { group.add_member(email: email) }.to(
           raise_error(Sequel::UniqueConstraintViolation,
                       /Key \(email, group_id\).+already exists/))
     }

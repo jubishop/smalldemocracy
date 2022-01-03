@@ -7,21 +7,21 @@ RSpec.describe(Main, type: :rack_test) {
     }
 
     it('renders logged in page when there is an email cookie') {
-      set_cookie(:email, 'my@email')
-      expect_slim(:index, email: 'my@email', req: an_instance_of(Tony::Request))
+      set_cookie(:email, email)
+      expect_slim(:index, email: email, req: an_instance_of(Tony::Request))
       get '/'
     }
 
     it('does not delete any existing email cookie') {
-      set_cookie(:email, 'nom@nom')
+      set_cookie(:email, email)
       get '/'
-      expect(get_cookie(:email)).to(eq('nom@nom'))
+      expect(get_cookie(:email)).to(eq(email))
     }
   }
 
   context('get /logout') {
     it('deletes the email cookie') {
-      set_cookie(:email, 'nomnomnom')
+      set_cookie(:email, email)
       get '/logout'
       expect(get_cookie(:email)).to(be_nil)
       expect(last_response.redirect?).to(be(true))
@@ -50,19 +50,19 @@ RSpec.describe(Main, type: :rack_test) {
     end
 
     it('sets the email address') {
-      set_cookie(:email, 'nom@nom')
-      auth_google(Tony::Auth::LoginInfo.new(email: 'me@email'))
-      expect(get_cookie(:email)).to(eq('me@email'))
+      set_cookie(:email, random_email)
+      auth_google(Tony::Auth::LoginInfo.new(email: email))
+      expect(get_cookie(:email)).to(eq(email))
     }
 
     it('redirects to / by default') {
-      auth_google(Tony::Auth::LoginInfo.new(email: 'me@email'))
+      auth_google(Tony::Auth::LoginInfo.new(email: email))
       expect(last_response.redirect?).to(be(true))
       expect(last_response.location).to(eq('/'))
     }
 
     it('redirects to :r in state') {
-      auth_google(Tony::Auth::LoginInfo.new(email: 'me@email',
+      auth_google(Tony::Auth::LoginInfo.new(email: email,
                                             state: { r: '/onward' }))
       expect(last_response.redirect?).to(be(true))
       expect(last_response.location).to(eq('/onward'))

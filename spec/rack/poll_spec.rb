@@ -137,7 +137,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects posting if you are not a member of the poll') {
-      set_cookie(:email, 'me@email')
+      set_cookie(:email, random_email)
       post_json('/poll/respond', { hash_id: poll.hashid })
       expect(last_response.status).to(be(404))
       expect(last_response.body).to(eq('Poll not found'))

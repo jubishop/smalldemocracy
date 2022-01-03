@@ -7,20 +7,20 @@ require_relative '../../lib/models/user'
 
 module RSpec
   module Models
-    def create_user(email: "#{rand}@#{rand}")
+    def create_user(email: random_email)
       return ::Models::User.find_or_create(email: email)
     end
 
-    def create_group(email: "#{rand}@#{rand}", name: rand.to_s)
+    def create_group(email: random_email, name: rand.to_s)
       return create_user(email: email).add_group(name: name)
     end
 
-    def create_member(email: "#{rand}@#{rand}",
+    def create_member(email: random_email,
                       name: rand.to_s)
       return create_group(email: email, name: name).creating_member
     end
 
-    def create_poll(email: "#{rand}@#{rand}",
+    def create_poll(email: random_email,
                     name: rand.to_s,
                     title: rand.to_s,
                     question: rand.to_s,
@@ -48,6 +48,7 @@ end
 module Models
   class User
     include Test::Env
+
     def add_group(name: rand.to_s)
       test_only!
       add_created_group(name: name)
@@ -68,7 +69,9 @@ module Models
   end
 
   class Group
+    include RSpec::EMail
     include Test::Env
+
     def add_poll(email: members.sample&.email,
                  title: rand.to_s,
                  question: rand.to_s,
@@ -82,7 +85,7 @@ module Models
             type: type)
     end
 
-    def add_member(email: "#{rand}@#{rand}")
+    def add_member(email: random_email)
       test_only!
       super(email: email)
     end
@@ -90,6 +93,7 @@ module Models
 
   class Member
     include Test::Env
+
     orig_add_poll = instance_method(:add_poll)
     undef_method(:add_poll)
     define_method(:add_poll) { |title: rand.to_s,
@@ -112,6 +116,7 @@ module Models
 
   class Poll
     include Test::Env
+
     def add_choice(text: rand.to_s)
       test_only!
       super(text: text)
@@ -120,6 +125,7 @@ module Models
 
   class Choice
     include Test::Env
+
     def add_response(member_id: poll.members.sample.id,
                      **attributes)
       test_only!

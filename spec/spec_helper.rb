@@ -11,6 +11,7 @@ ENV['GROUP_ID_SALT'] = 'groupsalt'
 
 require_relative '../setup'
 
+require_relative 'helpers/email'
 require_relative 'helpers/matchers'
 require_relative 'helpers/models'
 require_relative 'helpers/time'
@@ -27,10 +28,29 @@ Capybara.register_driver(:apparition) { |app|
 }
 Capybara.default_driver = :apparition
 
-RSpec.shared_context(:capybara) do
+RSpec.shared_context(:model) {
+  let(:email) { random_email }
+}
+
+RSpec.shared_context(:rack_test) {
+  include_context(:tony_rack_test)
+
+  let(:app) { Capybara.app }
+  let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
+  let(:email) { random_email }
+
+  # rubocop:disable Style/StringHashKeys
+  def post_json(path, data = {})
+    post(path, data.to_json, { 'CONTENT_TYPE' => 'application/json' })
+  end
+  # rubocop:enable Style/StringHashKeys
+}
+
+RSpec.shared_context(:capybara) {
   include_context(:tony_capybara)
 
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
+  let(:email) { random_email }
 
   def set_timezone
     expect(page).to(have_timezone)
@@ -41,19 +61,6 @@ RSpec.shared_context(:capybara) do
     set_timezone
     refresh
   end
-end
-
-RSpec.shared_context(:rack_test) {
-  include_context(:tony_rack_test)
-
-  let(:app) { Capybara.app }
-  let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
-
-  # rubocop:disable Style/StringHashKeys
-  def post_json(path, data = {})
-    post(path, data.to_json, { 'CONTENT_TYPE' => 'application/json' })
-  end
-  # rubocop:enable Style/StringHashKeys
 }
 
 RSpec.configure do |config|
@@ -75,10 +82,12 @@ RSpec.configure do |config|
   config.order = :random
   Kernel.srand(config.seed)
 
+  config.include(RSpec::EMail)
   config.include(RSpec::Models)
   config.include(RSpec::Time)
-  config.include_context(:capybara, type: :feature)
+  config.include_context(:model, type: :model)
   config.include_context(:rack_test, type: :rack_test)
+  config.include_context(:capybara, type: :feature)
 
   config.before(:each) {
     allow(Tony::Auth::Google).to(receive(:url)) { |_, r: '/'| r }

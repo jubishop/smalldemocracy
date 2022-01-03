@@ -1,15 +1,15 @@
 require_relative '../../lib/models/poll'
 
-RSpec.describe(Models::Poll) {
+RSpec.describe(Models::Poll, type: :model) {
   context('.create') {
     it('creates a poll') {
       now = Time.now
-      poll = create_poll(email: 'me@email',
+      poll = create_poll(email: email,
                          title: 'title',
                          question: 'question',
                          expiration: now,
                          type: :borda_split)
-      expect(poll.email).to(eq('me@email'))
+      expect(poll.email).to(eq(email))
       expect(poll.title).to(eq('title'))
       expect(poll.question).to(eq('question'))
       expect(poll.expiration).to(eq(now))

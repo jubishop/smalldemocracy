@@ -1,4 +1,4 @@
-RSpec.shared_examples('entity guards') { |path|
+RSpec.shared_examples('entity flows') { |path|
   context('logged out') {
     it('asks for email for create') {
       visit("/#{path}/create")

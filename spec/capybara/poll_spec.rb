@@ -1,17 +1,17 @@
 require 'duration'
 
-require_relative 'shared_examples/entity_guards'
+require_relative 'shared_examples/entity_flows'
 
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
   let(:current_time) { Time.new(1982, 6, 6, 11, 30) }
 
   let(:entity) { create_poll }
-  it_has_behavior('entity guards', 'poll')
+  it_has_behavior('entity flows', 'poll')
 
   context('no group') {
     it('displays a modal and redirects you if no group') {
-      set_cookie(:email, 'me@email')
+      set_cookie(:email, email)
       visit('/poll/create')
       expect(find('#group-modal')).to(
           have_link('Create Group', href: '/group/create'))

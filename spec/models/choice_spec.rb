@@ -1,6 +1,6 @@
 require_relative '../../lib/models/choice'
 
-RSpec.describe(Models::Choice) {
+RSpec.describe(Models::Choice, type: :model) {
   context('.create') {
     it('creates a choice') {
       choice = create_choice(text: 'text')

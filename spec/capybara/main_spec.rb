@@ -9,7 +9,7 @@ RSpec.describe(Main, type: :feature) {
     }
 
     it('displays logged in index') {
-      set_cookie(:email, 'my@email')
+      set_cookie(:email, 'main@loggedin')
       visit('/')
       expect(page).to(have_link('Create Poll', href: '/poll/create'))
       expect(page).to(have_link('Create Group', href: '/group/create'))

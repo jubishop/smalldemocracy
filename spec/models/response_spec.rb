@@ -1,6 +1,6 @@
 require_relative '../../lib/models/response'
 
-RSpec.describe(Models::Response) {
+RSpec.describe(Models::Response, type: :model) {
   context('.create') {
     it('creates a response with no score') {
       response = create_response

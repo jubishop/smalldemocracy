@@ -1,10 +1,10 @@
 require_relative '../../lib/models/group'
 
-RSpec.describe(Models::Member) {
+RSpec.describe(Models::Member, type: :model) {
   context('.create') {
     it('creates a member') {
-      member = create_member(email: 'me@email')
-      expect(member.email).to(eq('me@email'))
+      member = create_member(email: email)
+      expect(member.email).to(eq(email))
     }
 
     it('rejects creating member with no email') {
@@ -57,7 +57,7 @@ RSpec.describe(Models::Member) {
   context('#update') {
     it('rejects any updates') {
       member = create_member
-      expect { member.update(email: 'new@email') }.to(
+      expect { member.update(email: email) }.to(
           raise_error(Sequel::HookFailed, 'Members are immutable'))
     }
   }

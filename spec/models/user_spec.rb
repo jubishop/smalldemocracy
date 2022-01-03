@@ -1,10 +1,10 @@
 require_relative '../../lib/models/user'
 
-RSpec.describe(Models::User) {
+RSpec.describe(Models::User, type: :model) {
   context('.find_or_create') {
     it('creates a user') {
-      user = create_user(email: 'me@email')
-      expect(user.email).to(eq('me@email'))
+      user = create_user(email: email)
+      expect(user.email).to(eq(email))
     }
 
     it('creates a user only once') {
