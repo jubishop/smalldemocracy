@@ -41,7 +41,7 @@ GEM
     open3 (0.1.1)
     openssl (3.0.0)
     parallel (1.21.0)
-    parser (3.0.3.2)
+    parser (3.1.0.0)
       ast (~> 2.4.1)
     pg (1.2.3)
     public_suffix (4.0.6)
@@ -134,7 +134,7 @@ GEM
       tzinfo
     tony-auth (0.11)
       base64
-    tony-test (0.64)
+    tony-test (0.65)
       capybara
       chunky_png
       colorize

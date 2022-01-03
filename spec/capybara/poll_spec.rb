@@ -8,30 +8,16 @@ RSpec.describe(Poll, type: :feature) {
   let(:entity) { create_poll }
   it_has_behavior('entity flows', 'poll')
 
-  context('no group') {
-    it('displays a modal and redirects you') {
-      set_cookie(:email, email)
-      visit('/poll/create')
-      expect(find('#group-modal')).to(
-          have_link('Create Group', href: '/group/create'))
-      goldens.verify('no_group_modal')
-    }
-  }
-
   context('create') {
     it('creates a poll with complex :choices creation') {
-      current_time = Time.new(1982, 6, 6, 11, 30)
-      freeze_time(current_time)
-      allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
-
       # Set up basic data and fields of a new poll.
       email = 'poll_complex_choices@create'
       set_cookie(:email, email)
-      create_group(email: email, name: 'poll/create')
+      group = create_group(email: email, name: 'poll/create')
       visit('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
-      fill_in('expiration', with: current_time + 1.minute)
+      fill_in('expiration', with: Time.new(2032, 6, 6, 11, 30))
       select('Borda Split', from: 'type')
 
       # Sometimes click Add button, sometimes press enter on input field.
@@ -61,16 +47,30 @@ RSpec.describe(Poll, type: :feature) {
       find('h1').click
       goldens.verify('create')
 
+      expect_slim(
+          'poll/view',
+          poll: an_instance_of(Models::Poll),
+          member: group.creating_member,
+          timezone: an_instance_of(TZInfo::DataTimezone))
       click_button('Create Poll')
-      expect(current_path).to(match(%r{/poll/view/.+}))
     }
 
-    # TODO: Test that passing through group_id works.
+    it('displays a modal and redirects you when you have no group') {
+      set_cookie(:email, email)
+      visit('/poll/create')
+      expect(find('#group-modal')).to(
+          have_link('Create Group', href: '/group/create'))
+      goldens.verify('no_group_modal')
+    }
+
+    it('uses group_id to select a specific group option') {
+
+    }
   }
 
-  #   def create_choices(choices)
-  #   end
-
+  #
+  #     current_time = Time.new(1982, 6, 6, 11, 30)
+  #     freeze_time(current_time)
   #   def drag_to_bottom(choice)
   #     expect(page).to(have_fontawesome)
   #     expect(page).to(have_button(text: 'Submit Choices'))
@@ -98,7 +98,7 @@ RSpec.describe(Poll, type: :feature) {
   #     set_timezone
   #     click_button('Submit')
   #   end
-
+#       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
   #   def verify_finished_poll(page_name)
   #     allow(Time).to(receive(:now).and_return(Time.at(10**10)))
   #     refresh_page
