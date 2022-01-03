@@ -100,8 +100,8 @@ RSpec.describe(Models::User, type: :model) {
       other_group.add_member(email: @user.email)
       @expired_poll = my_group.add_poll
       @expired_poll.update(expiration: past)
-      @my_poll = my_group.add_poll(expiration: future)
-      @other_poll = other_group.add_poll(expiration: future)
+      @my_poll = my_group.add_poll
+      @other_poll = other_group.add_poll
       @expired_other_poll = other_group.add_poll
       @expired_other_poll.update(expiration: past)
     }

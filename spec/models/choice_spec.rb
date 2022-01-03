@@ -88,7 +88,7 @@ RSpec.describe(Models::Choice, type: :model) {
     it('rejects adding two responses from same member') {
       group = create_group
       member = group.add_member
-      poll = group.add_poll(expiration: future)
+      poll = group.add_poll
       choice = poll.add_choice
       choice.add_response(member_id: member.id)
       expect { choice.add_response(member_id: member.id) }.to(

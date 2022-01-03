@@ -66,7 +66,7 @@ RSpec.describe(Models::Poll, type: :model) {
   context('#destroy') {
     it('destroys itself from group') {
       group = create_group
-      poll = group.add_poll(expiration: future)
+      poll = group.add_poll
       expect(group.polls).to_not(be_empty)
       expect(poll.exists?).to(be(true))
       group.remove_poll(poll)
@@ -76,7 +76,7 @@ RSpec.describe(Models::Poll, type: :model) {
 
     it('destroys itself from user') {
       user = create_user
-      poll = user.add_poll(group_id: user.add_group.id, expiration: future)
+      poll = user.add_poll(group_id: user.add_group.id)
       expect(user.polls).to_not(be_empty)
       expect(poll.exists?).to(be(true))
       user.remove_poll(poll)
@@ -280,7 +280,7 @@ RSpec.describe(Models::Poll, type: :model) {
         group = create_group
         members.each { |member| group.add_member(email: member) }
 
-        @poll = group.add_poll(type: :borda_single, expiration: future)
+        @poll = group.add_poll(type: :borda_single)
         choices.each { |choice| @poll.add_choice(text: choice) }
 
         responses = {
@@ -321,7 +321,7 @@ RSpec.describe(Models::Poll, type: :model) {
         group = create_group
         members.each { |member| group.add_member(email: member) }
 
-        @poll = group.add_poll(type: :borda_split, expiration: future)
+        @poll = group.add_poll(type: :borda_split)
         choices.each { |choice| @poll.add_choice(text: choice) }
 
         responses = {
@@ -364,7 +364,7 @@ RSpec.describe(Models::Poll, type: :model) {
         group = create_group
         members.each { |member| group.add_member(email: member) }
 
-        @poll = group.add_poll(type: :choose_one, expiration: future)
+        @poll = group.add_poll(type: :choose_one)
         choices.each { |choice| @poll.add_choice(text: choice) }
 
         responses = {

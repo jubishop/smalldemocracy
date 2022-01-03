@@ -44,7 +44,7 @@ RSpec.describe(Models::Member, type: :model) {
     it('cascades destroy to responses') {
       group = create_group
       member = group.add_member
-      poll = member.add_poll(expiration: future)
+      poll = member.add_poll
       response = member.add_response(choice_id: poll.add_choice.id)
       expect(poll.responses).to_not(be_empty)
       expect(response.exists?).to(be(true))
@@ -88,7 +88,7 @@ RSpec.describe(Models::Member, type: :model) {
 
     it('reports responding to a poll') {
       member = create_member
-      poll = member.add_poll(expiration: future)
+      poll = member.add_poll
       member.add_response(choice_id: poll.add_choice.id)
       expect(member.responded?(poll_id: poll.id)).to(be(true))
     }
@@ -104,11 +104,10 @@ RSpec.describe(Models::Member, type: :model) {
 
   context('#responses') {
     let(:member) { create_member }
-    let(:poll) { member.add_poll(expiration: future) }
+    let(:poll) { member.add_poll }
     let!(:response) { member.add_response(choice_id: poll.add_choice.id) }
     let(:other_response) {
-      member.add_response(
-          choice_id: member.add_poll(expiration: future).add_choice.id)
+      member.add_response(choice_id: member.add_poll.add_choice.id)
     }
 
     it('returns only responses for a specific poll when poll_id: passed') {
@@ -126,7 +125,7 @@ RSpec.describe(Models::Member, type: :model) {
       poll = member.add_poll
       poll.update(expiration: past)
     }
-    let!(:my_poll) { member.add_poll(expiration: future) }
+    let!(:my_poll) { member.add_poll }
 
     it('finds all active polls with start_expiration') {
       expect(member.polls(start_expiration: Time.now)).to(
@@ -146,14 +145,14 @@ RSpec.describe(Models::Member, type: :model) {
   context('#add_response') {
     it('adds a response to a member') {
       member = create_member
-      choice = member.add_poll(expiration: future).add_choice
+      choice = member.add_poll.add_choice
       response = member.add_response(choice_id: choice.id)
       expect(member.responses).to(match_array(response))
     }
 
     it('rejects adding a response to an expired poll') {
       member = create_member
-      poll = member.add_poll(expiration: future)
+      poll = member.add_poll
       choice = poll.add_choice
       poll.update(expiration: past)
       expect { member.add_response(choice_id: choice.id) }.to(
@@ -169,7 +168,7 @@ RSpec.describe(Models::Member, type: :model) {
     it('rejects adding two responses to the same choice') {
       group = create_group
       member = group.add_member
-      poll = group.add_poll(expiration: future)
+      poll = group.add_poll
       choice = poll.add_choice
       member.add_response(choice_id: choice.id)
       expect { member.add_response(choice_id: choice.id) }.to(
