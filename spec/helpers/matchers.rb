@@ -4,9 +4,6 @@ module Tony
   module Test
     module Capybara
       module Matchers
-        def have_sortable_js
-          have_button(text: 'Submit Choices')
-        end
       end
     end
   end

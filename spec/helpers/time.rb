@@ -12,7 +12,7 @@ module RSpec
       return ::Time.at(rand(::Time.now.to_i)).round_down
     end
 
-    def freeze_time(moment: random_time)
+    def freeze_time(moment = random_time)
       allow(::Time).to(receive(:now).and_return(moment))
       return moment
     end

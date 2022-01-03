@@ -61,10 +61,6 @@ module Models
       return Models::Poll.create(group_id: group_id, email: email, **attributes)
     end
 
-    def response(poll_id:)
-      return poll_dataset(poll_id: poll_id).first
-    end
-
     def responses(poll_id: nil)
       return poll_id ? poll_dataset(poll_id: poll_id).all : super
     end

@@ -4,13 +4,12 @@ require_relative 'shared_examples/entity_flows'
 
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
-  let(:current_time) { Time.new(1982, 6, 6, 11, 30) }
 
   let(:entity) { create_poll }
   it_has_behavior('entity flows', 'poll')
 
   context('no group') {
-    it('displays a modal and redirects you if no group') {
+    it('displays a modal and redirects you') {
       set_cookie(:email, email)
       visit('/poll/create')
       expect(find('#group-modal')).to(
@@ -19,30 +18,60 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
-  # context('poll lifecycles') {
-  #   before(:each) {
-  #     freeze_time(current_time)
+  context('create') {
+    it('creates a poll with complex :choices creation') {
+      current_time = Time.new(1982, 6, 6, 11, 30)
+      freeze_time(current_time)
+      allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
 
-  #     # Deterministic choice ordering
-  #     allow_any_instance_of(Models::Poll).to(receive(:shuffled_choices) { |poll|
-  #       poll.choices.sort_by(&:text)
-  #     })
+      # Set up basic data and fields of a new poll.
+      email = 'poll_complex_choices@create'
+      set_cookie(:email, email)
+      create_group(email: email, name: 'poll/create')
+      visit('/poll/create')
+      fill_in('title', with: 'this is my title')
+      fill_in('question', with: 'what is life')
+      fill_in('expiration', with: current_time + 1.minute)
+      select('Borda Split', from: 'type')
 
-  #     # Create a poll
-  #     set_cookie(:email, 'one@one')
-  #     visit('/poll/create')
-  #     fill_in('title', with: 'this is my title')
-  #     fill_in('question', with: 'what is life')
-  #     fill_in('choices', with: 'one, two, three, four, five, six')
-  #     fill_in('expiration', with: current_time + 1.minute)
-  #   }
+      # Sometimes click Add button, sometimes press enter on input field.
+      click_button('Add Choice')
+      %w[zero one two three four five six].each_with_index { |choice, index|
+        if index.even?
+          all('input.text').last.fill_in(with: choice)
+          click_button('Add Choice')
+        else
+          all('input.text').last.fill_in(with: "#{choice}\n")
+        end
+      }
+
+      # Delete last empty field and "two".
+      all('li.listable div').last.click
+      all('li.listable div')[2].click
+
+      # Ensure clicking Add button and pressing enter do nothing when there's
+      # already an empty field.
+      all('input.text')[1].fill_in(with: '')
+      click_button('Add Choice')
+      all('input.text')[4].native.send_keys(:enter)
+
+      # Replace the now empty field ("one") with "seven".
+      all('input.text')[1].fill_in(with: 'seven')
+
+      find('h1').click
+      goldens.verify('create')
+
+      click_button('Create Poll')
+      expect(current_path).to(match(%r{/poll/view/.+}))
+    }
+  }
 
   #   def create_choices(choices)
   #   end
 
   #   def drag_to_bottom(choice)
   #     expect(page).to(have_fontawesome)
-  #     expect(page).to(have_sortable_js)
+  #     expect(page).to(have_button(text: 'Submit Choices'))
   #     choice_node = find(
   #         :xpath,
   #         "//li[@class='choice' and ./p[normalize-space()='#{choice}']]")
@@ -51,7 +80,7 @@ RSpec.describe(Poll, type: :feature) {
 
   #   def rearrange_choices(order)
   #     expect(page).to(have_fontawesome)
-  #     expect(page).to(have_sortable_js)
+  #     expect(page).to(have_button(text: 'Submit Choices'))
   #     values = page.evaluate_script('Poll.sortable.toArray()')
   #     expect(values.length).to(be(order.length))
   #     expect(order.uniq.length).to(be(order.length))

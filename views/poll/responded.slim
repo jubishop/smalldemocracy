@@ -35,4 +35,4 @@ include :expiration_text
       li ="#{choice} ❌ (0 points)"
 
 - when :choose_one
-  p You responded: #{member.response(poll_id: poll.id).choice.text}
+  p You responded: #{member.responses(poll_id: poll.id).first.choice.text}

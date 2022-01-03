@@ -159,7 +159,7 @@ RSpec.describe(Poll, type: :rack_test) {
                   { hash_id: poll.hashid, choice_id: choice.id })
         expect(last_response.status).to(be(201))
         expect(last_response.body).to(eq('Poll response added'))
-        expect(member.response(poll_id: poll.id).choice).to(eq(choice))
+        expect(member.responses(poll_id: poll.id).first.choice).to(eq(choice))
 
         expect_slim(
             'poll/responded',
