@@ -64,6 +64,8 @@ RSpec.describe(Poll, type: :feature) {
       click_button('Create Poll')
       expect(current_path).to(match(%r{/poll/view/.+}))
     }
+
+    # TODO: Test that passing through group_id works.
   }
 
   #   def create_choices(choices)
