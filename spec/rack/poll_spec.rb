@@ -68,7 +68,12 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
     }
 
-    # TODO: Fails if poll is already expired.
+    it('fails if poll expiration is in the past') {
+      valid_params[:expiration] = past.form
+      post '/poll/create', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq('Poll is created expired'))
+    }
   }
 
   context('get /view') {
