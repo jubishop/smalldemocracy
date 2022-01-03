@@ -63,9 +63,14 @@ RSpec.describe(Poll, type: :feature) {
       goldens.verify('no_group_modal')
     }
 
-    # TODO
-    # it('uses group_id to select a specific group option') {
-    # }
+    it('uses group_id to select a specific group option') {
+      user = create_user
+      set_cookie(:email, user.email)
+      5.times { user.add_group }
+      group = user.add_group(name: 'special group')
+      visit("/poll/create?group_id=#{group.id}")
+      goldens.verify('create_specific_group')
+    }
   }
 
   #
