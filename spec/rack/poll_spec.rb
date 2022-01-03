@@ -67,6 +67,8 @@ RSpec.describe(Poll, type: :rack_test) {
       post '/poll/create', valid_params
       expect(last_response.status).to(be(400))
     }
+
+    # TODO: Fails if poll is already expired.
   }
 
   context('get /view') {

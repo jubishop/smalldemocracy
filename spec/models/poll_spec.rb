@@ -45,7 +45,7 @@ RSpec.describe(Models::Poll, type: :model) {
           raise_error(Sequel::HookFailed, 'Expiration value is invalid'))
     }
 
-    it('rejects creating a poll in the past') {
+    it('rejects creating a poll that is already expired') {
       expect { create_poll(expiration: past) }.to(
           raise_error(Sequel::HookFailed, 'Poll is created expired'))
     }
