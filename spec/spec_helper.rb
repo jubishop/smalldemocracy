@@ -53,10 +53,8 @@ RSpec.shared_context(:capybara) {
   let(:email) { random_email }
 
   def go(path)
-    if page.current_path
-      expect(page).to(have_timezone)
-      page.driver.set_cookie(:tz, 'America/Los_Angeles')
-    end
+    expect(page).to(have_timezone) if page.current_path
+    page.driver.set_cookie(:tz, 'America/Los_Angeles')
     visit(path)
     expect(page).to(have_assets)
     expect(page).to(have_fontawesome)

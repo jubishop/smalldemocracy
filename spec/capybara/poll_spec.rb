@@ -92,26 +92,46 @@ RSpec.describe(Poll, type: :feature) {
   #   fill_in('expiration', with: Time.at(current_time + 90))
   # }
   #
-  #   def drag_to_bottom(choice)
-  #     expect(page).to(have_fontawesome)
-  #     expect(page).to(have_button(text: 'Submit Choices'))
-  #     choice_node = find(
-  #         :xpath,
-  #         "//li[@class='choice' and ./p[normalize-space()='#{choice}']]")
-  #     choice_node.drag_to(find('ul#bottom-choices'))
-  #   end
+  context(:borda) {
+    before(:each) {
+      freeze_time(Time.new(1982, 6, 6, 11, 30))
+      allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
+    }
 
-  #   def rearrange_choices(order)
-  #     expect(page).to(have_fontawesome)
-  #     expect(page).to(have_button(text: 'Submit Choices'))
-  #     values = page.evaluate_script('Poll.sortable.toArray()')
-  #     expect(values.length).to(be(order.length))
-  #     expect(order.uniq.length).to(be(order.length))
-  #     expect(order.uniq.sort.max).to(be(order.length - 1))
-  #     values = order.map { |position| values[position] }
-  #     page.execute_script("Poll.sortable.sort(#{values})")
-  #     page.execute_script('Poll.updateScores()')
-  #   end
+    def rearrange_choices(order)
+      values = page.evaluate_script('Poll.sortable.toArray()')
+      expect(values.length).to(be(order.length))
+      expect(order.uniq.length).to(be(order.length))
+      expect(order.uniq.sort.max).to(be(order.length - 1))
+      values = order.map { |position| values[position] }
+      page.execute_script("Poll.sortable.sort(#{values})")
+      page.execute_script('Poll.updateScores()')
+    end
+
+    context(:borda_split) {
+      def drag_to_bottom(choice)
+        expect(page).to(have_fontawesome)
+        expect(page).to(have_button(text: 'Submit Choices'))
+        choice_node = find(
+            :xpath,
+            "//li[@class='choice' and ./p[normalize-space()='#{choice}']]")
+        choice_node.drag_to(find('ul#bottom-choices'))
+      end
+
+      it('submits a borda split poll response') {
+        poll = create_poll(email: 'view@bordasplit',
+                           title: 'borda_split_title',
+                           question: 'borda_split_question',
+                           type: :borda_split)
+        %w[one two three four five six].each { |choice|
+          poll.add_choice(text: choice)
+        }
+        set_cookie(:email, poll.email)
+        go(poll.url)
+        goldens.verify('view_borda_split')
+      }
+    }
+  }
 
   #   def submit_creation(page_name)
   #     find('h1').click # Deselect any form field

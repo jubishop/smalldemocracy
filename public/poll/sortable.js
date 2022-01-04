@@ -2,7 +2,9 @@ class Poll {
   static domLoaded() {
     const choicesElement = document.getElementById('choices');
     const bottomChoicesElement = document.getElementById('bottom-choices');
-
+    this.pollID = choicesElement.getAttribute('poll_id');
+    this.submitButton = document.getElementById('submit');
+    this.submitButton.addEventListener('click', () => this.submitClicked());
     const choicesArray = Array.from(document.getElementsByClassName('choice'));
     this.choiceElements = Object.fromEntries(choicesArray.map((choice) => {
       return [
@@ -25,11 +27,6 @@ class Poll {
       this.bottomSortable = Sortable.create(bottomChoicesElement, options);
     }
 
-    this.pollID = choicesElement.getAttribute('poll_id');
-
-    this.submitButton = document.getElementById('submit');
-    this.submitButton.addEventListener('click', () => this.submitClicked());
-
     this.updateScores();
   }
 
@@ -43,9 +40,7 @@ class Poll {
     }
 
     let topScore = this.sortable.toArray().length;
-    if (!this.bottomSortable) {
-      topScore -= 1;
-    }
+    if (!this.bottomSortable) { topScore -= 1; }
     this.sortable.toArray().forEach((choiceID) => {
       const currentScore = topScore + baseScore;
       topScore -= 1;
