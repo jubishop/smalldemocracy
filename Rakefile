@@ -116,13 +116,23 @@ task(:sass, [:params]) { |_, args|
   `sass #{params} scss:public`
 }
 
+desc('Run esbuild over all JS files')
+task(:esbuild, [:params]) { |_, args|
+  params = args[:params].to_s
+  params += ' --bundle --format=esm --outdir=public --outbase=src'
+  files = (Dir['src/*/*'] - Dir['src/lib/*']).join(' ')
+  `esbuild #{files} #{params}`
+}
+
 desc('Compile css and launch localhost:8989')
 task(:run) {
   Thread.new { Rake::Task[:sass].invoke('--watch') }
+  Thread.new { Rake::Task[:esbuild].invoke('--watch') }
   `bundle exec rackup -p 8989`
 }
 
-task default: %w[rubocop:auto_correct sass spec]
-task models: %w[rubocop:auto_correct sass mspec]
-task rack: %w[rubocop:auto_correct sass rspec]
-task capybara: %w[rubocop:auto_correct sass cspec]
+task build: %w[rubocop:auto_correct sass esbuild]
+task default: %w[build spec]
+task models: %w[build mspec]
+task rack: %w[build rspec]
+task capybara: %w[build cspec]

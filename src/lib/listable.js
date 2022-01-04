@@ -1,3 +1,5 @@
+export { Listable }
+
 class Listable {
   constructor(listElement, buttonElement, options = {}) {
     this.listElement = listElement;
