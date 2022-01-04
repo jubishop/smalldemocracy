@@ -113,7 +113,7 @@ desc('Compile all scss files to compressed css')
 task(:sass, [:params]) { |_, args|
   params = args[:params].to_s
   params += ' --style=compressed --no-source-map'
-  `sass #{params} scss:public/css`
+  `sass #{params} scss:public`
 }
 
 desc('Compile css and launch localhost:8989')
