@@ -3,7 +3,7 @@
   - case poll.type
   - when :borda_single, :borda_split
     ==javascript_include_tag 'https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js'
-    ==javascript_include_tag 'poll/sortable'
+    ==javascript_include_tag 'poll/borda'
     ==stylesheet_link_tag 'poll/borda'
   - when :choose_one
     ==javascript_include_tag 'poll/choose'
