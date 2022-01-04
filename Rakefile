@@ -123,5 +123,6 @@ task(:run) {
 }
 
 task default: %w[rubocop:auto_correct sass spec]
+task models: %w[rubocop:auto_correct sass mspec]
 task rack: %w[rubocop:auto_correct sass rspec]
 task capybara: %w[rubocop:auto_correct sass cspec]

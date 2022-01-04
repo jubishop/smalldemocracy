@@ -96,20 +96,20 @@ RSpec.describe(Poll, type: :feature) {
       page.execute_script('Poll.updateScores()')
     end
 
-  #     it('executes borda_single') {
-  #       submit_creation('borda_single_create')
-  #       rearrange_choices([4, 2, 0, 5, 3, 1])
-  #       submit_choices
-  #       set_cookie(:email, 'two@two')
-  #       refresh_page
-  #       rearrange_choices([5, 3, 2, 0, 4, 1])
-  #       submit_choices('borda_single_view')
-  #       goldens.verify('borda_single_responded')
-  #       verify_finished_poll('borda_single_finished')
-  #       all('details')[1].click
-  #       all('details')[3].click
-  #       goldens.verify('borda_single_details_expanded')
-  #     }
+    #     it('executes borda_single') {
+    #       submit_creation('borda_single_create')
+    #       rearrange_choices([4, 2, 0, 5, 3, 1])
+    #       submit_choices
+    #       set_cookie(:email, 'two@two')
+    #       refresh_page
+    #       rearrange_choices([5, 3, 2, 0, 4, 1])
+    #       submit_choices('borda_single_view')
+    #       goldens.verify('borda_single_responded')
+    #       verify_finished_poll('borda_single_finished')
+    #       all('details')[1].click
+    #       all('details')[3].click
+    #       goldens.verify('borda_single_details_expanded')
+    #     }
 
     context(:borda_split) {
       def drag_to_bottom(choice)
