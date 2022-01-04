@@ -234,7 +234,7 @@ RSpec.describe(Poll, type: :rack_test) {
             '/poll/respond',
             {
               hash_id: poll.hashid,
-              responses: responses.fill { rand(10000) }
+              responses: responses.fill { rand(1000000000000) }
             })
         expect(last_response.status).to(be(400))
         expect(last_response.body).to(eq('Response has no poll'))
