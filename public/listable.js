@@ -1,4 +1,4 @@
-class Listable {
+export class Listable {
   constructor(listElement, buttonElement, options = {}) {
     this.listElement = listElement;
     this.buttonElement = buttonElement;

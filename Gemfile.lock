@@ -126,7 +126,7 @@ GEM
       linguistics
     rstruct (1.5)
       core
-    tony (0.55)
+    tony (0.56)
       base64
       rack
       rack-contrib

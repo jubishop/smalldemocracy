@@ -1,3 +1,5 @@
+import { Listable } from '../listable.js';
+
 class Poll {
   static domLoaded() {
     let listable = new Listable(

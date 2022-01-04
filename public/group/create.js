@@ -1,3 +1,5 @@
+import { Listable } from '../listable.js';
+
 class Group {
   static domLoaded() {
     let listable = new Listable(
