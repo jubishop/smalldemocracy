@@ -76,13 +76,6 @@ def rspec_n(count: 50, type: nil)
       print(char)
     end
   end
-
-  failures = results.uncolorize.match(/Runs Failed:\s+(\d+)/)[1].to_i
-  if failures.positive?
-    puts File.read(Dir['rspec_n_iteration*'].last)
-  else
-    puts 'All runs pass'.green
-  end
 end
 # rubocop:enable Style/TopLevelMethodDefinition
 
