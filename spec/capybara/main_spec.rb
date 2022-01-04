@@ -1,6 +1,8 @@
 RSpec.describe(Main, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/main') }
 
+  # TODO: Check github and home links on top header.
+
   context('index') {
     it('displays logged out index') {
       go('/')

@@ -2,6 +2,8 @@ require 'duration'
 
 require_relative 'shared_examples/entity_flows'
 
+# TODO: Check all links on poll pages
+
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
