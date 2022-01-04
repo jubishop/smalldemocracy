@@ -96,6 +96,21 @@ RSpec.describe(Poll, type: :feature) {
       page.execute_script('Poll.updateScores()')
     end
 
+  #     it('executes borda_single') {
+  #       submit_creation('borda_single_create')
+  #       rearrange_choices([4, 2, 0, 5, 3, 1])
+  #       submit_choices
+  #       set_cookie(:email, 'two@two')
+  #       refresh_page
+  #       rearrange_choices([5, 3, 2, 0, 4, 1])
+  #       submit_choices('borda_single_view')
+  #       goldens.verify('borda_single_responded')
+  #       verify_finished_poll('borda_single_finished')
+  #       all('details')[1].click
+  #       all('details')[3].click
+  #       goldens.verify('borda_single_details_expanded')
+  #     }
+
     context(:borda_split) {
       def drag_to_bottom(choice)
         wait_for_sortable
@@ -139,53 +154,6 @@ RSpec.describe(Poll, type: :feature) {
       }
     }
   }
-
-  #   context('borda') {
-  #     def submit_choices(page_name = nil)
-  #       expect(page).to(have_fontawesome)
-  #       expect(page).to(have_button(text: 'Submit Choices'))
-  #       goldens.verify(page_name) if page_name
-  #       set_timezone
-  #       click_button('Submit Choices')
-  #       expect(page).to(have_content('Completed'))
-  #     end
-
-  #     it('executes borda_single') {
-  #       submit_creation('borda_single_create')
-  #       rearrange_choices([4, 2, 0, 5, 3, 1])
-  #       submit_choices
-  #       set_cookie(:email, 'two@two')
-  #       refresh_page
-  #       rearrange_choices([5, 3, 2, 0, 4, 1])
-  #       submit_choices('borda_single_view')
-  #       goldens.verify('borda_single_responded')
-  #       verify_finished_poll('borda_single_finished')
-  #       all('details')[1].click
-  #       all('details')[3].click
-  #       goldens.verify('borda_single_details_expanded')
-  #     }
-
-  #     it('executes borda_split') {
-  #       select('Borda Split', from: 'type')
-  #       submit_creation('borda_split_create')
-  #       drag_to_bottom('two')
-  #       drag_to_bottom('three')
-  #       rearrange_choices([1, 0, 3, 2])
-  #       expect(page).to(have_button(text: 'Submit Choices'))
-  #       submit_choices
-  #       set_cookie(:email, 'two@two')
-  #       refresh_page
-  #       drag_to_bottom('two')
-  #       drag_to_bottom('five')
-  #       rearrange_choices([3, 1, 0, 2])
-  #       submit_choices('borda_split_view')
-  #       goldens.verify('borda_split_responded')
-  #       verify_finished_poll('borda_split_finished')
-  #       all('details')[0].click
-  #       all('details')[3].click
-  #       goldens.verify('borda_split_details_expanded')
-  #     }
-  #   }
 
   #   context('choose') {
   #     def submit_choice(choice)
