@@ -1,6 +1,7 @@
 = content_for :head
   title Create Group
-  ==javascript_include_tag 'group/create', type: :module
+  ==javascript_include_tag :listable
+  ==javascript_include_tag 'group/create'
   ==stylesheet_link_tag 'group/create'
 
 = content_for :header
