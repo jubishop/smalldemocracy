@@ -15,6 +15,9 @@ html lang="en"
         window.addEventListener('load', (event) => {
           document.documentElement.classList.add('page-fully-loaded');
         });
+        document.fonts.ready.then(function () {
+          document.documentElement.classList.add('fonts-fully-loaded');
+        });
 
   body
     header

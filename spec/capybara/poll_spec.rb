@@ -44,9 +44,11 @@ RSpec.describe(Poll, type: :feature) {
       # Replace the now empty field ("one") with "seven".
       all('input.text')[1].fill_in(with: 'seven')
 
+      # Click on title to remove focus from any form input.
       find('h1').click
       goldens.verify('create')
 
+      # Confirm redirect to viewing poll after creation.
       expect_slim(
           'poll/view',
           poll: an_instance_of(Models::Poll),
@@ -73,32 +75,18 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
-  # before(:each) {
-  #   current_time = Time.new(1982, 6, 6, 11, 30)
-  #   freeze_time(current_time)
-
-  #   # Deterministic choice ordering
-  #   allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
-
-  #   # Create a poll
-  #   set_cookie(:email, 'one@one')
-  #   go('/poll/create')
-  #   fill_in('title', with: 'this is my title')
-  #   fill_in('question', with: 'what is life')
-  #   fill_in(
-  #       'responders',
-  #       with: 'one@one, two@two, three@three, four@four, five@five, six@six')
-  #   fill_in('choices', with: 'one, two, three, four, five, six')
-  #   fill_in('expiration', with: Time.at(current_time + 90))
-  # }
-  #
   context(:borda) {
     before(:each) {
       freeze_time(Time.new(1982, 6, 6, 11, 30))
       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
     }
 
+    def wait_for_sortable
+      expect(page).to(have_button(text: 'Submit Choices'))
+    end
+
     def rearrange_choices(order)
+      wait_for_sortable
       values = page.evaluate_script('Poll.sortable.toArray()')
       expect(values.length).to(be(order.length))
       expect(order.uniq.length).to(be(order.length))
@@ -110,8 +98,7 @@ RSpec.describe(Poll, type: :feature) {
 
     context(:borda_split) {
       def drag_to_bottom(choice)
-        expect(page).to(have_fontawesome)
-        expect(page).to(have_button(text: 'Submit Choices'))
+        wait_for_sortable
         choice_node = find(
             :xpath,
             "//li[@class='choice' and ./p[normalize-space()='#{choice}']]")
@@ -119,6 +106,7 @@ RSpec.describe(Poll, type: :feature) {
       end
 
       it('submits a borda split poll response') {
+        # Set up and visit basic poll already in DB.
         poll = create_poll(email: 'view@bordasplit',
                            title: 'borda_split_title',
                            question: 'borda_split_question',
@@ -128,23 +116,29 @@ RSpec.describe(Poll, type: :feature) {
         }
         set_cookie(:email, poll.email)
         go(poll.url)
+
+        # Drag a couple choices to the bottom red section.
+        drag_to_bottom('two')
+        drag_to_bottom('three')
+
+        # Rearrange our remaining selected choices.
+        rearrange_choices([1, 0, 3, 2])
+        wait_for_sortable
+
+        # Click on title to remove focus from any form input.
+        find('h1').click
         goldens.verify('view_borda_split')
+
+        # Confirm reload to viewing poll after responding.
+        expect_slim(
+            'poll/responded',
+            poll: poll,
+            member: poll.creating_member,
+            timezone: an_instance_of(TZInfo::DataTimezone))
+        click_button('Submit Choices')
       }
     }
   }
-
-  #   def submit_creation(page_name)
-  #     find('h1').click # Deselect any form field
-  #     goldens.verify(page_name)
-  #     set_timezone
-  #     click_button('Submit')
-  #   end
-  #       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
-  #   def verify_finished_poll(page_name)
-  #     allow(Time).to(receive(:now).and_return(Time.at(10**10)))
-  #     refresh_page
-  #     goldens.verify(page_name)
-  #   end
 
   #   context('borda') {
   #     def submit_choices(page_name = nil)

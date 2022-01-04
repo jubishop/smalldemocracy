@@ -2,7 +2,7 @@ class Poll {
   static domLoaded() {
     const choicesElement = document.getElementById('choices');
     const bottomChoicesElement = document.getElementById('bottom-choices');
-    this.pollID = choicesElement.getAttribute('poll_id');
+    this.hashID = choicesElement.getAttribute('hash_id');
     this.submitButton = document.getElementById('submit');
     this.submitButton.addEventListener('click', () => this.submitClicked());
     const choicesArray = Array.from(document.getElementsByClassName('choice'));
@@ -57,9 +57,8 @@ class Poll {
     fetch('/poll/respond', {
       method: 'POST',
       body: JSON.stringify({
-        poll_id: this.pollID,
-        responses: this.sortable.toArray(),
-        bottom_responses: this?.bottomSortable?.toArray()
+        hash_id: this.hashID,
+        responses: this.sortable.toArray()
       }),
       headers: { 'Content-Type': 'application/json' }
     }).then(res => {

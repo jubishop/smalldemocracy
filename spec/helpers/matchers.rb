@@ -7,6 +7,10 @@ module Tony
         def have_assets
           have_selector('.page-fully-loaded')
         end
+
+        def have_fonts
+          have_selector('.fonts-fully-loaded')
+        end
       end
     end
   end

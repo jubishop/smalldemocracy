@@ -57,6 +57,7 @@ RSpec.shared_context(:capybara) {
     page.driver.set_cookie(:tz, 'America/Los_Angeles')
     visit(path)
     expect(page).to(have_assets)
+    expect(page).to(have_fonts)
     expect(page).to(have_fontawesome)
   end
 

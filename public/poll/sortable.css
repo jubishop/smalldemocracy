@@ -5,7 +5,7 @@ ul#choices, ul#bottom-choices {
 ul#bottom-choices {
   background-color: var(--del-color);
   min-height: 4rem;
-  padding: 2rem 0;
+  padding: 1rem 0;
 }
 
 li.choice {
