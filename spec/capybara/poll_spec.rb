@@ -132,6 +132,9 @@ RSpec.describe(Poll, type: :feature) {
         set_cookie(:email, poll.email)
         go(poll.url)
 
+        # Get a screenshot with an empty bottom section
+        goldens.verify('view_borda_split_empty_bottom')
+
         # Drag a couple choices to the bottom red section.
         drag_to_bottom('two')
         drag_to_bottom('three')
