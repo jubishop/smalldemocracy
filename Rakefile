@@ -109,7 +109,7 @@ task(:annotate) {
                                                     position: :before)
 }
 
-desc('Compile all scss files to compressed css')
+desc('Compile all SCSS files to compressed CSS')
 task(:sass, [:params]) { |_, args|
   params = args[:params].to_s
   params += ' --style=compressed --no-source-map'
@@ -124,7 +124,7 @@ task(:esbuild, [:params]) { |_, args|
   `esbuild #{files} #{params}`
 }
 
-desc('Compile css and launch localhost:8989')
+desc('Compile CSS, compile JS, launch localhost:8989')
 task(:run) {
   Thread.new { Rake::Task[:sass].invoke('--watch') }
   Thread.new { Rake::Task[:esbuild].invoke('--watch') }
