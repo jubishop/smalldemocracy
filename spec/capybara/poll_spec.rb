@@ -8,7 +8,7 @@ RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
   let(:entity) { create_poll }
-  it_has_behavior('entity flows', 'poll')
+  it_has_behavior('entity flows')
 
   context('create') {
     it('creates a poll with complex :choices creation') {
