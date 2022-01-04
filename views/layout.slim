@@ -10,6 +10,11 @@ html lang="en"
     ==stylesheet_link_tag 'css/layout'
     ==yield_content :head
     ==timezone_script
+    - if ENV.fetch('APP_ENV') != 'production'
+      javascript:
+        window.addEventListener('load', (event) => {
+          document.documentElement.classList.add('page-fully-loaded');
+        });
 
   body
     header
