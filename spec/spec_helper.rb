@@ -47,7 +47,6 @@ RSpec.shared_context(:rack_test) {
 }
 
 RSpec.shared_context(:capybara) {
-  require_relative 'helpers/goldens'
   include_context(:tony_capybara)
 
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
