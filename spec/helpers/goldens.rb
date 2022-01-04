@@ -10,7 +10,7 @@ module RSpec
       end
 
       def verify(filename)
-        expect(@capybara_page).to(have_selector('.page-fully-loaded'))
+        expect(@capybara_page).to(have_assets)
         expect(@capybara_page).to(have_fontawesome)
         @goldens_page.verify(filename)
       end

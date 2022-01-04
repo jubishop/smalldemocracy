@@ -53,14 +53,18 @@ RSpec.shared_context(:capybara) {
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
   let(:email) { random_email }
 
-  def set_timezone
-    expect(page).to(have_timezone)
-    page.driver.set_cookie(:tz, 'America/Los_Angeles')
+  def go(path)
+    if page.current_path
+      expect(page).to(have_timezone)
+      page.driver.set_cookie(:tz, 'America/Los_Angeles')
+    end
+    visit(path)
+    expect(page).to(have_assets)
+    expect(page).to(have_fontawesome)
   end
 
-  def refresh_page
-    set_timezone
-    refresh
+  def refresh
+    go(current_path)
   end
 }
 

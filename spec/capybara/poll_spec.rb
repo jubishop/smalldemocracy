@@ -14,7 +14,7 @@ RSpec.describe(Poll, type: :feature) {
       email = 'poll_complex_choices@create'
       set_cookie(:email, email)
       group = create_group(email: email, name: 'poll/create')
-      visit('/poll/create')
+      go('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
       fill_in('expiration', with: Time.new(2032, 6, 6, 11, 30))
@@ -57,7 +57,7 @@ RSpec.describe(Poll, type: :feature) {
 
     it('displays a modal and redirects you when you have no group') {
       set_cookie(:email, email)
-      visit('/poll/create')
+      go('/poll/create')
       expect(find('#group-modal')).to(
           have_link('Create Group', href: '/group/create'))
       goldens.verify('no_group_modal')
@@ -68,7 +68,7 @@ RSpec.describe(Poll, type: :feature) {
       set_cookie(:email, user.email)
       5.times { user.add_group }
       group = user.add_group(name: 'special group')
-      visit("/poll/create?group_id=#{group.id}")
+      go("/poll/create?group_id=#{group.id}")
       goldens.verify('create_specific_group')
     }
   }
@@ -82,7 +82,7 @@ RSpec.describe(Poll, type: :feature) {
 
   #   # Create a poll
   #   set_cookie(:email, 'one@one')
-  #   visit('/poll/create')
+  #   go('/poll/create')
   #   fill_in('title', with: 'this is my title')
   #   fill_in('question', with: 'what is life')
   #   fill_in(
