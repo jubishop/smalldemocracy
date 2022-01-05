@@ -253,7 +253,7 @@ RSpec.describe(Poll, type: :rack_test) {
             poll_response = poll_responses.find { |response|
               response.choice_id == choice_id
             }
-            expect(poll_response.score).to(eq(rank_calculation.call(rank)))
+            expect(poll_response.score).to(eq(score_calculation.call(rank)))
           }
 
           expect_slim(
@@ -267,7 +267,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
       context(':borda_single') {
         let(:poll) { create_poll(type: :borda_single) }
-        let(:rank_calculation) {
+        let(:score_calculation) {
           ->(rank) { poll.choices.length - rank - 1 }
         }
 
@@ -285,7 +285,7 @@ RSpec.describe(Poll, type: :rack_test) {
       context(':borda_split') {
         let(:poll) { create_poll(type: :borda_split) }
         let(:responses) { choices.shuffle.map(&:id).drop(4) }
-        let(:rank_calculation) {
+        let(:score_calculation) {
           ->(rank) { poll.choices.length - rank }
         }
 

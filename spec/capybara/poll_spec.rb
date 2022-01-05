@@ -77,22 +77,28 @@ RSpec.describe(Poll, type: :feature) {
 
   context(:view) {
     let(:poll) {
-      poll = create_poll(email: "#{type}@create.com",
-                         title: "#{type}_title",
-                         question: "#{type}_question",
-                         type: type)
-      %w[zero one two three four five six].each { |choice|
-        poll.add_choice(text: choice)
-      }
-      poll
+      create_poll(email: "#{type}@view.com",
+                  title: "#{type}_title",
+                  question: "#{type}_question",
+                  type: type)
     }
+    let(:member) { poll.creating_member }
+
+    def expect_responded_slim
+      expect_slim(
+          'poll/responded',
+          poll: poll,
+          member: member,
+          timezone: an_instance_of(TZInfo::DataTimezone))
+    end
 
     before(:each) {
       freeze_time(Time.new(1982, 6, 6, 11, 30))
       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
-
       set_cookie(:email, poll.email)
-      go(poll.url)
+      %w[zero one two three four five six].each { |choice|
+        poll.add_choice(text: choice)
+      }
     }
 
     context(:borda) {
@@ -115,6 +121,8 @@ RSpec.describe(Poll, type: :feature) {
         let(:type) { :borda_single }
 
         it('submits a poll response') {
+          go(poll.url)
+
           # Rearrange our choices.
           rearrange_choices([1, 0, 6, 3, 2, 5, 4])
           wait_for_sortable
@@ -124,11 +132,7 @@ RSpec.describe(Poll, type: :feature) {
           goldens.verify('view_borda_single')
 
           # Confirm reload to viewing poll after responding.
-          expect_slim(
-              'poll/responded',
-              poll: poll,
-              member: poll.creating_member,
-              timezone: an_instance_of(TZInfo::DataTimezone))
+          expect_responded_slim
           click_button('Submit Choices')
         }
       }
@@ -145,6 +149,8 @@ RSpec.describe(Poll, type: :feature) {
         let(:type) { :borda_split }
 
         it('submits a poll response') {
+          go(poll.url)
+
           # Get a screenshot with an empty bottom section
           goldens.verify('view_borda_split_empty_bottom')
 
@@ -161,11 +167,7 @@ RSpec.describe(Poll, type: :feature) {
           goldens.verify('view_borda_split')
 
           # Confirm reload to viewing poll after responding.
-          expect_slim(
-              'poll/responded',
-              poll: poll,
-              member: poll.creating_member,
-              timezone: an_instance_of(TZInfo::DataTimezone))
+          expect_responded_slim
           click_button('Submit Choices')
         }
       }
@@ -175,43 +177,79 @@ RSpec.describe(Poll, type: :feature) {
       let(:type) { :choose_one }
 
       it('submits a poll response') {
-        goldens.verify('view_choose_one')
+        go(poll.url)
+
+        # Get a screenshot of all our choices.
+        goldens.verify('view_choose')
 
         # Confirm reload to viewing poll after responding.
-        expect_slim(
-            'poll/responded',
-            poll: poll,
-            member: poll.creating_member,
-            timezone: an_instance_of(TZInfo::DataTimezone))
+        expect_responded_slim
         click_button('three')
       }
     }
   }
 
-  #   context(:responded) {
-  #     def submit_choice(choice)
-  #       set_timezone
-  #       expect(page).to(have_fontawesome)
-  #       click_button(choice)
-  #     end
+  context(:responded) {
+    let(:poll) {
+      create_poll(email: "#{type}@responded.com",
+                  title: "#{type}_title",
+                  question: "#{type}_question",
+                  type: type)
+    }
+    let(:member) { poll.creating_member }
 
-  #     it('executes choose_one') {
-  #       select('Choose One', from: 'type')
-  #       submit_creation('choose_one_create')
-  #       goldens.verify('choose_one_view')
-  #       submit_choice('one')
-  #       goldens.verify('choose_one_responded')
-  #       set_cookie(:email, 'two@two')
-  #       refresh_page
-  #       submit_choice('two')
-  #       set_cookie(:email, 'three@three')
-  #       refresh_page
-  #       submit_choice('two')
-  #       verify_finished_poll('choose_one_finished')
-  #       all('details')[0].click
-  #       all('details')[1].click
-  #       goldens.verify('choose_one_details_expanded')
-  #     }
-  #   }
-  # }
+    before(:each) {
+      freeze_time(Time.new(1982, 6, 6, 11, 30))
+      allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
+      set_cookie(:email, poll.email)
+      %w[zero one two three four five six].each { |choice|
+        poll.add_choice(text: choice)
+      }
+    }
+
+    shared_examples('borda response') {
+      it('shows a response') {
+        choices.each_with_index { |position, rank|
+          choice = poll.choices[position]
+          member.add_response(choice_id: choice.id,
+                              score: score_calculation.call(rank))
+        }
+        go(poll.url)
+        goldens.verify("responded_#{type}")
+      }
+    }
+
+    context(:borda_single) {
+      let(:type) { :borda_single }
+      let(:choices) { [3, 5, 1, 2, 0, 4, 6] }
+      let(:score_calculation) {
+        ->(rank) { poll.choices.length - rank - 1 }
+      }
+
+      it_has_behavior('borda response')
+    }
+
+    context(:borda_split) {
+      let(:type) { :borda_split }
+      let(:choices) { [3, 5, 1, 6] }
+      let(:score_calculation) {
+        ->(rank) { poll.choices.length - rank }
+      }
+
+      it_has_behavior('borda response')
+    }
+
+    context(:choose) {
+      let(:type) { :choose_one }
+      let(:choice) { poll.choices[3] }
+
+      it('shows a response page') {
+        member.add_response(choice_id: choice.id)
+        go(poll.url)
+        goldens.verify('responded_choose')
+      }
+    }
+  }
+
+  # TODO: Context finished.
 }
