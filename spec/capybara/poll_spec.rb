@@ -208,7 +208,7 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     shared_examples('borda response') {
-      it('shows a response') {
+      it('shows a response page') {
         choices.each_with_index { |position, rank|
           choice = poll.choices[position]
           member.add_response(choice_id: choice.id,
