@@ -2,11 +2,11 @@
   title =poll
   - case poll.type
   - when :borda_single, :borda_split
-    ==javascript_include_tag 'poll/borda'
     ==stylesheet_link_tag 'poll/borda'
+    ==javascript_include_tag 'poll/borda'
   - when :choose_one
+    ==stylesheet_link_tag :base
     ==javascript_include_tag 'poll/choose'
-    ==stylesheet_link_tag 'poll/choose'
 
 = content_for :banner
   =poll
@@ -25,7 +25,7 @@ include :expiration_text
     p Drag to red those in which you won't participate.
 
   section
-    ul#choices hash_id=poll.hashid
+    ul#choices hash-id=poll.hashid
       - poll.choices.shuffle.each do |choice|
         li.choice data-id=choice.id
           i.grip.fas.fa-grip-lines
@@ -41,7 +41,6 @@ include :expiration_text
 - when :choose_one
   p Click on your choice.
 
-  ul#choices hash_id=poll.hashid
+  #choices hash-id=poll.hashid
     - poll.choices.shuffle.each do |choice|
-      li.choice data-id=choice.id
-        button.text disabled=true =choice.text
+      button.choice data-id=choice.id disabled=true =choice.text

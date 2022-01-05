@@ -1,40 +1,38 @@
-class Poll {
+// src/poll/choose.js
+var Poll = class {
   static domLoaded() {
-    const choicesElement = document.getElementById('choices');
-    this.pollID = choicesElement.getAttribute('poll_id');
-
-    this.choicesArray = Array.from(document.getElementsByClassName('choice'));
+    const choicesElement = document.getElementById("choices");
+    this.hashID = choicesElement.getAttribute("hash-id");
+    this.choicesArray = Array.from(choicesElement.getElementsByClassName("choice"));
     this.choicesArray.forEach((choice) => {
-      choice.addEventListener('click', () => this.choiceClicked(choice));
-      choice.getElementsByClassName('text')[0].disabled = false;
+      choice.addEventListener("click", () => this.choiceClicked(choice));
+      choice.disabled = false;
     });
   }
-
   static async choiceClicked(choice) {
-    this.choicesArray.forEach((choice) => {
-      choice.getElementsByClassName('text')[0].disabled = true;
+    this.choicesArray.forEach((choice2) => {
+      choice2.disabled = true;
     });
-    fetch('/poll/respond', {
-      method: 'POST',
+    fetch("/poll/respond", {
+      method: "POST",
       body: JSON.stringify({
-        poll_id: this.pollID,
-        choice: choice.getAttribute('data-id'),
+        hash_id: this.hashID,
+        choice_id: choice.getAttribute("data-id")
       }),
-      headers: { 'Content-Type': 'application/json' }
-    }).then(res => {
+      headers: { "Content-Type": "application/json" }
+    }).then((res) => {
       if (res.status == 201) {
         return false;
       } else {
         return res.text();
       }
-    }).then(error_message => {
+    }).then((error_message) => {
       if (error_message) {
-        alert('Error: ' + error_message);
+        alert("Error: " + error_message);
       } else {
         location.reload();
       }
     });
   }
-}
-
+};
 document.addEventListener("DOMContentLoaded", () => Poll.domLoaded());
