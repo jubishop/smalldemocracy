@@ -127,7 +127,7 @@ RSpec.describe(Models::Poll, type: :model) {
     }
   }
 
-  context('timestamps') {
+  context(:timestamps) {
     it('sets updated_at and created_at upon creation') {
       moment = freeze_time
       poll = create_poll
@@ -199,7 +199,7 @@ RSpec.describe(Models::Poll, type: :model) {
     }
   }
 
-  context('results') {
+  context(:results) {
     it('raises error if using scores on choose_* types') {
       poll = create_poll(type: :choose_one)
       poll.update(expiration: past)

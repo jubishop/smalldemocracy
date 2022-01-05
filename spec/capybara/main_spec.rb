@@ -1,7 +1,7 @@
 RSpec.describe(Main, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/main') }
 
-  context('index') {
+  context(:index) {
     def expect_header_links
       expect(page).to(have_selector('a.home[href="/"]'))
       github_url = 'https://github.com/jubishop/smalldemocracy'

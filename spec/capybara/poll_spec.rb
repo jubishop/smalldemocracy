@@ -8,7 +8,7 @@ RSpec.describe(Poll, type: :feature) {
   let(:entity) { create_poll }
   it_has_behavior('entity flows')
 
-  context('create') {
+  context(:create) {
     it('creates a poll with complex :choices creation') {
       # Set up basic data and fields of a new poll.
       email = 'poll_complex_choices@create'
@@ -75,7 +75,7 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
-  context(:create) {
+  context(:respond) {
     let(:poll) {
       poll = create_poll(email: "#{type}@create.com",
                          title: "#{type}_title",
@@ -188,7 +188,7 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
-  #   context('choose') {
+  #   context(:choose) {
   #     def submit_choice(choice)
   #       set_timezone
   #       expect(page).to(have_fontawesome)

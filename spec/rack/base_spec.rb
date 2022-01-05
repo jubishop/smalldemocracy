@@ -1,5 +1,5 @@
 RSpec.describe(Base, type: :rack_test) {
-  context('production') {
+  context(:production) {
     def get_path(path)
       # rubocop:disable Style/StringHashKeys
       get(path, {}, { 'HTTPS' => 'on' })
