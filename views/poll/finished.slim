@@ -17,10 +17,10 @@ ruby:
     h3 Choices
     ol
       - poll.counts.each do |result|
-        - count = "(#{result.count} #{'time'.en.plural(result.count)})"
+        - count = "#{result.count} #{'time'.en.plural(result.count)}"
         li
           details
-            summary = "#{result} #{count}"
+            summary = "#{result} (#{count})"
             ul
               - breakdown[result.choice].each do |br|
                 li =br.member
@@ -33,10 +33,10 @@ ruby:
     h3 Borda Score
     ol
       - poll.scores.each do |result|
-        - score = "(#{result.score} #{'point'.en.plural(result.score)})"
+        - score = "#{result.score} #{'point'.en.plural(result.score)}"
         li
           details
-            summary ="#{result} #{score}"
+            summary ="#{result} (#{score})"
             ul
               - breakdown[result.choice].each do |br|
                 - points = 'point'.en.plural(br.score)
