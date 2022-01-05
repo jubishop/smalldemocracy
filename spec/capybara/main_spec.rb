@@ -4,8 +4,15 @@ RSpec.describe(Main, type: :feature) {
   # TODO: Check github and home links on top header.
 
   context('index') {
+    def expect_header_links
+      expect(page).to(have_selector('a.home[href="/"]'))
+      github_url = 'https://github.com/jubishop/smalldemocracy'
+      expect(page).to(have_selector("a.github[href='#{github_url}']"))
+    end
+
     it('displays logged out index') {
       go('/')
+      expect_header_links
       expect(page).to(have_link('Sign in with Google', href: '/'))
       goldens.verify('logged_out')
     }
@@ -13,6 +20,7 @@ RSpec.describe(Main, type: :feature) {
     it('displays logged in index') {
       set_cookie(:email, 'main@loggedin')
       go('/')
+      expect_header_links
       expect(page).to(have_link('Create Poll', href: '/poll/create'))
       expect(page).to(have_link('Create Group', href: '/group/create'))
       goldens.verify('logged_in')
