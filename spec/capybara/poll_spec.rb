@@ -207,7 +207,7 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     shared_examples('borda response') {
-      it('shows a response page') {
+      it('shows a responded page') {
         choices.each_with_index { |position, rank|
           choice = poll.choices[position]
           member.add_response(choice_id: choice.id,
@@ -242,7 +242,7 @@ RSpec.describe(Poll, type: :feature) {
       let(:type) { :choose_one }
       let(:choice) { poll.choices[3] }
 
-      it('shows a response page') {
+      it('shows a responded page') {
         member.add_response(choice_id: choice.id)
         go(poll.url)
         goldens.verify('responded_choose')
@@ -252,7 +252,7 @@ RSpec.describe(Poll, type: :feature) {
 
   context(:finished) {
     let(:poll) {
-      create_poll(email: "#{type}@responded.com",
+      create_poll(email: "#{type}@finished.com",
                   title: "#{type}_title",
                   question: "#{type}_question",
                   type: type)
@@ -276,6 +276,26 @@ RSpec.describe(Poll, type: :feature) {
       set_cookie(:email, poll.email)
     }
 
+    shared_examples('finish') {
+      it('shows a finished page') {
+        responses.each_with_index { |ranked_choices, index|
+          member = members[index]
+          ranked_choices.each_with_index { |choice, rank|
+            member.add_response(
+                choice_id: choices[choice].id,
+                score: score_calculation.call(rank))
+          }
+        }
+        poll.update(expiration: past)
+        go(poll.url)
+        goldens.verify("finished_#{type}")
+        summary_expansions.each { |summary_pos|
+          all('summary')[summary_pos].click
+        }
+        goldens.verify("finished_#{type}_expanded")
+      }
+    }
+
     context(:borda_single) {
       let(:type) { :borda_single }
       let(:responses) {
@@ -290,22 +310,45 @@ RSpec.describe(Poll, type: :feature) {
       let(:score_calculation) {
         ->(rank) { poll.choices.length - rank - 1 }
       }
+      let(:summary_expansions) { [1, 3] }
 
-      it('shows finished poll') {
-        responses.each_with_index { |ranked_choices, index|
-          member = members[index]
-          ranked_choices.each_with_index { |choice, rank|
-            member.add_response(
-                choice_id: choices[choice].id,
-                score: score_calculation.call(rank))
-          }
-        }
-        poll.update(expiration: past)
-        go(poll.url)
-        goldens.verify("finished_#{type}")
+      it_has_behavior('finish')
+    }
+
+    context(:borda_split) {
+      let(:type) { :borda_split }
+      let(:responses) {
+        [
+          %w[zero one two three],
+          %w[five six zero one two],
+          %w[five six zero],
+          %w[five three four six zero one],
+          %w[zero one]
+        ]
       }
+      let(:score_calculation) {
+        ->(rank) { poll.choices.length - rank }
+      }
+      let(:summary_expansions) { [2, 8] }
+
+      it_has_behavior('finish')
+    }
+
+    context(:choose) {
+      let(:type) { :choose_one }
+      let(:responses) {
+        [
+          %w[zero],
+          %w[two],
+          %w[two],
+          %w[five],
+          %w[zero]
+        ]
+      }
+      let(:score_calculation) { ->(_) {} }
+      let(:summary_expansions) { [1] }
+
+      it_has_behavior('finish')
     }
   }
-  # TODO: Context finished.
-  # Test expanding details of results.
 }
