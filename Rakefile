@@ -74,7 +74,7 @@ def rspec_n(count: 50, type: nil)
   count ||= 50
   type = type ? " -t type:#{type}" : ''
 
-  puts 'Now running...'
+  puts 'Now running...'.green
   results = ''
   cmd = "bundle exec rspec_n #{count} -c 'bundle exec rspec#{type}' -s"
   Open3.popen3(cmd) do |_, stderr, _, _|

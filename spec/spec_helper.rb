@@ -1,4 +1,7 @@
 require 'capybara/apparition'
+require 'colorize'
+require 'core/test'
+require 'rspec/retry'
 require 'tony/test'
 
 ENV['APP_ENV'] = 'test'
@@ -96,4 +99,13 @@ RSpec.configure do |config|
     ENV['APP_ENV'] = 'test'
     ENV['RACK_ENV'] = 'test'
   }
+
+  if ENV.fetch('FAIL_ON_GOLDEN', false) || Test::Env.github_actions?
+    puts 'Enabling rspec-retry'.green
+    config.verbose_retry = true
+    config.display_try_failure_messages = true
+    config.default_retry_count = 3
+    config.around(:each, :feature, &:run_with_retry)
+    config.retry_callback = proc { Capybara.reset! }
+  end
 end
