@@ -3,8 +3,8 @@
   ==javascript_include_tag 'poll/create'
   ==stylesheet_link_tag 'poll/create'
 
-= content_for :header
-  h1 Create Poll
+= content_for :banner
+  | Create Poll
 
 - if user.groups.empty?
   dialog#group-modal open=true

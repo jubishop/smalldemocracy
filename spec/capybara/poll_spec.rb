@@ -96,20 +96,36 @@ RSpec.describe(Poll, type: :feature) {
       page.execute_script('Poll.updateScores()')
     end
 
-    #     it('executes borda_single') {
-    #       submit_creation('borda_single_create')
-    #       rearrange_choices([4, 2, 0, 5, 3, 1])
-    #       submit_choices
-    #       set_cookie(:email, 'two@two')
-    #       refresh_page
-    #       rearrange_choices([5, 3, 2, 0, 4, 1])
-    #       submit_choices('borda_single_view')
-    #       goldens.verify('borda_single_responded')
-    #       verify_finished_poll('borda_single_finished')
-    #       all('details')[1].click
-    #       all('details')[3].click
-    #       goldens.verify('borda_single_details_expanded')
-    #     }
+    context(:borda_single) {
+      it('submits a poll response') {
+        # Set up and visit basic poll already in DB.
+        poll = create_poll(email: 'view@bordasingle',
+                           title: 'borda_single_title',
+                           question: 'borda_single_question',
+                           type: :borda_single)
+        %w[zero one two three four five six].each { |choice|
+          poll.add_choice(text: choice)
+        }
+        set_cookie(:email, poll.email)
+        go(poll.url)
+
+        # Rearrange our choices.
+        rearrange_choices([1, 0, 6, 3, 2, 5, 4])
+        wait_for_sortable
+
+        # Click on title to remove focus from any form input.
+        find('h1').click
+        goldens.verify('view_borda_single')
+
+        # Confirm reload to viewing poll after responding.
+        expect_slim(
+            'poll/responded',
+            poll: poll,
+            member: poll.creating_member,
+            timezone: an_instance_of(TZInfo::DataTimezone))
+        click_button('Submit Choices')
+      }
+    }
 
     context(:borda_split) {
       def drag_to_bottom(choice)
@@ -120,13 +136,13 @@ RSpec.describe(Poll, type: :feature) {
         choice_node.drag_to(find('ul#bottom-choices'))
       end
 
-      it('submits a borda split poll response') {
+      it('submits a poll response') {
         # Set up and visit basic poll already in DB.
         poll = create_poll(email: 'view@bordasplit',
                            title: 'borda_split_title',
                            question: 'borda_split_question',
                            type: :borda_split)
-        %w[one two three four five six].each { |choice|
+        %w[zero one two three four five six].each { |choice|
           poll.add_choice(text: choice)
         }
         set_cookie(:email, poll.email)
@@ -140,7 +156,7 @@ RSpec.describe(Poll, type: :feature) {
         drag_to_bottom('three')
 
         # Rearrange our remaining selected choices.
-        rearrange_choices([1, 0, 3, 2])
+        rearrange_choices([1, 4, 0, 3, 2])
         wait_for_sortable
 
         # Click on title to remove focus from any form input.

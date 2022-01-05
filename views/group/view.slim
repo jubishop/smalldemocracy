@@ -2,8 +2,8 @@
   title =group.name
   ==stylesheet_link_tag :base
 
-= content_for :header
-  h1 =group.name
+= content_for :banner
+  =group.name
 
 ul
   - group.members.each do |member|
