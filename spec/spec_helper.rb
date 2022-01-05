@@ -60,10 +60,6 @@ RSpec.shared_context(:capybara) {
     expect(page).to(have_fonts)
     expect(page).to(have_fontawesome)
   end
-
-  def refresh
-    go(current_path)
-  end
 }
 
 RSpec.configure do |config|
