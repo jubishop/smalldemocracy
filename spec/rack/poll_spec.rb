@@ -209,7 +209,8 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     context(':borda') {
-      let(:poll) { create_poll(type: :borda_single) }
+      let(:poll) { create_poll(type: type) }
+      let(:type) { :borda_single }
       let(:choices) { Array.new(10).fill { poll.add_choice } }
       let(:responses) { choices.shuffle.map(&:id) }
 
@@ -266,7 +267,7 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       context(':borda_single') {
-        let(:poll) { create_poll(type: :borda_single) }
+        let(:type) { :borda_single }
         let(:score_calculation) {
           ->(rank) { poll.choices.length - rank - 1 }
         }
@@ -283,7 +284,7 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       context(':borda_split') {
-        let(:poll) { create_poll(type: :borda_split) }
+        let(:type) { :borda_split }
         let(:responses) { choices.shuffle.map(&:id).drop(4) }
         let(:score_calculation) {
           ->(rank) { poll.choices.length - rank }

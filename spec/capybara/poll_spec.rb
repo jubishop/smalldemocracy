@@ -138,6 +138,8 @@ RSpec.describe(Poll, type: :feature) {
       }
 
       context(:borda_split) {
+        let(:type) { :borda_split }
+
         def drag_to_bottom(choice)
           wait_for_sortable
           choice_node = find(
@@ -145,8 +147,6 @@ RSpec.describe(Poll, type: :feature) {
               "//li[@class='choice' and ./p[normalize-space()='#{choice}']]")
           choice_node.drag_to(find('ul#bottom-choices'))
         end
-
-        let(:type) { :borda_split }
 
         it('submits a poll response') {
           go(poll.url)
