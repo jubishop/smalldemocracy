@@ -124,6 +124,13 @@ task(:esbuild, [:params]) { |_, args|
   `esbuild #{files} #{params}`
 }
 
+desc('Delete and regenerate all public/ CSS and JS files')
+task(:rebuild) {
+  `rm -rf public/*~*.ico`
+  Rake::Task[:sass].invoke
+  Rake::Task[:esbuild].invoke
+}
+
 desc('Compile CSS, compile JS, launch localhost:8989')
 task(:run) {
   Thread.new { Rake::Task[:sass].invoke('--watch') }
