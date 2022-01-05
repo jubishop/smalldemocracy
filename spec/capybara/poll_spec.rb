@@ -75,7 +75,7 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
-  context(:respond) {
+  context(:view) {
     let(:poll) {
       poll = create_poll(email: "#{type}@create.com",
                          title: "#{type}_title",
@@ -188,7 +188,7 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
-  #   context(:choose) {
+  #   context(:responded) {
   #     def submit_choice(choice)
   #       set_timezone
   #       expect(page).to(have_fontawesome)

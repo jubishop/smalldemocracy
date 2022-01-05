@@ -119,7 +119,7 @@ task(:sass, [:params]) { |_, args|
 desc('Run esbuild over all JS files')
 task(:esbuild, [:params]) { |_, args|
   params = args[:params].to_s
-  params += ' --bundle --format=esm --outdir=public --outbase=src'
+  params += ' --bundle --format=esm --outdir=public'
   files = (Dir['src/*/*'] - Dir['src/lib/*']).join(' ')
   `esbuild #{files} #{params}`
 }
