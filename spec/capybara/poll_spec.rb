@@ -252,4 +252,5 @@ RSpec.describe(Poll, type: :feature) {
   }
 
   # TODO: Context finished.
+  # Test expanding details of results.
 }

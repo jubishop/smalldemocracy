@@ -3,7 +3,7 @@
   ==stylesheet_link_tag :base
 
 = content_for :banner
-  ="#{poll} Finished"
+  | #{poll} Finished
 
 h2 Results:
 
@@ -25,8 +25,7 @@ ruby:
               - breakdown[result.choice].each do |br|
                 li =br.member
       - rejected_choices.each do |choice|
-        li
-          | #{choice} (0 times)
+        li ="#{choice} (0 times)"
 
 - if [:borda_split, :borda_single].include?(poll.type)
   section
@@ -42,8 +41,7 @@ ruby:
                 - points = 'point'.en.plural(br.score)
                 li ="#{br.member} (#{br.score} #{points})"
       - rejected_choices.each do |choice|
-        li
-          | #{choice} (0 points)
+        li ="#{choice} (0 points)"
 
 section
   h3 Unresponded
