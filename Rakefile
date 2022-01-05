@@ -8,7 +8,7 @@ def connect_sequel_db # rubocop:disable Style/TopLevelMethodDefinition
 end
 
 namespace :db do
-  desc 'Run migrations'
+  desc 'Run sequel migrations'
   task(:migrate, [:version]) { |_, args|
     version = args[:version].to_i if args[:version]
     require 'sequel/core'
@@ -18,7 +18,7 @@ namespace :db do
     Sequel::Migrator.run(db, 'db/migrations', target: version)
   }
 
-  desc 'Clear DB'
+  desc 'Clear database'
   task(:clear) {
     Rake::Task['db:migrate'].invoke(0)
   }
@@ -31,27 +31,27 @@ require 'rubocop/rake_task'
 
 RuboCop::RakeTask.new(:rubocop)
 
-desc('Run all rspec tests')
+desc('Run all tests')
 RSpec::Core::RakeTask.new(:spec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.verbose
 }
 
-desc('Run spec only model tests')
+desc('Run spec on model tests')
 RSpec::Core::RakeTask.new(:mspec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.rspec_opts = '-t type:model'
   t.verbose
 }
 
-desc('Run spec only rack tests')
+desc('Run spec on rack tests')
 RSpec::Core::RakeTask.new(:rspec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.rspec_opts = '-t type:rack_test'
   t.verbose
 }
 
-desc('Run spec only capybara tests')
+desc('Run spec on capybara tests')
 RSpec::Core::RakeTask.new(:cspec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.rspec_opts = '-t type:feature'
@@ -109,14 +109,14 @@ task(:annotate) {
                                                     position: :before)
 }
 
-desc('Compile all SCSS files to compressed CSS')
+desc('Compile all SCSS files from scss/ into public/')
 task(:sass, [:params]) { |_, args|
   params = args[:params].to_s
   params += ' --style=compressed --no-source-map'
   `sass #{params} scss:public`
 }
 
-desc('Run esbuild over all JS files')
+desc('Bundle all JS files from src/ into public/')
 task(:esbuild, [:params]) { |_, args|
   params = args[:params].to_s
   params += ' --bundle --format=esm --outdir=public'
@@ -124,22 +124,22 @@ task(:esbuild, [:params]) { |_, args|
   `esbuild #{files} #{params}`
 }
 
-desc('Delete and regenerate all public/ CSS and JS files')
+desc('Rebuild all public/ CSS and JS files')
 task(:rebuild) {
   `rm -rf public/*~*.ico`
   Rake::Task[:sass].invoke
   Rake::Task[:esbuild].invoke
 }
 
-desc('Compile CSS, compile JS, launch localhost:8989')
+desc('Rebuild, watch, and launch localhost:8989')
 task(:run) {
+  `rm -rf public/*~*.ico`
   Thread.new { Rake::Task[:sass].invoke('--watch') }
   Thread.new { Rake::Task[:esbuild].invoke('--watch') }
   `bundle exec rackup -p 8989`
 }
 
-task build: %w[rubocop:auto_correct sass esbuild]
-task default: %w[build spec]
-task models: %w[build mspec]
-task rack: %w[build rspec]
-task capybara: %w[build cspec]
+task models: %w[rubocop:auto_correct rebuild mspec]
+task rack: %w[rubocop:auto_correct rebuild rspec]
+task capybara: %w[rubocop:auto_correct rebuild cspec]
+task default: %w[rubocop:auto_correct rebuild spec]
