@@ -8,7 +8,7 @@ class Group {
         {
           placeholderText: 'Email address...',
           inputType: 'email',
-          inputName: 'members[]',
+          inputName: 'members[]'
         });
   }
 }
