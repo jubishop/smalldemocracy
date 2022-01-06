@@ -61,7 +61,7 @@ module Models
     end
 
     def before_create
-      cancel_action('Poll is created expired') unless expiration > Time.now
+      cancel_action('Poll is created expired') if finished?
       super
     end
 
