@@ -83,9 +83,7 @@ RSpec.describe(Poll, type: :rack_test) {
     let(:member) { poll.creating_member }
     let(:email) { member.email }
 
-    before(:each) {
-      rack_mock_session.cookie_jar['tz'] = tz_name
-    }
+    before(:each) { rack_mock_session.cookie_jar['tz'] = tz_name }
 
     it('shows poll if you have not responded') {
       expect_slim('poll/view', poll: poll, member: member, timezone: timezone)

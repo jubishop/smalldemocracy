@@ -45,6 +45,8 @@ RSpec.shared_context(:rack_test) {
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
   let(:email) { random_email }
 
+  before(:each) { rack_mock_session.cookie_jar['tz'] = 'America/Los_Angeles' }
+
   # rubocop:disable Style/StringHashKeys
   def post_json(path, data = {})
     post(path, data.to_json, { 'CONTENT_TYPE' => 'application/json' })
