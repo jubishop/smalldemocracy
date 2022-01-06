@@ -14,7 +14,7 @@ module RSpec
     end
 
     def create_group(email: random_email, name: rand.to_s)
-      return create_user(email: email).add_group(name: name)
+      return ::Models::Group.create(email: email, name: name)
     end
 
     def create_member(email: random_email,

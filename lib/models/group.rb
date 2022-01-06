@@ -27,6 +27,11 @@ module Models
     one_to_many :polls, remover: ->(poll) { poll.destroy }, clearer: nil
     plugin :hash_id, salt: ENV.fetch('GROUP_ID_SALT').freeze
 
+    def before_create
+      super
+      User.find_or_create(email: email)
+    end
+
     def after_create
       add_member(email: email)
       super

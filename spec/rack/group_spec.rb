@@ -1,8 +1,6 @@
 require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Group, type: :rack_test) {
-  let(:user) { create_user }
-  let(:email) { user.email }
   let(:members) { ['one@one', 'two@two', 'three@three'] }
   let(:valid_params) {
     {
@@ -28,6 +26,7 @@ RSpec.describe(Group, type: :rack_test) {
     it('creates a new group with members and redirects to view') {
       post '/group/create', valid_params
       expect(last_response.redirect?).to(be(true))
+      user = Models::User.find_or_create(email: email)
       group = user.groups.first
       expect(group).to(have_attributes(email: user.email, name: 'name'))
       expect(group.members.map(&:email)).to(match_array(members + [user.email]))

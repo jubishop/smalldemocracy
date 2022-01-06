@@ -11,9 +11,11 @@ var Listable = class {
     return this.options.hasOwnProperty(key) ? this.options[key] : fallback;
   }
   addItem() {
-    const emptyItem = this.items.find((item2) => !item2.inputElement.value);
-    if (emptyItem) {
-      emptyItem.inputElement.focus();
+    const emptyOrInvalidItem = this.items.find((item2) => {
+      return !item2.inputElement.value || !item2.inputElement.reportValidity();
+    });
+    if (emptyOrInvalidItem) {
+      emptyOrInvalidItem.inputElement.focus();
       return;
     }
     const listItem = this.buildListItem();
@@ -50,7 +52,7 @@ var Listable = class {
       }
     });
     inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter" && inputElement.reportValidity()) {
+      if (event.key == "Enter") {
         event.preventDefault();
         this.addItem();
         return false;

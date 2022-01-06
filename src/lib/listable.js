@@ -14,9 +14,11 @@ class Listable {
   }
 
   addItem() {
-    const emptyItem = this.items.find((item) => !item.inputElement.value);
-    if (emptyItem) {
-      emptyItem.inputElement.focus();
+    const emptyOrInvalidItem = this.items.find((item) => {
+      return !item.inputElement.value || !item.inputElement.reportValidity();
+    });
+    if (emptyOrInvalidItem) {
+      emptyOrInvalidItem.inputElement.focus();
       return;
     }
 
@@ -59,7 +61,7 @@ class Listable {
       }
     });
     inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter" && inputElement.reportValidity()) {
+      if (event.key == "Enter") {
         event.preventDefault();
         this.addItem();
         return false;
