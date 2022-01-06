@@ -67,5 +67,11 @@ RSpec.describe(Main, type: :rack_test) {
       expect(last_response.redirect?).to(be(true))
       expect(last_response.location).to(eq('/onward'))
     }
+
+    it('defaults to / when there is no :r in state') {
+      auth_google(Tony::Auth::LoginInfo.new(email: email, state: {}))
+      expect(last_response.redirect?).to(be(true))
+      expect(last_response.location).to(eq('/'))
+    }
   }
 }
