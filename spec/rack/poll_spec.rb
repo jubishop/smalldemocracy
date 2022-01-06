@@ -72,7 +72,7 @@ RSpec.describe(Poll, type: :rack_test) {
       valid_params[:expiration] = past.form
       post '/poll/create', valid_params
       expect(last_response.status).to(be(400))
-      expect(last_response.body).to(eq('Cannot create an expired poll'))
+      expect(last_response.body).to(eq('Poll is created expired'))
     }
   }
 

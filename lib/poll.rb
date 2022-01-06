@@ -33,9 +33,7 @@ class Poll < Base
       choices = list_param(req, :choices)
       req.params.delete(:choices)
 
-      require 'colorize'
       expiration = param(req, :expiration)
-      puts expiration.red
       hour_offset = req.timezone.utc_offset / 3600
       utc_offset = hour_offset.abs.to_s
       utc_offset.prepend('0') if hour_offset.abs < 10
@@ -49,13 +47,6 @@ class Poll < Base
         # rubocop:enable Style/DateTime
       rescue Date::Error
         return 400, "#{date_string} is invalid date"
-      end
-
-      puts req.params[:expiration].to_s.red
-      puts Time.now.to_s.red
-
-      if req.params[:expiration] < Time.now
-        return 400, 'Cannot create an expired poll'
       end
 
       begin

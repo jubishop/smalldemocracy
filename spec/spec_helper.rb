@@ -45,12 +45,6 @@ RSpec.shared_context(:rack_test) {
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
   let(:email) { random_email }
 
-  current_utc_offset = Time.now.utc_offset
-  timezone_id = TZInfo::Timezone.all.find { |timezone|
-    timezone.observed_utc_offset == current_utc_offset
-  }.identifier
-  before(:each) { rack_mock_session.cookie_jar['tz'] = timezone_id }
-
   # rubocop:disable Style/StringHashKeys
   def post_json(path, data = {})
     post(path, data.to_json, { 'CONTENT_TYPE' => 'application/json' })
