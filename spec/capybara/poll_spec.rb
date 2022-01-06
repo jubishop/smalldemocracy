@@ -15,6 +15,7 @@ RSpec.describe(Poll, type: :feature) {
       set_cookie(:email, email)
       group = create_group(email: email, name: 'poll/create')
       go('/poll/create')
+      goldens.verify('create_empty')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
       fill_in('expiration', with: Time.new(2032, 6, 6, 11, 30))
