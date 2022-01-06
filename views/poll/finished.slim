@@ -1,8 +1,9 @@
 = content_for :head
   title Poll Finished
+  ==stylesheet_link_tag :base
 
-= content_for :header
-  h1 #{poll} Finished
+= content_for :banner
+  | #{poll} Finished
 
 h2 Results:
 
@@ -16,36 +17,34 @@ ruby:
     h3 Choices
     ol
       - poll.counts.each do |result|
-        - count = "(#{result.count} #{'time'.en.plural(result.count)})"
+        - count = "#{result.count} #{'time'.en.plural(result.count)}"
         li
           details
-            summary = "#{result} #{count}"
+            summary = "#{result} (#{count})"
             ul
               - breakdown[result.choice].each do |br|
-                li =br.responder
+                li =br.member
       - rejected_choices.each do |choice|
-        li
-          | #{choice} (0 times)
+        li ="#{choice} (0 times)"
 
 - if [:borda_split, :borda_single].include?(poll.type)
   section
     h3 Borda Score
     ol
       - poll.scores.each do |result|
-        - score = "(#{result.score} #{'point'.en.plural(result.score)})"
+        - score = "#{result.score} #{'point'.en.plural(result.score)}"
         li
           details
-            summary ="#{result} #{score}"
+            summary ="#{result} (#{score})"
             ul
               - breakdown[result.choice].each do |br|
                 - points = 'point'.en.plural(br.score)
-                li ="#{br.responder} (#{br.score} #{points})"
+                li ="#{br.member} (#{br.score} #{points})"
       - rejected_choices.each do |choice|
-        li
-          | #{choice} (0 points)
+        li ="#{choice} (0 points)"
 
 section
   h3 Unresponded
   ul
-    - unresponded.each do |responder|
-      li =responder
+    - unresponded.each do |member|
+      li =member

@@ -1,0 +1,9 @@
+= content_for :head
+  title Need Email
+  ==stylesheet_link_tag :base
+
+h1 Need Email
+
+p Please login first.
+
+a href=Tony::Auth::Google.url(req, r: req.path) Sign in with Google

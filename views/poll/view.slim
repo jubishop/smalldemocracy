@@ -2,17 +2,16 @@
   title =poll
   - case poll.type
   - when :borda_single, :borda_split
-    ==javascript_include_tag 'https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js'
-    ==javascript_include_tag 'poll/sortable'
-    ==stylesheet_link_tag '/poll/sortable'
+    ==stylesheet_link_tag 'poll/borda'
+    ==javascript_include_tag 'poll/borda'
   - when :choose_one
-    ==javascript_include_tag 'poll/choose/one'
-    ==stylesheet_link_tag 'poll/choose/one'
+    ==stylesheet_link_tag :base
+    ==javascript_include_tag 'poll/choose'
 
-= content_for :header
-  h1 =poll
+= content_for :banner
+  =poll
 
-p Hello #{responder.email} (<a href="/logout?r=#{poll.url}">Logout</a>)
+p Hello #{member.email}
 
 h2 =poll.question
 
@@ -26,8 +25,8 @@ include :expiration_text
     p Drag to red those in which you won't participate.
 
   section
-    ul#choices poll_id=poll.id
-      - poll.shuffled_choices.each do |choice|
+    ul#choices hash-id=poll.hashid
+      - poll.choices.shuffle.each do |choice|
         li.choice data-id=choice.id
           i.grip.fas.fa-grip-lines
           p.text =choice.text
@@ -42,7 +41,6 @@ include :expiration_text
 - when :choose_one
   p Click on your choice.
 
-  ul#choices poll_id=poll.id
-    - poll.shuffled_choices.each do |choice|
-      li.choice data-id=choice.id
-        button.text disabled=true =choice.text
+  #choices hash-id=poll.hashid
+    - poll.choices.shuffle.each do |choice|
+      button.choice data-id=choice.id disabled=true =choice.text

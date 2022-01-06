@@ -1,60 +1,50 @@
 require_relative '../models/poll'
+require_relative 'cookie'
 
 module Helpers
   module Guard
     include Cookie
 
-    def require_poll(req, resp)
-      unless req.params.key?(:poll_id)
-        resp.status = 400
-        resp.write('No poll_id provided')
-        throw(:response)
-      end
-
+    def require_group(req)
       begin
-        poll = Models::Poll[req.params.fetch(:poll_id)]
-      rescue Sequel::DatabaseError => error
-        puts error
+        group = Models::Group.with_hashid(req.params[:hash_id])
+      rescue Hashids::InputError
+        # Ignore
       end
+      unless group
+        if req.get?
+          throw(:response, [404, @slim.render('group/not_found')])
+        else
+          throw(:response, [404, 'No group found'])
+        end
+      end
+      return group
+    end
 
+    def require_poll(req)
+      begin
+        poll = Models::Poll.with_hashid(req.params[:hash_id])
+      rescue Hashids::InputError
+        # Ignore
+      end
       unless poll
-        resp.status = 404
-        resp.write(@slim.render('poll/not_found'))
-        throw(:response)
+        if req.get?
+          throw(:response, [404, @slim.render('poll/not_found')])
+        else
+          throw(:response, [404, 'No poll found'])
+        end
       end
-
       return poll
     end
 
-    def require_finished_poll(req, resp)
-      poll = require_poll(req, resp)
-
-      unless poll.finished?
-        resp.status = 403
-        resp.write(@slim.render('poll/not_finished'))
-        throw(:response)
-      end
-
-      return poll
-    end
-
-    def require_choice(req, resp)
-      choice = Models::Choice[req.params.fetch(:choice_id)]
-      unless choice
-        resp.status = 404
-        resp.write(@slim.render('poll/choice_not_found'))
-        throw(:response)
-      end
-
-      return choice
-    end
-
-    def require_email(req, resp)
+    def require_email(req)
       email = fetch_email(req)
       unless email
-        resp.status = 404
-        resp.write(@slim.render('email/not_found'))
-        throw(:response)
+        if req.get?
+          throw(:response, [401, @slim.render(:get_email, req: req)])
+        else
+          throw(:response, [401, 'No email found'])
+        end
       end
       return email
     end

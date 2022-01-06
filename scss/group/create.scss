@@ -1,0 +1,11 @@
+@use "../layout";
+
+@use "../listable";
+
+ul#member-list {
+  padding: 0;
+}
+
+li.listable.default .delete-button {
+  cursor: not-allowed;
+}

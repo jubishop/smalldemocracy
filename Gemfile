@@ -10,6 +10,7 @@ gem 'rack-contrib'
 gem 'rack-protection'
 gem 'rake'
 gem 'sequel'
+gem 'sequel-hash_id'
 gem 'slim'
 
 source 'https://www.jubigems.org' do
@@ -28,11 +29,13 @@ group :development do
   gem 'rack-test'
   gem 'rspec'
   gem 'rspec_n', require: false
+  gem 'rspec-retry'
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'rubocop-rake'
   gem 'rubocop-rspec'
   gem 'rubocop-sequel'
+  gem 'sequel-annotate'
   gem 'websocket-driver'
 
   source 'https://www.jubigems.org' do

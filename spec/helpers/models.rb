@@ -1,45 +1,140 @@
+require_relative '../../lib/models/choice'
+require_relative '../../lib/models/group'
+require_relative '../../lib/models/member'
 require_relative '../../lib/models/poll'
+require_relative '../../lib/models/response'
+require_relative '../../lib/models/user'
+require_relative 'email'
+require_relative 'time'
 
 module RSpec
   module Models
-    def create(title: 'title',
-               question: 'question',
-               expiration: Time.now.to_i + 62,
-               choices: 'one, two, three',
-               responders: 'a@a',
-               type: nil)
-      return ::Models::Poll.create(title: title,
-                                   question: question,
-                                   expiration: expiration,
-                                   choices: choices,
-                                   responders: responders,
-                                   type: type)
+    def create_user(email: random_email)
+      return ::Models::User.find_or_create(email: email)
+    end
+
+    def create_group(email: random_email, name: rand.to_s)
+      return ::Models::Group.create(email: email, name: name)
+    end
+
+    def create_member(email: random_email,
+                      name: rand.to_s)
+      return create_group(email: email, name: name).creating_member
+    end
+
+    def create_poll(email: random_email,
+                    name: rand.to_s,
+                    title: rand.to_s,
+                    question: rand.to_s,
+                    expiration: future,
+                    type: :choose_one)
+      return create_group(email: email, name: name).add_poll(
+          email: email,
+          title: title,
+          question: question,
+          expiration: expiration,
+          type: type)
+    end
+
+    def create_choice(text: rand.to_s, **attributes)
+      return create_poll(**attributes).add_choice(text: text)
+    end
+
+    def create_response(score: nil, **attributes)
+      choice = create_choice(**attributes)
+      return choice.add_response(score: score)
     end
   end
 end
 
 module Models
+  class User
+    include RSpec::Time
+    include Test::Env
+
+    def add_group(name: rand.to_s)
+      test_only!
+      add_created_group(name: name)
+    end
+
+    def add_poll(group_id: groups.sample&.id,
+                 title: rand.to_s,
+                 question: rand.to_s,
+                 expiration: future,
+                 type: :choose_one)
+      test_only!
+      add_created_poll(group_id: group_id,
+                       title: title,
+                       question: question,
+                       expiration: expiration,
+                       type: type)
+    end
+  end
+
+  class Group
+    include RSpec::EMail
+    include RSpec::Time
+    include Test::Env
+
+    def add_poll(email: members.sample&.email,
+                 title: rand.to_s,
+                 question: rand.to_s,
+                 expiration: future,
+                 type: :choose_one)
+      test_only!
+      super(email: email,
+            title: title,
+            question: question,
+            expiration: expiration,
+            type: type)
+    end
+
+    def add_member(email: random_email)
+      test_only!
+      super(email: email)
+    end
+  end
+
+  class Member
+    include RSpec::Time
+    include Test::Env
+
+    orig_add_poll = instance_method(:add_poll)
+    undef_method(:add_poll)
+    define_method(:add_poll) { |title: rand.to_s,
+                                question: rand.to_s,
+                                expiration: future,
+                                type: :choose_one|
+      test_only!
+      orig_add_poll.bind_call(self, title: title,
+                                    question: question,
+                                    expiration: expiration,
+                                    type: type)
+    }
+
+    def add_response(choice_id: polls.sample.choices.sample,
+                     score: nil)
+      test_only!
+      super(choice_id: choice_id, score: score)
+    end
+  end
+
   class Poll
     include Test::Env
 
-    def mock_response
+    def add_choice(text: rand.to_s)
       test_only!
-      responder = responder(email: 'a@a')
-      responses = choices.map(&:id)
+      super(text: text)
+    end
+  end
 
-      case type
-      when :borda_single, :borda_split
-        responses.each_with_index { |choice_id, rank|
-          score = responses.length - rank
-          score -= 1 if type == :borda_single
+  class Choice
+    include Test::Env
 
-          responder.add_response(choice_id: choice_id, score: score)
-        }
-      when :choose_one
-        responder.add_response(choice_id: choices.first.id)
-      end
-
-      return responses
+    def add_response(member_id: poll.members.sample.id,
+                     **attributes)
+      test_only!
+      super(member_id: member_id, **attributes)
     end
   end
 end

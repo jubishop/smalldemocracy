@@ -6,10 +6,16 @@ html lang="en"
 
     ==font_awesome '9c18181028'
     ==favicon_link_tag
-    ==stylesheet_link_tag 'css/pico'
-    ==stylesheet_link_tag 'css/layout'
     ==yield_content :head
     ==timezone_script
+    - if ENV.fetch('APP_ENV') != 'production'
+      javascript:
+        window.addEventListener('load', (event) => {
+          document.documentElement.classList.add('page-fully-loaded');
+        });
+        document.fonts.ready.then(function () {
+          document.documentElement.classList.add('fonts-fully-loaded');
+        });
 
   body
     header
@@ -20,7 +26,8 @@ html lang="en"
               i.fa-light.fa-poll-people
         ul
           li
-            ==yield_content :header
+            h1
+              ==yield_content :banner
         ul
           li
             a.github href="https://github.com/jubishop/smalldemocracy"

@@ -27,6 +27,7 @@ GEM
     concurrent-ruby (1.1.9)
     cri (2.15.11)
     diff-lcs (1.5.0)
+    hashids (1.0.6)
     linguistics (2.1.0)
       loggability (~> 0.11)
     loggability (0.18.2)
@@ -40,7 +41,7 @@ GEM
     open3 (0.1.1)
     openssl (3.0.0)
     parallel (1.21.0)
-    parser (3.0.3.2)
+    parser (3.1.0.0)
       ast (~> 2.4.1)
     pg (1.2.3)
     public_suffix (4.0.6)
@@ -70,22 +71,24 @@ GEM
     rspec-mocks (3.10.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
+    rspec-retry (0.6.2)
+      rspec-core (> 3.3)
     rspec-support (3.10.3)
     rspec_n (1.4.0)
       colorize (~> 0.8.0)
       cri (~> 2.15.3)
-    rubocop (1.24.0)
+    rubocop (1.24.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.15.0, < 2.0)
+      rubocop-ast (>= 1.15.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.15.1)
       parser (>= 3.0.1.1)
-    rubocop-performance (1.13.0)
+    rubocop-performance (1.13.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
@@ -95,7 +98,12 @@ GEM
     rubocop-sequel (0.3.3)
       rubocop (~> 1.0)
     ruby-progressbar (1.11.0)
-    sequel (5.51.0)
+    sequel (5.52.0)
+    sequel-annotate (1.7.0)
+      sequel (>= 4)
+    sequel-hash_id (0.1.2)
+      hashids (~> 1.0)
+      sequel (>= 4.0, < 6.0)
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
@@ -120,7 +128,7 @@ GEM
       linguistics
     rstruct (1.5)
       core
-    tony (0.51)
+    tony (0.56)
       base64
       rack
       rack-contrib
@@ -128,7 +136,7 @@ GEM
       tzinfo
     tony-auth (0.11)
       base64
-    tony-test (0.61)
+    tony-test (0.69)
       capybara
       chunky_png
       colorize
@@ -162,6 +170,7 @@ DEPENDENCIES
   rack-test
   rake
   rspec
+  rspec-retry
   rspec_n
   rstruct!
   rubocop
@@ -170,6 +179,8 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-sequel
   sequel
+  sequel-annotate
+  sequel-hash_id
   slim
   tony!
   tony-auth!

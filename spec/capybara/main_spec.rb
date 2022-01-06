@@ -1,23 +1,37 @@
 RSpec.describe(Main, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/main') }
 
-  context('index') {
+  context(:index) {
+    def expect_header_links
+      expect(page).to(have_selector('a.home[href="/"]'))
+      github_url = 'https://github.com/jubishop/smalldemocracy'
+      expect(page).to(have_selector("a.github[href='#{github_url}']"))
+    end
+
     it('displays logged out index') {
-      visit('/')
-      goldens.verify('index_logged_out')
+      go('/')
+      expect_header_links
+      expect(page).to(have_link('Sign in with Google', href: '/'))
+      goldens.verify('logged_out')
     }
 
     it('displays logged in index') {
-      set_cookie(:email, 'test@example.com')
-      visit('/')
-      goldens.verify('index_logged_in')
+      set_cookie(:email, 'main@loggedin')
+      go('/')
+      expect_header_links
+      expect(page).to(have_link('Create Poll', href: '/poll/create'))
+      expect(page).to(have_link('Create Group', href: '/group/create'))
+      goldens.verify('logged_in')
     }
   }
 
   context('not found') {
     it('displays a not found page') {
-      visit('does_not_exist')
-      goldens.verify('page_not_found')
+      go('/does_not_exist')
+      expect(page).to(
+          have_link('report',
+                    href: 'https://github.com/jubishop/smalldemocracy/issues'))
+      goldens.verify('not_found')
     }
   }
 }

@@ -1,0 +1,21 @@
+= content_for :head
+  title Create Group
+  ==stylesheet_link_tag 'group/create'
+  ==javascript_include_tag 'group/create'
+
+= content_for :banner
+  | Create Group
+
+form action="create" method="post"
+  label for="name" Group Name:
+  input name="name" type="text" required=true autofocus=true
+
+  ul#member-list
+    li.listable.default
+      input.text type="email" value=email readonly=true
+      div
+        i.delete-button.fa-duotone.fa-trash-can-xmark
+
+  button#add-member.secondary type="button" Add Member
+
+  button type="submit" Create Group

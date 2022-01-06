@@ -1,44 +1,71 @@
 require_relative '../../lib/models/response'
 
-RSpec.describe(Models::Response) {
-  context('::create') {
-    it('successfully makes a response') {
-      poll = create
-      response = poll.responders.first.add_response(
-          choice_id: poll.choices.first.id, score: 1)
-      expect(response.responder).to(eq(poll.responders.first))
-      expect(response.choice).to(eq(poll.choices.first))
+RSpec.describe(Models::Response, type: :model) {
+  context('.create') {
+    it('creates a response with no score') {
+      response = create_response
+      expect(response.score).to(be(nil))
+    }
+
+    it('creates a response with a score') {
+      response = create_response(score: 10)
+      expect(response.score).to(be(10))
+    }
+  }
+
+  context('#destroy') {
+    it('destroys itself from choice') {
+      response = create_response
+      choice = response.choice
+      expect(choice.responses).to_not(be_empty)
+      expect(response.exists?).to(be(true))
+      choice.remove_response(response)
+      expect(choice.responses).to(be_empty)
+      expect(response.exists?).to(be(false))
+    }
+
+    it('destroys itself from member') {
+      response = create_response
+      member = response.member
+      expect(member.responses).to_not(be_empty)
+      expect(response.exists?).to(be(true))
+      member.remove_response(response)
+      expect(member.responses).to(be_empty)
+      expect(response.exists?).to(be(false))
+    }
+
+    it('rejects destroying from an expired poll') {
+      response = create_response
+      response.poll.update(expiration: past)
+      expect { response.destroy }.to(
+          raise_error(Sequel::HookFailed,
+                      'Response removed from expired poll'))
+    }
+  }
+
+  context('#choice') {
+    it('finds its choice') {
+      choice = create_choice
+      response = choice.add_response(member_id: choice.poll.creating_member.id)
+      expect(response.choice).to(eq(choice))
+    }
+  }
+
+  context('#member') {
+    it('finds its member') {
+      poll = create_poll
+      response = poll.creating_member.add_response(
+          choice_id: poll.add_choice.id)
+      expect(response.member).to(eq(poll.creating_member))
+    }
+  }
+
+  context('#poll') {
+    it('finds its poll through join table') {
+      poll = create_poll
+      response = poll.creating_member.add_response(
+          choice_id: poll.add_choice.id)
       expect(response.poll).to(eq(poll))
-      expect(response.score).to(eq(1))
-    }
-
-    it('rejects making a response with no responder associated') {
-      poll = create
-      expect {
-        poll.choices.first.add_response
-      }.to(raise_error(ArgumentError))
-    }
-
-    it('rejects making a response with no choice associated') {
-      poll = create
-      expect {
-        poll.responders.first.add_response
-      }.to(raise_error(ArgumentError))
-    }
-
-    it('rejects creating two responses with duplicate choices') {
-      poll = create
-      poll.responders.first.add_response(choice_id: poll.choices[0].id)
-      expect {
-        poll.responders.first.add_response(choice_id: poll.choices[0].id)
-      }.to(raise_error(Sequel::ConstraintViolation))
-    }
-
-    it('rejects creating a response on finished poll') {
-      poll = create(expiration: 1)
-      expect {
-        poll.responders.first.add_response(choice_id: poll.choices.first.id)
-      }.to(raise_error(Sequel::HookFailed))
     }
   }
 }
