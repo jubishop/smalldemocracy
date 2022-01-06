@@ -11,6 +11,8 @@ ENV['SMALLDEMOCRACY_HASHED_PASSWORD'] =
 ENV['SMALLDEMOCRACY_COOKIE_SECRET'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
 ENV['POLL_ID_SALT'] = 'pollsalt'
 ENV['GROUP_ID_SALT'] = 'groupsalt'
+ENV['GOOGLE_CLIENT_ID'] = 'clientid'
+ENV['GOOGLE_SECRET'] = 'secret'
 
 require_relative '../setup'
 
