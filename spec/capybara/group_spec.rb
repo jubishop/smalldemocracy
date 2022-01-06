@@ -14,7 +14,7 @@ RSpec.describe(Group, type: :feature) {
       goldens.verify('create_empty')
 
       # Fill in a name and add some group members
-      fill_in('name', with: 'group name')
+      fill_in('name', with: 'group_create')
 
       # Sometimes click Add button, sometimes press enter on input field.
       click_button('Add Member')
@@ -57,6 +57,18 @@ RSpec.describe(Group, type: :feature) {
           group: an_instance_of(Models::Group),
           member: an_instance_of(Models::Member))
       click_button('Create Group')
+    }
+  }
+
+  context(:view) {
+    it('displays a group') {
+      group = create_group(email: 'group@view.com', name: 'group_view')
+      10.times { |index|
+        group.add_member(email: "group_#{index + 1}@view.com")
+      }
+      set_cookie(:email, group.email)
+      go(group.url)
+      goldens.verify('view')
     }
   }
 }
