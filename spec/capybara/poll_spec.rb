@@ -4,6 +4,9 @@ require_relative 'shared_examples/entity_flows'
 
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
+  let(:time) {
+    Time.new(1982, 6, 6, 11, 30, 0, TZInfo::Timezone.get('America/Los_Angeles'))
+  }
 
   let(:entity) { create_poll }
   it_has_behavior('entity flows')
@@ -94,7 +97,7 @@ RSpec.describe(Poll, type: :feature) {
     end
 
     before(:each) {
-      freeze_time(Time.new(1982, 6, 6, 11, 30))
+      freeze_time(time)
       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
       set_cookie(:email, poll.email)
       %w[zero one two three four five six].each { |choice|
@@ -200,7 +203,7 @@ RSpec.describe(Poll, type: :feature) {
     let(:member) { poll.creating_member }
 
     before(:each) {
-      freeze_time(Time.new(1982, 6, 6, 11, 30))
+      freeze_time(time)
       set_cookie(:email, poll.email)
       %w[zero one two three four five six].each { |choice|
         poll.add_choice(text: choice)
@@ -273,7 +276,7 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     before(:each) {
-      freeze_time(Time.new(1982, 6, 6, 11, 30))
+      freeze_time(time)
       set_cookie(:email, poll.email)
     }
 

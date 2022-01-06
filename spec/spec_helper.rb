@@ -13,7 +13,7 @@ ENV['POLL_ID_SALT'] = 'pollsalt'
 ENV['GROUP_ID_SALT'] = 'groupsalt'
 ENV['GOOGLE_CLIENT_ID'] = 'clientid'
 ENV['GOOGLE_SECRET'] = 'secret'
-ENV['RESET_DB_ON_SETUP'] = true # NEVER SET THIS ANYWHERE ELSE
+ENV['RESET_DB_ON_SETUP'] = '1' # NEVER SET THIS ANYWHERE ELSE
 
 require_relative '../setup'
 
