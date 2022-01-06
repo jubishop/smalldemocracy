@@ -156,7 +156,7 @@ RSpec.describe(Poll, type: :feature) {
           go(poll.url)
 
           # Get a screenshot with an empty bottom section
-          goldens.verify('view_borda_split_empty_bottom')
+          goldens.verify('view_borda_split_empty_bottom', pixel_tolerance: 0.3)
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
@@ -168,7 +168,7 @@ RSpec.describe(Poll, type: :feature) {
 
           # Click on title to remove focus from any form input.
           find('h1').click
-          goldens.verify('view_borda_split')
+          goldens.verify('view_borda_split', pixel_tolerance: 0.6)
 
           # Confirm reload to viewing poll after responding.
           expect_responded_slim
@@ -184,7 +184,7 @@ RSpec.describe(Poll, type: :feature) {
         go(poll.url)
 
         # Get a screenshot of all our choices.
-        goldens.verify('view_choose')
+        goldens.verify('view_choose', pixel_tolerance: 1.1)
 
         # Confirm reload to viewing poll after responding.
         expect_responded_slim

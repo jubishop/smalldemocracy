@@ -136,7 +136,7 @@ GEM
       tzinfo
     tony-auth (0.11)
       base64
-    tony-test (0.69)
+    tony-test (0.70)
       capybara
       chunky_png
       colorize
