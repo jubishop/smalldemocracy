@@ -29,7 +29,6 @@ group :development do
   gem 'rack-test'
   gem 'rspec'
   gem 'rspec_n', require: false
-  gem 'rspec-retry'
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'rubocop-rake'
