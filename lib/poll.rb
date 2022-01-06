@@ -49,6 +49,10 @@ class Poll < Base
         return 400, "#{date_string} is invalid date"
       end
 
+      if req.params[:expiration] < Time.now
+        return 400, 'Cannot create an expired poll'
+      end
+
       begin
         poll = Models::Poll.create(**req.params.symbolize_keys)
         choices.each { |choice| poll.add_choice(text: choice) }

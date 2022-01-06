@@ -151,8 +151,8 @@ task(:run) {
   `bundle exec rackup -p 8989`
 }
 
-task models: %w[rubocop:auto_correct rebuild mspec]
-task rack: %w[rubocop:auto_correct rebuild rspec]
-task fast: %w[rubocop:auto_correct rebuild fspec]
+task models: %w[rubocop:auto_correct mspec]
+task rack: %w[rubocop:auto_correct rspec]
+task fast: %w[rubocop:auto_correct fspec]
 task capybara: %w[rubocop:auto_correct rebuild cspec]
 task default: %w[rubocop:auto_correct rebuild spec]
