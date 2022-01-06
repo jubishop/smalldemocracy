@@ -23,7 +23,7 @@ end
 
 class Time
   def form
-    return strftime('%Y-%m-%dT%H:%M %z')
+    return strftime('%Y-%m-%dT%H:%M')
   end
 
   def round_down
