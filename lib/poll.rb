@@ -49,6 +49,10 @@ class Poll < Base
         return 400, "#{date_string} is invalid date"
       end
 
+      require 'colorize'
+      puts req.params[:expiration].to_s.red
+      puts Time.now.to_s.red
+
       if req.params[:expiration] < Time.now
         return 400, 'Cannot create an expired poll'
       end
