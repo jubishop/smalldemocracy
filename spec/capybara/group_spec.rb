@@ -44,7 +44,7 @@ RSpec.describe(Group, type: :feature) {
       click_button('Add Member')
       all('input.text')[4].native.send_keys(:enter)
 
-      # Replace the now empty field ("group_1") with "group_7".
+      # Replace the now invalid field with "group_7".
       all('input.text')[1].fill_in(with: 'group_7@create.com')
 
       # Click on title to remove focus from any form input.
