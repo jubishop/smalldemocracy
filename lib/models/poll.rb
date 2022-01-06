@@ -82,7 +82,7 @@ module Models
     end
 
     def finished?
-      return Time.at(expiration) < Time.now
+      return expiration < Time.now
     end
 
     def scores
