@@ -35,7 +35,6 @@ group :development do
   gem 'rubocop-rspec'
   gem 'rubocop-sequel'
   gem 'sequel-annotate'
-  gem 'websocket-driver'
 
   source 'https://www.jubigems.org' do
     gem 'core-test'
