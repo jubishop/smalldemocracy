@@ -20,12 +20,7 @@ RSpec.describe(Models::Poll, type: :model) {
       user = create_user
       group = create_group
       expect {
-        Models::Poll.create(email: user.email,
-                            group_id: group.id,
-                            title: 'title',
-                            question: 'question',
-                            expiration: future,
-                            type: :borda_single)
+        create_poll(email: user.email, group_id: group.id)
       }.to(raise_error(Sequel::HookFailed,
                        /Creator.+is not a member of/))
     }

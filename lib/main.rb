@@ -1,4 +1,5 @@
 require_relative 'base'
+require_relative 'models/user'
 
 class Main < Base
   def initialize
@@ -8,7 +9,11 @@ class Main < Base
       email = fetch_email(req)
       return 200, @slim.render(:logged_out, req: req) unless email
 
-      resp.write(@slim.render(:logged_in, email: email))
+      user = Models::User.find_or_create(email: email)
+      polls = user.polls(start_expiration: Time.now)
+      resp.write(@slim.render(:logged_in, email: email,
+                                          groups: user.groups,
+                                          polls: polls))
     })
 
     get('/logout', ->(req, resp) {

@@ -5,8 +5,28 @@
 = content_for :banner
   | Small Democracy
 
-p Welcome #{email} (<a href="/logout">Logout</a>)
+h2 Welcome #{email} (<a href="/logout">Logout</a>)
 
-a href="/group/create" Create Group
-br
-a href="/poll/create" Create Poll
+article
+  header Your Groups
+  - if groups.empty?
+    p You belong to no groups.
+  - else
+    ul
+      - groups.each do |group|
+        li
+          a href=group.url #{group.name}
+  footer
+    a href="/group/create" Create Group
+
+article
+  header Your Polls
+  - if polls.empty?
+    p You have no active polls.
+  - else
+    ul
+      - polls.each do |poll|
+        li
+          a href=poll.url #{poll.title}
+  footer
+    a href="/poll/create" Create Poll

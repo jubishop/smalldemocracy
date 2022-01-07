@@ -24,12 +24,14 @@ module RSpec
 
     def create_poll(email: random_email,
                     name: rand.to_s,
+                    group_id: create_group(email: email, name: name).id,
                     title: rand.to_s,
                     question: rand.to_s,
                     expiration: future,
                     type: :choose_one)
-      return create_group(email: email, name: name).add_poll(
+      return ::Models::Poll.create(
           email: email,
+          group_id: group_id,
           title: title,
           question: question,
           expiration: expiration,

@@ -7,8 +7,22 @@ RSpec.describe(Main, type: :rack_test) {
     }
 
     it('renders logged in page when there is an email cookie') {
-      set_cookie(:email, email)
-      expect_slim(:logged_in, email: email)
+      # Create poll and group data that should render.
+      user = create_user
+      Array.new(3).fill { create_group(email: user.email) }
+      Array.new(3).fill {
+        create_poll(email: user.email, group_id: user.groups.first.id)
+      }
+
+      # This data should not render.
+      create_group(email: email)
+      create_poll(email: user.email).update(expiration: past)
+      create_poll(email: user.email).update(expiration: past)
+
+      set_cookie(:email, user.email)
+      expect_slim(:logged_in, email: user.email,
+                              groups: user.groups,
+                              polls: user.polls(start_expiration: Time.now))
       get '/'
     }
 
