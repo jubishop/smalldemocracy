@@ -74,6 +74,13 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
       expect(last_response.body).to(eq('Poll is created expired'))
     }
+
+    it('fails if user is not part of poll group') {
+      set_cookie(:email, create_user.email)
+      post '/poll/create', valid_params
+      expect(last_response.body).to(match(/Creator.+is not a member of/))
+      expect(last_response.status).to(be(400))
+    }
   }
 
   context('get /view') {

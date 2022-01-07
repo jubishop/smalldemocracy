@@ -16,6 +16,19 @@ RSpec.describe(Models::Poll, type: :model) {
       expect(poll.type).to(eq(:borda_split))
     }
 
+    it('rejects creating a poll where creator is not a member of group') {
+      user = create_user
+      group = create_group
+      expect {
+        Models::Poll.create(email: user.email,
+                            group_id: group.id,
+                            title: 'title',
+                            question: 'question',
+                            expiration: future,
+                            type: :borda_single)
+      }.to(raise_error(Sequel::HookFailed,
+                       /Creator.+is not a member of/))
+    }
     it('rejects creating poll with no title') {
       expect { create_poll(title: nil) }.to(
           raise_error(Sequel::NotNullConstraintViolation,
