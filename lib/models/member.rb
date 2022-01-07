@@ -54,7 +54,7 @@ module Models
     end
 
     def responded?(poll_id:)
-      return poll_dataset(poll_id: poll_id).count.positive?
+      return poll_responses_dataset(poll_id: poll_id).count.positive?
     end
 
     def add_poll(**attributes)
@@ -62,7 +62,7 @@ module Models
     end
 
     def responses(poll_id: nil)
-      return poll_id ? poll_dataset(poll_id: poll_id).all : super
+      return poll_id ? poll_responses_dataset(poll_id: poll_id).all : super
     end
 
     def polls(start_expiration: nil, end_expiration: nil)
@@ -79,7 +79,7 @@ module Models
 
     private
 
-    def poll_dataset(poll_id:)
+    def poll_responses_dataset(poll_id:)
       choices = Models::Choice.where(poll_id: poll_id).select(:id)
       return responses_dataset.where(choice_id: choices)
     end
