@@ -11,6 +11,7 @@ Slim::Engine.set_options(
     tabsize: 2,
     pretty: ENV.fetch('APP_ENV') != 'production')
 
+Sequel.extension(:migration)
 DB = case ENV.fetch('APP_ENV')
      when 'production'
        Sequel.connect(ENV.fetch('DATABASE_URL'))
@@ -26,10 +27,7 @@ DB = case ENV.fetch('APP_ENV')
          Sequel.postgres(database: 'smalldemocracy_test')
        end
      end
-
-Sequel.extension(:migration)
 DB.extension(:pg_enum)
-
 if ENV.fetch('RESET_DB_ON_SETUP', false)
   Sequel::Migrator.run(DB, 'db/migrations', target: 0)
 end
