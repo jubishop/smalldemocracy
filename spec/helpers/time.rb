@@ -3,11 +3,11 @@ require 'duration'
 module RSpec
   module Time
     def future
-      return (::Time.now + 10.days).round_down
+      return (::Time.now + 10.minutes).round_down
     end
 
     def past
-      return (::Time.now - 10.days).round_down
+      return (::Time.now - 10.minutes).round_down
     end
 
     def random_time
