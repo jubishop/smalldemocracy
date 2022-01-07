@@ -5,7 +5,12 @@ class Main < Base
     super
 
     get('/', ->(req, resp) {
-      resp.write(@slim.render(:index, email: fetch_email(req), req: req))
+      email = fetch_email(req)
+      if email
+        resp.write(@slim.render(:logged_in, email: email))
+      else
+        resp.write(@slim.render(:logged_out, req: req))
+      end
     })
 
     get('/logout', ->(req, resp) {

@@ -1,0 +1,12 @@
+= content_for :head
+  title Small Democracy Home
+  ==stylesheet_link_tag :base
+
+= content_for :banner
+  | Small Democracy
+
+p Welcome #{email} (<a href="/logout">Logout</a>)
+
+a href="/group/create" Create Group
+br
+a href="/poll/create" Create Poll

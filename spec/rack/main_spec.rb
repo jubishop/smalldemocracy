@@ -1,14 +1,14 @@
 RSpec.describe(Main, type: :rack_test) {
   context('get /') {
     it('renders logged out page when there is no email cookie') {
-      expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
+      expect_slim(:logged_out, req: an_instance_of(Tony::Request))
       get '/'
       expect(last_response.ok?).to(be(true))
     }
 
     it('renders logged in page when there is an email cookie') {
       set_cookie(:email, email)
-      expect_slim(:index, email: email, req: an_instance_of(Tony::Request))
+      expect_slim(:logged_in, email: email)
       get '/'
     }
 
@@ -25,7 +25,7 @@ RSpec.describe(Main, type: :rack_test) {
       get '/logout'
       expect(get_cookie(:email)).to(be_nil)
       expect(last_response.redirect?).to(be(true))
-      expect_slim(:index, email: false, req: an_instance_of(Tony::Request))
+      expect_slim(:logged_out, req: an_instance_of(Tony::Request))
       follow_redirect!
     }
 
