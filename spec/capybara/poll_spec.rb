@@ -5,7 +5,7 @@ require_relative 'shared_examples/entity_flows'
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
   let(:time) {
-    Time.new(1982, 6, 6, 11, 30, 0, TZInfo::Timezone.get('America/Los_Angeles'))
+    Time.new(1982, 6, 6, 11, 30, 0, TZInfo::Timezone.get('Asia/Bangkok'))
   }
 
   let(:entity) { create_poll }

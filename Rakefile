@@ -12,7 +12,6 @@ namespace :db do
   task(:migrate, [:version]) { |_, args|
     version = args[:version].to_i if args[:version]
     require 'sequel/core'
-    Sequel.default_timezone = nil
     Sequel.extension(:migration)
     db = connect_sequel_db
     db.extension(:pg_enum)

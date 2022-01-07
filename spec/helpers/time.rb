@@ -23,7 +23,8 @@ end
 
 class Time
   def form
-    return strftime('%Y-%m-%dT%H:%M')
+    # Asia/Bangkok => +07:00
+    return self.class.at(self, in: '+07:00').strftime('%Y-%m-%dT%H:%M')
   end
 
   def round_down

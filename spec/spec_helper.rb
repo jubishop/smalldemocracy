@@ -59,7 +59,7 @@ RSpec.shared_context(:capybara) {
 
   def go(path)
     expect(page).to(have_timezone) if page.current_path
-    page.driver.set_cookie(:tz, 'America/Los_Angeles')
+    page.driver.set_cookie(:tz, 'Asia/Bangkok')
     visit(path)
     expect(page).to(have_assets)
     expect(page).to(have_fonts)

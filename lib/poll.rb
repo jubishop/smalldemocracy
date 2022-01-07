@@ -1,5 +1,6 @@
 require 'core'
 require 'date'
+require 'duration'
 
 require_relative 'base'
 require_relative 'models/poll'
@@ -33,17 +34,11 @@ class Poll < Base
       choices = list_param(req, :choices)
       req.params.delete(:choices)
 
-      expiration = param(req, :expiration)
-      hour_offset = req.timezone.utc_offset / 3600
-      utc_offset = hour_offset.abs.to_s
-      utc_offset.prepend('0') if hour_offset.abs < 10
-      utc_offset.prepend(hour_offset >= 0 ? '+' : '-')
-      utc_offset += '00'
-      date_string = "#{expiration} #{utc_offset}"
       begin
         # rubocop:disable Style/DateTime
         req.params[:expiration] = DateTime.strptime(
-            date_string, '%Y-%m-%dT%H:%M %z').to_time
+            param(req, :expiration), '%Y-%m-%dT%H:%M').to_time
+        req.params[:expiration] -= req.timezone.utc_offset.seconds
         # rubocop:enable Style/DateTime
       rescue Date::Error
         return 400, "#{date_string} is invalid date"
