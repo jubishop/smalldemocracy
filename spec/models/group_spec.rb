@@ -133,6 +133,17 @@ RSpec.describe(Models::Group, type: :model) {
     }
   }
 
+  context('#remove_member') {
+    it('removes a member') {
+      group = create_group
+      member = group.add_member
+      expect(member.user.email).to(eq(member.email))
+      expect(group.members).to(match_array([group.creating_member, member]))
+      group.remove_member(member)
+      expect(group.members).to(match_array(group.creating_member))
+    }
+  }
+
   context('#add_poll') {
     it('adds a poll to a group') {
       group = create_group
