@@ -6,11 +6,9 @@ class Main < Base
 
     get('/', ->(req, resp) {
       email = fetch_email(req)
-      if email
-        resp.write(@slim.render(:logged_in, email: email))
-      else
-        resp.write(@slim.render(:logged_out, req: req))
-      end
+      return 200, @slim.render(:logged_out, req: req) unless email
+
+      resp.write(@slim.render(:logged_in, email: email))
     })
 
     get('/logout', ->(req, resp) {
