@@ -58,12 +58,15 @@ module Models
       return Models::Group.where(id: members_dataset.select(:group_id)).all
     end
 
-    def polls(start_expiration: nil, end_expiration: nil)
+    def polls(start_expiration: nil,
+              end_expiration: nil,
+              limit: nil,
+              order: :asc)
       return Models::Poll.where(
           [
             [:group_id, members_dataset.select(:group_id)],
             [:expiration, start_expiration..end_expiration]
-          ]).all
+          ]).order_by(Sequel.public_send(order, :expiration)).limit(limit).all
     end
 
     def to_s

@@ -1,3 +1,5 @@
+require 'duration'
+
 require_relative '../../lib/models/user'
 
 RSpec.describe(Models::User, type: :model) {
@@ -100,29 +102,49 @@ RSpec.describe(Models::User, type: :model) {
       other_group.add_member(email: @user.email)
       @expired_poll = my_group.add_poll
       @expired_poll.update(expiration: past)
-      @my_poll = my_group.add_poll
-      @other_poll = other_group.add_poll
       @expired_other_poll = other_group.add_poll
-      @expired_other_poll.update(expiration: past)
+      @expired_other_poll.update(expiration: past + 10.seconds)
+      @my_poll = my_group.add_poll
+      @other_poll = other_group.add_poll(expiration: future + 10.seconds)
     }
 
-    it('finds all active polls with start_expiration') {
+    it('finds all active polls with start_expiration sorted ascending') {
       expect(@user.polls(start_expiration: Time.now)).to(
-          match_array([@my_poll, @other_poll]))
+          eq([@my_poll, @other_poll]))
     }
 
-    it('finds all expired by polls with end_expiration') {
+    it('finds all active polls with start_expiration sorted ascending') {
+      expect(@user.polls(start_expiration: Time.now, order: :desc)).to(
+          eq([@other_poll, @my_poll]))
+    }
+
+    it('finds all expired by polls with end_expiration sorted ascending') {
       expect(@user.polls(end_expiration: Time.now)).to(
-          match_array([@expired_poll, @expired_other_poll]))
+          eq([@expired_poll, @expired_other_poll]))
     }
 
-    it('finds all polls') {
-      expect(@user.polls).to(match_array([
-                                           @my_poll,
-                                           @other_poll,
-                                           @expired_poll,
-                                           @expired_other_poll
-                                         ]))
+    it('finds all expired by polls with end_expiration sorted descending') {
+      expect(@user.polls(end_expiration: Time.now, order: :desc)).to(
+          eq([@expired_other_poll, @expired_poll]))
+    }
+
+    it('finds all polls sorted ascending') {
+      expect(@user.polls).to(
+          eq([@expired_poll, @expired_other_poll, @my_poll, @other_poll]))
+    }
+
+    it('finds all polls sorted descending') {
+      expect(@user.polls(order: :desc)).to(
+          eq([@other_poll, @my_poll, @expired_other_poll, @expired_poll]))
+    }
+
+    it('finds polls up to a limit sorted ascending') {
+      expect(@user.polls(limit: 2)).to(eq([@expired_poll, @expired_other_poll]))
+    }
+
+    it('finds polls up to a limit sorted descending') {
+      expect(@user.polls(limit: 2, order: :desc)).to(
+          eq([@other_poll, @my_poll]))
     }
   }
 
