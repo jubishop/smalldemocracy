@@ -38,5 +38,11 @@ class Group < Base
 
       return 200, @slim.render('group/view', group: group, member: member)
     })
+
+    post('/group/add', ->(req, _) {
+    })
+
+    post('/group/remove', ->(req, _) {
+    })
   end
 end
