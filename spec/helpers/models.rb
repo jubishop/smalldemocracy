@@ -101,19 +101,6 @@ module Models
     include RSpec::Time
     include Test::Env
 
-    orig_add_poll = instance_method(:add_poll)
-    undef_method(:add_poll)
-    define_method(:add_poll) { |title: rand.to_s,
-                                question: rand.to_s,
-                                expiration: future,
-                                type: :choose_one|
-      test_only!
-      orig_add_poll.bind_call(self, title: title,
-                                    question: question,
-                                    expiration: expiration,
-                                    type: type)
-    }
-
     def add_response(choice_id: polls.sample.choices.sample,
                      score: nil)
       test_only!

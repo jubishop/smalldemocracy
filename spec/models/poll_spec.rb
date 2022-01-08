@@ -182,7 +182,7 @@ RSpec.describe(Models::Poll, type: :model) {
     it('finds its creating member') {
       group = create_group
       member = group.add_member
-      poll = member.add_poll
+      poll = group.add_poll(email: member.email)
       expect(poll.creating_member).to(eq(member))
     }
   }

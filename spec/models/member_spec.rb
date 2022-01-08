@@ -44,7 +44,7 @@ RSpec.describe(Models::Member, type: :model) {
     it('cascades destroy to responses') {
       group = create_group
       member = group.add_member
-      poll = member.add_poll
+      poll = group.add_poll
       response = member.add_response(choice_id: poll.add_choice.id)
       expect(poll.responses).to_not(be_empty)
       expect(response.exists?).to(be(true))
@@ -82,32 +82,24 @@ RSpec.describe(Models::Member, type: :model) {
   context('#responded?') {
     it('reports not responding to a poll') {
       member = create_member
-      poll = member.add_poll
+      poll = member.group.add_poll
       expect(member.responded?(poll_id: poll.id)).to(be(false))
     }
 
     it('reports responding to a poll') {
       member = create_member
-      poll = member.add_poll
+      poll = member.group.add_poll
       member.add_response(choice_id: poll.add_choice.id)
       expect(member.responded?(poll_id: poll.id)).to(be(true))
     }
   }
 
-  context('#add_poll') {
-    it('adds a poll to a member') {
-      member = create_member
-      poll = member.add_poll
-      expect(member.polls).to(match_array(poll))
-    }
-  }
-
   context('#responses') {
     let(:member) { create_member }
-    let(:poll) { member.add_poll }
+    let(:poll) { member.group.add_poll }
     let!(:response) { member.add_response(choice_id: poll.add_choice.id) }
     let(:other_response) {
-      member.add_response(choice_id: member.add_poll.add_choice.id)
+      member.add_response(choice_id: member.group.add_poll.add_choice.id)
     }
 
     it('returns only responses for a specific poll when poll_id: passed') {
@@ -119,40 +111,17 @@ RSpec.describe(Models::Member, type: :model) {
     }
   }
 
-  context('#polls') {
-    let(:member) {  create_member }
-    let!(:expired_poll) {
-      poll = member.add_poll
-      poll.update(expiration: past)
-    }
-    let!(:my_poll) { member.add_poll }
-
-    it('finds all active polls with start_expiration') {
-      expect(member.polls(start_expiration: Time.now)).to(
-          match_array(my_poll))
-    }
-
-    it('finds all expired by polls with end_expiration') {
-      expect(member.polls(end_expiration: Time.now)).to(
-          match_array(expired_poll))
-    }
-
-    it('finds all polls') {
-      expect(member.polls).to(match_array([my_poll, expired_poll]))
-    }
-  }
-
   context('#add_response') {
     it('adds a response to a member') {
       member = create_member
-      choice = member.add_poll.add_choice
+      choice = member.group.add_poll.add_choice
       response = member.add_response(choice_id: choice.id)
       expect(member.responses).to(match_array(response))
     }
 
     it('rejects adding a response to an expired poll') {
       member = create_member
-      poll = member.add_poll
+      poll = member.group.add_poll
       choice = poll.add_choice
       poll.update(expiration: past)
       expect { member.add_response(choice_id: choice.id) }.to(

@@ -57,20 +57,8 @@ module Models
       return poll_responses_dataset(poll_id: poll_id).count.positive?
     end
 
-    def add_poll(**attributes)
-      return Models::Poll.create(group_id: group_id, email: email, **attributes)
-    end
-
     def responses(poll_id: nil)
       return poll_id ? poll_responses_dataset(poll_id: poll_id).all : super
-    end
-
-    def polls(start_expiration: nil, end_expiration: nil)
-      return Models::Poll.where(
-          [
-            [:group_id, group_id],
-            [:expiration, start_expiration..end_expiration]
-          ]).all
     end
 
     def to_s
