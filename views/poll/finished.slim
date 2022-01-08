@@ -20,7 +20,7 @@ ruby:
         - count = "#{result.count} #{'time'.en.plural(result.count)}"
         li
           details
-            summary = "#{result} (#{count})"
+            summary ="#{result} (#{count})"
             ul
               - breakdown[result.choice].each do |br|
                 li =br.member

@@ -2,6 +2,9 @@ require 'duration'
 
 RSpec.describe(Main, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/main') }
+  let(:time) {
+    Time.new(1982, 6, 6, 11, 30, 0, TZInfo::Timezone.get('Asia/Bangkok'))
+  }
 
   context(:index) {
     def expect_header_links
@@ -27,18 +30,20 @@ RSpec.describe(Main, type: :feature) {
     }
 
     it('displays logged in index with groups and polls') {
+      freeze_time(time)
+
       # Create poll and group data to see on the page.
       user = create_user(email: 'logged_in_with_data@main.com')
       3.times { |i| create_group(email: user.email, name: "group_#{i}") }
       3.times { |i|
         create_poll(email: user.email,
-                    group_id: user.groups.sample.id,
+                    group_id: user.groups.first.id,
                     title: "active_poll_#{i}",
                     expiration: future + i.minutes)
       }
       3.times { |i|
         create_poll(email: user.email,
-                    group_id: user.groups.sample.id,
+                    group_id: user.groups.last.id,
                     title: "past_poll_#{i}").update(
                         expiration: past - i.minutes)
       }

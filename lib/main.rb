@@ -3,7 +3,13 @@ require_relative 'models/user'
 
 class Main < Base
   def initialize
-    super
+    super(Tony::Slim.new(views: 'views',
+                         layout: 'views/layout',
+                         options: {
+                           include_dirs: [
+                             File.join(Dir.pwd, 'views/partials')
+                           ]
+                         }))
 
     get('/', ->(req, resp) {
       email = fetch_email(req)

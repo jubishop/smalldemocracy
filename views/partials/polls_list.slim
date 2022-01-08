@@ -1,0 +1,8 @@
+ul
+  - polls.each do |poll|
+    li
+      a href=poll.url #{poll.title}
+      =="&nbsp;&nbsp;"
+      small expire#{poll.expiration < Time.now ? 'd' : 's'}
+            <i>#{poll.expiration.strftime('%b %d %Y, %I:%M %p %Z')}</i>,
+            in group <strong>#{poll.group.name}</strong>

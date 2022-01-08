@@ -37,6 +37,10 @@ module Models
       super
     end
 
+    def size
+      return members_dataset.count
+    end
+
     def creating_member
       return member(email: email)
     end

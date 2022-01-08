@@ -5,7 +5,7 @@
 = content_for :banner
   | Small Democracy
 
-h2 Welcome #{email} (<a href="/logout">Logout</a>)
+h3 Welcome #{email} (<a href="/logout">Logout</a>)
 
 article
   header Your Groups
@@ -16,6 +16,9 @@ article
       - groups.each do |group|
         li
           a href=group.url #{group.name}
+          =="&nbsp;&nbsp;"
+          small <i>#{group.size}</i> members, created by
+                <strong>#{email == group.email ? 'you' : group.email}</strong>
   footer
     a href="/group/create" Create Group
 
@@ -24,10 +27,8 @@ article
   - if upcoming_polls.empty?
     p You have no active polls.
   - else
-    ul
-      - upcoming_polls.each do |poll|
-        li
-          a href=poll.url #{poll.title}
+    - polls = upcoming_polls
+    include :polls_list
   footer
     a href="/poll/create" Create Poll
 
@@ -36,7 +37,5 @@ article
   - if past_polls.empty?
     p You have no finished polls.
   - else
-    ul
-      - past_polls.each do |poll|
-        li
-          a href=poll.url #{poll.title}
+    - polls = past_polls
+    include :polls_list

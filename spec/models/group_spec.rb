@@ -87,6 +87,14 @@ RSpec.describe(Models::Group, type: :model) {
     }
   }
 
+  context('#size') {
+    it('returns number of members in group') {
+      group = create_group
+      5.times { group.add_member }
+      expect(group.size).to(be(6))
+    }
+  }
+
   context('#creating_member') {
     it('finds its creating member') {
       user = create_user
