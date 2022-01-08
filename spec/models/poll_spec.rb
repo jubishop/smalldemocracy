@@ -137,18 +137,19 @@ RSpec.describe(Models::Poll, type: :model) {
 
   context(:timestamps) {
     it('sets updated_at and created_at upon creation') {
-      moment = freeze_time
       poll = create_poll
-      expect(poll.created_at).to(eq(moment))
-      expect(poll.updated_at).to(eq(moment))
+      expect(poll.created_at).to(eq(Time.now))
+      expect(poll.updated_at).to(eq(Time.now))
     }
 
-    it('sets updated_at upon update') {
+    it('sets updated_at upon update to new value') {
+      created_time = Time.now
       poll = create_poll
-      moment = freeze_time
+      updated_time = freeze_time(future)
       poll.update(title: 'title')
+      expect(poll.created_at).to(eq(created_time))
       expect(poll.created_at).to_not(eq(poll.updated_at))
-      expect(poll.updated_at).to(eq(moment))
+      expect(poll.updated_at).to(eq(updated_time))
     }
   }
 

@@ -94,6 +94,7 @@ RSpec.configure do |config|
   config.include_context(:capybara, type: :feature)
 
   config.before(:each) {
+    freeze_time(Time.now)
     allow(Tony::Auth::Google).to(receive(:url)) { |_, r: '/'| r }
   }
 
