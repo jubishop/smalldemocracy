@@ -6,8 +6,7 @@ ul
       - expired = poll.expiration < Time.now
       - prefix = "expire#{expired ? 'd ' : 's in '}"
       - time_span = (Time.now - poll.expiration).abs.seconds.format_parts.first
-      - suffix = "#{expired ? ' ago' : ''}"
-      small #{prefix}<i>#{time_span}</i>#{suffix}, in group
-            <a class="secondary" href=#{poll.group.url}>
-              #{poll.group.name}
-            </a>
+      - suffix = "#{expired ? ' ago' : ''}, in group "
+      small
+        | #{prefix}<i>#{time_span}</i>#{suffix}
+        a.secondary href=poll.group.url #{poll.group.name}
