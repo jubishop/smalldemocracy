@@ -5,6 +5,7 @@ ul
       =="&nbsp;&nbsp;"
       small expire#{poll.expiration < Time.now ? 'd' : 's'}
             <i>#{poll.expiration.strftime('%b %d %Y, %I:%M %p %Z')}</i>,
-            in group <a class="secondary" href=#{poll.group.url}>
-                       #{poll.group.name}
-                     </a>
+            in group
+            <a class="secondary" href=#{poll.group.url}>
+              #{poll.group.name}
+            </a>
