@@ -56,10 +56,13 @@ RSpec.describe(Main, type: :feature) {
 
       # Confirm links to all our groups and polls are accurate.
       user.groups.each { |group|
-        expect(page).to(have_link(group.name, href: group.url))
+        group_node = find(:xpath, "//li[./a[@href='#{group.url}']]")
+        expect(group_node).to(have_link(group.name, href: group.url))
       }
       user.polls.each { |poll|
-        expect(page).to(have_link(poll.title, href: poll.url))
+        poll_node = find(:xpath, "//li[./a[@href='#{poll.url}']]")
+        expect(poll_node).to(have_link(poll.title, href: poll.url))
+        expect(poll_node).to(have_link(poll.group.name, href: poll.group.url))
       }
 
       goldens.verify('logged_in_with_data')
