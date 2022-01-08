@@ -10,10 +10,12 @@ class Main < Base
       return 200, @slim.render(:logged_out, req: req) unless email
 
       user = Models::User.find_or_create(email: email)
-      polls = user.polls(start_expiration: Time.now)
+      upcoming_polls = user.polls(start_expiration: Time.now, limit: 20)
+      past_polls = user.polls(end_expiration: Time.now, limit: 20, order: :desc)
       resp.write(@slim.render(:logged_in, email: email,
                                           groups: user.groups,
-                                          polls: polls))
+                                          upcoming_polls: upcoming_polls,
+                                          past_polls: past_polls))
     })
 
     get('/logout', ->(req, resp) {

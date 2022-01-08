@@ -1,3 +1,5 @@
+require 'duration'
+
 RSpec.describe(Main, type: :rack_test) {
   context('get /') {
     it('renders logged out page when there is no email cookie') {
@@ -7,22 +9,29 @@ RSpec.describe(Main, type: :rack_test) {
     }
 
     it('renders logged in page when there is an email cookie') {
-      # Create poll and group data that should render.
+      # Create poll and group data.
       user = create_user
       Array.new(3).fill { create_group(email: user.email) }
-      Array.new(3).fill {
-        create_poll(email: user.email, group_id: user.groups.first.id)
+      upcoming_polls = Array.new(22).fill { |i|
+        create_poll(email: user.email,
+                    group_id: user.groups.sample.id,
+                    expiration: future + i.minutes)
+      }
+      past_polls = Array.new(22).fill { |i|
+        create_poll(email: user.email,
+                    group_id: user.groups.sample.id).update(
+                        expiration: past - i.minutes)
       }
 
-      # This data should not render.
-      create_group(email: email)
-      create_poll(email: user.email).update(expiration: past)
-      create_poll(email: user.email).update(expiration: past)
+      # Test that we limit only see 20
+      upcoming_polls = upcoming_polls.first(20)
+      past_polls = past_polls.first(20)
 
       set_cookie(:email, user.email)
       expect_slim(:logged_in, email: user.email,
                               groups: user.groups,
-                              polls: user.polls(start_expiration: Time.now))
+                              upcoming_polls: upcoming_polls,
+                              past_polls: past_polls)
       get '/'
     }
 

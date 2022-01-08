@@ -18,8 +18,8 @@ RSpec.describe(Group, type: :feature) {
 
       # Sometimes click Add button, sometimes press enter on input field.
       click_button('Add Member')
-      6.times { |index|
-        email = "group_#{index + 1}@create.com"
+      6.times { |i|
+        email = "group_#{i + 1}@create.com"
         if index.even?
           all('input.text').last.fill_in(with: email)
           click_button('Add Member')
@@ -63,8 +63,8 @@ RSpec.describe(Group, type: :feature) {
   context(:view) {
     it('displays a group') {
       group = create_group(email: 'group@view.com', name: 'group_view')
-      10.times { |index|
-        group.add_member(email: "group_#{index + 1}@view.com")
+      10.times { |i|
+        group.add_member(email: "group_#{i + 1}@view.com")
       }
       set_cookie(:email, group.email)
       go(group.url)

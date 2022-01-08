@@ -20,13 +20,23 @@ article
     a href="/group/create" Create Group
 
 article
-  header Your Polls
-  - if polls.empty?
+  header Active Polls
+  - if upcoming_polls.empty?
     p You have no active polls.
   - else
     ul
-      - polls.each do |poll|
+      - upcoming_polls.each do |poll|
         li
           a href=poll.url #{poll.title}
   footer
     a href="/poll/create" Create Poll
+
+article
+  header Recently Finished Polls
+  - if past_polls.empty?
+    p You have no finished polls.
+  - else
+    ul
+      - past_polls.each do |poll|
+        li
+          a href=poll.url #{poll.title}
