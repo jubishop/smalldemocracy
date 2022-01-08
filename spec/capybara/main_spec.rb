@@ -34,16 +34,17 @@ RSpec.describe(Main, type: :feature) {
 
       # Create poll and group data to see on the page.
       user = create_user(email: 'logged_in_with_data@main.com')
-      3.times { |i| create_group(email: user.email, name: "group_#{i}") }
-      3.times { |i|
+      2.times { |i| create_group(email: user.email, name: "group_#{i}") }
+      other_group = create_group(email: 'logged_in_other_user@main.com',
+                                 name: 'other_group')
+      other_group.add_member(email: user.email)
+      user.groups.each_with_index { |group, i|
         create_poll(email: user.email,
-                    group_id: user.groups.first.id,
+                    group_id: group.id,
                     title: "active_poll_#{i}",
                     expiration: future + i.minutes)
-      }
-      3.times { |i|
         create_poll(email: user.email,
-                    group_id: user.groups.last.id,
+                    group_id: group.id,
                     title: "past_poll_#{i}").update(
                         expiration: past - i.minutes)
       }
