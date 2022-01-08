@@ -20,7 +20,7 @@ RSpec.describe(Group, type: :feature) {
       click_button('Add Member')
       6.times { |i|
         email = "group_#{i + 1}@create.com"
-        if index.even?
+        if i.even?
           all('input.text').last.fill_in(with: email)
           click_button('Add Member')
         else

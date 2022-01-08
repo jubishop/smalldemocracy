@@ -1,3 +1,5 @@
+require 'duration'
+
 RSpec.describe(Main, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/main') }
 
@@ -30,8 +32,15 @@ RSpec.describe(Main, type: :feature) {
       3.times { |i| create_group(email: user.email, name: "group_#{i}") }
       3.times { |i|
         create_poll(email: user.email,
-                    group_id: user.groups.first.id,
-                    title: "poll_#{i}")
+                    group_id: user.groups.sample.id,
+                    title: "active_poll_#{i}",
+                    expiration: future + i.minutes)
+      }
+      3.times { |i|
+        create_poll(email: user.email,
+                    group_id: user.groups.sample.id,
+                    title: "past_poll_#{i}").update(
+                        expiration: past - i.minutes)
       }
 
       set_cookie(:email, user.email)
