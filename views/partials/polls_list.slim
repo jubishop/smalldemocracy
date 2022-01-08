@@ -3,9 +3,11 @@ ul
     li
       a href=poll.url #{poll.title}
       =="&nbsp;&nbsp;"
-      small expire#{poll.expiration < Time.now ? 'd' : 's'}
-            <i>#{poll.expiration.strftime('%b %d %Y, %I:%M %p %Z')}</i>,
-            in group
+      - expired = poll.expiration < Time.now
+      - prefix = "expire#{expired ? 'd ' : 's in '}"
+      - time_span = (Time.now - poll.expiration).abs.seconds.format_parts.first
+      - suffix = "#{expired ? ' ago' : ''}"
+      small #{prefix}<i>#{time_span}</i>#{suffix}, in group
             <a class="secondary" href=#{poll.group.url}>
               #{poll.group.name}
             </a>

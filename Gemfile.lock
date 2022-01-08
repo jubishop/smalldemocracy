@@ -121,7 +121,7 @@ GEM
   specs:
     core (1.17)
     core-test (0.5)
-    duration (1.5)
+    duration (1.6)
       core
       linguistics
     rstruct (1.5)
