@@ -11,7 +11,7 @@ module RSpec
     end
 
     def random_time
-      return ::Time.at(rand(::Time.now.to_i)).round_down
+      return ::Time.at(rand(2**31)).round_down
     end
 
     def freeze_time(moment = random_time)
