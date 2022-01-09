@@ -1,4 +1,4 @@
-// src/poll/choose.js
+// src/poll/view/choose.js
 var Poll = class {
   static domLoaded() {
     const choicesElement = document.getElementById("choices");

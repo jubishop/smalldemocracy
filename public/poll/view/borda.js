@@ -2070,7 +2070,7 @@ _extends(Remove, {
   pluginName: "removeOnSpill"
 });
 
-// src/poll/borda.js
+// src/poll/view/borda.js
 var Poll = class {
   static domLoaded() {
     const choicesElement = document.getElementById("choices");

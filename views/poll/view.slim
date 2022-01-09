@@ -2,11 +2,11 @@
   title =poll
   - case poll.type
   - when :borda_single, :borda_split
-    ==stylesheet_link_tag 'poll/borda'
-    ==javascript_include_tag 'poll/borda'
+    ==stylesheet_link_tag 'poll/view/borda'
+    ==javascript_include_tag 'poll/view/borda'
   - when :choose_one
     ==stylesheet_link_tag :base
-    ==javascript_include_tag 'poll/choose'
+    ==javascript_include_tag 'poll/view/choose'
 
 = content_for :banner
   =poll

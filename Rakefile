@@ -132,13 +132,13 @@ desc('Bundle all JS files from src/ into public/')
 task(:esbuild, [:params]) { |_, args|
   params = args[:params].to_s
   params += ' --bundle --format=esm --outdir=public'
-  files = (Dir['src/*/*'] - Dir['src/lib/*']).join(' ')
+  files = (Dir['src/**/*.js'] - Dir['src/lib/*.js']).join(' ')
   `esbuild #{files} #{params}`
 }
 
 desc('Rebuild all public/ CSS and JS files')
 task(:rebuild) {
-  `rm -rf public/*~*.ico`
+  `find -E public -type f -regex ".+[js|css]$" -delete`
   Rake::Task[:sass].invoke
   Rake::Task[:esbuild].invoke
 }

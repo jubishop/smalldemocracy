@@ -1,4 +1,4 @@
-import { Sortable } from '../lib/sortable'
+import { Sortable } from '../../lib/sortable'
 
 class Poll {
   static domLoaded() {
