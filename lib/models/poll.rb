@@ -54,7 +54,7 @@ module Models
         cancel_action(message)
       end
       unless member(email: creator.email)
-        cancel_action("Creator: '#{email}', is not a member of '#{group.name}'")
+        cancel_action("Creator #{email} is not a member of #{group.name}")
       end
       cancel_action('Expiration value is invalid') unless expiration.is_a?(Time)
       super

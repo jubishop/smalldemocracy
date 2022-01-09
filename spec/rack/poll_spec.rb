@@ -76,9 +76,11 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('fails if user is not part of poll group') {
-      set_cookie(:email, create_user.email)
+      email = create_user.email
+      set_cookie(:email, email)
       post '/poll/create', valid_params
-      expect(last_response.body).to(match(/Creator.+is not a member of/))
+      expect(last_response.body).to(
+          eq("Creator #{email} is not a member of #{group.name}"))
       expect(last_response.status).to(be(400))
     }
   }
@@ -189,7 +191,8 @@ RSpec.describe(Poll, type: :rack_test) {
         post_json('/poll/respond',
                   { hash_id: poll.hashid, choice_id: another_choice.id })
         expect(last_response.status).to(be(409))
-        expect(last_response.body).to(match(/Member has already responded/))
+        expect(last_response.body).to(
+            eq("Member has already responded to #{poll.title}"))
       }
 
       it('rejects posting with no choice_id') {
@@ -226,7 +229,8 @@ RSpec.describe(Poll, type: :rack_test) {
         post_json('/poll/respond',
                   { hash_id: poll.hashid, responses: [choice.id] })
         expect(last_response.status).to(be(409))
-        expect(last_response.body).to(match(/Member has already responded/))
+        expect(last_response.body).to(
+            eq("Member has already responded to #{poll.title}"))
       }
 
       it('rejects posting with no responses') {

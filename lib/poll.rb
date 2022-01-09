@@ -13,7 +13,7 @@ class Poll < Base
     super
 
     get('/poll/create', ->(req, _) {
-      email = require_email(req)
+      email = require_session(req)
       user = Models::User.find_or_create(email: email)
 
       return 200, @slim.render('poll/create',
@@ -22,7 +22,7 @@ class Poll < Base
     })
 
     post('/poll/create', ->(req, resp) {
-      email = require_email(req)
+      email = require_session(req)
       req.params[:email] = email
 
       choices = req.list_param(:choices)
@@ -49,7 +49,7 @@ class Poll < Base
     })
 
     get(%r{^/poll/view/(?<hash_id>.+)$}, ->(req, _) {
-      email = require_email(req)
+      email = require_session(req)
       poll = require_poll(req)
 
       member = poll.member(email: email)
@@ -70,7 +70,7 @@ class Poll < Base
 
     post('/poll/respond', ->(req, _) {
       poll = require_poll(req)
-      email = require_email(req)
+      email = require_session(req)
 
       return 405, 'Poll has already finished' if poll.finished?
 

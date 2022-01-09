@@ -37,7 +37,7 @@ module Helpers
       return poll
     end
 
-    def require_email(req)
+    def require_session(req)
       email = fetch_email(req)
       unless email
         if req.get?
