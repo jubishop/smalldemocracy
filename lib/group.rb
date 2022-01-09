@@ -16,7 +16,7 @@ class Group < Base
       email = require_session(req)
       req.params[:email] = email
 
-      members = req.list_param(:members)
+      members = req.list_param(:members, [])
       req.params.delete(:members)
 
       begin

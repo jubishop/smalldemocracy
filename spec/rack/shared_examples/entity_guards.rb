@@ -23,10 +23,12 @@ RSpec.shared_examples('entity guards') { |path|
       expect(last_response.status).to(be(400))
     }
 
-    it('fails if any field is missing or empty') {
+    it('fails if any singular field is missing or empty') {
       valid_params.each_key { |key|
+        next if valid_params[key].is_a?(Enumerable)
+
         params = valid_params.clone
-        params[key] = params[key].is_a?(Enumerable) ? [] : ''
+        params[key] = ''
         post "/#{path}/create", params
         expect(last_response.status).to(be(400))
         params.delete(key)

@@ -25,7 +25,7 @@ class Poll < Base
       email = require_session(req)
       req.params[:email] = email
 
-      choices = req.list_param(:choices)
+      choices = req.list_param(:choices, [])
       req.params.delete(:choices)
 
       begin
