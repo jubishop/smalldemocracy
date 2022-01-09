@@ -10,13 +10,7 @@ class Poll < Base
   include Helpers::Guard
 
   def initialize
-    super(Tony::Slim.new(views: 'views',
-                         layout: 'views/layout',
-                         options: {
-                           include_dirs: [
-                             File.join(Dir.pwd, 'views/poll/partials')
-                           ]
-                         }))
+    super
 
     get('/poll/create', ->(req, _) {
       email = require_email(req)

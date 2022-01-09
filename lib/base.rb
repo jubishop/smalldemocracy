@@ -7,7 +7,9 @@ class Base < Tony::App
   include Helpers::Cookie
   include Helpers::Guard
 
-  def initialize(slim = Tony::Slim.new(views: 'views', layout: 'views/layout'))
+  def initialize(slim = Tony::Slim.new(views: 'views',
+                                       partials: 'views/partials',
+                                       layout: 'views/layout'))
     super(secret: ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET'))
     @slim = slim
 

@@ -7,7 +7,7 @@
 
 p Thanks #{member.email}!
 
-include :expiration_text
+==partial(:expiration_text)
 
 - case poll.type
 - when :borda_single

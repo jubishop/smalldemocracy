@@ -15,7 +15,7 @@ p Hello #{member.email}
 
 h2 =poll.question
 
-include :expiration_text
+==partial(:expiration_text)
 
 - case poll.type
 - when :borda_single, :borda_split

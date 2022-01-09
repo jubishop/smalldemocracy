@@ -3,7 +3,6 @@ require 'linguistics'
 require 'openssl'
 require 'sequel'
 require 'slim'
-require 'slim/include'
 
 Linguistics.use(:en)
 
