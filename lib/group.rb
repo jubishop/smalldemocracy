@@ -16,7 +16,7 @@ class Group < Base
       email = require_email(req)
       req.params[:email] = email
 
-      members = list_param(req, :members)
+      members = req.list_param(:members)
       req.params.delete(:members)
 
       begin

@@ -25,13 +25,13 @@ class Poll < Base
       email = require_email(req)
       req.params[:email] = email
 
-      choices = list_param(req, :choices)
+      choices = req.list_param(:choices)
       req.params.delete(:choices)
 
       begin
         # rubocop:disable Style/DateTime
         req.params[:expiration] = DateTime.strptime(
-            param(req, :expiration), '%Y-%m-%dT%H:%M').to_time
+            req.param(:expiration), '%Y-%m-%dT%H:%M').to_time
         req.params[:expiration] -= req.timezone.utc_offset.seconds
         # rubocop:enable Style/DateTime
       rescue Date::Error
@@ -99,11 +99,11 @@ class Poll < Base
   private
 
   def save_choose_one_poll_response(req, member)
-    member.add_response(choice_id: param(req, :choice_id))
+    member.add_response(choice_id: req.param(:choice_id))
   end
 
   def save_borda_poll_response(req, poll, member)
-    responses = list_param(req, :responses)
+    responses = req.list_param(:responses)
 
     if poll.type == :borda_single && responses.length != poll.choices.length
       throw(:response, [400, 'Response set does not match number of choices'])

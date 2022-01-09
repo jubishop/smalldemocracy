@@ -131,8 +131,8 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('rejects an empty post body') {
       post_json('/poll/respond')
-      expect(last_response.status).to(be(404))
-      expect(last_response.body).to(eq('No poll found'))
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq('No hash_id given'))
     }
 
     it('rejects posting to invalid poll') {

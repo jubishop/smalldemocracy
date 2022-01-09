@@ -7,7 +7,7 @@ module Helpers
 
     def require_group(req)
       begin
-        group = Models::Group.with_hashid(req.params[:hash_id])
+        group = Models::Group.with_hashid(req.param(:hash_id))
       rescue Hashids::InputError
         # Ignore
       end
@@ -23,7 +23,7 @@ module Helpers
 
     def require_poll(req)
       begin
-        poll = Models::Poll.with_hashid(req.params[:hash_id])
+        poll = Models::Poll.with_hashid(req.param(:hash_id))
       rescue Hashids::InputError
         # Ignore
       end
