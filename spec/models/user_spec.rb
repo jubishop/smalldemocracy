@@ -27,8 +27,7 @@ RSpec.describe(Models::User, type: :model) {
 
     it('rejects creating user with invalid email') {
       expect { create_user(email: 'invalid@') }.to(
-          raise_error(Sequel::HookFailed,
-                      "User has invalid email: 'invalid@'"))
+          raise_error(Sequel::HookFailed, 'User has invalid email invalid@'))
     }
   }
 

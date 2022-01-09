@@ -19,10 +19,9 @@ RSpec.describe(Models::Poll, type: :model) {
     it('rejects creating a poll where creator is not a member of group') {
       user = create_user
       group = create_group
-      expect {
-        create_poll(email: user.email, group_id: group.id)
-      }.to(raise_error(Sequel::HookFailed,
-                       /Creator.+is not a member of/))
+      expect { create_poll(email: user.email, group_id: group.id) }.to(
+          raise_error(Sequel::HookFailed,
+                      "Creator #{user.email} is not a member of #{group.name}"))
     }
     it('rejects creating poll with no title') {
       expect { create_poll(title: nil) }.to(

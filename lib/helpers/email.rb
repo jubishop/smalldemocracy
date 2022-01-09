@@ -7,7 +7,7 @@ module Helpers
 
       return if URI::MailTo::EMAIL_REGEXP.match?(email.to_s)
 
-      return "#{name} has invalid email: '#{email}'"
+      return "#{name} has invalid email #{email}"
     end
   end
 end

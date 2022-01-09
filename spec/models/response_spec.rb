@@ -38,8 +38,7 @@ RSpec.describe(Models::Response, type: :model) {
       response = create_response
       response.poll.update(expiration: past)
       expect { response.destroy }.to(
-          raise_error(Sequel::HookFailed,
-                      'Response removed from expired poll'))
+          raise_error(Sequel::HookFailed, 'Response removed from expired poll'))
     }
   }
 

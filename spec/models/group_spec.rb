@@ -119,21 +119,20 @@ RSpec.describe(Models::Group, type: :model) {
   }
 
   context('#add_member') {
+    let(:group) { create_group }
+
     it('adds an existing user as a member to a group') {
-      group = create_group
       member = group.add_member(email: create_user.email)
       expect(group.members).to(match_array([group.creating_member, member]))
     }
 
     it('creates a new user when adding member to a group') {
-      group = create_group
       member = group.add_member
       expect(member.user.email).to(eq(member.email))
       expect(group.members).to(match_array([group.creating_member, member]))
     }
 
     it('rejects adding duplicate members') {
-      group = create_group
       group.add_member(email: email)
       expect { group.add_member(email: email) }.to(
           raise_error(Sequel::UniqueConstraintViolation,
@@ -153,35 +152,34 @@ RSpec.describe(Models::Group, type: :model) {
   }
 
   context('#add_poll') {
+    let(:group) { create_group }
+
     it('adds a poll to a group') {
-      group = create_group
       poll = group.add_poll
       expect(group.polls).to(match_array(poll))
     }
 
     it('rejects creating a poll where creator is not in group') {
-      group = create_group
       other_user = create_user
       expect { group.add_poll(email: other_user.email) }.to(
-          raise_error(Sequel::HookFailed, /Creator.+is not a member/))
+          raise_error(
+              Sequel::HookFailed,
+              "Creator #{other_user.email} is not a member of #{group.name}"))
     }
 
     it('rejects creating a poll with no creator email') {
-      group = create_group
       expect { group.add_poll(email: nil) }.to(
           raise_error(Sequel::HookFailed, 'Poll has no email'))
     }
 
     it('rejects creating a poll with empty creator email') {
-      group = create_group
       expect { group.add_poll(email: '') }.to(
           raise_error(Sequel::HookFailed, 'Poll has empty email'))
     }
 
     it('rejects creating a poll with invalid creator email') {
-      group = create_group
       expect { group.add_poll(email: 'invalid') }.to(
-          raise_error(Sequel::HookFailed, "Poll has invalid email: 'invalid'"))
+          raise_error(Sequel::HookFailed, 'Poll has invalid email invalid'))
     }
   }
 }

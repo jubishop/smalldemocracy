@@ -48,7 +48,7 @@ module Models
 
     def before_destroy
       if self == group.creating_member
-        cancel_action("Creators (#{email}) cannot be removed from their groups")
+        cancel_action('Creators cannot be removed from their groups')
       end
       super
     end

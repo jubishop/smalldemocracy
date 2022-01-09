@@ -19,8 +19,7 @@ RSpec.describe(Models::Member, type: :model) {
 
     it('rejects creating member with invalid email') {
       expect { create_member(email: 'invalid@') }.to(
-          raise_error(Sequel::HookFailed,
-                      "User has invalid email: 'invalid@'"))
+          raise_error(Sequel::HookFailed, 'User has invalid email invalid@'))
     }
   }
 
@@ -38,7 +37,7 @@ RSpec.describe(Models::Member, type: :model) {
     it('rejects destroying creating member from group') {
       expect { create_member.destroy }.to(
           raise_error(Sequel::HookFailed,
-                      /Creators.+cannot be removed from their group/))
+                      'Creators cannot be removed from their groups'))
     }
 
     it('cascades destroy to responses') {
