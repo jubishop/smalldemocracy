@@ -4,7 +4,7 @@ class Poll {
     this.hashID = choicesElement.getAttribute('hash-id');
 
     this.choicesArray = Array.from(
-        choicesElement.getElementsByClassName('choice'));
+      choicesElement.getElementsByClassName('choice'));
     this.choicesArray.forEach((choice) => {
       choice.addEventListener('click', () => this.choiceClicked(choice));
       choice.disabled = false;

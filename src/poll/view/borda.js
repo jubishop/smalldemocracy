@@ -8,7 +8,7 @@ class Poll {
     this.submitButton = document.getElementById('submit');
     this.submitButton.addEventListener('click', () => this.submitClicked());
     const choicesArray = Array.from(
-        choicesElement.getElementsByClassName('choice'));
+      choicesElement.getElementsByClassName('choice'));
     this.choiceElements = Object.fromEntries(choicesArray.map((choice) => {
       return [
         choice.getAttribute('data-id'),
@@ -22,7 +22,7 @@ class Poll {
       onStart: () => { this.submitButton.disabled = true; },
       onEnd: () => this.updateScores()
     };
-    if(window.matchMedia("(pointer: coarse)").matches) {
+    if (window.matchMedia("(pointer: coarse)").matches) {
       options.handle = '.grip';
     }
     this.sortable = Sortable.create(choicesElement, options);

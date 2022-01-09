@@ -72,7 +72,7 @@ var Listable = class {
 // src/poll/create.js
 var Poll = class {
   static domLoaded() {
-    let listable = new Listable(document.getElementById("choice-list"), document.getElementById("add-choice"), {
+    new Listable(document.getElementById("choice-list"), document.getElementById("add-choice"), {
       placeholderText: "Enter choice...",
       inputName: "choices[]"
     });

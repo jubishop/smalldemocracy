@@ -29,7 +29,7 @@ class Listable {
     listItem.appendChild(deleteButton);
     this.listElement.appendChild(listItem);
 
-    const item = {listItem, inputElement};
+    const item = { listItem, inputElement };
     this.items.push(item);
 
     deleteButton.addEventListener('click', () => this.deleteItem(item));
@@ -74,8 +74,8 @@ class Listable {
     const deleteButton = document.createElement('div');
     const deleteIcon = document.createElement('i');
     deleteIcon.classList.add(
-        ...this.option('deleteButtonClasses',
-                       ['delete-button', 'fa-duotone', 'fa-trash-can']));
+      ...this.option('deleteButtonClasses',
+        ['delete-button', 'fa-duotone', 'fa-trash-can']));
     deleteButton.appendChild(deleteIcon);
     return deleteButton;
   }

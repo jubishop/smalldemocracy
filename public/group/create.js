@@ -72,7 +72,7 @@ var Listable = class {
 // src/group/create.js
 var Group = class {
   static domLoaded() {
-    let listable = new Listable(document.getElementById("member-list"), document.getElementById("add-member"), {
+    new Listable(document.getElementById("member-list"), document.getElementById("add-member"), {
       placeholderText: "Email address...",
       inputType: "email",
       inputName: "members[]"
