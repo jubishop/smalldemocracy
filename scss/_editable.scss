@@ -1,14 +1,14 @@
-li.listable {
+li.editable {
   align-items: center;
   display: flex;
 }
 
-li.listable .text {
+li.editable .text {
   flex: 1 1 auto;
   margin: 0 0.5rem;
 }
 
-li.listable .delete-button {
+li.editable .delete-button {
   --fa-primary-color: var(--del-color);
   --fa-secondary-color: var(--contrast);
   cursor: pointer;
