@@ -1,0 +1,11 @@
+dialog#group-modal open=true
+  article
+    h4 #{title}
+    p #{body}
+    footer
+      ==yield
+
+javascript:
+  document.addEventListener("DOMContentLoaded", () => {
+    document.documentElement.classList.add('modal-is-open');
+  });
