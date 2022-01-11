@@ -6,7 +6,7 @@
 = content_for :banner
   =group.name
 
-ul#member-list
+ul#member-list group-id=group.hashid
   - group.members.each do |member|
     - creator = member.email == group.email
     li.editable
