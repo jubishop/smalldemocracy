@@ -1,8 +1,13 @@
+- is_creator = member.email == group.email
+
 = content_for :head
   title =group.name
-  - if member.email == group.email
+  - if is_creator
     ==stylesheet_link_tag 'group/creator_view'
     ==javascript_include_tag 'group/creator_view'
+  - else
+    ==stylesheet_link_tag 'group/member_view'
+    ==javascript_include_tag 'group/member_view'
 
 = content_for :banner
   =group.name
@@ -15,7 +20,11 @@ ul#member-list hash-id=group.hashid
   - group.members.each do |member|
     li.editable
       p.text #{member.email}
-      - if member.email == group.email
+      - if is_creator && member.email == group.email
         div
           i.delete-button.fa-duotone.fa-trash-can-xmark
-button#add-member type="button" Add Member
+
+- if is_creator
+  button#add-member type="button" Add Member
+- else
+  button#leave-group type="button" Leave Group
