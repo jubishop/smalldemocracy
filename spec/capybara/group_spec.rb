@@ -69,7 +69,8 @@ RSpec.describe(Group, type: :feature) {
       set_cookie(:email, group.email)
       go(group.url)
       expect(page).to(
-          have_link('Create Poll', href: "/poll/create?group_id=#{group.id}"))
+          have_link("Create New Poll for #{group.name}",
+                    href: "/poll/create?group_id=#{group.id}"))
       goldens.verify('view')
     }
   }

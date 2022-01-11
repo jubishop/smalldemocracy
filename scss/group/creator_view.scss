@@ -1,0 +1,7 @@
+@use "view";
+
+@use "../editable";
+
+li.editable .fa-trash-can-xmark {
+  cursor: not-allowed;
+}

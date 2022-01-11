@@ -1,7 +1,5 @@
 @use "../layout";
 
-@use "../editable";
-
 ul#member-list {
   display: flex;
   flex-direction: column;
@@ -13,8 +11,4 @@ ul#member-list li {
   border: 1px solid var(--form-element-border-color);
   border-radius: 0.2rem;
   padding: 0.4rem;
-}
-
-li.editable .fa-trash-can-xmark {
-  cursor: not-allowed;
 }

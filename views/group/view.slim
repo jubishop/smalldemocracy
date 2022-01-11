@@ -1,18 +1,21 @@
 = content_for :head
   title =group.name
-  ==stylesheet_link_tag 'group/view'
-  ==javascript_include_tag 'group/view'
+  - if member.email == group.email
+    ==stylesheet_link_tag 'group/creator_view'
+    ==javascript_include_tag 'group/creator_view'
 
 = content_for :banner
   =group.name
 
+h4
+  a href="/poll/create?group_id=#{group.id}"
+    | Create New Poll for <em>#{group.name}</em>
+
 ul#member-list group-id=group.hashid
   - group.members.each do |member|
-    - creator = member.email == group.email
     li.editable
       p.text #{member.email}
-      div class=(creator ? "immutable" : "deletable")
-        i.delete-button.fa-duotone class=(creator ? "fa-trash-can-xmark" \
-                                                  : "fa-trash-can")
-
-a href="/poll/create?group_id=#{group.id}" Create Poll
+      - if member.email == group.email
+        div
+          i.delete-button.fa-duotone.fa-trash-can-xmark
+button#add-member type="button" Add Member

@@ -136,16 +136,21 @@ task(:esbuild, [:params]) { |_, args|
   `esbuild #{files} #{params}`
 }
 
-desc('Rebuild all public/ CSS and JS files')
-task(:rebuild) {
+desc('Remove all public/ CSS and JS files')
+task(:clear) {
   `find -E public -type f -regex ".+[js|css]$" -delete`
+}
+
+desc('Remove then rebuild all public/ CSS and JS files')
+task(:rebuild) {
+  Rake::Task[:clear].invoke
   Rake::Task[:sass].invoke
   Rake::Task[:esbuild].invoke
 }
 
 desc('Rebuild, watch, and launch localhost:8989')
 task(:run) {
-  `rm -rf public/*~*.ico`
+  Rake::Task[:clear].invoke
   Thread.new { Rake::Task[:sass].invoke('--watch') }
   Thread.new { Rake::Task[:esbuild].invoke('--watch') }
   `bundle exec rackup -p 8989`
