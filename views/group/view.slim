@@ -18,7 +18,7 @@ h4
 
 ul#member-list hash-id=group.hashid
   - group.members.each do |member|
-    li.editable
+    li class=(is_creator ? "editable" : "viewable")
       p.text #{member.email}
       - if is_creator && member.email == group.email
         div
