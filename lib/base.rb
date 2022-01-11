@@ -17,8 +17,12 @@ class Base < Tony::App
       return 404, @slim.render(:not_found)
     })
 
-    error(->(_, resp) {
+    error(->(req, resp) {
       raise resp.error unless ENV['APP_ENV'] == 'production'
+
+      email = fetch_email(req)
+      my_emails = ['jubishop@gmail.com', 'jubi@google.com', 'jubi@hey.com']
+      raise resp.error if my_emails.include?(email)
 
       return 500, @slim.render(:error)
     })
