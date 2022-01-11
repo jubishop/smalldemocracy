@@ -11,7 +11,7 @@ h4
   a href="/poll/create?group_id=#{group.id}"
     | Create New Poll for <em>#{group.name}</em>
 
-ul#member-list group-id=group.hashid
+ul#member-list hash-id=group.hashid
   - group.members.each do |member|
     li.editable
       p.text #{member.email}

@@ -37,26 +37,53 @@ class Editable {
       return;
     }
 
-    // Make actual POST call
     this.inputElement.disabled = true;
-    console.log(this.addCallback(this.inputElement.value));
+    fetch(this.addPath, {
+      method: 'POST',
+      body: JSON.stringify(this.addCallback(this.inputElement.value)),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+      if (res.status == 201) {
+        return false;
+      } else {
+        return res.text();
+      }
+    }).then(error_message => {
+      if (error_message) {
+        alert('Error: ' + error_message);
+        this.inputElement.disabled = false;
+      } else {
+        const textElement = this.buildTextElement();
+        textElement.textContent = this.inputElement.value;
+        this.listItem.removeChild(this.inputElement);
+        this.listItem.appendChild(textElement);
+        this.addDeleteButtonToElement(this.listItem);
 
-    const textElement = this.buildTextElement();
-    textElement.textContent = this.inputElement.value;
-    this.listItem.removeChild(this.inputElement);
-    this.listItem.appendChild(textElement);
-    this.addDeleteButtonToElement(this.listItem);
-
-    this.listItem = null;
-    this.inputElement = null;
-    this.addButton.disabled = false;
+        this.listItem = null;
+        this.inputElement = null;
+      }
+      this.addButton.disabled = false;
+    });
   }
 
   deleteItem(element) {
-    // Make actual POST call
-    console.log(this.deleteCallback(element));
-
-    this.listElement.removeChild(element);
+    fetch(this.deletePath, {
+      method: 'POST',
+      body: JSON.stringify(this.deleteCallback(element)),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+      if (res.status == 201) {
+        return false;
+      } else {
+        return res.text();
+      }
+    }).then(error_message => {
+      if (error_message) {
+        alert('Error: ' + error_message);
+      } else {
+        this.listElement.removeChild(element);
+      }
+    });
   }
 
   addInputElement() {

@@ -28,19 +28,50 @@ var Editable = class {
       return;
     }
     this.inputElement.disabled = true;
-    console.log(this.addCallback(this.inputElement.value));
-    const textElement = this.buildTextElement();
-    textElement.textContent = this.inputElement.value;
-    this.listItem.removeChild(this.inputElement);
-    this.listItem.appendChild(textElement);
-    this.addDeleteButtonToElement(this.listItem);
-    this.listItem = null;
-    this.inputElement = null;
-    this.addButton.disabled = false;
+    fetch(this.addPath, {
+      method: "POST",
+      body: JSON.stringify(this.addCallback(this.inputElement.value)),
+      headers: { "Content-Type": "application/json" }
+    }).then((res) => {
+      if (res.status == 201) {
+        return false;
+      } else {
+        return res.text();
+      }
+    }).then((error_message) => {
+      if (error_message) {
+        alert("Error: " + error_message);
+        this.inputElement.disabled = false;
+      } else {
+        const textElement = this.buildTextElement();
+        textElement.textContent = this.inputElement.value;
+        this.listItem.removeChild(this.inputElement);
+        this.listItem.appendChild(textElement);
+        this.addDeleteButtonToElement(this.listItem);
+        this.listItem = null;
+        this.inputElement = null;
+      }
+      this.addButton.disabled = false;
+    });
   }
   deleteItem(element) {
-    console.log(this.deleteCallback(element));
-    this.listElement.removeChild(element);
+    fetch(this.deletePath, {
+      method: "POST",
+      body: JSON.stringify(this.deleteCallback(element)),
+      headers: { "Content-Type": "application/json" }
+    }).then((res) => {
+      if (res.status == 201) {
+        return false;
+      } else {
+        return res.text();
+      }
+    }).then((error_message) => {
+      if (error_message) {
+        alert("Error: " + error_message);
+      } else {
+        this.listElement.removeChild(element);
+      }
+    });
   }
   addInputElement() {
     const listItem = this.buildListItem();
@@ -98,6 +129,8 @@ var Editable = class {
 // src/group/creator_view.js
 var Group = class {
   static domLoaded() {
+    const listElement = document.getElementById("member-list");
+    const hashID = listElement.getAttribute("hash-id");
     const elementXPath = document.evaluate("//li[@class='editable' and not(./div)]", document);
     const elements = [];
     let element = elementXPath.iterateNext();
@@ -105,10 +138,16 @@ var Group = class {
       elements.push(element);
       element = elementXPath.iterateNext();
     }
-    new Editable(document.getElementById("member-list"), elements, document.getElementById("add-member"), "/group/add_member", "/group/delete_member", (memberEmailToAdd) => {
-      return "hello from add";
+    new Editable(listElement, elements, document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
+      return {
+        hash_id: hashID,
+        email: memberEmailToAdd
+      };
     }, (elementToDelete) => {
-      return "hello from delete";
+      return {
+        hash_id: hashID,
+        email: elementToDelete.getElementsByTagName("p")[0].textContent.trim()
+      };
     }, {
       inputType: "email",
       placeholderText: "Add member"

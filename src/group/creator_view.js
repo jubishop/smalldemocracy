@@ -2,6 +2,8 @@ import { Editable } from '../lib/editable'
 
 class Group {
   static domLoaded() {
+    const listElement = document.getElementById('member-list');
+    const hashID = listElement.getAttribute("hash-id");
     const elementXPath = document.evaluate(
       "//li[@class='editable' and not(./div)]", document);
     const elements = [];
@@ -11,16 +13,22 @@ class Group {
       element = elementXPath.iterateNext()
     }
     new Editable(
-      document.getElementById('member-list'),
+      listElement,
       elements,
       document.getElementById('add-member'),
       '/group/add_member',
-      '/group/delete_member',
+      '/group/remove_member',
       (memberEmailToAdd) => {
-        return 'hello from add';
+        return {
+          hash_id: hashID,
+          email: memberEmailToAdd,
+        }
       },
       (elementToDelete) => {
-        return 'hello from delete';
+        return {
+          hash_id: hashID,
+          email: elementToDelete.getElementsByTagName('p')[0].textContent.trim()
+        }
       },
       {
         inputType: 'email',
