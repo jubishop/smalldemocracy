@@ -24,6 +24,7 @@ class Base < Tony::App
       my_emails = ['jubishop@gmail.com', 'jubi@google.com', 'jubi@hey.com']
       raise resp.error if my_emails.include?(email)
 
+      puts resp.error
       return 500, @slim.render(:error)
     })
 
