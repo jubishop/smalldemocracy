@@ -6,6 +6,7 @@ ul#member-list {
   padding: 0;
 }
 
-li.listable .fa-trash-can-xmark {
+#creator-trash-can, #creator-trash-can .delete-button {
+  border-bottom: none;
   cursor: not-allowed;
 }

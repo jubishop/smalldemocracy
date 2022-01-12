@@ -21,7 +21,7 @@ ul#member-list hash-id=group.hashid
     li class=(is_creator ? "editable" : "viewable")
       p.text #{member.email}
       - if is_creator && member.email == group.email
-        div
+        div#creator-trash-can data-tooltip="Can't delete group's creator"
           i.delete-button.fa-duotone.fa-trash-can-xmark
 
 - if is_creator

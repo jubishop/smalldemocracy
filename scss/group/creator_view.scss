@@ -2,6 +2,7 @@
 
 @use "../editable";
 
-li.editable .fa-trash-can-xmark {
+#creator-trash-can, #creator-trash-can .delete-button {
+  border-bottom: none;
   cursor: not-allowed;
 }

@@ -13,7 +13,7 @@ form action="create" method="post"
   ul#member-list
     li.listable
       input.text type="email" value=email readonly=true
-      div
+      div#creator-trash-can data-tooltip="Can't delete group's creator"
         i.delete-button.fa-duotone.fa-trash-can-xmark
 
   button#add-member.secondary type="button" Add Member
