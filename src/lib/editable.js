@@ -95,6 +95,7 @@ class Editable {
     this.listItem = listItem;
     this.inputElement = inputElement;
     this.addButton.disabled = true;
+    this.inputElement.focus();
   }
 
   addDeleteButtonToElement(element) {
