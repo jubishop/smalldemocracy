@@ -61,17 +61,46 @@ RSpec.describe(Group, type: :feature) {
   }
 
   context(:view) {
-    it('displays a group') {
-      group = create_group(email: 'group@view.com', name: 'group_view')
-      10.times { |i|
-        group.add_member(email: "group_#{i + 1}@view.com")
+    context(:creator) {
+      let(:group) {
+        create_group(email: 'group_creator@view.com', name: 'group_view')
       }
-      set_cookie(:email, group.email)
-      go(group.url)
-      expect(page).to(
-          have_link("Create New Poll for #{group.name}",
-                    href: "/poll/create?group_id=#{group.id}"))
-      goldens.verify('view')
+
+      before(:each) {
+        10.times { |i|
+          group.add_member(email: "group_creator_#{i + 1}@view.com")
+        }
+      }
+
+      it('displays a group') {
+        set_cookie(:email, group.email)
+        go(group.url)
+        expect(page).to(
+            have_link("Create New Poll for #{group.name}",
+                      href: "/poll/create?group_id=#{group.id}"))
+        goldens.verify('creator_view')
+      }
+    }
+
+    context(:member) {
+      let(:group) {
+        create_group(email: 'group_member@view.com', name: 'group_view')
+      }
+
+      before(:each) {
+        10.times { |i|
+          group.add_member(email: "group_member_#{i + 1}@view.com")
+        }
+      }
+
+      it('displays a group') {
+        set_cookie(:email, group.members.last.email)
+        go(group.url)
+        expect(page).to(
+            have_link("Create New Poll for #{group.name}",
+                      href: "/poll/create?group_id=#{group.id}"))
+        goldens.verify('member_view')
+      }
     }
   }
 }
