@@ -17,11 +17,15 @@ class Base < Tony::App
       return 404, @slim.render(:not_found)
     })
 
-    error(->(_, resp) {
+    error(->(req, resp) {
       raise resp.error unless ENV['APP_ENV'] == 'production'
 
-      puts resp.error
-      return 500, @slim.render(:error)
+      if on_prod?(req)
+        puts resp.error.full_message(highlight: true, order: :top)
+      end
+
+      stack_trace = Rack::ShowExceptions.new(self).pretty(req.env, resp.error)
+      return 500, @slim.render(:error, stack_trace: stack_trace)
     })
 
     # For testing only

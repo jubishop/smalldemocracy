@@ -69,14 +69,4 @@ RSpec.describe(Main, type: :feature) {
       goldens.verify('logged_in_with_data')
     }
   }
-
-  context('not found') {
-    it('displays a not found page') {
-      go('/does_not_exist')
-      expect(page).to(
-          have_link('report',
-                    href: 'https://github.com/jubishop/smalldemocracy/issues'))
-      goldens.verify('not_found')
-    }
-  }
 }

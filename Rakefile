@@ -75,11 +75,9 @@ def rspec_n(count: 50, type: nil)
   type = type ? " -t type:#{type}" : ''
 
   puts 'Now running...'.green
-  results = ''
   cmd = "bundle exec rspec_n #{count} -c 'bundle exec rspec#{type}' -s"
   Open3.popen3(cmd) do |_, stderr, _, _|
     while (char = stderr.getc)
-      results += char
       print(char)
     end
   end
@@ -149,11 +147,21 @@ task(:rebuild) {
 }
 
 desc('Rebuild, watch, and launch localhost:8989')
-task(:run) {
+task(:run, [:port]) { |_, args|
+  port = args[:port]
+  port ||= 8989
+
   Rake::Task[:clear].invoke
   Thread.new { Rake::Task[:sass].invoke('--watch') }
   Thread.new { Rake::Task[:esbuild].invoke('--watch') }
-  `bundle exec rackup -p 8989`
+
+  require 'colorize'
+  require 'open3'
+  Open3.popen3("bundle exec rackup -p #{port}") do |_, stderr, _, _|
+    while (char = stderr.getc)
+      print(char)
+    end
+  end
 }
 
 task models: %w[mspec]

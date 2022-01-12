@@ -12,11 +12,10 @@ RSpec.describe(Base, type: :rack_test) {
       Capybara.app = Rack::Builder.parse_file('config.ru').first
     }
 
-    it('does not reveal error message stack traces in production') {
-      expect_slim(:error)
+    it('does not print raw stack traces in production') {
+      expect_slim(:error, stack_trace: an_instance_of(String))
       get_path('/throw_error')
       expect(last_response.status).to(be(500))
-      expect(last_response.body).to_not(include('Fuck you'))
     }
 
     after(:all) {
