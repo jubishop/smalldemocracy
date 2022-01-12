@@ -18,7 +18,7 @@ class Base < Tony::App
     })
 
     error(->(req, resp) {
-      raise resp.error unless ENV['APP_ENV'] == 'production'
+      raise resp.error unless ENV.fetch('APP_ENV') == 'production'
 
       if on_prod?(req)
         puts resp.error.full_message(highlight: true, order: :top)

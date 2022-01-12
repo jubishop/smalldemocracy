@@ -1,3 +1,5 @@
+require 'core/test'
+
 require_relative '../../lib/models/choice'
 require_relative '../../lib/models/group'
 require_relative '../../lib/models/member'
@@ -9,6 +11,8 @@ require_relative 'time'
 
 module RSpec
   module Models
+    include RSpec::EMail
+
     def create_user(email: random_email)
       return ::Models::User.find_or_create(email: email)
     end
