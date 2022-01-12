@@ -5,6 +5,15 @@ module Helpers
   module Guard
     include Cookie
 
+    PRIVILEGED_USERS = %w[
+      jubishop@gmail.com jubi@google.com jubi@hey.com
+    ].freeze
+    private_constant :PRIVILEGED_USERS
+
+    def session_is_privileged?(req)
+      return PRIVILEGED_USERS.include?(fetch_email(req))
+    end
+
     def require_group(req)
       begin
         group = Models::Group.with_hashid(req.param(:hash_id))

@@ -12,7 +12,7 @@ RSpec.describe(Base, type: :feature) {
   }
 
   context(:production) {
-    before(:all) {
+    before(:each) {
       ENV['APP_ENV'] = 'production'
       ENV['RACK_ENV'] = 'production'
     }
@@ -23,11 +23,6 @@ RSpec.describe(Base, type: :feature) {
           have_link('report',
                     href: 'https://github.com/jubishop/smalldemocracy/issues'))
       goldens.verify('error')
-    }
-
-    after(:all) {
-      ENV['APP_ENV'] = 'test'
-      ENV['RACK_ENV'] = 'test'
     }
   }
 }

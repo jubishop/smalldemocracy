@@ -1,27 +1,23 @@
 RSpec.describe(Base, type: :rack_test) {
   context(:production) {
-    def get_path(path)
-      # rubocop:disable Style/StringHashKeys
-      get(path, {}, { 'HTTPS' => 'on' })
-      # rubocop:enable Style/StringHashKeys
-    end
-
-    before(:all) {
+    before(:each) {
       ENV['APP_ENV'] = 'production'
       ENV['RACK_ENV'] = 'production'
-      Capybara.app = Rack::Builder.parse_file('config.ru').first
     }
 
-    it('does not print raw stack traces in production') {
-      expect_slim(:error, stack_trace: an_instance_of(String))
-      get_path('/throw_error')
+    it('does not print raw stack traces in production for normal users') {
+      expect_slim(:error, stack_trace: nil)
+      get '/throw_error'
       expect(last_response.status).to(be(500))
+      expect(last_response.body).to_not(include('Fuck you'))
     }
 
-    after(:all) {
-      ENV['APP_ENV'] = 'test'
-      ENV['RACK_ENV'] = 'test'
-      Capybara.app = Rack::Builder.parse_file('config.ru').first
+    it('does not print raw stack traces in production for privileged users') {
+      set_cookie(:email, 'jubishop@gmail.com')
+      expect_slim(:error, stack_trace: an_instance_of(String))
+      get '/throw_error'
+      expect(last_response.status).to(be(500))
+      expect(last_response.body).to(include('Fuck you'))
     }
   }
 
