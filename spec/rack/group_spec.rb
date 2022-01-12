@@ -96,7 +96,7 @@ RSpec.describe(Group, type: :rack_test) {
       expect(last_response.status).to(be(201))
       expect(last_response.body).to(eq('Group member added'))
       expect(group.members(reload: true).map(&:email)).to(
-          match_array([group.creating_member.email, 'add_member@group.com']))
+          match_array([group.creating_member.email, valid_params[:email]]))
     }
 
     it('rejects adding member that is already in the group') {
