@@ -76,8 +76,8 @@ def rspec_n(count: 50, type: nil)
 
   puts 'Now running...'.green
   cmd = "bundle exec rspec_n #{count} -c 'bundle exec rspec#{type}' -s"
-  Open3.popen3(cmd) do |_, stderr, _, _|
-    while (char = stderr.getc)
+  Open3.popen2e(cmd) do |_, stdout_and_stderr, _|
+    while (char = stdout_and_stderr.getc)
       print(char)
     end
   end
@@ -157,8 +157,8 @@ task(:run, [:port]) { |_, args|
 
   require 'colorize'
   require 'open3'
-  Open3.popen3("bundle exec rackup -p #{port}") do |_, stderr, _, _|
-    while (char = stderr.getc)
+  Open3.popen2e("bundle exec rackup -p #{port}") do |_, stdout_and_stderr, _|
+    while (char = stdout_and_stderr.getc)
       print(char)
     end
   end
