@@ -34,9 +34,9 @@ GEM
     matrix (0.4.2)
     mini_mime (1.1.2)
     nio4r (2.5.8)
-    nokogiri (1.13.0-x86_64-darwin)
+    nokogiri (1.13.1-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.13.0-x86_64-linux)
+    nokogiri (1.13.1-x86_64-linux)
       racc (~> 1.4)
     open3 (0.1.1)
     openssl (3.0.0)
@@ -134,7 +134,7 @@ GEM
       tzinfo
     tony-auth (0.12)
       base64
-    tony-test (0.71)
+    tony-test (0.76)
       capybara
       chunky_png
       colorize
