@@ -28,12 +28,13 @@ RSpec.describe(Poll, type: :feature) {
       # either case the new input field gets focus.
       click_button('Add Choice')
       %w[zero one two three four five six].each_with_index { |choice, index|
-        expect(all('input.text').last).to(have_focus)
+        input_field = all('input.text').last
+        expect(input_field).to(have_focus)
         if index.even?
-          all('input.text').last.fill_in(with: choice)
+          input_field.fill_in(with: choice)
           click_button('Add Choice')
         else
-          all('input.text').last.fill_in(with: "#{choice}\n")
+          input_field.fill_in(with: "#{choice}\n")
         end
       }
 
@@ -43,14 +44,15 @@ RSpec.describe(Poll, type: :feature) {
 
       # Ensure clicking Add button and pressing enter do nothing when there's
       # already an empty field, and focuses the empty field.
-      all('input.text')[1].fill_in(with: '')
+      empty_field = all('input.text')[1]
+      empty_field.fill_in(with: '')
       click_button('Add Choice')
-      expect(all('input.text')[1]).to(have_focus)
+      expect(empty_field).to(have_focus)
       all('input.text')[4].native.send_keys(:enter)
-      expect(all('input.text')[1]).to(have_focus)
+      expect(empty_field).to(have_focus)
 
       # Replace the now empty field ("one") with "seven".
-      all('input.text')[1].fill_in(with: 'seven')
+      empty_field.fill_in(with: 'seven')
 
       # Click on title to remove focus from any form input.
       find('h1').click

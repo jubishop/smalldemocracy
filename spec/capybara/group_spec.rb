@@ -7,7 +7,7 @@ RSpec.describe(Group, type: :feature) {
   it_has_behavior('entity flows')
 
   context(:create) {
-    it('creates a group') {
+    it('creates a group with complex :members creation') {
       # Visit group creation page.
       set_cookie(:email, 'group@create.com')
       go('/group/create')
@@ -16,15 +16,18 @@ RSpec.describe(Group, type: :feature) {
       # Fill in a name and add some group members
       fill_in('name', with: 'group_create')
 
-      # Sometimes click Add button, sometimes press enter on input field.
+      # Sometimes click Add button, sometimes press enter on input field, in
+      # either case the new input field gets focus.
       click_button('Add Member')
       6.times { |i|
+        input_field = all('input.text').last
+        expect(input_field).to(have_focus)
         email = "group_#{i + 1}@create.com"
         if i.even?
-          all('input.text').last.fill_in(with: email)
+          input_field.fill_in(with: email)
           click_button('Add Member')
         else
-          all('input.text').last.fill_in(with: "#{email}\n")
+          input_field.fill_in(with: "#{email}\n")
         end
       }
 
@@ -33,19 +36,25 @@ RSpec.describe(Group, type: :feature) {
       all('li.listable div')[2].click
 
       # Ensure clicking Add button and pressing enter do nothing when there's
-      # already an empty field.
-      all('input.text')[1].fill_in(with: '')
+      # already an empty field, and focuses the empty field.
+      empty_field = all('input.text')[1]
+      empty_field.fill_in(with: '')
       click_button('Add Member')
+      expect(empty_field).to(have_focus)
       all('input.text')[4].native.send_keys(:enter)
+      expect(empty_field).to(have_focus)
 
       # Ensure clicking Add button and pressing enter when there's an invalid
-      # email does nothing
-      all('input.text')[1].fill_in(with: 'invalid')
+      # email does nothing, and focuses the invalid field.
+      invalid_field = all('input.text')[1]
+      invalid_field.fill_in(with: 'invalid')
       click_button('Add Member')
+      expect(invalid_field).to(have_focus)
       all('input.text')[4].native.send_keys(:enter)
+      expect(invalid_field).to(have_focus)
 
       # Replace the now invalid field with "group_7".
-      all('input.text')[1].fill_in(with: 'group_7@create.com')
+      invalid_field.fill_in(with: 'group_7@create.com')
 
       # Click on title to remove focus from any form input.
       find('h1').click
