@@ -24,9 +24,11 @@ RSpec.describe(Poll, type: :feature) {
       fill_in('expiration', with: Time.new(2032, 6, 6, 11, 30))
       select('Borda Split', from: 'type')
 
-      # Sometimes click Add button, sometimes press enter on input field.
+      # Sometimes click Add button, sometimes press enter on input field, in
+      # either case the new input field gets focus.
       click_button('Add Choice')
       %w[zero one two three four five six].each_with_index { |choice, index|
+        expect(all('input.text').last).to(have_focus)
         if index.even?
           all('input.text').last.fill_in(with: choice)
           click_button('Add Choice')
@@ -40,10 +42,12 @@ RSpec.describe(Poll, type: :feature) {
       all('li.listable div')[2].click
 
       # Ensure clicking Add button and pressing enter do nothing when there's
-      # already an empty field.
+      # already an empty field, and focuses the empty field.
       all('input.text')[1].fill_in(with: '')
       click_button('Add Choice')
+      expect(all('input.text')[1]).to(have_focus)
       all('input.text')[4].native.send_keys(:enter)
+      expect(all('input.text')[1]).to(have_focus)
 
       # Replace the now empty field ("one") with "seven".
       all('input.text')[1].fill_in(with: 'seven')
