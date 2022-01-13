@@ -51,6 +51,7 @@ RSpec.describe(Group, type: :rack_test) {
       set_cookie(:email, create_user.email)
       expect_slim('group/not_found')
       get group.url
+      expect(last_response.status).to(be(404))
     }
   }
 
