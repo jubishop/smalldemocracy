@@ -46,6 +46,12 @@ RSpec.describe(Group, type: :rack_test) {
       get group.url
       expect(last_response.ok?).to(be(true))
     }
+
+    it('shows not found for non member') {
+      set_cookie(:email, create_user.email)
+      expect_slim('group/not_found')
+      get group.url
+    }
   }
 
   shared_examples('group membership mutability') { |operation|
