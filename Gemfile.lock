@@ -132,7 +132,7 @@ GEM
       rack-contrib
       slim
       tzinfo
-    tony-auth (0.11)
+    tony-auth (0.12)
       base64
     tony-test (0.71)
       capybara
