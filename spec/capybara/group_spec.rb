@@ -66,6 +66,10 @@ RSpec.describe(Group, type: :feature) {
           group: an_instance_of(Models::Group),
           member: an_instance_of(Models::Member))
       click_button('Create Group')
+
+      # Ensure actual changes made in DB.
+      user = Models::User.find_or_create(email: 'group@create.com')
+      expect(user.created_groups.map(&:name)).to(include('group_create'))
     }
   }
 
@@ -89,31 +93,30 @@ RSpec.describe(Group, type: :feature) {
                       href: "/poll/create?group_id=#{group.id}"))
         goldens.verify('creator_view')
 
-        # Add a few more members.
+        # Add a member.
         add_button = find('#add-member')
-        2.times { |i|
-          expect(add_button).to_not(be_disabled)
-          add_button.click
-          expect(add_button).to(be_disabled)
-          input_field = find('input.input')
-          expect(input_field).to(have_focus)
-          input_field.fill_in(with: "group_add_#{i + 1}@view.com\n")
-          expect(input_field).to(be_gone)
-        }
+        expect(add_button).to_not(be_disabled)
+        add_button.click
+        expect(add_button).to(be_disabled)
+        input_field = find('input.input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "group_adder@view.com\n")
+        expect(input_field).to(be_gone)
         expect(add_button).to_not(be_disabled)
 
         # The first delete button is the creator, and ignores clicks.
         first('.delete-button').click
 
-        # Delete members 2 and 3
+        # Delete member #2.
         member_2_delete_button = all('.delete-button')[2]
-        member_3_delete_button = all('.delete-button')[3]
         member_2_delete_button.click
-        member_3_delete_button.click
         expect(member_2_delete_button).to(be_gone)
-        expect(member_3_delete_button).to(be_gone)
-
         goldens.verify('view_modified')
+
+        # Ensure actual changes made in DB
+        member_emails = group.members.map(&:email)
+        expect(member_emails).to(include('group_adder@view.com'))
+        expect(member_emails).to_not(include('group_creator_2@view.com'))
       }
     }
 

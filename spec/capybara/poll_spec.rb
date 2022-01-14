@@ -65,6 +65,9 @@ RSpec.describe(Poll, type: :feature) {
           member: group.creating_member,
           timezone: an_instance_of(TZInfo::DataTimezone))
       click_button('Create Poll')
+
+      # Ensure actual changes made in DB.
+      expect(group.polls.map(&:title)).to(include('this is my title'))
     }
 
     it('displays a modal and redirects you when you have no group') {
