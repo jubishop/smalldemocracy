@@ -6,6 +6,19 @@ GIT
       capybara (~> 3.13, < 4)
       websocket-driver (>= 0.6.5)
 
+PATH
+  remote: /Users/jubishop/Desktop/tony-test
+  specs:
+    tony-test (0.82)
+      capybara
+      chunky_png
+      colorize
+      puma
+      rack
+      rack-contrib
+      rack-test
+      rspec
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -134,15 +147,6 @@ GEM
       tzinfo
     tony-auth (0.12)
       base64
-    tony-test (0.81)
-      capybara
-      chunky_png
-      colorize
-      puma
-      rack
-      rack-contrib
-      rack-test
-      rspec
 
 PLATFORMS
   x86_64-darwin-19

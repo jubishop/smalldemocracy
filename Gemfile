@@ -38,6 +38,6 @@ group :development do
 
   source 'https://www.jubigems.org' do
     gem 'core-test'
-    gem 'tony-test'
+    gem 'tony-test', path: '/Users/jubishop/Desktop/tony-test'
   end
 end
