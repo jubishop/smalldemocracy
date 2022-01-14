@@ -55,7 +55,7 @@ RSpec.describe(Group, type: :rack_test) {
     }
   }
 
-  shared_examples('group membership mutability') { |operation|
+  shared_examples('group mutability') { |operation|
     it('fails with no cookie') {
       clear_cookies
       post "group/#{operation}", valid_params
@@ -96,7 +96,7 @@ RSpec.describe(Group, type: :rack_test) {
       }
     }
 
-    it_has_behavior('group membership mutability', 'add_member')
+    it_has_behavior('group mutability', 'add_member')
 
     it('adds member to group') {
       expect(group.members).to(eq([group.creating_member]))
@@ -127,7 +127,7 @@ RSpec.describe(Group, type: :rack_test) {
       }
     }
 
-    it_has_behavior('group membership mutability', 'remove_member')
+    it_has_behavior('group mutability', 'remove_member')
 
     it('removes member from group') {
       expect(group.members).to(match_array([group.creating_member, member]))
@@ -152,5 +152,17 @@ RSpec.describe(Group, type: :rack_test) {
       expect(last_response.body).to(
           eq("remove_member@group.com is not a member of #{group.name}"))
     }
+  }
+
+  context('post /name') {
+    let(:group) { create_group }
+    let(:valid_params) {
+      {
+        hash_id: group.hashid,
+        name: 'New Group Name'
+      }
+    }
+
+    it_has_behavior('group mutability', 'name')
   }
 }

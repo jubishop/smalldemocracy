@@ -82,5 +82,23 @@ class Group < Base
         return 201, 'Group member removed'
       end
     })
+
+    post('/group/name', ->(req, _) {
+      email = require_session(req)
+      group = require_group(req)
+      name = req.param(:name)
+
+      unless email == group.email
+        return 400, "#{email} is not the creator of #{group.name}"
+      end
+
+      begin
+        group.update(name: name)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Group name changed'
+      end
+    })
   end
 end
