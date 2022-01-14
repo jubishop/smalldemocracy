@@ -3,6 +3,7 @@ require 'linguistics'
 require 'openssl'
 require 'sequel'
 require 'slim'
+require 'honeybadger'  # Always last
 
 Linguistics.use(:en)
 

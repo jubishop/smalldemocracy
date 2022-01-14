@@ -28,6 +28,7 @@ GEM
     cri (2.15.11)
     diff-lcs (1.5.0)
     hashids (1.0.6)
+    honeybadger (4.9.0)
     linguistics (2.1.0)
       loggability (~> 0.11)
     loggability (0.18.2)
@@ -158,6 +159,7 @@ DEPENDENCIES
   core!
   core-test!
   duration!
+  honeybadger
   linguistics
   open3
   openssl

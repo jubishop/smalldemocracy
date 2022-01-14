@@ -11,7 +11,7 @@ RSpec.describe(Base, type: :rack_test) {
       expect(last_response.body).to_not(include('Fuck you'))
     }
 
-    it('does not print raw stack traces in production for privileged users') {
+    it('does print raw stack traces in production for privileged users') {
       set_cookie(:email, 'jubishop@gmail.com')
       expect_slim(:error, stack_trace: an_instance_of(String))
       get '/throw_error'
