@@ -91,13 +91,16 @@ RSpec.describe(Group, type: :feature) {
 
         # Add a few more members.
         add_button = find('#add-member')
-        3.times { |i|
+        2.times { |i|
+          expect(add_button).to_not(be_disabled)
           add_button.click
           expect(add_button).to(be_disabled)
           input_field = find('input.input')
           expect(input_field).to(have_focus)
           input_field.fill_in(with: "group_add_#{i + 1}@view.com\n")
+          expect(input_field).to(be_gone)
         }
+        expect(add_button).to_not(be_disabled)
 
         # The first delete button is the creator, and ignores clicks.
         first('.delete-button').click
