@@ -1,3 +1,4 @@
+require 'honeybadger'
 require 'tony'
 
 require_relative 'helpers/cookie'
@@ -21,6 +22,7 @@ class Base < Tony::App
       raise resp.error unless ENV.fetch('APP_ENV') == 'production'
 
       puts resp.error.full_message(highlight: true, order: :top) if on_prod?
+      Honeybadger.notify(resp.error)
 
       stack_trace = nil
       if session_is_privileged?(req)

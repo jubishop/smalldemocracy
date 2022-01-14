@@ -5,6 +5,7 @@ require 'tony/auth'
 
 require_relative 'setup'
 
+use Honeybadger::Rack::ErrorNotifier if ENV.fetch('RACK_ENV') == 'production'
 use Tony::SSLEnforcer if ENV.fetch('RACK_ENV') == 'production'
 use Rack::Session::Cookie, secret: ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET')
 use Rack::Protection if ENV.fetch('RACK_ENV') == 'production'

@@ -2,6 +2,7 @@ ruby '>= 3.0.2'
 source 'https://rubygems.org'
 
 gem 'base64'
+gem 'honeybadger'
 gem 'linguistics'
 gem 'openssl'
 gem 'pg'
