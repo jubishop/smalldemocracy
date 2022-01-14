@@ -13,11 +13,11 @@ RSpec.describe(Group, type: :feature) {
       go('/group/create')
       goldens.verify('create_empty')
 
-      # Fill in a name and add some group members
+      # Fill in a name.
       fill_in('name', with: 'group_create')
 
-      # Sometimes click Add button, sometimes press enter on input field, in
-      # either case the new input field gets focus.
+      # Add some members.  Sometimes click Add button, sometimes press enter on
+      # input field, in either case the new input field gets focus.
       click_button('Add Member')
       6.times { |i|
         input_field = all('input.text').last
@@ -75,19 +75,42 @@ RSpec.describe(Group, type: :feature) {
         create_group(email: 'group_creator@view.com', name: 'group_view')
       }
 
-      before(:each) {
+      it('displays a group') {
+        # Set up context to view a group as creator.
+        set_cookie(:email, group.email)
         10.times { |i|
           group.add_member(email: "group_creator_#{i + 1}@view.com")
         }
-      }
 
-      it('displays a group') {
-        set_cookie(:email, group.email)
+        # Visit group view as creator.
         go(group.url)
         expect(page).to(
             have_link("Create New Poll for #{group.name}",
                       href: "/poll/create?group_id=#{group.id}"))
         goldens.verify('creator_view')
+
+        # Add a few more members.
+        add_button = find('#add-member')
+        3.times { |i|
+          add_button.click
+          expect(add_button).to(be_disabled)
+          input_field = find('input.input')
+          expect(input_field).to(have_focus)
+          input_field.fill_in(with: "group_add_#{i + 1}@view.com\n")
+        }
+
+        # The first delete button is the creator, and ignores clicks.
+        first('.delete-button').click
+
+        # Delete members 2 and 3
+        member_2_delete_button = all('.delete-button')[2]
+        member_3_delete_button = all('.delete-button')[3]
+        member_2_delete_button.click
+        member_3_delete_button.click
+        expect(member_2_delete_button).to(be_gone)
+        expect(member_3_delete_button).to(be_gone)
+
+        goldens.verify('view_modified')
       }
     }
 
