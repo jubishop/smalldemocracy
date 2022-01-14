@@ -38,8 +38,8 @@ RSpec.describe(Group, type: :rack_test) {
 
   context('get /view') {
     let(:group) { create_group }
-    let(:member) { group.add_member }
     let(:email) { member.email }
+    let(:member) { group.add_member }
 
     it('shows group for member') {
       expect_slim('group/view', group: group, member: member)
@@ -87,8 +87,8 @@ RSpec.describe(Group, type: :rack_test) {
 
   context('post /add_member') {
     let(:group) { create_group }
-    let(:member_email) { 'add_member@group.com' }
     let(:email) { group.email }
+    let(:member_email) { 'add_member@group.com' }
     let(:valid_params) {
       {
         hash_id: group.hashid,
@@ -156,13 +156,23 @@ RSpec.describe(Group, type: :rack_test) {
 
   context('post /name') {
     let(:group) { create_group }
+    let(:email) { group.email }
+    let(:group_name) { 'New Group Name' }
     let(:valid_params) {
       {
         hash_id: group.hashid,
-        name: 'New Group Name'
+        name: group_name
       }
     }
 
     it_has_behavior('group mutability', 'name')
+
+    it('updates group name') {
+      expect(group.name).to_not(eq(group_name))
+      post 'group/name', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Group name changed'))
+      expect(group.reload.name).to(eq(group_name))
+    }
   }
 }
