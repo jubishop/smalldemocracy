@@ -56,6 +56,14 @@ RSpec.describe(Models::Group, type: :model) {
     }
   }
 
+  context('#update') {
+    it('updates with new name') {
+      group = create_group
+      group.update(name: 'new group name')
+      expect(group.name).to(eq('new group name'))
+    }
+  }
+
   context('#creator') {
     it('finds its creator') {
       user = create_user
