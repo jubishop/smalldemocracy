@@ -2,7 +2,6 @@ RSpec.describe(Base, type: :rack_test) {
   context(:production) {
     before(:each) {
       ENV['APP_ENV'] = 'production'
-      ENV['RACK_ENV'] = 'production'
     }
 
     it('does not print raw stack traces in production for normal users') {

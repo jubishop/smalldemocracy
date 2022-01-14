@@ -20,9 +20,7 @@ class Base < Tony::App
     error(->(req, resp) {
       raise resp.error unless ENV.fetch('APP_ENV') == 'production'
 
-      if on_prod?(req)
-        puts resp.error.full_message(highlight: true, order: :top)
-      end
+      puts resp.error.full_message(highlight: true, order: :top) if on_prod?
 
       stack_trace = nil
       if session_is_privileged?(req)
@@ -32,8 +30,8 @@ class Base < Tony::App
     })
 
     # For testing only
-    get('/throw_error', ->(req, resp) {
-      if on_prod?(req)
+    get('/throw_error', ->(_, resp) {
+      if on_prod?
         resp.redirect('/')
         return
       end
@@ -44,7 +42,7 @@ class Base < Tony::App
 
   private
 
-  def on_prod?(req)
-    return req.host_authority == 'www.smalldemocracy.com'
+  def on_prod?
+    return ENV.fetch('ON_PROD', false)
   end
 end

@@ -23,6 +23,3 @@ jobs:
       run: bundle install
     - name: Run rubocop
       run: bundle exec rake rubocop
-      env:
-        RACK_ENV: development
-        APP_ENV: development

@@ -8,13 +8,14 @@ html lang="en"
     ==favicon_link_tag
     ==yield_content :head
     ==timezone_script
-    javascript:
-      window.addEventListener('load', (event) => {
-        document.documentElement.classList.add('page-fully-loaded');
-      });
-      document.fonts.ready.then(function () {
-        document.documentElement.classList.add('fonts-fully-loaded');
-      });
+    - unless ENV.fetch('ON_PROD', false)
+      javascript:
+        window.addEventListener('load', (event) => {
+          document.documentElement.classList.add('page-fully-loaded');
+        });
+        document.fonts.ready.then(function () {
+          document.documentElement.classList.add('fonts-fully-loaded');
+        });
 
   body
     header

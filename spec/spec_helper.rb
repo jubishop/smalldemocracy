@@ -100,6 +100,5 @@ RSpec.configure do |config|
 
   config.after(:each) {
     ENV['APP_ENV'] = 'test'
-    ENV['RACK_ENV'] = 'test'
   }
 end
