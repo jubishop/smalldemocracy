@@ -1,4 +1,5 @@
 import { Editable } from '../lib/editable'
+import { Modal } from '../lib/modal'
 
 class Group {
   static domLoaded() {
@@ -6,7 +7,7 @@ class Group {
     const listElement = document.getElementById('member-list');
     const hashID = listElement.getAttribute("hash-id");
 
-    // Name management.
+    // Edit name.
     const nameContainer = document.getElementById('group-name');
     const editGroupButton = document.getElementById('edit-group-button');
     editGroupButton.addEventListener('click', () => {
@@ -55,7 +56,7 @@ class Group {
       });
     });
 
-    // Membership management.
+    // Add and remove members.
     const elementXPath = document.evaluate(
       "//li[@class='editable' and not(./div)]", document);
     const elements = [];
@@ -86,6 +87,13 @@ class Group {
         inputType: 'email',
         placeholderText: 'Add member'
       });
+
+    // Delete group.
+    const deleteButton = document.getElementById('delete-group');
+    deleteButton.addEventListener('click', () => {
+      new Modal('hello', 'world').display();
+      console.log("delete group");
+    });
   }
 }
 
