@@ -2,6 +2,11 @@ import { Editable } from '../lib/editable'
 
 class Group {
   static domLoaded() {
+    const editGroupButton = document.getElementById('edit-group-button');
+    editGroupButton.addEventListener('click', () => {
+      console.log("edit group!");
+    });
+
     const listElement = document.getElementById('member-list');
     const hashID = listElement.getAttribute("hash-id");
     const elementXPath = document.evaluate(

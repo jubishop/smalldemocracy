@@ -2,6 +2,22 @@
 
 @use "../editable";
 
+#group-name {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+  margin-bottom: 2rem;
+}
+
+#group-name h2 {
+  margin: 0;
+}
+
+#edit-group-button {
+  cursor: pointer;
+}
+
 #creator-trash-can, #creator-trash-can .delete-button {
   border-bottom: none;
   cursor: not-allowed;

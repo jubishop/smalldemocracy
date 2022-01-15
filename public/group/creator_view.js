@@ -130,6 +130,10 @@ var Editable = class {
 // src/group/creator_view.js
 var Group = class {
   static domLoaded() {
+    const editGroupButton = document.getElementById("edit-group-button");
+    editGroupButton.addEventListener("click", () => {
+      console.log("edit group!");
+    });
     const listElement = document.getElementById("member-list");
     const hashID = listElement.getAttribute("hash-id");
     const elementXPath = document.evaluate("//li[@class='editable' and not(./div)]", document);

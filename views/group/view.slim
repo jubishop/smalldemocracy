@@ -12,6 +12,15 @@
 = content_for :banner
   =group.name
 
+- if is_creator
+  div#group-name
+    h2 =group.name
+    div#edit-group-button
+      i.fa-duotone.fa-pencil
+
+- else
+  h2 =group.name
+
 h4
   a href="/poll/create?group_id=#{group.id}"
     | Create New Poll for <em>#{group.name}</em>
