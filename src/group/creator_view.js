@@ -11,7 +11,7 @@ class Group {
     const nameContainer = document.getElementById('group-name');
     const editGroupButton = document.getElementById('edit-group-button');
     editGroupButton.addEventListener('click', () => {
-      const textElement = document.querySelector('#group-name h2');
+      const textElement = nameContainer.firstElementChild;
       textElement.remove();
       editGroupButton.remove();
       const inputElement = document.createElement('input');
@@ -82,7 +82,7 @@ class Group {
       (elementToDelete) => {
         return {
           hash_id: hashID,
-          email: elementToDelete.querySelector('p').textContent.trim()
+          email: elementToDelete.firstElementChild.textContent.trim()
         }
       },
       {

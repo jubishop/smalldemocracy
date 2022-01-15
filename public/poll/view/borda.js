@@ -2082,7 +2082,7 @@ var Poll = class {
     this.choiceElements = Object.fromEntries(choicesArray.map((choice) => {
       return [
         choice.getAttribute("data-id"),
-        choice.querySelector(".score")
+        choice.lastElementChild
       ];
     }));
     const options = {
