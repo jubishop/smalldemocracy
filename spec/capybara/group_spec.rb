@@ -105,10 +105,10 @@ RSpec.describe(Group, type: :feature) {
         expect(add_button).to_not(be_disabled)
 
         # The first delete button is the creator, and ignores clicks.
-        first('.delete-button').click
+        first('.delete-icon').click
 
         # Delete member #2.
-        member_2_delete_button = all('.delete-button')[2]
+        member_2_delete_button = all('.delete-icon')[2]
         member_2_delete_button.click
         expect(member_2_delete_button).to(be_gone)
         goldens.verify('view_modified')

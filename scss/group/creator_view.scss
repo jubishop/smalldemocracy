@@ -14,11 +14,13 @@
   margin: 0;
 }
 
-#edit-group-button {
+.edit-group-icon {
+  --fa-primary-color: var(--ins-color);
+  --fa-secondary-color: var(--contrast);
   cursor: pointer;
 }
 
-#creator-trash-can, #creator-trash-can .delete-button {
+#creator-trash-can, #creator-trash-can .delete-icon {
   border-bottom: none;
   cursor: not-allowed;
 }

@@ -17,7 +17,7 @@ class Editable {
     this.addCallback = addCallback;
     this.deleteCallback = deleteCallback;
     this.options = Object.assign({
-      deleteButtonClasses: ['delete-button', 'fa-duotone', 'fa-trash-can'],
+      deleteButtonClasses: ['delete-icon', 'fa-duotone', 'fa-trash-can'],
       inputClasses: ['input'],
       inputType: 'text',
       listItemClasses: ['editable'],
