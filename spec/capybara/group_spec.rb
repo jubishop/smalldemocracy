@@ -111,9 +111,22 @@ RSpec.describe(Group, type: :feature) {
         member_2_delete_button = all('.delete-icon')[2]
         member_2_delete_button.click
         expect(member_2_delete_button).to(be_gone)
+
+        # Rename group
+        edit_group_button = find('#edit-group-button')
+        edit_group_button.click
+        expect(edit_group_button).to(be_gone)
+        input_field = find('#group-name input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "New group name\n")
+        expect(input_field).to(be_gone)
+        expect(edit_group_button).to(be_visible)
+
+        # Screenshot group's new state.
         goldens.verify('view_modified')
 
         # Ensure actual changes made in DB
+        expect(group.reload.name).to(eq('New group name'))
         member_emails = group.members.map(&:email)
         expect(member_emails).to(include('group_adder@view.com'))
         expect(member_emails).to_not(include('group_creator_2@view.com'))

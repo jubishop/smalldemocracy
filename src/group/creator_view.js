@@ -27,6 +27,7 @@ class Group {
       inputElement.addEventListener("keyup", (event) => {
         if (event.key == "Enter") {
           event.preventDefault();
+          inputElement.disabled = true;
           fetch('/group/name', {
             method: 'POST',
             body: JSON.stringify({
@@ -42,6 +43,7 @@ class Group {
             }
           }).then(error_message => {
             if (error_message) {
+              inputElement.disabled = false;
               alert('Error: ' + error_message);
             } else {
               inputElement.remove();
