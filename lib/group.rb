@@ -100,5 +100,22 @@ class Group < Base
         return 201, 'Group name changed'
       end
     })
+
+    post('/group/destroy', ->(req, _) {
+      email = require_session(req)
+      group = require_group(req)
+
+      unless email == group.email
+        return 400, "#{email} is not the creator of #{group.name}"
+      end
+
+      begin
+        group.destroy
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Group destroyed'
+      end
+    })
   end
 end

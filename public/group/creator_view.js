@@ -129,20 +129,49 @@ var Editable = class {
 
 // src/lib/modal.js
 var Modal = class {
-  constructor(title, body, buttons = []) {
+  constructor(title, body, buttons = false) {
     this.dialog = document.createElement("dialog");
     const article = document.createElement("article");
     const header = document.createElement("header");
     header.textContent = title;
+    const closeButton = document.createElement("a");
+    closeButton.classList.add("close");
+    closeButton.style.cursor = "pointer";
+    closeButton.addEventListener("click", () => this.close());
+    header.appendChild(closeButton);
     article.appendChild(header);
     const bodyElement = document.createElement("p");
     bodyElement.textContent = body;
     article.appendChild(bodyElement);
+    if (buttons) {
+      const footer = document.createElement("footer");
+      for (const buttonText in buttons) {
+        const buttonInfo = buttons[buttonText];
+        const button = document.createElement("a");
+        button.setAttribute("role", "button");
+        button.setAttribute("href", "#");
+        button.textContent = buttonText;
+        if (buttonInfo.hasOwnProperty("classes")) {
+          button.classList.add(...buttonInfo.classes);
+        }
+        if (buttonInfo.hasOwnProperty("callback")) {
+          button.addEventListener("click", () => buttonInfo.callback());
+        } else {
+          button.addEventListener("click", () => this.close());
+        }
+        footer.appendChild(button);
+      }
+      article.appendChild(footer);
+    }
     this.dialog.appendChild(article);
   }
   display() {
     this.dialog.setAttribute("open", true);
     document.body.prepend(this.dialog);
+  }
+  close() {
+    this.dialog.setAttribute("open", false);
+    this.dialog.remove();
   }
 };
 
@@ -223,8 +252,35 @@ var Group = class {
     });
     const deleteButton = document.getElementById("delete-group");
     deleteButton.addEventListener("click", () => {
-      new Modal("hello", "world").display();
-      console.log("delete group");
+      const modal = new Modal("Are you sure?", "Deleting this group will also delete all it's polls", {
+        "Cancel": {
+          classes: ["secondary"]
+        },
+        "Do It": {
+          callback: () => {
+            fetch("/group/destroy", {
+              method: "POST",
+              body: JSON.stringify({
+                hash_id: hashID
+              }),
+              headers: { "Content-Type": "application/json" }
+            }).then((res) => {
+              if (res.status == 201) {
+                return false;
+              } else {
+                return res.text();
+              }
+            }).then((error_message) => {
+              if (error_message) {
+                alert("Error: " + error_message);
+              } else {
+                window.location.replace("/");
+              }
+            });
+          },
+          classes: ["primary"]
+        }
+      }).display();
     });
   }
 };

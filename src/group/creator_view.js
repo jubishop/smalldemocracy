@@ -47,7 +47,7 @@ class Group {
               alert('Error: ' + error_message);
             } else {
               inputElement.remove();
-              const h2Element  = document.createElement('h2');
+              const h2Element = document.createElement('h2');
               h2Element.textContent = inputElement.value.trim();
               nameContainer.appendChild(h2Element);
               nameContainer.appendChild(editGroupButton);
@@ -93,8 +93,37 @@ class Group {
     // Delete group.
     const deleteButton = document.getElementById('delete-group');
     deleteButton.addEventListener('click', () => {
-      new Modal('hello', 'world').display();
-      console.log("delete group");
+      const modal = new Modal(
+        'Are you sure?',
+        "Deleting this group will also delete all it's polls", {
+          'Cancel': {
+            classes: ['secondary']
+          },
+          'Do It': {
+            callback: () => {
+              fetch('/group/destroy', {
+                method: 'POST',
+                body: JSON.stringify({
+                  hash_id: hashID
+                }),
+                headers: { 'Content-Type': 'application/json' }
+              }).then(res => {
+                if (res.status == 201) {
+                  return false;
+                } else {
+                  return res.text();
+                }
+              }).then(error_message => {
+                if (error_message) {
+                  alert('Error: ' + error_message);
+                } else {
+                  window.location.replace('/');
+                }
+              });
+            },
+            classes: ['primary']
+          }
+        }).display();
     });
   }
 }
