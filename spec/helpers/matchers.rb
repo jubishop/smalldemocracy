@@ -11,6 +11,10 @@ module Tony
         def have_fonts
           have_selector('.fonts-fully-loaded')
         end
+
+        def have_modal
+          have_selector('.modal-is-open')
+        end
       end
     end
   end

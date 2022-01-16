@@ -175,4 +175,23 @@ RSpec.describe(Group, type: :rack_test) {
       expect(group.reload.name).to(eq(group_name))
     }
   }
+
+  context('post /destroy') {
+    let(:group) { create_group }
+    let(:email) { group.email }
+    let(:valid_params) {
+      {
+        hash_id: group.hashid
+      }
+    }
+
+    it_has_behavior('group mutability', 'destroy')
+
+    it('destroys a group') {
+      post '/group/destroy', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Group destroyed'))
+      expect(group.exists?).to(be(false))
+    }
+  }
 }

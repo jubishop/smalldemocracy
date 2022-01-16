@@ -75,7 +75,7 @@ RSpec.describe(Poll, type: :feature) {
       go('/poll/create')
       expect(find('#group-modal')).to(
           have_link('Create Group', href: '/group/create'))
-      expect(page).to(have_selector('.modal-is-open'))
+      expect(page).to(have_modal)
       goldens.verify('create_no_group_modal')
     }
 

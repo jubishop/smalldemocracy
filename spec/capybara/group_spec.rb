@@ -108,11 +108,11 @@ RSpec.describe(Group, type: :feature) {
         first('.delete-icon').click
 
         # Delete member #2.
-        member_2_delete_button = all('.delete-icon')[2]
-        member_2_delete_button.click
-        expect(member_2_delete_button).to(be_gone)
+        delete_member_2_button = all('.delete-icon')[2]
+        delete_member_2_button.click
+        expect(delete_member_2_button).to(be_gone)
 
-        # Rename group
+        # Rename group.
         edit_group_button = find('#edit-group-button')
         edit_group_button.click
         expect(edit_group_button).to(be_gone)
@@ -125,11 +125,30 @@ RSpec.describe(Group, type: :feature) {
         # Screenshot group's new state.
         goldens.verify('view_modified')
 
-        # Ensure actual changes made in DB
+        # Ensure actual changes made in DB.
         expect(group.reload.name).to(eq('New group name'))
         member_emails = group.members.map(&:email)
         expect(member_emails).to(include('group_adder@view.com'))
         expect(member_emails).to_not(include('group_creator_2@view.com'))
+
+        # Now click to delete the group.
+        delete_group_button = find('#delete-group')
+        delete_group_button.click
+        expect(page).to(have_modal)
+
+        # Screenshot group deletion modal.
+        goldens.verify('delete_modal')
+
+        # Delete group.
+        expect_slim(:logged_in, email: group.email,
+                                groups: [],
+                                upcoming_polls: [],
+                                past_polls: [])
+        click_link('Do It')
+
+        # Confirm redirection to home and group deleted.
+        expect(page).to(have_current_path('/'))
+        expect(group.exists?).to(be(false))
       }
     }
 
