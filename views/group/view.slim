@@ -25,7 +25,7 @@ h4
   a href="/poll/create?group_id=#{group.id}"
     | Create New Poll for <em>#{group.name}</em>
 
-ul#member-list hash-id=group.hashid
+ul#member-list data-id=group.hashid
   - group.members.each do |member|
     li class=(is_creator ? "editable" : "viewable")
       p.text #{member.email}

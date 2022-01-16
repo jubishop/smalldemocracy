@@ -2075,7 +2075,7 @@ var Poll = class {
   static domLoaded() {
     const choicesElement = document.getElementById("choices");
     const bottomChoicesElement = document.getElementById("bottom-choices");
-    this.hashID = choicesElement.getAttribute("hash-id");
+    this.hashID = choicesElement.getAttribute("data-id");
     this.submitButton = document.getElementById("submit");
     this.submitButton.addEventListener("click", () => this.submitClicked());
     const choicesArray = Array.from(choicesElement.getElementsByClassName("choice"));

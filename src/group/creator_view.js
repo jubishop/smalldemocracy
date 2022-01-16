@@ -5,7 +5,7 @@ class Group {
   static domLoaded() {
     // Extract group `hashid` first.
     const listElement = document.getElementById('member-list');
-    const hashID = listElement.getAttribute("hash-id");
+    const hashID = listElement.getAttribute("data-id");
 
     // Edit name.
     const nameContainer = document.getElementById('group-name');

@@ -181,7 +181,7 @@ var Modal = class {
 var Group = class {
   static domLoaded() {
     const listElement = document.getElementById("member-list");
-    const hashID = listElement.getAttribute("hash-id");
+    const hashID = listElement.getAttribute("data-id");
     const nameContainer = document.getElementById("group-name");
     const editGroupButton = document.getElementById("edit-group-button");
     editGroupButton.addEventListener("click", () => {

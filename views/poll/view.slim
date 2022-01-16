@@ -25,7 +25,7 @@ h2 =poll.question
     p Drag to red those in which you won't participate.
 
   section
-    ul#choices hash-id=poll.hashid
+    ul#choices data-id=poll.hashid
       - poll.choices.shuffle.each do |choice|
         li.choice data-id=choice.id
           i.grip.fas.fa-grip-lines
@@ -41,6 +41,6 @@ h2 =poll.question
 - when :choose_one
   p Click on your choice.
 
-  #choices hash-id=poll.hashid
+  #choices data-id=poll.hashid
     - poll.choices.shuffle.each do |choice|
       button.choice data-id=choice.id disabled=true =choice.text

@@ -2,7 +2,7 @@
 var Poll = class {
   static domLoaded() {
     const choicesElement = document.getElementById("choices");
-    this.hashID = choicesElement.getAttribute("hash-id");
+    this.hashID = choicesElement.getAttribute("data-id");
     this.choicesArray = Array.from(choicesElement.getElementsByClassName("choice"));
     this.choicesArray.forEach((choice) => {
       choice.addEventListener("click", () => this.choiceClicked(choice));
