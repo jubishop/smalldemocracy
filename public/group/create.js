@@ -4,7 +4,7 @@ var Listable = class {
     this.listElement = listElement;
     this.buttonElement = buttonElement;
     this.options = Object.assign({
-      deleteButtonClasses: ["delete-button", "fa-duotone", "fa-trash-can"],
+      deleteButtonClasses: ["delete-icon", "fa-duotone", "fa-trash-can"],
       inputName: "item[]",
       inputType: "text",
       listItemClasses: ["listable"],

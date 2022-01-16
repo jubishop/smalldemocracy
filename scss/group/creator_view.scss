@@ -2,7 +2,24 @@
 
 @use "../editable";
 
-#creator-trash-can, #creator-trash-can .delete-button {
+#group-name {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+#group-name h2 {
+  margin: 0;
+}
+
+.edit-group-icon {
+  --fa-primary-color: var(--ins-color);
+  --fa-secondary-color: var(--contrast);
+  cursor: pointer;
+}
+
+#creator-trash-can, #creator-trash-can .delete-icon {
   border-bottom: none;
   cursor: not-allowed;
 }

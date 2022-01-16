@@ -12,7 +12,7 @@ class Poll {
     this.choiceElements = Object.fromEntries(choicesArray.map((choice) => {
       return [
         choice.getAttribute('data-id'),
-        choice.getElementsByClassName('score')[0]
+        choice.lastElementChild
       ];
     }));
 

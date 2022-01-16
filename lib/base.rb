@@ -21,8 +21,10 @@ class Base < Tony::App
     error(->(req, resp) {
       raise resp.error unless ENV.fetch('APP_ENV') == 'production'
 
-      puts resp.error.full_message(highlight: true, order: :top) if on_prod?
-      Honeybadger.notify(resp.error)
+      if on_prod?
+        puts resp.error.full_message(highlight: true, order: :top)
+        Honeybadger.notify(resp.error)
+      end
 
       stack_trace = nil
       if session_is_privileged?(req)

@@ -12,6 +12,15 @@
 = content_for :banner
   =group.name
 
+- if is_creator
+  div#group-name
+    h2 =group.name
+    div#edit-group-button
+      i.edit-group-icon.fa-duotone.fa-pencil
+
+- else
+  h2 =group.name
+
 h4
   a href="/poll/create?group_id=#{group.id}"
     | Create New Poll for <em>#{group.name}</em>
@@ -22,9 +31,12 @@ ul#member-list hash-id=group.hashid
       p.text #{member.email}
       - if is_creator && member.email == group.email
         div#creator-trash-can data-tooltip="Can't delete group's creator"
-          i.delete-button.fa-duotone.fa-trash-can-xmark
+          i.delete-icon.fa-duotone.fa-trash-can-xmark
 
 - if is_creator
   button#add-member type="button" Add Member
 - else
   button#leave-group type="button" Leave Group
+
+- if is_creator
+  button#delete-group.contrast type="button" Delete Group

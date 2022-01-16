@@ -38,8 +38,8 @@ RSpec.describe(Group, type: :rack_test) {
 
   context('get /view') {
     let(:group) { create_group }
-    let(:member) { group.add_member }
     let(:email) { member.email }
+    let(:member) { group.add_member }
 
     it('shows group for member') {
       expect_slim('group/view', group: group, member: member)
@@ -55,7 +55,7 @@ RSpec.describe(Group, type: :rack_test) {
     }
   }
 
-  shared_examples('group membership mutability') { |operation|
+  shared_examples('group mutability') { |operation|
     it('fails with no cookie') {
       clear_cookies
       post "group/#{operation}", valid_params
@@ -87,8 +87,8 @@ RSpec.describe(Group, type: :rack_test) {
 
   context('post /add_member') {
     let(:group) { create_group }
-    let(:member_email) { 'add_member@group.com' }
     let(:email) { group.email }
+    let(:member_email) { 'add_member@group.com' }
     let(:valid_params) {
       {
         hash_id: group.hashid,
@@ -96,7 +96,7 @@ RSpec.describe(Group, type: :rack_test) {
       }
     }
 
-    it_has_behavior('group membership mutability', 'add_member')
+    it_has_behavior('group mutability', 'add_member')
 
     it('adds member to group') {
       expect(group.members).to(eq([group.creating_member]))
@@ -127,7 +127,7 @@ RSpec.describe(Group, type: :rack_test) {
       }
     }
 
-    it_has_behavior('group membership mutability', 'remove_member')
+    it_has_behavior('group mutability', 'remove_member')
 
     it('removes member from group') {
       expect(group.members).to(match_array([group.creating_member, member]))
@@ -151,6 +151,47 @@ RSpec.describe(Group, type: :rack_test) {
       expect(last_response.status).to(be(400))
       expect(last_response.body).to(
           eq("remove_member@group.com is not a member of #{group.name}"))
+    }
+  }
+
+  context('post /name') {
+    let(:group) { create_group }
+    let(:email) { group.email }
+    let(:group_name) { 'New Group Name' }
+    let(:valid_params) {
+      {
+        hash_id: group.hashid,
+        name: group_name
+      }
+    }
+
+    it_has_behavior('group mutability', 'name')
+
+    it('updates group name') {
+      expect(group.name).to_not(eq(group_name))
+      post 'group/name', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Group name changed'))
+      expect(group.reload.name).to(eq(group_name))
+    }
+  }
+
+  context('post /destroy') {
+    let(:group) { create_group }
+    let(:email) { group.email }
+    let(:valid_params) {
+      {
+        hash_id: group.hashid
+      }
+    }
+
+    it_has_behavior('group mutability', 'destroy')
+
+    it('destroys a group') {
+      post '/group/destroy', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Group destroyed'))
+      expect(group.exists?).to(be(false))
     }
   }
 }
