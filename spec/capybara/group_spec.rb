@@ -139,7 +139,14 @@ RSpec.describe(Group, type: :feature) {
         # Screenshot group deletion modal.
         goldens.verify('delete_modal')
 
-        # Delete group.
+        # Click cancel and confirm modal goes away.
+        click_link('Cancel')
+        expect(page).to_not(have_modal)
+        expect(page).to(have_current_path(group.url))
+
+        # Now click again and this time confirm deletion of group.
+        delete_group_button.click
+        expect(page).to(have_modal)
         expect_slim(:logged_in, email: group.email,
                                 groups: [],
                                 upcoming_polls: [],
