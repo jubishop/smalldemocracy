@@ -90,25 +90,9 @@ class Group {
         },
         'Do It': {
           callback: () => {
-            fetch('/group/destroy', {
-              method: 'POST',
-              body: JSON.stringify({
-                hash_id: hashID
-              }),
-              headers: { 'Content-Type': 'application/json' }
-            }).then(res => {
-              if (res.status == 201) {
-                return false;
-              } else {
-                return res.text();
-              }
-            }).then(error_message => {
-              if (error_message) {
-                alert('Error: ' + error_message);
-              } else {
-                window.location.replace('/');
-              }
-            });
+            post('/group/destroy',
+              { hash_id: hashID },
+              () => window.location.replace('/'));
           },
           classes: ['primary']
         }

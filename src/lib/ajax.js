@@ -1,7 +1,11 @@
 import { Modal } from './modal'
 export { post }
 
-function post(path, params, successCallback, errorCallback = false) {
+function post(path,
+  params,
+  successCallback,
+  errorCallback = false,
+  finallyCallback = () => {}) {
   fetch(path, {
     method: 'POST',
     body: JSON.stringify(params),
@@ -22,5 +26,6 @@ function post(path, params, successCallback, errorCallback = false) {
     } else {
       successCallback();
     }
+    finallyCallback();
   });
 }

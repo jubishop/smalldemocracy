@@ -1,3 +1,80 @@
+// src/lib/modal.js
+var Modal2 = class {
+  constructor(title, body, buttons = false) {
+    this.dialog = document.createElement("dialog");
+    const article = document.createElement("article");
+    const header = document.createElement("header");
+    header.textContent = title;
+    const closeButton = document.createElement("a");
+    closeButton.classList.add("close");
+    closeButton.style.cursor = "pointer";
+    closeButton.addEventListener("click", () => this.close());
+    header.appendChild(closeButton);
+    article.appendChild(header);
+    const bodyElement = document.createElement("p");
+    bodyElement.textContent = body;
+    article.appendChild(bodyElement);
+    if (buttons) {
+      const footer = document.createElement("footer");
+      for (const buttonText in buttons) {
+        const buttonInfo = buttons[buttonText];
+        const button = document.createElement("a");
+        button.setAttribute("role", "button");
+        button.setAttribute("href", "#");
+        button.textContent = buttonText;
+        if (buttonInfo.hasOwnProperty("classes")) {
+          button.classList.add(...buttonInfo.classes);
+        }
+        if (buttonInfo.hasOwnProperty("callback")) {
+          button.addEventListener("click", () => buttonInfo.callback());
+        } else {
+          button.addEventListener("click", () => this.close());
+        }
+        footer.appendChild(button);
+      }
+      article.appendChild(footer);
+    }
+    this.dialog.appendChild(article);
+  }
+  display() {
+    this.dialog.setAttribute("open", true);
+    document.body.prepend(this.dialog);
+    document.documentElement.classList.add("modal-is-open");
+  }
+  close() {
+    this.dialog.setAttribute("open", false);
+    this.dialog.remove();
+    document.documentElement.classList.remove("modal-is-open");
+  }
+};
+
+// src/lib/ajax.js
+function post(path, params, successCallback, errorCallback = false, finallyCallback = () => {
+}) {
+  fetch(path, {
+    method: "POST",
+    body: JSON.stringify(params),
+    headers: { "Content-Type": "application/json" }
+  }).then((res) => {
+    if (res.status == 201) {
+      return false;
+    } else {
+      return res.text();
+    }
+  }).then((error_message) => {
+    if (error_message) {
+      if (errorCallback) {
+        errorCallback(error_message);
+      } else {
+        new Modal2("Error", error_message).display();
+      }
+    } else {
+      successCallback();
+    }
+    finallyCallback();
+  });
+}
+
 // src/lib/editable.js
 var Editable = class {
   constructor(listElement, elements, addButton, addPath, deletePath, addCallback, deleteCallback, options = {}) {
@@ -28,49 +105,24 @@ var Editable = class {
       return;
     }
     this.inputElement.disabled = true;
-    fetch(this.addPath, {
-      method: "POST",
-      body: JSON.stringify(this.addCallback(this.inputElement.value)),
-      headers: { "Content-Type": "application/json" }
-    }).then((res) => {
-      if (res.status == 201) {
-        return false;
-      } else {
-        return res.text();
-      }
-    }).then((error_message) => {
-      if (error_message) {
-        alert("Error: " + error_message);
-        this.inputElement.disabled = false;
-      } else {
-        const textElement = this.buildTextElement();
-        textElement.textContent = this.inputElement.value;
-        this.listItem.removeChild(this.inputElement);
-        this.listItem.appendChild(textElement);
-        this.addDeleteButtonToElement(this.listItem);
-        this.listItem = null;
-        this.inputElement = null;
-      }
+    post(this.addPath, this.addCallback(this.inputElement.value), () => {
+      const textElement = this.buildTextElement();
+      textElement.textContent = this.inputElement.value;
+      this.listItem.removeChild(this.inputElement);
+      this.listItem.appendChild(textElement);
+      this.addDeleteButtonToElement(this.listItem);
+      this.listItem = null;
+      this.inputElement = null;
+    }, (error_message) => {
+      new Modal("Error", error_message).display();
+      this.inputElement.disabled = false;
+    }, () => {
       this.addButton.disabled = false;
     });
   }
   deleteItem(element) {
-    fetch(this.deletePath, {
-      method: "POST",
-      body: JSON.stringify(this.deleteCallback(element)),
-      headers: { "Content-Type": "application/json" }
-    }).then((res) => {
-      if (res.status == 201) {
-        return false;
-      } else {
-        return res.text();
-      }
-    }).then((error_message) => {
-      if (error_message) {
-        alert("Error: " + error_message);
-      } else {
-        this.listElement.removeChild(element);
-      }
+    post(this.deletePath, this.deleteCallback(element), () => {
+      this.listElement.removeChild(element);
     });
   }
   addInputElement() {
@@ -127,81 +179,6 @@ var Editable = class {
   }
 };
 
-// src/lib/modal.js
-var Modal = class {
-  constructor(title, body, buttons = false) {
-    this.dialog = document.createElement("dialog");
-    const article = document.createElement("article");
-    const header = document.createElement("header");
-    header.textContent = title;
-    const closeButton = document.createElement("a");
-    closeButton.classList.add("close");
-    closeButton.style.cursor = "pointer";
-    closeButton.addEventListener("click", () => this.close());
-    header.appendChild(closeButton);
-    article.appendChild(header);
-    const bodyElement = document.createElement("p");
-    bodyElement.textContent = body;
-    article.appendChild(bodyElement);
-    if (buttons) {
-      const footer = document.createElement("footer");
-      for (const buttonText in buttons) {
-        const buttonInfo = buttons[buttonText];
-        const button = document.createElement("a");
-        button.setAttribute("role", "button");
-        button.setAttribute("href", "#");
-        button.textContent = buttonText;
-        if (buttonInfo.hasOwnProperty("classes")) {
-          button.classList.add(...buttonInfo.classes);
-        }
-        if (buttonInfo.hasOwnProperty("callback")) {
-          button.addEventListener("click", () => buttonInfo.callback());
-        } else {
-          button.addEventListener("click", () => this.close());
-        }
-        footer.appendChild(button);
-      }
-      article.appendChild(footer);
-    }
-    this.dialog.appendChild(article);
-  }
-  display() {
-    this.dialog.setAttribute("open", true);
-    document.body.prepend(this.dialog);
-    document.documentElement.classList.add("modal-is-open");
-  }
-  close() {
-    this.dialog.setAttribute("open", false);
-    this.dialog.remove();
-    document.documentElement.classList.remove("modal-is-open");
-  }
-};
-
-// src/lib/ajax.js
-function post(path, params, successCallback, errorCallback = false) {
-  fetch(path, {
-    method: "POST",
-    body: JSON.stringify(params),
-    headers: { "Content-Type": "application/json" }
-  }).then((res) => {
-    if (res.status == 201) {
-      return false;
-    } else {
-      return res.text();
-    }
-  }).then((error_message) => {
-    if (error_message) {
-      if (errorCallback) {
-        errorCallback(error_message);
-      } else {
-        new Modal("Error", error_message).display();
-      }
-    } else {
-      successCallback();
-    }
-  });
-}
-
 // src/group/creator_view.js
 var Group = class {
   static domLoaded() {
@@ -237,7 +214,7 @@ var Group = class {
             nameContainer.appendChild(h2Element);
             nameContainer.appendChild(editGroupButton);
           }, (error_message) => {
-            new Modal("Error", error_message).display();
+            new Modal2("Error", error_message).display();
             inputElement.disabled = false;
           });
           return false;
@@ -267,31 +244,13 @@ var Group = class {
     });
     const deleteButton = document.getElementById("delete-group");
     deleteButton.addEventListener("click", () => {
-      const modal = new Modal("Are you sure?", "Deleting this group will also delete all it's polls", {
+      const modal = new Modal2("Are you sure?", "Deleting this group will also delete all it's polls", {
         "Cancel": {
           classes: ["secondary"]
         },
         "Do It": {
           callback: () => {
-            fetch("/group/destroy", {
-              method: "POST",
-              body: JSON.stringify({
-                hash_id: hashID
-              }),
-              headers: { "Content-Type": "application/json" }
-            }).then((res) => {
-              if (res.status == 201) {
-                return false;
-              } else {
-                return res.text();
-              }
-            }).then((error_message) => {
-              if (error_message) {
-                alert("Error: " + error_message);
-              } else {
-                window.location.replace("/");
-              }
-            });
+            post("/group/destroy", { hash_id: hashID }, () => window.location.replace("/"));
           },
           classes: ["primary"]
         }
