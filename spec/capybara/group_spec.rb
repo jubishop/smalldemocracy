@@ -7,12 +7,16 @@ RSpec.describe(Group, type: :feature) {
   it_has_behavior('entity flows')
 
   context(:create) {
-    it('creates a group with complex :members creation') {
-      # Visit group creation page.
+    before(:each) {
       set_cookie(:email, 'group@create.com')
       go('/group/create')
-      goldens.verify('create_empty')
+    }
 
+    it('shows a group create page') {
+      goldens.verify('create_empty')
+    }
+
+    it('creates a group with complex :members creation') {
       # Fill in a name.
       fill_in('name', with: 'group_create')
 
@@ -58,7 +62,7 @@ RSpec.describe(Group, type: :feature) {
 
       # Click on title to remove focus from any form input.
       find('h1').click
-      goldens.verify('create')
+      goldens.verify('create_filled_in')
 
       # Confirm redirect to viewing group after creation.
       expect_slim(
@@ -74,25 +78,31 @@ RSpec.describe(Group, type: :feature) {
   }
 
   context(:view) {
+    let(:group) { |context|
+      create_group(email: "#{context.full_description.tr(' ', '_')}@view.com",
+                   name: context.description)
+    }
+
+    before(:each) {
+      10.times { |i|
+        group.add_member(email: "group_member_#{i + 1}@view.com")
+      }
+    }
+
     context(:creator) {
-      let(:group) {
-        create_group(email: 'group_creator@view.com', name: 'group_view')
+      before(:each) {
+        set_cookie(:email, group.email)
+        go(group.url)
       }
 
       it('displays a group') {
-        # Set up context to view a group as creator.
-        set_cookie(:email, group.email)
-        10.times { |i|
-          group.add_member(email: "group_creator_#{i + 1}@view.com")
-        }
-
-        # Visit group view as creator.
-        go(group.url)
         expect(page).to(
             have_link("Create New Poll for #{group.name}",
                       href: "/poll/create?group_id=#{group.id}"))
         goldens.verify('creator_view')
+      }
 
+      it('supports complex editing of group') {
         # Add a member.
         add_button = find('#add-member')
         expect(add_button).to_not(be_disabled)
@@ -130,8 +140,10 @@ RSpec.describe(Group, type: :feature) {
         member_emails = group.members.map(&:email)
         expect(member_emails).to(include('group_adder@view.com'))
         expect(member_emails).to_not(include('group_creator_2@view.com'))
+      }
 
-        # Now click to delete the group.
+      it('shows a deletion confirmation warning upon delete') {
+        # Click to delete the group.
         delete_group_button = find('#delete-group')
         delete_group_button.click
         expect(page).to(have_modal)
@@ -143,8 +155,11 @@ RSpec.describe(Group, type: :feature) {
         click_link('Cancel')
         expect(page).to_not(have_modal)
         expect(page).to(have_current_path(group.url))
+      }
 
-        # Now click again and this time confirm deletion of group.
+      it('supports deleting group') {
+        # Click and confirm deletion of group.
+        delete_group_button = find('#delete-group')
         delete_group_button.click
         expect(page).to(have_modal)
         expect_slim(:logged_in, email: group.email,
@@ -160,19 +175,12 @@ RSpec.describe(Group, type: :feature) {
     }
 
     context(:member) {
-      let(:group) {
-        create_group(email: 'group_member@view.com', name: 'group_view')
-      }
-
       before(:each) {
-        10.times { |i|
-          group.add_member(email: "group_member_#{i + 1}@view.com")
-        }
+        set_cookie(:email, group.members.last.email)
+        go(group.url)
       }
 
       it('displays a group') {
-        set_cookie(:email, group.members.last.email)
-        go(group.url)
         expect(page).to(
             have_link("Create New Poll for #{group.name}",
                       href: "/poll/create?group_id=#{group.id}"))
