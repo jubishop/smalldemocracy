@@ -1,3 +1,5 @@
+import { post } from '../../lib/ajax'
+
 class Poll {
   static domLoaded() {
     const choicesElement = document.getElementById('choices');
@@ -13,26 +15,9 @@ class Poll {
 
   static async choiceClicked(choice) {
     this.choicesArray.forEach((choice) => { choice.disabled = true; });
-    fetch('/poll/respond', {
-      method: 'POST',
-      body: JSON.stringify({
-        hash_id: this.hashID,
-        choice_id: choice.getAttribute('data-id'),
-      }),
-      headers: { 'Content-Type': 'application/json' }
-    }).then(res => {
-      if (res.status == 201) {
-        return false;
-      } else {
-        return res.text();
-      }
-    }).then(error_message => {
-      if (error_message) {
-        alert('Error: ' + error_message);
-      } else {
-        location.reload();
-      }
-    });
+    post('/poll/respond',
+      { hash_id: this.hashID, choice_id: choice.getAttribute('data-id') },
+      () => location.reload());
   }
 }
 

@@ -1,4 +1,5 @@
 import { Sortable } from '../../lib/sortable'
+import { post } from '../../lib/ajax'
 
 class Poll {
   static domLoaded() {
@@ -55,26 +56,9 @@ class Poll {
 
   static async submitClicked() {
     this.submitButton.disabled = true;
-    fetch('/poll/respond', {
-      method: 'POST',
-      body: JSON.stringify({
-        hash_id: this.hashID,
-        responses: this.sortable.toArray()
-      }),
-      headers: { 'Content-Type': 'application/json' }
-    }).then(res => {
-      if (res.status == 201) {
-        return false;
-      } else {
-        return res.text();
-      }
-    }).then(error_message => {
-      if (error_message) {
-        alert('Error: ' + error_message);
-      } else {
-        location.reload();
-      }
-    });
+    post('/poll/respond',
+      { hash_id: this.hashID, responses: this.sortable.toArray() },
+      () => location.reload());
   }
 }
 

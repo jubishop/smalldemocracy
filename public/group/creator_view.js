@@ -121,9 +121,7 @@ var Editable = class {
     });
   }
   deleteItem(element) {
-    post(this.deletePath, this.deleteCallback(element), () => {
-      this.listElement.removeChild(element);
-    });
+    post(this.deletePath, this.deleteCallback(element), () => this.listElement.removeChild(element));
   }
   addInputElement() {
     const listItem = this.buildListItem();
