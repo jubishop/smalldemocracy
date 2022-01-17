@@ -74,6 +74,10 @@ RSpec.describe(Group, type: :rack_test) {
         expect(last_response.status).to(be(400))
       }
     }
+  }
+
+  shared_examples('creator mutability') { |operation|
+    it_has_behavior('group mutability', operation)
 
     it('fails if user is not group creator') {
       email = group.add_member.email
@@ -96,7 +100,7 @@ RSpec.describe(Group, type: :rack_test) {
       }
     }
 
-    it_has_behavior('group mutability', 'add_member')
+    it_has_behavior('creator mutability', 'add_member')
 
     it('adds member to group') {
       expect(group.members).to(eq([group.creating_member]))
@@ -127,7 +131,7 @@ RSpec.describe(Group, type: :rack_test) {
       }
     }
 
-    it_has_behavior('group mutability', 'remove_member')
+    it_has_behavior('creator mutability', 'remove_member')
 
     it('removes member from group') {
       expect(group.members).to(match_array([group.creating_member, member]))
@@ -165,7 +169,7 @@ RSpec.describe(Group, type: :rack_test) {
       }
     }
 
-    it_has_behavior('group mutability', 'name')
+    it_has_behavior('creator mutability', 'name')
 
     it('updates group name') {
       expect(group.name).to_not(eq(group_name))
@@ -185,13 +189,49 @@ RSpec.describe(Group, type: :rack_test) {
       }
     }
 
-    it_has_behavior('group mutability', 'destroy')
+    it_has_behavior('creator mutability', 'destroy')
 
     it('destroys a group') {
       post '/group/destroy', valid_params
       expect(last_response.status).to(be(201))
       expect(last_response.body).to(eq('Group destroyed'))
       expect(group.exists?).to(be(false))
+    }
+  }
+
+  context('post /leave') {
+    let(:group) { create_group }
+    let(:valid_params) {
+      {
+        hash_id: group.hashid
+      }
+    }
+
+    it_has_behavior('group mutability', 'leave')
+
+    it('leaves group') {
+      member = group.add_member
+      expect(group.members).to(include(member))
+      set_cookie(:email, member.email)
+      post '/group/leave', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Group left'))
+      expect(group.members(reload: true)).to_not(include(member))
+      expect(member.exists?).to(be(false))
+    }
+
+    it('rejects leaving a group you are not a part of') {
+      post '/group/leave', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq("#{email} is not a member of #{group.name}"))
+    }
+
+    it('rejects leaving a group you created') {
+      set_cookie(:email, group.email)
+      post '/group/leave', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq('Creators cannot leave their own group'))
     }
   }
 }

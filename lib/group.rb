@@ -103,17 +103,19 @@ class Group < Base
       email = require_session(req)
       group = require_group(req)
 
-      return 400, 'Creator cannot leave their own group' if email == group.email
+      if email == group.email
+        return 400, 'Creators cannot leave their own group'
+      end
 
       member = group.member(email: email)
       return 400, "#{email} is not a member of #{group.name}" unless member
 
       begin
-        member.destroy
+        group.remove_member(member)
       rescue Sequel::Error => error
         return 400, error.message
       else
-        return 201, 'Member removed'
+        return 201, 'Group left'
       end
     })
   end
