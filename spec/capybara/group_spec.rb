@@ -79,7 +79,7 @@ RSpec.describe(Group, type: :feature) {
 
   context(:view) {
     let(:group) { |context|
-      create_group(email: "#{context.full_description.tr(' ', '_')}@view.com",
+      create_group(email: context.full_description.to_email('group.com'),
                    name: context.description)
     }
 

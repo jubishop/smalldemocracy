@@ -12,13 +12,21 @@ RSpec.describe(Poll, type: :feature) {
   it_has_behavior('entity flows')
 
   context(:create) {
-    it('creates a poll with complex :choices creation') {
-      # Set up basic data and fields of a new poll.
-      email = 'poll_complex_choices@create'
-      set_cookie(:email, email)
-      group = create_group(email: email, name: 'poll/create')
+    let(:group) { |context|
+      create_group(email: context.full_description.to_email('poll.com'),
+                   name: context.description)
+    }
+
+    it('shows poll form ready to be filled in') {
+      set_cookie(:email, group.email)
       go('/poll/create')
       goldens.verify('create_empty')
+    }
+
+    it('creates a poll with complex :choices creation') {
+      # Fill in basic data for a poll.
+      set_cookie(:email, group.email)
+      go('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
       fill_in('expiration', with: Time.new(2032, 6, 6, 11, 30))
@@ -56,7 +64,7 @@ RSpec.describe(Poll, type: :feature) {
 
       # Click on title to remove focus from any form input.
       find('h1').click
-      goldens.verify('create')
+      goldens.verify('create_filled_in')
 
       # Confirm redirect to viewing poll after creation.
       expect_slim(
@@ -162,11 +170,13 @@ RSpec.describe(Poll, type: :feature) {
           choice_node.drag_to(find('ul#bottom-choices'))
         end
 
+        it('shows a an empty borda_split page') {
+          go(poll.url)
+          goldens.verify('view_borda_split_empty_bottom')
+        }
+
         it('submits a poll response') {
           go(poll.url)
-
-          # Get a screenshot with an empty bottom section
-          goldens.verify('view_borda_split_empty_bottom')
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
@@ -291,7 +301,7 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     shared_examples('finish') {
-      it('shows a finished page') {
+      before(:each) {
         responses.each_with_index { |ranked_choices, index|
           member = members[index]
           ranked_choices.each_with_index { |choice, rank|
@@ -302,7 +312,13 @@ RSpec.describe(Poll, type: :feature) {
         }
         poll.update(expiration: past)
         go(poll.url)
+      }
+
+      it('shows a finished page') {
         goldens.verify("finished_#{type}")
+      }
+
+      it('shows a finished page with expanded summaries') {
         summary_expansions.each { |summary_pos|
           all('summary')[summary_pos].click
         }
