@@ -40,13 +40,8 @@ class Group < Base
     })
 
     post('/group/add_member', ->(req, _) {
-      email = require_session(req)
-      group = require_group(req)
+      group = require_creator(req)
       member_email = req.param(:email)
-
-      unless email == group.email
-        return 400, "#{email} is not the creator of #{group.name}"
-      end
 
       begin
         group.add_member(email: member_email)
@@ -58,14 +53,10 @@ class Group < Base
     })
 
     post('/group/remove_member', ->(req, _) {
-      email = require_session(req)
-      group = require_group(req)
+      group = require_creator(req)
       member_email = req.param(:email)
 
-      unless email == group.email
-        return 400, "#{email} is not the creator of #{group.name}"
-      end
-      if member_email == group.creating_member.email
+      if member_email == group.email
         return 400, 'Cannot remove the creator of a group'
       end
 
@@ -84,13 +75,8 @@ class Group < Base
     })
 
     post('/group/name', ->(req, _) {
-      email = require_session(req)
-      group = require_group(req)
+      group = require_creator(req)
       name = req.param(:name)
-
-      unless email == group.email
-        return 400, "#{email} is not the creator of #{group.name}"
-      end
 
       begin
         group.update(name: name)
@@ -102,12 +88,7 @@ class Group < Base
     })
 
     post('/group/destroy', ->(req, _) {
-      email = require_session(req)
-      group = require_group(req)
-
-      unless email == group.email
-        return 400, "#{email} is not the creator of #{group.name}"
-      end
+      group = require_creator(req)
 
       begin
         group.destroy
@@ -117,5 +98,18 @@ class Group < Base
         return 201, 'Group destroyed'
       end
     })
+  end
+
+  private
+
+  def require_creator(req)
+    email = require_session(req)
+    group = require_group(req)
+
+    unless email == group.email
+      throw(:response, [400, "#{email} is not the creator of #{group.name}"])
+    end
+
+    return group
   end
 end
