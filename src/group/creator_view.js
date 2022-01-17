@@ -1,5 +1,6 @@
 import { Editable } from '../lib/editable'
 import { Modal } from '../lib/modal'
+import { post } from '../lib/ajax'
 
 class Group {
   static domLoaded() {
@@ -28,30 +29,18 @@ class Group {
         if (event.key == "Enter") {
           event.preventDefault();
           inputElement.disabled = true;
-          fetch('/group/name', {
-            method: 'POST',
-            body: JSON.stringify({
-              hash_id: hashID,
-              name: inputElement.value.trim()
-            }),
-            headers: { 'Content-Type': 'application/json' }
-          }).then(res => {
-            if (res.status == 201) {
-              return false;
-            } else {
-              return res.text();
-            }
-          }).then(error_message => {
-            if (error_message) {
-              inputElement.disabled = false;
-              alert('Error: ' + error_message);
-            } else {
-              inputElement.remove();
-              const h2Element = document.createElement('h2');
-              h2Element.textContent = inputElement.value.trim();
-              nameContainer.appendChild(h2Element);
-              nameContainer.appendChild(editGroupButton);
-            }
+          post('/group/name', {
+            hash_id: hashID,
+            name: inputElement.value.trim()
+          }, () => { // successCallback
+            inputElement.remove();
+            const h2Element = document.createElement('h2');
+            h2Element.textContent = inputElement.value.trim();
+            nameContainer.appendChild(h2Element);
+            nameContainer.appendChild(editGroupButton);
+          }, (error_message) => { // errorCallback
+            new Modal('Error', error_message).display();
+            inputElement.disabled = false;
           });
           return false;
         }
@@ -96,34 +85,34 @@ class Group {
       const modal = new Modal(
         'Are you sure?',
         "Deleting this group will also delete all it's polls", {
-          'Cancel': {
-            classes: ['secondary']
+        'Cancel': {
+          classes: ['secondary']
+        },
+        'Do It': {
+          callback: () => {
+            fetch('/group/destroy', {
+              method: 'POST',
+              body: JSON.stringify({
+                hash_id: hashID
+              }),
+              headers: { 'Content-Type': 'application/json' }
+            }).then(res => {
+              if (res.status == 201) {
+                return false;
+              } else {
+                return res.text();
+              }
+            }).then(error_message => {
+              if (error_message) {
+                alert('Error: ' + error_message);
+              } else {
+                window.location.replace('/');
+              }
+            });
           },
-          'Do It': {
-            callback: () => {
-              fetch('/group/destroy', {
-                method: 'POST',
-                body: JSON.stringify({
-                  hash_id: hashID
-                }),
-                headers: { 'Content-Type': 'application/json' }
-              }).then(res => {
-                if (res.status == 201) {
-                  return false;
-                } else {
-                  return res.text();
-                }
-              }).then(error_message => {
-                if (error_message) {
-                  alert('Error: ' + error_message);
-                } else {
-                  window.location.replace('/');
-                }
-              });
-            },
-            classes: ['primary']
-          }
-        }).display();
+          classes: ['primary']
+        }
+      }).display();
     });
   }
 }

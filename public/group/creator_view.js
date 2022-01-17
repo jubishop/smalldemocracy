@@ -177,6 +177,31 @@ var Modal = class {
   }
 };
 
+// src/lib/ajax.js
+function post(path, params, successCallback, errorCallback = false) {
+  fetch(path, {
+    method: "POST",
+    body: JSON.stringify(params),
+    headers: { "Content-Type": "application/json" }
+  }).then((res) => {
+    if (res.status == 201) {
+      return false;
+    } else {
+      return res.text();
+    }
+  }).then((error_message) => {
+    if (error_message) {
+      if (errorCallback) {
+        errorCallback(error_message);
+      } else {
+        new Modal("Error", error_message).display();
+      }
+    } else {
+      successCallback();
+    }
+  });
+}
+
 // src/group/creator_view.js
 var Group = class {
   static domLoaded() {
@@ -202,30 +227,18 @@ var Group = class {
         if (event.key == "Enter") {
           event.preventDefault();
           inputElement.disabled = true;
-          fetch("/group/name", {
-            method: "POST",
-            body: JSON.stringify({
-              hash_id: hashID,
-              name: inputElement.value.trim()
-            }),
-            headers: { "Content-Type": "application/json" }
-          }).then((res) => {
-            if (res.status == 201) {
-              return false;
-            } else {
-              return res.text();
-            }
-          }).then((error_message) => {
-            if (error_message) {
-              inputElement.disabled = false;
-              alert("Error: " + error_message);
-            } else {
-              inputElement.remove();
-              const h2Element = document.createElement("h2");
-              h2Element.textContent = inputElement.value.trim();
-              nameContainer.appendChild(h2Element);
-              nameContainer.appendChild(editGroupButton);
-            }
+          post("/group/name", {
+            hash_id: hashID,
+            name: inputElement.value.trim()
+          }, () => {
+            inputElement.remove();
+            const h2Element = document.createElement("h2");
+            h2Element.textContent = inputElement.value.trim();
+            nameContainer.appendChild(h2Element);
+            nameContainer.appendChild(editGroupButton);
+          }, (error_message) => {
+            new Modal("Error", error_message).display();
+            inputElement.disabled = false;
           });
           return false;
         }
