@@ -92,7 +92,9 @@ class Group {
           callback: () => {
             post('/group/destroy',
               { hash_id: hashID },
-              () => window.location.replace('/'));
+              () => window.location.replace('/'), // successCallback
+              false, // errorCallback
+              () => modal.close()); // finallyCallback
           },
           classes: ['primary']
         }

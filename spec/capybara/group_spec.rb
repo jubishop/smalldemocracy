@@ -175,8 +175,10 @@ RSpec.describe(Group, type: :feature) {
     }
 
     context(:member) {
+      let(:email) { group.members.last.email }
+
       before(:each) {
-        set_cookie(:email, group.members.last.email)
+        set_cookie(:email, email)
         go(group.url)
       }
 
@@ -185,6 +187,41 @@ RSpec.describe(Group, type: :feature) {
             have_link("Create New Poll for #{group.name}",
                       href: "/poll/create?group_id=#{group.id}"))
         goldens.verify('member_view')
+      }
+
+      it('shows a confirmation warning upon leaving') {
+        # Click to leave the group.
+        leave_group_button = find('#leave-group')
+        leave_group_button.click
+        expect(page).to(have_modal)
+
+        # Screenshot group deletion modal.
+        goldens.verify('leave_modal')
+
+        # Click cancel and confirm modal goes away.
+        click_link('Cancel')
+        expect(page).to_not(have_modal)
+        expect(page).to(have_current_path(group.url))
+      }
+
+      it('supports leaving group') {
+        member = group.member(email: email)
+        expect(member.exists?).to(be(true))
+
+        # Click and confirm leaving group.
+        leave_group_button = find('#leave-group')
+        leave_group_button.click
+        expect(page).to(have_modal)
+        expect_slim(:logged_in, email: email,
+                                groups: [],
+                                upcoming_polls: [],
+                                past_polls: [])
+        click_link('Do It')
+
+        # Confirm redirection to home and group left.
+        expect(page).to(have_current_path('/'))
+        expect(group.member(email: email)).to(be(nil))
+        expect(member.exists?).to(be(false))
       }
     }
   }

@@ -98,6 +98,26 @@ class Group < Base
         return 201, 'Group destroyed'
       end
     })
+
+    post('/group/leave', ->(req, _) {
+      email = require_session(req)
+      group = require_group(req)
+
+      if email == group.email
+        return 400, 'Creators cannot leave their own group'
+      end
+
+      member = group.member(email: email)
+      return 400, "#{email} is not a member of #{group.name}" unless member
+
+      begin
+        group.remove_member(member)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Group left'
+      end
+    })
   end
 
   private
