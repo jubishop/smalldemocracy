@@ -45,11 +45,13 @@ class Modal {
     this.dialog.setAttribute('open', true);
     document.body.prepend(this.dialog);
     document.documentElement.classList.add('modal-is-open');
+    return this;
   }
 
   close() {
     this.dialog.setAttribute('open', false);
     this.dialog.remove();
     document.documentElement.classList.remove('modal-is-open');
+    return this;
   }
 }
