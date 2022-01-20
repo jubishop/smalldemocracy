@@ -170,7 +170,7 @@ RSpec.describe(Poll, type: :feature) {
           choice_node.drag_to(find('ul#bottom-choices'))
         end
 
-        it('shows a an empty borda_split page') {
+        it('shows an empty borda_split page') {
           go(poll.url)
           goldens.verify('view_borda_split_empty_bottom')
         }

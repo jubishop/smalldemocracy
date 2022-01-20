@@ -27,5 +27,12 @@ function post(path,
       successCallback();
     }
     finallyCallback();
+  }).catch((error_message) => {
+    if (errorCallback) {
+      errorCallback(error_message);
+    } else {
+      new Modal('Error', error_message).display();
+    }
+    finallyCallback();
   });
 }

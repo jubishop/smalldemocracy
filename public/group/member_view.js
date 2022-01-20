@@ -74,6 +74,13 @@ function post(path, params, successCallback, errorCallback = false, finallyCallb
       successCallback();
     }
     finallyCallback();
+  }).catch((error_message) => {
+    if (errorCallback) {
+      errorCallback(error_message);
+    } else {
+      new Modal("Error", error_message).display();
+    }
+    finallyCallback();
   });
 }
 

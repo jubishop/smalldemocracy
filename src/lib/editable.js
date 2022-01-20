@@ -1,5 +1,6 @@
 export { Editable }
 
+import { Modal } from './modal'
 import { post } from './ajax'
 
 class Editable {
@@ -49,13 +50,11 @@ class Editable {
         this.addDeleteButtonToElement(this.listItem);
         this.listItem = null;
         this.inputElement = null;
+        this.addButton.disabled = false;
       },
       (error_message) => { // errorCallback
         new Modal('Error', error_message).display();
         this.inputElement.disabled = false;
-      },
-      () => { // finallyCallback
-        this.addButton.disabled = false;
       });
   }
 

@@ -1,5 +1,5 @@
 // src/lib/modal.js
-var Modal2 = class {
+var Modal = class {
   constructor(title, body, buttons = false) {
     this.dialog = document.createElement("dialog");
     const article = document.createElement("article");
@@ -68,10 +68,17 @@ function post(path, params, successCallback, errorCallback = false, finallyCallb
       if (errorCallback) {
         errorCallback(error_message);
       } else {
-        new Modal2("Error", error_message).display();
+        new Modal("Error", error_message).display();
       }
     } else {
       successCallback();
+    }
+    finallyCallback();
+  }).catch((error_message) => {
+    if (errorCallback) {
+      errorCallback(error_message);
+    } else {
+      new Modal("Error", error_message).display();
     }
     finallyCallback();
   });
@@ -115,11 +122,10 @@ var Editable = class {
       this.addDeleteButtonToElement(this.listItem);
       this.listItem = null;
       this.inputElement = null;
+      this.addButton.disabled = false;
     }, (error_message) => {
       new Modal("Error", error_message).display();
       this.inputElement.disabled = false;
-    }, () => {
-      this.addButton.disabled = false;
     });
   }
   deleteItem(element) {
@@ -214,7 +220,7 @@ var Group = class {
             nameContainer.appendChild(h2Element);
             nameContainer.appendChild(editGroupButton);
           }, (error_message) => {
-            new Modal2("Error", error_message).display();
+            new Modal("Error", error_message).display();
             inputElement.disabled = false;
           });
           return false;
@@ -244,7 +250,7 @@ var Group = class {
     });
     const deleteButton = document.getElementById("delete-group");
     deleteButton.addEventListener("click", () => {
-      const modal = new Modal2("Are you sure?", "Deleting this group will also delete all it's polls", {
+      const modal = new Modal("Are you sure?", "Deleting this group will also delete all it's polls", {
         "Cancel": {
           classes: ["secondary"]
         },
