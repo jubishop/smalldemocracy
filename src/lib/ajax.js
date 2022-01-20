@@ -10,11 +10,11 @@ function post(path,
     method: 'POST',
     body: JSON.stringify(params),
     headers: { 'Content-Type': 'application/json' }
-  }).then(res => {
-    if (res.status == 201) {
-      return false;
+  }).then(response => {
+    if (response.status == 201) {
+      return undefined;
     } else {
-      return res.text();
+      return response.text();
     }
   }).then(error_message => {
     if (error_message) {
@@ -26,13 +26,13 @@ function post(path,
     } else {
       successCallback();
     }
-    finallyCallback();
   }).catch(error_message => {
     if (errorCallback) {
       errorCallback(error_message);
     } else {
       new Modal('Error', error_message).display();
     }
+  }).finally(() => {
     finallyCallback();
   });
 }
