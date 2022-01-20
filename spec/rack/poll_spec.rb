@@ -263,7 +263,8 @@ RSpec.describe(Poll, type: :rack_test) {
             poll_response = poll_responses.find { |response|
               response.choice_id == choice_id
             }
-            expect(poll_response.score).to(eq(score_calculation.call(rank)))
+            expect(poll_response.data[:score]).to(
+                eq(score_calculation.call(rank)))
           }
 
           expect_slim(

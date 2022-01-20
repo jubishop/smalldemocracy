@@ -17,7 +17,7 @@ ruby:
     h3 Choices
     ol
       - poll.counts.each do |result|
-        - count = "#{result.count} #{'time'.en.plural(result.count)}"
+        - count = "#{result.to_i} #{'time'.en.plural(result.to_i)}"
         li
           details
             summary ="#{result} (#{count})"
@@ -32,7 +32,7 @@ ruby:
     h3 Borda Score
     ol
       - poll.scores.each do |result|
-        - score = "#{result.score} #{'point'.en.plural(result.score)}"
+        - score = "#{result.to_i} #{'point'.en.plural(result.to_i)}"
         li
           details
             summary ="#{result} (#{score})"

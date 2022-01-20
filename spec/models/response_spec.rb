@@ -4,7 +4,7 @@ RSpec.describe(Models::Response, type: :model) {
   context('.create') {
     it('creates a response with no score') {
       response = create_response
-      expect(response.data).to(be(nil))
+      expect(response.data[:score]).to(be(nil))
     }
 
     it('creates a response with a score') {

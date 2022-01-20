@@ -18,7 +18,7 @@ module Models
       end
 
       def to_a
-        return values.sort_by! { |result| -result.count }
+        return values.sort_by! { |result| -result.to_i }
       end
     end
 
@@ -38,8 +38,6 @@ module Models
       end
 
       alias to_i value
-      alias score value
-      alias count value
 
       def text
         choice.text

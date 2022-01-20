@@ -38,7 +38,7 @@ module Models
     end
 
     def data
-      return super&.symbolize_keys!
+      return (super || {}).symbolize_keys!
     end
 
     def to_s

@@ -235,7 +235,7 @@ RSpec.describe(Poll, type: :feature) {
         choices.each_with_index { |position, rank|
           choice = poll.choices[position]
           member.add_response(choice_id: choice.id,
-                              score: score_calculation.call(rank))
+                              data: { score: score_calculation.call(rank) })
         }
         go(poll.url)
         goldens.verify("responded_#{type}")
@@ -307,7 +307,7 @@ RSpec.describe(Poll, type: :feature) {
           ranked_choices.each_with_index { |choice, rank|
             member.add_response(
                 choice_id: choices[choice].id,
-                score: score_calculation.call(rank))
+                data: { score: score_calculation.call(rank) })
           }
         }
         poll.update(expiration: past)
