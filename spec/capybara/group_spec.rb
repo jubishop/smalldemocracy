@@ -162,10 +162,6 @@ RSpec.describe(Group, type: :feature) {
         delete_group_button = find('#delete-group')
         delete_group_button.click
         expect(page).to(have_modal)
-        expect_slim(:logged_in, email: group.email,
-                                groups: [],
-                                upcoming_polls: [],
-                                past_polls: [])
         click_link('Do It')
 
         # Confirm redirection to home and group deleted.
@@ -212,10 +208,6 @@ RSpec.describe(Group, type: :feature) {
         leave_group_button = find('#leave-group')
         leave_group_button.click
         expect(page).to(have_modal)
-        expect_slim(:logged_in, email: email,
-                                groups: [],
-                                upcoming_polls: [],
-                                past_polls: [])
         click_link('Do It')
 
         # Confirm redirection to home and group left.

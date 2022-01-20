@@ -110,7 +110,7 @@ class Poll < Base
     end
 
     responses.each_with_index { |choice_id, rank|
-    score = poll.choices.length - rank
+      score = poll.choices.length - rank
       score -= 1 if poll.type == :borda_single
       member.add_response(choice_id: choice_id, data: { score: score })
     }
