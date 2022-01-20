@@ -89,9 +89,13 @@ module Models
       assert_finished
       assert_type(:borda_single, :borda_split)
 
-      return Helpers::PollResults.new(responses) { |response|
+      point_results = Helpers::PollResults.new(responses)
+      scores_results = Helpers::PollResults.new(responses) { |response|
         response.data[:score]
-      }.to_a
+      }
+      return scores_results.values.sort_by! { |result|
+        [-result.to_i, -point_results[result.choice].to_i]
+      }
     end
 
     def counts
