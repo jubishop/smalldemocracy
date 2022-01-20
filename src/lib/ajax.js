@@ -27,7 +27,7 @@ function post(path,
       successCallback();
     }
     finallyCallback();
-  }).catch((error_message) => {
+  }).catch(error_message => {
     if (errorCallback) {
       errorCallback(error_message);
     } else {
