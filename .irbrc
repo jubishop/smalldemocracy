@@ -1,7 +1,4 @@
-ENV['APP_ENV'] = 'test'
-
 require 'sequel'
-
 DB = Sequel.postgres(database: 'smalldemocracy_dev')
 
 require_relative 'lib/models/choice'
@@ -15,3 +12,5 @@ require_relative 'spec/helpers/models'
 class Object
   include RSpec::Models
 end
+
+ENV['APP_ENV'] = 'test'

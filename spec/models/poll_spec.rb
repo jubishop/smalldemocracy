@@ -247,7 +247,7 @@ RSpec.describe(Models::Poll, type: :model) {
         }
         expect(@poll.counts.map(&:to_s)).to(
             match_array(results.map { |r| r[0].to_s }))
-        expect(@poll.counts.map(&:count)).to(
+        expect(@poll.counts.map(&:to_i)).to(
             match_array(results.map { |r| r[1] }))
       }
 
@@ -302,7 +302,7 @@ RSpec.describe(Models::Poll, type: :model) {
           member = @poll.member(email: email.to_s)
           @poll.choices.each { |choice|
             score = choices.length - ranks.index(choice.text) - 1
-            member.add_response(choice_id: choice.id, score: score)
+            member.add_response(choice_id: choice.id, data: { score: score })
           }
         }
 
@@ -344,7 +344,7 @@ RSpec.describe(Models::Poll, type: :model) {
           @poll.choices.each { |choice|
             if chosen_ranks.include?(choice.text)
               score = choices.length - chosen_ranks.index(choice.text)
-              member.add_response(choice_id: choice.id, score: score)
+              member.add_response(choice_id: choice.id, data: { score: score })
             end
           }
         }

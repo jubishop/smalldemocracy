@@ -1,6 +1,7 @@
 require 'capybara/apparition'
 require 'colorize'
 require 'core/test'
+require 'sequel'
 require 'tony/test'
 
 ENV['APP_ENV'] = 'test'
@@ -32,6 +33,18 @@ Capybara.register_driver(:apparition) { |app|
   })
 }
 Capybara.default_driver = :apparition
+
+RSpec.shared_context(:migration) {
+  let(:DB) { Sequel::DATABASES.first }
+
+  before(:each) {
+    Sequel::Migrator.run(DB, 'db/migrations', target: 0)
+  }
+
+  after(:each) {
+    Sequel::Migrator.run(DB, 'db/migrations')
+  }
+}
 
 RSpec.shared_context(:model) {
   let(:email) { random_email }
@@ -89,6 +102,7 @@ RSpec.configure do |config|
   config.include(RSpec::EMail)
   config.include(RSpec::Models)
   config.include(RSpec::Time)
+  config.include_context(:migration, type: :migration)
   config.include_context(:model, type: :model)
   config.include_context(:rack_test, type: :rack_test)
   config.include_context(:capybara, type: :feature)

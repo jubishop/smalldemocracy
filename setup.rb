@@ -30,6 +30,7 @@ DB = case ENV.fetch('APP_ENV')
        end
      end
 DB.extension(:pg_enum)
+DB.extension(:pg_json)
 if ENV.fetch('RESET_DB_ON_SETUP', false)
   Sequel::Migrator.run(DB, 'db/migrations', target: 0)
 end

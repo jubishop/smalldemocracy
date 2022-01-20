@@ -89,7 +89,9 @@ module Models
       assert_finished
       assert_type(:borda_single, :borda_split)
 
-      return Helpers::PollResults.new(responses, &:score).to_a
+      return Helpers::PollResults.new(responses) { |response|
+        response.data[:score]
+      }.to_a
     end
 
     def counts
@@ -101,9 +103,11 @@ module Models
       when :choose_one
         return point_results.to_a
       when :borda_split
-        scores_results = Helpers::PollResults.new(responses, &:score)
+        scores_results = Helpers::PollResults.new(responses) { |response|
+          response.data[:score]
+        }
         return point_results.values.sort_by! { |result|
-          [-result.count, -scores_results[result.choice].score]
+          [-result.to_i, -scores_results[result.choice].to_i]
         }
       end
     end
@@ -119,9 +123,9 @@ module Models
           unresponded.push(member)
         else
           member.responses.each { |response|
-            results[response.choice].push(BreakdownResult.new(
-                                              member: member,
-                                              score: response.score))
+            results[response.choice].push(
+                BreakdownResult.new(member: member,
+                                    score: response.data[:score]))
           }
         end
       }
