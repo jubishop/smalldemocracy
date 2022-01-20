@@ -15,6 +15,7 @@ namespace :db do
     Sequel.extension(:migration)
     db = connect_sequel_db
     db.extension(:pg_enum)
+    db.extension(:pg_json)
     Sequel::Migrator.run(db, 'db/migrations', target: version)
   }
 
@@ -34,6 +35,13 @@ RuboCop::RakeTask.new(:rubocop)
 desc('Run all tests')
 RSpec::Core::RakeTask.new(:spec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
+  t.verbose
+}
+
+desc('Run spec on migrations')
+RSpec::Core::RakeTask.new(:migrations) { |t|
+  t.pattern = Dir.glob('spec/**/*_spec.rb')
+  t.rspec_opts = '-t type:migration'
   t.verbose
 }
 
