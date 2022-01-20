@@ -7,7 +7,7 @@ RSpec.describe('002_move_score_to_json', type: :migration) {
     Sequel::Migrator.run(DB, 'db/migrations', target: 1)
   }
 
-  it('migrates score into json blob') {
+  it('migrates score into json data') {
     # Manually and painfully create a bunch of responses, putting values into
     # the old `Response.score` field.
     responses = {} # Key = response_id, Value = score.
@@ -44,11 +44,11 @@ RSpec.describe('002_move_score_to_json', type: :migration) {
       }
     }
 
-    # Migrate and find all responses now in blob['score']
+    # Migrate and find all responses now in data['score']
     Sequel::Migrator.run(DB, 'db/migrations', target: 2)
     responses.each { |response_id, score|
       response = DB[:responses].first(id: response_id)
-      expect(response[:blob]['score']).to(eq(score))
+      expect(response[:data]['score']).to(eq(score))
       expect(response[:score]).to(be_nil)
     }
   }

@@ -46,9 +46,9 @@ module RSpec
       return create_poll(**attributes).add_choice(text: text)
     end
 
-    def create_response(score: nil, **attributes)
+    def create_response(data: nil, **attributes)
       choice = create_choice(**attributes)
-      return choice.add_response(score: score)
+      return choice.add_response(data: data)
     end
   end
 end
@@ -106,9 +106,9 @@ module Models
     include Test::Env
 
     def add_response(choice_id: polls.sample.choices.sample,
-                     score: nil)
+                     data: nil)
       test_only!
-      super(choice_id: choice_id, score: score)
+      super(choice_id: choice_id, data: data)
     end
   end
 

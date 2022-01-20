@@ -11,6 +11,7 @@
 #  responses_choice_id_fkey | (choice_id) REFERENCES choices(id) ON DELETE CASCADE
 #  responses_member_id_fkey | (member_id) REFERENCES members(id) ON DELETE CASCADE
 
+require 'core'
 require 'sequel'
 
 require_relative 'choice'
@@ -34,6 +35,10 @@ module Models
     def before_destroy
       cancel_action('Response removed from expired poll') if poll.finished?
       super
+    end
+
+    def data
+      return super&.symbolize_keys!
     end
 
     def to_s
