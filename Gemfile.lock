@@ -28,7 +28,7 @@ GEM
     cri (2.15.11)
     diff-lcs (1.5.0)
     hashids (1.0.6)
-    honeybadger (4.9.0)
+    honeybadger (4.10.0)
     linguistics (2.1.0)
       loggability (~> 0.11)
     loggability (0.18.2)
@@ -76,9 +76,9 @@ GEM
     rspec_n (1.4.0)
       colorize (~> 0.8.0)
       cri (~> 2.15.3)
-    rubocop (1.24.1)
+    rubocop (1.25.0)
       parallel (~> 1.10)
-      parser (>= 3.0.0.0)
+      parser (>= 3.1.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
@@ -87,7 +87,7 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.15.1)
       parser (>= 3.0.1.1)
-    rubocop-performance (1.13.1)
+    rubocop-performance (1.13.2)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
     rubocop-rake (0.6.0)
@@ -120,7 +120,7 @@ GEM
 GEM
   remote: https://www.jubigems.org/
   specs:
-    core (1.17)
+    core (1.18)
     core-test (0.5)
     duration (1.6)
       core
@@ -135,7 +135,7 @@ GEM
       tzinfo
     tony-auth (0.12)
       base64
-    tony-test (0.83)
+    tony-test (0.84)
       capybara
       chunky_png
       colorize
