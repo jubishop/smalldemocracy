@@ -11,8 +11,9 @@ Slim::Engine.set_options(
     tabsize: 2,
     pretty: ENV.fetch('APP_ENV') != 'production')
 
+Sequel.application_timezone = :utc
 Sequel.database_timezone = :utc
-Sequel.application_timezone = :local
+Sequel.typecast_timezone = :utc
 Sequel.extension(:migration)
 DB = case ENV.fetch('APP_ENV')
      when 'production'

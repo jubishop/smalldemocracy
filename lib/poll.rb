@@ -1,6 +1,7 @@
 require 'core'
 require 'date'
 require 'duration'
+require 'time'
 
 require_relative 'base'
 require_relative 'models/poll'
@@ -30,12 +31,11 @@ class Poll < Base
       choices = req.list_param(:choices, [])
       req.params.delete(:choices)
 
+      offset = req.timezone.current_period.offset.utc_total_offset
       begin
-        # rubocop:disable Style/DateTime
-        req.params[:expiration] = DateTime.strptime(
-            req.param(:expiration), '%Y-%m-%dT%H:%M').to_time
-        req.params[:expiration] -= req.timezone.utc_offset.seconds
-        # rubocop:enable Style/DateTime
+        req.params[:expiration] = Time.strptime(
+            "#{req.param(:expiration)} UTC",
+            '%Y-%m-%dT%H:%M %Z') - offset
       rescue Date::Error
         return 400, "#{date_string} is invalid date"
       end
