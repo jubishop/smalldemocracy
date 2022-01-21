@@ -184,6 +184,7 @@ DEPENDENCIES
   tony!
   tony-auth!
   tony-test!
+  tzinfo
 
 RUBY VERSION
    ruby 3.0.3p157

@@ -1,4 +1,5 @@
 require 'duration'
+require 'tzinfo'
 
 require_relative 'shared_examples/entity_flows'
 

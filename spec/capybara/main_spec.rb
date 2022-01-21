@@ -1,4 +1,5 @@
 require 'duration'
+require 'tzinfo'
 
 RSpec.describe(Main, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/main') }

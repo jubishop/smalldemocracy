@@ -3,6 +3,7 @@ require 'colorize'
 require 'core/test'
 require 'sequel'
 require 'tony/test'
+require 'tzinfo'
 
 ENV['APP_ENV'] = 'test'
 ENV['RACK_ENV'] = 'test'

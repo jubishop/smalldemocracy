@@ -28,7 +28,7 @@ form action="create" method="post"
     - user.groups.each do |group|
       option value=group.id selected=(group.id == group_id) #{group.name}
 
-  label for="expiration" Expiration:
+  label for="expiration" Expiration (in #{form_time.zone.abbr}):
   input[name="expiration"
         type="datetime-local"
         required=true
