@@ -35,7 +35,7 @@ class Poll < Base
         req.params[:expiration] = Time.strptime(
             "#{req.param(:expiration)} UTC",
             '%Y-%m-%dT%H:%M %Z') - req.timezone.current_period.utc_total_offset
-      rescue Date::Error
+      rescue ArgumentError
         return 400, "#{req.param(:expiration)} is invalid date"
       end
 

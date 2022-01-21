@@ -74,6 +74,13 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
     }
 
+    it('fails if poll expiration is invalid string') {
+      valid_params[:expiration] = 'Sometime tomorrow'
+      post '/poll/create', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq('Sometime tomorrow is invalid date'))
+    }
+
     it('fails if poll expiration is in the past') {
       valid_params[:expiration] = past.form
       post '/poll/create', valid_params
