@@ -23,6 +23,8 @@ RSpec.describe(Poll, type: :feature) {
     it('shows poll form ready to be filled in') {
       set_cookie(:email, group.email)
       go('/poll/create')
+
+      expect(page).to(have_field('expiration', with: (Time.now + 7.days).form))
       goldens.verify('create_empty')
     }
 
