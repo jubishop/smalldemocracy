@@ -31,13 +31,12 @@ class Poll < Base
       choices = req.list_param(:choices, [])
       req.params.delete(:choices)
 
-      offset = req.timezone.current_period.offset.utc_total_offset
       begin
         req.params[:expiration] = Time.strptime(
             "#{req.param(:expiration)} UTC",
-            '%Y-%m-%dT%H:%M %Z') - offset
+            '%Y-%m-%dT%H:%M %Z') - req.timezone.current_period.utc_total_offset
       rescue Date::Error
-        return 400, "#{date_string} is invalid date"
+        return 400, "#{req.params[:expiration]} is invalid date"
       end
 
       begin
