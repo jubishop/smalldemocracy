@@ -108,7 +108,7 @@ RSpec.configure do |config|
   config.include_context(:capybara, type: :feature)
 
   config.before(:each) {
-    freeze_time(Time.now)
+    freeze_time(Time.at(Time.now, in: TZInfo::Timezone.get('America/New_York')))
     allow(Tony::Auth::Google).to(receive(:url)) { |_, r: '/'| r }
   }
 
