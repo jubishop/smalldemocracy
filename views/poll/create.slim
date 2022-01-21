@@ -32,9 +32,9 @@ form action="create" method="post"
   input[name="expiration"
         type="datetime-local"
         required=true
-        value=(poll_time + 7.days).strftime('%Y-%m-%dT%H:%M')
-        min=poll_time.strftime('%Y-%m-%dT%H:%M')
-        max=(poll_time + 90.days).strftime('%Y-%m-%dT%H:%M')]
+        value=(form_time + 7.days).strftime('%Y-%m-%dT%H:%M')
+        min=form_time.strftime('%Y-%m-%dT%H:%M')
+        max=(form_time + 90.days).strftime('%Y-%m-%dT%H:%M')]
 
   label for="type" Type:
   select name="type"

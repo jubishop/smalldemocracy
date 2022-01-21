@@ -16,10 +16,10 @@ class Poll < Base
       email = require_session(req)
       user = Models::User.find_or_create(email: email)
 
-      poll_time = Time.now - (Time.now.utc_offset - req.timezone.utc_offset)
+      form_time = Time.at(Time.now, in: req.timezone)
       return 200, @slim.render('poll/create',
                                user: user,
-                               poll_time: poll_time,
+                               form_time: form_time,
                                group_id: req.params.fetch(:group_id, 0).to_i)
     })
 

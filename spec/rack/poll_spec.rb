@@ -30,7 +30,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('shows creation page') {
       expect_slim('poll/create', user: user,
-                                 poll_time: an_instance_of(Time),
+                                 form_time: an_instance_of(Time),
                                  group_id: 0)
       get 'poll/create'
       expect(last_response.ok?).to(be(true))
@@ -38,7 +38,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('shows creation page and propagates :group_id parameter') {
       expect_slim('poll/create', user: user,
-                                 poll_time: an_instance_of(Time),
+                                 form_time: an_instance_of(Time),
                                  group_id: group.id)
       get 'poll/create', group_id: group.id
       expect(last_response.ok?).to(be(true))
