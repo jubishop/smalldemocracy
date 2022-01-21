@@ -144,6 +144,8 @@ RSpec.describe(Poll, type: :feature) {
 
         it('submits a poll response') {
           go(poll.url)
+          expect(page).to(have_content('Jun 06 1982, at 11:40 AM +07. ' \
+                                       '(10 minutes from now).'))
 
           # Rearrange our choices.
           rearrange_choices([1, 0, 6, 3, 2, 5, 4])
@@ -177,6 +179,8 @@ RSpec.describe(Poll, type: :feature) {
 
         it('submits a poll response') {
           go(poll.url)
+          expect(page).to(have_content('Jun 06 1982, at 11:40 AM +07. ' \
+                                       '(10 minutes from now).'))
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
@@ -202,6 +206,8 @@ RSpec.describe(Poll, type: :feature) {
 
       it('submits a poll response') {
         go(poll.url)
+        expect(page).to(have_content('Jun 06 1982, at 11:40 AM +07. ' \
+                                     '(10 minutes from now).'))
 
         # Get a screenshot of all our choices.
         goldens.verify('view_choose')
