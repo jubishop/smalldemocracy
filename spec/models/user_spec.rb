@@ -94,17 +94,21 @@ RSpec.describe(Models::User, type: :model) {
   }
 
   context('#polls') {
-    before(:all) {
+    before(:context) {
+      @current_time = future + 15.seconds
       @user = create_user
       my_group = @user.add_group
       other_group = create_group
       other_group.add_member(email: @user.email)
-      @expired_poll = my_group.add_poll
-      @expired_poll.update(expiration: past)
-      @expired_other_poll = other_group.add_poll
-      @expired_other_poll.update(expiration: past + 10.seconds)
-      @my_poll = my_group.add_poll
-      @other_poll = other_group.add_poll(expiration: future + 10.seconds)
+      @expired_poll = my_group.add_poll(expiration: @current_time - 10.seconds)
+      @expired_other_poll = other_group.add_poll(
+          expiration: @current_time - 5.seconds)
+      @my_poll = my_group.add_poll(expiration: @current_time + 5.seconds)
+      @other_poll = other_group.add_poll(expiration: @current_time + 10.seconds)
+    }
+
+    before(:each) {
+      freeze_time(@current_time)
     }
 
     it('finds all active polls with start_expiration sorted ascending') {

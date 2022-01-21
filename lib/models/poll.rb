@@ -57,11 +57,10 @@ module Models
         cancel_action("Creator #{email} is not a member of #{group.name}")
       end
       cancel_action('Expiration value is invalid') unless expiration.is_a?(Time)
-      super
-    end
-
-    def before_create
-      cancel_action('Poll is created expired') if finished?
+      cancel_action('Poll expiration set to time in the past') if finished?
+      if (expiration - 90.days) > Time.now
+        cancel_action('Poll expiration set to more than 90 days in the future')
+      end
       super
     end
 

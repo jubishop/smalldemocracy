@@ -4,12 +4,15 @@ require_relative 'shared_examples/entity_flows'
 
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
-  let(:time) {
-    Time.new(1982, 6, 6, 11, 30, 0, TZInfo::Timezone.get('Asia/Bangkok'))
-  }
 
   let(:entity) { create_poll }
   it_has_behavior('entity flows')
+
+  before(:each) {
+    # Need a fixed moment in time for consistent goldens.
+    freeze_time(Time.new(1982, 6, 6, 11, 30, 0,
+                         TZInfo::Timezone.get('Asia/Bangkok')))
+  }
 
   context(:create) {
     let(:group) { |context|
@@ -29,7 +32,7 @@ RSpec.describe(Poll, type: :feature) {
       go('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
-      fill_in('expiration', with: Time.new(2032, 6, 6, 11, 30))
+      fill_in('expiration', with: Time.now + 5.days)
       select('Borda Split', from: 'type')
 
       # Sometimes click Add button, sometimes press enter on input field, in
@@ -115,12 +118,11 @@ RSpec.describe(Poll, type: :feature) {
     end
 
     def expect_expiration_text
-      expect(page).to(have_content('Jun 06 1982, at 11:40 AM +07. ' \
-                                   '(10 minutes from now).'))
+      expect(page).to(have_content('This poll ends on Jun 06 1982, ' \
+                                   'at 12:25 PM +07 (55 minutes from now).'))
     end
 
     before(:each) {
-      freeze_time(time)
       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
       set_cookie(:email, poll.email)
       %w[zero one two three four five six].each { |choice|
@@ -231,7 +233,6 @@ RSpec.describe(Poll, type: :feature) {
     let(:member) { poll.creating_member }
 
     before(:each) {
-      freeze_time(time)
       set_cookie(:email, poll.email)
       %w[zero one two three four five six].each { |choice|
         poll.add_choice(text: choice)
@@ -289,9 +290,7 @@ RSpec.describe(Poll, type: :feature) {
                   question: "#{type}_question",
                   type: type)
     }
-    let(:group) {
-      poll.group
-    }
+    let(:group) { poll.group }
     let(:members) {
       Array.new(6).fill { |i|
         group.add_member(email: "#{type}_#{i}@finished.com")
@@ -304,7 +303,6 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     before(:each) {
-      freeze_time(time)
       set_cookie(:email, poll.email)
     }
 
@@ -318,7 +316,7 @@ RSpec.describe(Poll, type: :feature) {
                 data: { score: score_calculation.call(rank) })
           }
         }
-        poll.update(expiration: past)
+        freeze_time(future + 1.day)
         go(poll.url)
       }
 

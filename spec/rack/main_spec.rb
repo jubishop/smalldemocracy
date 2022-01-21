@@ -15,13 +15,14 @@ RSpec.describe(Main, type: :rack_test) {
       upcoming_polls = Array.new(22).fill { |i|
         create_poll(email: user.email,
                     group_id: user.groups.sample.id,
-                    expiration: future + i.minutes)
+                    expiration: future + (i + 1).minutes)
       }
       past_polls = Array.new(22).fill { |i|
         create_poll(email: user.email,
-                    group_id: user.groups.sample.id).update(
-                        expiration: past - i.minutes)
+                    group_id: user.groups.sample.id,
+                    expiration: future - (i + 1).minutes)
       }
+      freeze_time(future)
 
       # Test that we limit only see 20
       upcoming_polls = upcoming_polls.first(20)

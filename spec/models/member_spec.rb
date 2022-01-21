@@ -122,7 +122,7 @@ RSpec.describe(Models::Member, type: :model) {
       member = create_member
       poll = member.group.add_poll
       choice = poll.add_choice
-      poll.update(expiration: past)
+      freeze_time(future + 1.day)
       expect { member.add_response(choice_id: choice.id) }.to(
           raise_error(Sequel::HookFailed, 'Response modified in expired poll'))
     }

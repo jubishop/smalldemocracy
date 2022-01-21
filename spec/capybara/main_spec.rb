@@ -42,12 +42,13 @@ RSpec.describe(Main, type: :feature) {
         create_poll(email: user.email,
                     group_id: group.id,
                     title: "active_poll_#{i}",
-                    expiration: future + i.minutes)
+                    expiration: future + (i + 1).minutes)
         create_poll(email: user.email,
                     group_id: group.id,
-                    title: "past_poll_#{i}").update(
-                        expiration: past - i.minutes)
+                    title: "past_poll_#{i}",
+                    expiration: future - (i + 1).minutes)
       }
+      freeze_time(future)
 
       set_cookie(:email, user.email)
       go('/')

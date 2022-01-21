@@ -33,7 +33,7 @@ RSpec.describe(Models::Choice, type: :model) {
 
     it('rejects destroying from an expired poll') {
       choice = create_choice
-      choice.poll.update(expiration: past)
+      freeze_time(future + 1.day)
       expect { choice.destroy }.to(
           raise_error(Sequel::HookFailed,
                       'Choice removed from expired poll'))
@@ -72,7 +72,7 @@ RSpec.describe(Models::Choice, type: :model) {
     it('rejects adding a response to an expired poll') {
       choice = create_choice
       member = choice.poll.group.add_member
-      choice.poll.update(expiration: past)
+      freeze_time(future + 1.day)
       expect { choice.add_response(member_id: member.id) }.to(
           raise_error(Sequel::HookFailed,
                       'Response modified in expired poll'))

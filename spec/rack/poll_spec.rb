@@ -72,7 +72,8 @@ RSpec.describe(Poll, type: :rack_test) {
       valid_params[:expiration] = past.form
       post '/poll/create', valid_params
       expect(last_response.status).to(be(400))
-      expect(last_response.body).to(eq('Poll is created expired'))
+      expect(last_response.body).to(
+          eq('Poll expiration set to time in the past'))
     }
 
     it('fails if user is not part of poll group') {
@@ -113,7 +114,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('shows results if poll is finished') {
       member.add_response(choice_id: poll.add_choice.id)
-      poll.update(expiration: past)
+      freeze_time(future + 1.day)
       breakdown, unresponded = poll.breakdown
       expect_slim(
           'poll/finished',
@@ -158,7 +159,7 @@ RSpec.describe(Poll, type: :rack_test) {
     }
 
     it('rejects posting responses to expired poll') {
-      poll.update(expiration: past)
+      freeze_time(future + 1.day)
       post_json('/poll/respond', { hash_id: poll.hashid })
       expect(last_response.status).to(be(405))
       expect(last_response.body).to(eq('Poll has already finished'))
