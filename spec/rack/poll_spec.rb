@@ -76,6 +76,14 @@ RSpec.describe(Poll, type: :rack_test) {
           eq('Poll expiration set to time in the past'))
     }
 
+    it('fails if poll expiration is more than 90 days out') {
+      valid_params[:expiration] = (Time.now + 91.days).form
+      post '/poll/create', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq('Poll expiration set to more than 90 days in the future'))
+    }
+
     it('fails if user is not part of poll group') {
       email = create_user.email
       set_cookie(:email, email)
