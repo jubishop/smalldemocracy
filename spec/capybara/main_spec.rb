@@ -3,7 +3,7 @@ require 'duration'
 RSpec.describe(Main, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/main') }
   let(:time) {
-    Time.new(1982, 6, 6, 11, 30, 0, TZInfo::Timezone.get('Asia/Bangkok'))
+    Time.new(1982, 6, 6, 11, 30, 0, TZInfo::Timezone.get('America/New_York'))
   }
 
   context(:index) {

@@ -11,7 +11,7 @@ RSpec.describe(Poll, type: :feature) {
   before(:each) {
     # Need a fixed moment in time for consistent goldens.
     freeze_time(Time.new(1982, 6, 6, 11, 30, 0,
-                         TZInfo::Timezone.get('Asia/Bangkok')))
+                         TZInfo::Timezone.get('America/New_York')))
   }
 
   context(:create) {
@@ -119,7 +119,7 @@ RSpec.describe(Poll, type: :feature) {
 
     def expect_expiration_text
       expect(page).to(have_content('This poll ends on Jun 06 1982, ' \
-                                   'at 12:25 PM +07 (55 minutes from now).'))
+                                   'at 11:25 PM +07 (55 minutes from now).'))
     end
 
     before(:each) {
