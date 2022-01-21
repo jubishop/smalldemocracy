@@ -114,6 +114,11 @@ RSpec.describe(Poll, type: :feature) {
           timezone: an_instance_of(TZInfo::DataTimezone))
     end
 
+    def expect_expiration_text
+      expect(page).to(have_content('Jun 06 1982, at 11:40 AM +07. ' \
+                                   '(10 minutes from now).'))
+    end
+
     before(:each) {
       freeze_time(time)
       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
@@ -144,8 +149,7 @@ RSpec.describe(Poll, type: :feature) {
 
         it('submits a poll response') {
           go(poll.url)
-          expect(page).to(have_content('Jun 06 1982, at 11:40 AM +07. ' \
-                                       '(10 minutes from now).'))
+          expect_expiration_text
 
           # Rearrange our choices.
           rearrange_choices([1, 0, 6, 3, 2, 5, 4])
@@ -179,8 +183,7 @@ RSpec.describe(Poll, type: :feature) {
 
         it('submits a poll response') {
           go(poll.url)
-          expect(page).to(have_content('Jun 06 1982, at 11:40 AM +07. ' \
-                                       '(10 minutes from now).'))
+          expect_expiration_text
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
@@ -206,8 +209,7 @@ RSpec.describe(Poll, type: :feature) {
 
       it('submits a poll response') {
         go(poll.url)
-        expect(page).to(have_content('Jun 06 1982, at 11:40 AM +07. ' \
-                                     '(10 minutes from now).'))
+        expect_expiration_text
 
         # Get a screenshot of all our choices.
         goldens.verify('view_choose')
