@@ -32,10 +32,9 @@ require 'rubocop/rake_task'
 
 RuboCop::RakeTask.new(:rubocop)
 
-desc('Run all tests except migrations')
+desc('Run all tests')
 RSpec::Core::RakeTask.new(:spec) { |t|
   t.pattern = Dir.glob('spec/**/*_spec.rb')
-  t.rspec_opts = '-t ~type:migration'
   t.verbose
 }
 
