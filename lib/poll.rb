@@ -69,6 +69,37 @@ class Poll < Base
                                                    timezone: req.timezone)
     })
 
+    post('/poll/add_choice', ->(req, _) {
+      poll = require_creator(req)
+      choice_text = req.param(:choice)
+
+      begin
+        poll.add_choice(text: choice_text)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll choice added'
+      end
+    })
+
+    post('/poll/remove_choice', ->(req, _) {
+      poll = require_creator(req)
+      choice_text = req.param(:choice)
+
+      choice = poll.choice(text: choice_text)
+      unless choice
+        return 400, "#{choice_text} is not a choice of #{poll.title}"
+      end
+
+      begin
+        poll.remove_choice(choice)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll choice removed'
+      end
+    })
+
     post('/poll/respond', ->(req, _) {
       poll = require_poll(req)
       email = require_session(req)
@@ -98,6 +129,17 @@ class Poll < Base
   end
 
   private
+
+  def require_creator(req)
+    email = require_session(req)
+    poll = require_poll(req)
+
+    unless email == poll.email
+      throw(:response, [400, "#{email} is not the creator of #{poll.title}"])
+    end
+
+    return poll
+  end
 
   def save_choose_one_poll_response(req, member)
     member.add_response(choice_id: req.param(:choice_id))

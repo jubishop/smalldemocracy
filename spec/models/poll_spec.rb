@@ -211,6 +211,11 @@ RSpec.describe(Models::Poll, type: :model) {
       choice = poll.add_choice
       expect(poll.choice(text: choice.text)).to(eq(choice))
     }
+
+    it('returns nil when choice does not exist') {
+      poll = create_poll
+      expect(poll.choice(text: 'does not exist')).to(be_nil)
+    }
   }
 
   context('#finished?') {
