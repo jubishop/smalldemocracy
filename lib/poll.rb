@@ -131,15 +131,21 @@ class Poll < Base
   private
 
   def require_editable_poll(req)
+    poll = require_creator(req)
+
+    if poll.any_response?
+      throw(:response, [400, "#{poll.title} already has responses"])
+    end
+
+    return poll
+  end
+
+  def require_creator(req)
     email = require_session(req)
     poll = require_poll(req)
 
     unless email == poll.email
       throw(:response, [400, "#{email} is not the creator of #{poll.title}"])
-    end
-
-    if poll.any_response?
-      throw(:response, [400, "#{poll.title} already has responses"])
     end
 
     return poll
