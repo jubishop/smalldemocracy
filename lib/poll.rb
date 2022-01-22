@@ -70,7 +70,7 @@ class Poll < Base
     })
 
     post('/poll/add_choice', ->(req, _) {
-      poll = require_creator(req)
+      poll = require_editable_poll(req)
       choice_text = req.param(:choice)
 
       begin
@@ -83,7 +83,7 @@ class Poll < Base
     })
 
     post('/poll/remove_choice', ->(req, _) {
-      poll = require_creator(req)
+      poll = require_editable_poll(req)
       choice_text = req.param(:choice)
 
       choice = poll.choice(text: choice_text)
@@ -130,12 +130,16 @@ class Poll < Base
 
   private
 
-  def require_creator(req)
+  def require_editable_poll(req)
     email = require_session(req)
     poll = require_poll(req)
 
     unless email == poll.email
       throw(:response, [400, "#{email} is not the creator of #{poll.title}"])
+    end
+
+    if poll.any_response?
+      throw(:response, [400, "#{poll.title} already has responses"])
     end
 
     return poll
