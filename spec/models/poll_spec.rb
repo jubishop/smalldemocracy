@@ -231,6 +231,28 @@ RSpec.describe(Models::Poll, type: :model) {
     }
   }
 
+  context('#any_response?') {
+    it('returns false when no responses given') {
+      poll = create_poll
+      expect(poll.any_response?).to(be(false));
+    }
+
+    it('returns false when a response has been given but then destroyed') {
+      poll = create_poll
+      choice = poll.add_choice
+      response = choice.add_response(member_id: poll.creating_member.id)
+      response.destroy
+      expect(poll.any_response?).to(be(false))
+    }
+
+    it('returns true when a response has been given') {
+      poll = create_poll
+      choice = poll.add_choice
+      choice.add_response(member_id: poll.creating_member.id)
+      expect(poll.any_response?).to(be(true))
+    }
+  }
+
   context(:results) {
     it('raises error if using scores on choose_* types') {
       poll = create_poll(type: :choose_one)
