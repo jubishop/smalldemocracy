@@ -217,6 +217,8 @@ var Group = class {
             inputElement.remove();
             const h2Element = document.createElement("h2");
             h2Element.textContent = inputElement.value.trim();
+            const createLink = document.getElementById("create-link");
+            createLink.innerHTML = `Create new poll for <em>${inputElement.value}</em>`;
             nameContainer.appendChild(h2Element);
             nameContainer.appendChild(editGroupButton);
           }, (error_message) => {

@@ -23,8 +23,8 @@
   h3 Created by #{group.email}
 
 h4
-  a href="/poll/create?group_id=#{group.id}"
-    | Create New Poll for <em>#{group.name}</em>
+  a#create-link href="/poll/create?group_id=#{group.id}"
+    | Create new poll for <em>#{group.name}</em>
 
 ul#member-list data-id=group.hashid
   - group.members.each do |member|

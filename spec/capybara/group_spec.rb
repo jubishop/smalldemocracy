@@ -83,24 +83,31 @@ RSpec.describe(Group, type: :feature) {
                    name: context.description)
     }
 
+    def expect_create_new_poll_link
+      expect(page).to(
+          have_link("Create new poll for #{group.name}",
+                    href: "/poll/create?group_id=#{group.id}"))
+    end
+
     before(:each) {
       10.times { |i|
         group.add_member(email: "group_member_#{i + 1}@view.com")
       }
+      set_cookie(:email, email)
+      go(group.url)
+    }
+
+    shared_examples('displayable') { |viewer|
+      it('displays a group') {
+        expect_create_new_poll_link
+        goldens.verify("#{viewer}_view")
+      }
     }
 
     context(:creator) {
-      before(:each) {
-        set_cookie(:email, group.email)
-        go(group.url)
-      }
+      let(:email) { group.email }
 
-      it('displays a group') {
-        expect(page).to(
-            have_link("Create New Poll for #{group.name}",
-                      href: "/poll/create?group_id=#{group.id}"))
-        goldens.verify('creator_view')
-      }
+      it_has_behavior('displayable', 'creator')
 
       it('supports complex editing of group') {
         # Add a member.
@@ -174,17 +181,7 @@ RSpec.describe(Group, type: :feature) {
     context(:member) {
       let(:email) { group.members.last.email }
 
-      before(:each) {
-        set_cookie(:email, email)
-        go(group.url)
-      }
-
-      it('displays a group') {
-        expect(page).to(
-            have_link("Create New Poll for #{group.name}",
-                      href: "/poll/create?group_id=#{group.id}"))
-        goldens.verify('member_view')
-      }
+      it_has_behavior('displayable', 'member')
 
       it('shows a confirmation warning upon leaving') {
         # Click to leave the group.
