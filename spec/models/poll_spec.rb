@@ -234,7 +234,7 @@ RSpec.describe(Models::Poll, type: :model) {
   context('#any_response?') {
     it('returns false when no responses given') {
       poll = create_poll
-      expect(poll.any_response?).to(be(false));
+      expect(poll.any_response?).to(be(false))
     }
 
     it('returns false when a response has been given but then destroyed') {

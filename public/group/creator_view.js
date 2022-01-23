@@ -84,8 +84,8 @@ function post(path, params, successCallback, errorCallback = false, finallyCallb
   });
 }
 
-// src/lib/editable.js
-var Editable = class {
+// src/lib/editable_list.js
+var EditableList = class {
   constructor(listElement, elements, addButton, addPath, deletePath, addCallback, deleteCallback, options = {}) {
     this.listElement = listElement;
     this.addButton = addButton;
@@ -236,7 +236,7 @@ var Group = class {
       elements.push(element);
       element = elementXPath.iterateNext();
     }
-    new Editable(listElement, elements, document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
+    new EditableList(listElement, elements, document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
       return {
         hash_id: hashID,
         email: memberEmailToAdd.trim()

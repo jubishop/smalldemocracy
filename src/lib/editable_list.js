@@ -1,9 +1,9 @@
-export { Editable }
+export { EditableList }
 
 import { Modal } from './modal'
 import { post } from './ajax'
 
-class Editable {
+class EditableList {
   constructor(listElement,
     elements,
     addButton,

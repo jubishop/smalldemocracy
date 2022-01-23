@@ -1,4 +1,4 @@
-import { Editable } from '../lib/editable'
+import { EditableList } from '../lib/editable_list'
 import { Modal } from '../lib/modal'
 import { post } from '../lib/ajax'
 
@@ -59,7 +59,7 @@ class Group {
       elements.push(element);
       element = elementXPath.iterateNext()
     }
-    new Editable(
+    new EditableList(
       listElement,
       elements,
       document.getElementById('add-member'),
