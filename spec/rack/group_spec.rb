@@ -92,14 +92,18 @@ RSpec.describe(Group, type: :rack_test) {
     }
   }
 
-  context('post /add_member') {
-    let(:member_email) { 'add_member@group.com' }
+  shared_context('group mutability') {
+    let(:member_email) { 'mutable_member@group.com' }
     let(:valid_params) {
       {
         hash_id: group.hashid,
         email: member_email
       }
     }
+  }
+
+  context('post /add_member') {
+    include_context('group mutability')
 
     it_has_behavior('creator mutability', 'add_member')
 
@@ -122,19 +126,17 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /remove_member') {
-    let(:member) { group.add_member }
-    let(:valid_params) {
-      {
-        hash_id: group.hashid,
-        email: member.email
-      }
+    include_context('group mutability')
+
+    before(:each) {
+      group.add_member(email: member_email)
     }
 
     it_has_behavior('creator mutability', 'remove_member')
 
     it('removes member from group') {
-      expect(group.members).to(match_array([group.creating_member, member]))
-      valid_params
+      expect(group.members.map(&:email)).to(
+          match_array([group.creating_member.email, member_email]))
       post 'group/remove_member', valid_params
       expect(last_response.status).to(be(201))
       expect(last_response.body).to(eq('Group member removed'))
@@ -191,11 +193,7 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /leave') {
-    let(:valid_params) {
-      {
-        hash_id: group.hashid
-      }
-    }
+    let(:valid_params) { { hash_id: group.hashid } }
 
     it_has_behavior('group mutability', 'leave')
 

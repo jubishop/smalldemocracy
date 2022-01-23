@@ -4,12 +4,12 @@ require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :rack_test) {
   let(:group) { create_group }
-  let(:poll) { create_poll }
+  let(:poll) { group.add_poll }
   let(:type) { :choose_one }
   let(:expiration) { future }
   let(:choices) { %w[one two three] }
   let(:member) { group.creating_member }
-  let(:email) { member.email }
+  let(:email) { group.email }
   let(:valid_params) {
     {
       title: 'title',
@@ -177,30 +177,62 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
-  context('post /add_choice') {
+  shared_context('poll choice mutability') {
+    let(:email) { poll.email }
+    let(:choice_text) { 'A choice' }
     let(:valid_params) {
       {
         hash_id: poll.hashid,
-        choice: 'New choice'
+        choice: choice_text
       }
     }
+  }
 
+  context('post /add_choice') {
+    include_context('poll choice mutability')
     it_has_behavior('poll mutability', 'add_choice')
+
+    it('adds choice to poll') {
+      expect(poll.choices).to(be_empty)
+      post 'poll/add_choice', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll choice added'))
+      expect(poll.choices(reload: true).map(&:text)).to(eq([choice_text]))
+    }
+
+    it('rejects adding choice that is already in the poll') {
+      poll.add_choice(text: choice_text)
+      post 'poll/add_choice', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          match(/violates unique constraint "choice_unique"/))
+    }
   }
 
   context('post /remove_choice') {
-    let(:valid_params) {
-      {
-        hash_id: poll.hashid,
-        choice: 'Existing choice'
-      }
-    }
+    include_context('poll choice mutability')
 
     before(:each) {
-      poll.add_choice(text: 'Existing choice')
+      poll.add_choice(text: choice_text)
     }
 
     it_has_behavior('poll mutability', 'remove_choice')
+
+    it('removes choice from poll') {
+      expect(poll.choices.map(&:text)).to(eq([choice_text]))
+      post 'poll/remove_choice', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll choice removed'))
+      expect(poll.choices(reload: true)).to(be_empty)
+    }
+
+    it('rejects removing choice that is not in the poll') {
+      valid_params[:choice] = 'Not in poll'
+      post 'poll/remove_choice', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq("Not in poll is not a choice of #{poll.title}"))
+    }
   }
 
   context('post /respond') {
