@@ -4,6 +4,7 @@ require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :rack_test) {
   let(:group) { create_group }
+  let(:poll) { create_poll }
   let(:type) { :choose_one }
   let(:expiration) { future }
   let(:choices) { %w[one two three] }
@@ -110,7 +111,6 @@ RSpec.describe(Poll, type: :rack_test) {
   context('get /view') {
     let(:tz_name) { 'Africa/Djibouti' }
     let(:timezone) { TZInfo::Timezone.get(tz_name) }
-    let(:poll) { create_poll }
     let(:member) { poll.creating_member }
     let(:email) { member.email }
 
@@ -147,8 +147,63 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
+  shared_examples('poll mutability') { |operation|
+    it('fails with no cookie') {
+      clear_cookies
+      post "poll/#{operation}", valid_params
+      expect(last_response.status).to(be(401))
+      expect(last_response.body).to(eq('No email found'))
+    }
+
+    it('fails if any field is missing or empty') {
+      valid_params.each_key { |key|
+        params = valid_params.clone
+        params[key] = ''
+        post "/poll/#{operation}", params
+        expect(last_response.status).to(be(400))
+        params.delete(key)
+        post "/poll/#{operation}", params
+        expect(last_response.status).to(be(400))
+      }
+    }
+
+    it('fails if user is not poll creator') {
+      email = poll.group.add_member.email
+      set_cookie(:email, email)
+      post "poll/#{operation}", valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq("#{email} is not the creator of #{poll.title}"))
+    }
+  }
+
+  context('post /add_choice') {
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        choice: 'New choice'
+      }
+    }
+
+    it_has_behavior('poll mutability', 'add_choice')
+  }
+
+  context('post /remove_choice') {
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        choice: 'Existing choice'
+      }
+    }
+
+    before(:each) {
+      poll.add_choice(text: 'Existing choice')
+    }
+
+    it_has_behavior('poll mutability', 'remove_choice')
+  }
+
   context('post /respond') {
-    let(:poll) { create_poll }
     let(:email) { poll.email }
     let(:choice) { poll.add_choice }
     let(:member) { poll.creating_member }
@@ -299,7 +354,6 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       context(':borda_single') {
-        let(:type) { :borda_single }
         let(:score_calculation) {
           ->(rank) { poll.choices.length - rank - 1 }
         }
