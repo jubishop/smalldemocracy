@@ -177,6 +177,18 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
+  shared_examples('poll content mutability') { |operation|
+    it_has_behavior('poll mutability', operation)
+
+    it('fails if poll has any responses') {
+      choice = poll.add_choice
+      choice.add_response
+      post "poll/#{operation}", valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq("#{poll.title} already has responses"))
+    }
+  }
+
   shared_context('poll choice mutability') {
     let(:email) { poll.email }
     let(:choice_text) { 'A choice' }
@@ -190,7 +202,7 @@ RSpec.describe(Poll, type: :rack_test) {
 
   context('post /add_choice') {
     include_context('poll choice mutability')
-    it_has_behavior('poll mutability', 'add_choice')
+    it_has_behavior('poll content mutability', 'add_choice')
 
     it('adds choice to poll') {
       expect(poll.choices).to(be_empty)
@@ -216,7 +228,7 @@ RSpec.describe(Poll, type: :rack_test) {
       poll.add_choice(text: choice_text)
     }
 
-    it_has_behavior('poll mutability', 'remove_choice')
+    it_has_behavior('poll content mutability', 'remove_choice')
 
     it('removes choice from poll') {
       expect(poll.choices.map(&:text)).to(eq([choice_text]))
