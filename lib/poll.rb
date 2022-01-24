@@ -69,6 +69,32 @@ class Poll < Base
                                                    timezone: req.timezone)
     })
 
+    post('/poll/title', ->(req, _) {
+      poll = require_editable_poll(req)
+      title = req.param(:title)
+
+      begin
+        poll.update(title: title)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll title changed'
+      end
+    })
+
+    post('/poll/question', ->(req, _) {
+      poll = require_editable_poll(req)
+      question = req.param(:question)
+
+      begin
+        poll.update(question: question)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll question changed'
+      end
+    })
+
     post('/poll/add_choice', ->(req, _) {
       poll = require_editable_poll(req)
       choice_text = req.param(:choice)

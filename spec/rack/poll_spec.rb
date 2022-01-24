@@ -189,6 +189,48 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
+  context('post /title') {
+    let(:email) { poll.email }
+    let(:poll_title) { 'A title' }
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        title: poll_title
+      }
+    }
+
+    it_has_behavior('poll content mutability', 'title')
+
+    it('edits title of poll') {
+      expect(poll.title).to_not(eq(poll_title))
+      post 'poll/title', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll title changed'))
+      expect(poll.reload.title).to(eq(poll_title))
+    }
+  }
+
+  context('post /question') {
+    let(:email) { poll.email }
+    let(:poll_question) { 'A question' }
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        question: poll_question
+      }
+    }
+
+    it_has_behavior('poll content mutability', 'question')
+
+    it('edits question of poll') {
+      expect(poll.question).to_not(eq(poll_question))
+      post 'poll/question', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll question changed'))
+      expect(poll.reload.question).to(eq(poll_question))
+    }
+  }
+
   shared_context('poll choice mutability') {
     let(:email) { poll.email }
     let(:choice_text) { 'A choice' }
