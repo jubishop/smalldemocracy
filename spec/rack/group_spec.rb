@@ -14,8 +14,6 @@ RSpec.describe(Group, type: :rack_test) {
   let(:entity) { create_group(email: email) }
   it_has_behavior('entity guards', 'group')
 
-  before(:each) { set_cookie(:email, email) }
-
   context('get /create') {
     it('shows creation page if you have an email cookie') {
       expect_slim('group/create', email: email)
@@ -218,7 +216,6 @@ RSpec.describe(Group, type: :rack_test) {
     }
 
     it('rejects leaving a group you created') {
-      set_cookie(:email, group.email)
       post '/group/leave', valid_params
       expect(last_response.status).to(be(400))
       expect(last_response.body).to(eq('Creators cannot leave their own group'))

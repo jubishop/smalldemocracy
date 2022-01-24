@@ -15,6 +15,7 @@ RSpec.describe(Main, type: :feature) {
     end
 
     it('displays logged out index') {
+      clear_cookies
       go('/')
       expect_header_links
       expect(page).to(have_link('Sign in with Google', href: '/'))

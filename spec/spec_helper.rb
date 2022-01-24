@@ -57,6 +57,7 @@ RSpec.shared_context(:rack_test) {
   let(:app) { Capybara.app }
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
   let(:email) { random_email }
+  before(:each) { set_cookie(:email, email) }
 
   # rubocop:disable Style/StringHashKeys
   def post_json(path, data = {})
@@ -70,6 +71,7 @@ RSpec.shared_context(:capybara) {
 
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
   let(:email) { random_email }
+  before(:each) { set_cookie(:email, email) }
 
   def go(path)
     expect(page).to(have_timezone) if page.current_path

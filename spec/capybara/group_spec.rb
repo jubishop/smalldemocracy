@@ -7,8 +7,9 @@ RSpec.describe(Group, type: :feature) {
   it_has_behavior('entity flows')
 
   context(:create) {
+    let(:email) { 'group@create.com' }
+
     before(:each) {
-      set_cookie(:email, 'group@create.com')
       go('/group/create')
     }
 
@@ -93,7 +94,6 @@ RSpec.describe(Group, type: :feature) {
       10.times { |i|
         group.add_member(email: "group_member_#{i + 1}@view.com")
       }
-      set_cookie(:email, email)
       go(group.url)
     }
 
@@ -179,7 +179,7 @@ RSpec.describe(Group, type: :feature) {
     }
 
     context(:member) {
-      let(:email) { group.members.last.email }
+      let(:email) { 'group_member_9@view.com' }
 
       it_has_behavior('displayable', 'member')
 

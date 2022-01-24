@@ -104,8 +104,9 @@ RSpec.describe(Poll, type: :feature) {
   }
 
   context(:view) {
+    let(:email) { "#{type}@view.com" }
     let(:poll) {
-      create_poll(email: "#{type}@view.com",
+      create_poll(email: email,
                   title: "#{type}_title",
                   question: "#{type}_question",
                   type: type)
@@ -127,7 +128,6 @@ RSpec.describe(Poll, type: :feature) {
 
     before(:each) {
       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
-      set_cookie(:email, poll.email)
       %w[zero one two three four five six].each { |choice|
         poll.add_choice(text: choice)
       }
@@ -227,8 +227,9 @@ RSpec.describe(Poll, type: :feature) {
   }
 
   context(:responded) {
+    let(:email) { "#{type}@responded.com" }
     let(:poll) {
-      create_poll(email: "#{type}@responded.com",
+      create_poll(email: email,
                   title: "#{type}_title",
                   question: "#{type}_question",
                   type: type)
@@ -236,7 +237,6 @@ RSpec.describe(Poll, type: :feature) {
     let(:member) { poll.creating_member }
 
     before(:each) {
-      set_cookie(:email, poll.email)
       %w[zero one two three four five six].each { |choice|
         poll.add_choice(text: choice)
       }
@@ -287,8 +287,9 @@ RSpec.describe(Poll, type: :feature) {
   }
 
   context(:finished) {
+    let(:email) { "#{type}@finished.com" }
     let(:poll) {
-      create_poll(email: "#{type}@finished.com",
+      create_poll(email: email,
                   title: "#{type}_title",
                   question: "#{type}_question",
                   type: type)
@@ -303,10 +304,6 @@ RSpec.describe(Poll, type: :feature) {
       %w[zero one two three four five six].to_h { |choice|
         [choice, poll.add_choice(text: choice)]
       }
-    }
-
-    before(:each) {
-      set_cookie(:email, poll.email)
     }
 
     shared_examples('finish') {

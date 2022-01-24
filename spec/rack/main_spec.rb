@@ -3,6 +3,7 @@ require 'duration'
 RSpec.describe(Main, type: :rack_test) {
   context('get /') {
     it('renders logged out page when there is no email cookie') {
+      clear_cookies
       expect_slim(:logged_out, req: an_instance_of(Tony::Request))
       get '/'
       expect(last_response.ok?).to(be(true))
@@ -37,7 +38,6 @@ RSpec.describe(Main, type: :rack_test) {
     }
 
     it('does not delete any existing email cookie') {
-      set_cookie(:email, email)
       get '/'
       expect(get_cookie(:email)).to(eq(email))
     }
@@ -45,7 +45,7 @@ RSpec.describe(Main, type: :rack_test) {
 
   context('get /logout') {
     it('deletes the email cookie') {
-      set_cookie(:email, email)
+      expect(get_cookie(:email)).to_not(be_nil)
       get '/logout'
       expect(get_cookie(:email)).to(be_nil)
       expect(last_response.redirect?).to(be(true))

@@ -24,8 +24,6 @@ RSpec.describe(Poll, type: :rack_test) {
   let(:entity) { create_poll(email: email) }
   it_has_behavior('entity guards', 'poll')
 
-  before(:each) { set_cookie(:email, email) }
-
   context('get /create') {
     let(:user) { create_user }
     let(:email) { user.email }
