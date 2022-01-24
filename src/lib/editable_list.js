@@ -41,10 +41,10 @@ class EditableList {
     }
 
     this.inputElement.disabled = true;
-    post(this.addPath, this.addCallback(this.inputElement.value),
+    post(this.addPath, this.addCallback(this.inputElement.value.trim()),
       () => { // successCallback
         const textElement = this.buildTextElement();
-        textElement.textContent = this.inputElement.value;
+        textElement.textContent = this.inputElement.value.trim();
         this.listItem.removeChild(this.inputElement);
         this.listItem.appendChild(textElement);
         this.addDeleteButtonToElement(this.listItem);

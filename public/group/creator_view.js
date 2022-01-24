@@ -114,9 +114,9 @@ var EditableList = class {
       return;
     }
     this.inputElement.disabled = true;
-    post(this.addPath, this.addCallback(this.inputElement.value), () => {
+    post(this.addPath, this.addCallback(this.inputElement.value.trim()), () => {
       const textElement = this.buildTextElement();
-      textElement.textContent = this.inputElement.value;
+      textElement.textContent = this.inputElement.value.trim();
       this.listItem.removeChild(this.inputElement);
       this.listItem.appendChild(textElement);
       this.addDeleteButtonToElement(this.listItem);
@@ -185,49 +185,71 @@ var EditableList = class {
   }
 };
 
+// src/lib/editable_field.js
+var EditableField = class {
+  constructor(fieldElement, editButton, editPath, editCallback, successCallback = () => {
+  }, options = {}) {
+    this.fieldElement = fieldElement;
+    this.editButton = editButton;
+    this.editPath = editPath;
+    this.editCallback = editCallback;
+    this.successCallback = successCallback;
+    this.options = Object.assign({
+      textElementType: "h2"
+    }, options);
+    this.editButton.addEventListener("click", () => this.showInputField());
+  }
+  showInputField() {
+    const textElement = this.fieldElement.firstElementChild;
+    textElement.remove();
+    this.editButton.remove();
+    const inputElement = document.createElement("input");
+    inputElement.value = textElement.textContent.trim();
+    this.fieldElement.appendChild(inputElement);
+    inputElement.focus();
+    inputElement.addEventListener("keydown", (event) => {
+      if (event.key == "Enter") {
+        event.preventDefault();
+        return false;
+      }
+    });
+    inputElement.addEventListener("keyup", (event) => {
+      if (event.key == "Enter") {
+        event.preventDefault();
+        inputElement.disabled = true;
+        post(this.editPath, this.editCallback(inputElement.value.trim()), () => {
+          inputElement.remove();
+          this.showTextField(inputElement.value.trim());
+        }, (error_message) => {
+          new Modal("Error", error_message).display();
+          inputElement.disabled = false;
+        });
+        return false;
+      }
+    });
+  }
+  showTextField(textContent) {
+    const textElement = document.createElement(this.options["textElementType"]);
+    textElement.textContent = textContent;
+    this.fieldElement.appendChild(textElement);
+    this.fieldElement.appendChild(this.editButton);
+    this.successCallback(textContent);
+  }
+};
+
 // src/group/creator_view.js
 var Group = class {
   static domLoaded() {
     const listElement = document.getElementById("member-list");
     const hashID = listElement.getAttribute("data-id");
-    const nameContainer = document.getElementById("group-name");
-    const editGroupButton = document.getElementById("edit-group-button");
-    editGroupButton.addEventListener("click", () => {
-      const textElement = nameContainer.firstElementChild;
-      textElement.remove();
-      editGroupButton.remove();
-      const inputElement = document.createElement("input");
-      inputElement.value = textElement.textContent.trim();
-      nameContainer.appendChild(inputElement);
-      inputElement.focus();
-      inputElement.addEventListener("keydown", (event) => {
-        if (event.key == "Enter") {
-          event.preventDefault();
-          return false;
-        }
-      });
-      inputElement.addEventListener("keyup", (event) => {
-        if (event.key == "Enter") {
-          event.preventDefault();
-          inputElement.disabled = true;
-          post("/group/name", {
-            hash_id: hashID,
-            name: inputElement.value.trim()
-          }, () => {
-            inputElement.remove();
-            const h2Element = document.createElement("h2");
-            h2Element.textContent = inputElement.value.trim();
-            const createLink = document.getElementById("create-link");
-            createLink.innerHTML = `Create new poll for <em>${inputElement.value}</em>`;
-            nameContainer.appendChild(h2Element);
-            nameContainer.appendChild(editGroupButton);
-          }, (error_message) => {
-            new Modal("Error", error_message).display();
-            inputElement.disabled = false;
-          });
-          return false;
-        }
-      });
+    new EditableField(document.getElementById("group-name"), document.getElementById("edit-group-button"), "/group/name", (textContent) => {
+      return {
+        hash_id: hashID,
+        name: textContent
+      };
+    }, (textContent) => {
+      const createLink = document.getElementById("create-link");
+      createLink.innerHTML = `Create new poll for <em>${textContent}</em>`;
     });
     const elementXPath = document.evaluate("//li[@class='editable' and not(./div)]", document);
     const elements = [];
