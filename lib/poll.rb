@@ -31,13 +31,7 @@ class Poll < Base
       choices = req.list_param(:choices, [])
       req.params.delete(:choices)
 
-      begin
-        req.params[:expiration] = Time.strptime(
-            "#{req.param(:expiration)} UTC",
-            '%Y-%m-%dT%H:%M %Z') - req.timezone.current_period.utc_total_offset
-      rescue ArgumentError
-        return 400, "#{req.param(:expiration)} is invalid date"
-      end
+      req.params[:expiration] = require_expiration(req)
 
       begin
         poll = Models::Poll.create(**req.params.symbolize_keys)
@@ -126,6 +120,18 @@ class Poll < Base
       end
     })
 
+    post('/poll/expiration', ->(req, _) {
+      poll = require_creator(req)
+
+      begin
+        poll.update(expiration: require_expiration(req))
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll expiration updated'
+      end
+    })
+
     post('/poll/respond', ->(req, _) {
       poll = require_poll(req)
       email = require_session(req)
@@ -155,6 +161,14 @@ class Poll < Base
   end
 
   private
+
+  def require_expiration(req)
+    return Time.strptime(
+        "#{req.param(:expiration)} UTC",
+        '%Y-%m-%dT%H:%M %Z') - req.timezone.current_period.utc_total_offset
+  rescue ArgumentError
+    throw(:response, [400, "#{req.param(:expiration)} is invalid date"])
+  end
 
   def require_editable_poll(req)
     poll = require_creator(req)
