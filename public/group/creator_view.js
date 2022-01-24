@@ -237,6 +237,18 @@ var EditableField = class {
   }
 };
 
+// src/lib/dom.js
+function getElementsByXPath(xpath) {
+  const elementXPath = document.evaluate(xpath, document);
+  const elements = [];
+  let element = elementXPath.iterateNext();
+  while (element) {
+    elements.push(element);
+    element = elementXPath.iterateNext();
+  }
+  return elements;
+}
+
 // src/group/creator_view.js
 var Group = class {
   static domLoaded() {
@@ -251,14 +263,7 @@ var Group = class {
       const createLink = document.getElementById("create-link");
       createLink.innerHTML = `Create new poll for <em>${textContent}</em>`;
     });
-    const elementXPath = document.evaluate("//li[@class='editable' and not(./div)]", document);
-    const elements = [];
-    let element = elementXPath.iterateNext();
-    while (element) {
-      elements.push(element);
-      element = elementXPath.iterateNext();
-    }
-    new EditableList(listElement, elements, document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
+    new EditableList(listElement, getElementsByXPath("//li[@class='editable' and not(./div)]"), document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
       return {
         hash_id: hashID,
         email: memberEmailToAdd.trim()

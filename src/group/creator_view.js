@@ -1,6 +1,7 @@
 import { EditableList } from '../lib/editable_list'
 import { EditableField } from '../lib/editable_field'
 import { Modal } from '../lib/modal'
+import { getElementsByXPath } from '../lib/dom'
 import { post } from '../lib/ajax'
 
 class Group {
@@ -27,17 +28,9 @@ class Group {
     );
 
     // Add and remove members.
-    const elementXPath = document.evaluate(
-      "//li[@class='editable' and not(./div)]", document);
-    const elements = [];
-    let element = elementXPath.iterateNext();
-    while (element) {
-      elements.push(element);
-      element = elementXPath.iterateNext()
-    }
     new EditableList(
       listElement,
-      elements,
+      getElementsByXPath("//li[@class='editable' and not(./div)]"),
       document.getElementById('add-member'),
       '/group/add_member',
       '/group/remove_member',
