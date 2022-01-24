@@ -1,3 +1,4 @@
+require 'duration'
 require 'tzinfo'
 
 require_relative 'shared_examples/entity_guards'
@@ -284,6 +285,45 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
       expect(last_response.body).to(
           eq("Not in poll is not a choice of #{poll.title}"))
+    }
+  }
+
+  context('post /expiration') {
+    let(:email) { poll.email }
+    let(:poll_expiration) { future + 10.days }
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        expiration: poll_expiration.form
+      }
+    }
+
+    include_context('poll mutability', 'expiration')
+
+    it('updates poll expiration') {
+      expect(poll.expiration).to_not(eq(poll_expiration))
+      post 'poll/expiration', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll expiration updated'))
+      expect(poll.reload.expiration).to(eq(poll_expiration))
+    }
+
+    it('fails if new expiration is in the past') {
+      valid_params[:expiration] = past.form
+      post 'poll/expiration', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq('Poll expiration set to time in the past'))
+      expect(poll.expiration).to_not(eq(valid_params[:expiration]))
+    }
+
+    it('fails if new expiration is more than 90 days out') {
+      valid_params[:expiration] = (Time.now + 91.days).form
+      post 'poll/expiration', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq('Poll expiration set to more than 90 days in the future'))
+      expect(poll.expiration).to_not(eq(valid_params[:expiration]))
     }
   }
 
