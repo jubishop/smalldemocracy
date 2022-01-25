@@ -183,7 +183,7 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.ok?).to(be(true))
     }
 
-    it('redirects to viewing poll if poll has any responses by others') {
+    it('redirects to viewing poll if there are responses by others') {
       set_cookie(:email, poll.email)
       member = group.add_member
       choice = poll.add_choice
@@ -198,7 +198,7 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.ok?).to(be(true))
     }
 
-    it('redirects to viewing responded poll if user has responded') {
+    it('redirects to viewing responded poll if session user has responded') {
       set_cookie(:email, poll.email)
       choice = poll.add_choice
       choice.add_response(member_id: poll.creating_member.id)
