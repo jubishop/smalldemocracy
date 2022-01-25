@@ -123,11 +123,10 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('shows your answers if you have responded') {
       member.add_response(choice_id: poll.add_choice.id)
-      expect_slim(
-          'poll/responded',
-          poll: poll,
-          member: member,
-          timezone: timezone)
+      expect_slim('poll/responded',
+                  poll: poll,
+                  member: member,
+                  timezone: timezone)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }
@@ -136,12 +135,80 @@ RSpec.describe(Poll, type: :rack_test) {
       member.add_response(choice_id: poll.add_choice.id)
       freeze_time(future + 1.day)
       breakdown, unresponded = poll.breakdown
-      expect_slim(
-          'poll/finished',
-          poll: poll,
-          breakdown: breakdown,
-          unresponded: unresponded)
+      expect_slim('poll/finished',
+                  poll: poll,
+                  breakdown: breakdown,
+                  unresponded: unresponded)
       get poll.url
+      expect(last_response.ok?).to(be(true))
+    }
+  }
+
+  context('get /edit') {
+    it('shows edit page') {
+      set_cookie(:email, poll.email)
+      expect_slim('poll/edit', poll: poll)
+      get poll.edit_url
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('redirects and asks for email with no cookie') {
+      clear_cookies
+      get poll.edit_url
+      expect(last_response.redirect?).to(be(true))
+      expect_slim(:get_email, req: an_instance_of(Tony::Request))
+      follow_redirect!
+      expect(last_response.status).to(eq(401))
+    }
+
+    it('returns not found if user is not in poll') {
+      set_cookie(:email, random_email)
+      get poll.edit_url
+      expect(last_response.redirect?).to(be(true))
+      expect_slim('poll/not_found')
+      follow_redirect!
+      expect(last_response.status).to(eq(404))
+    }
+
+    it('redirects to viewing poll if user is not poll creator') {
+      member = poll.group.add_member
+      set_cookie(:email, member.email)
+      get poll.edit_url
+      expect(last_response.redirect?).to(be(true))
+      expect_slim('poll/view',
+                  poll: poll,
+                  member: member,
+                  timezone: an_instance_of(TZInfo::DataTimezone))
+      follow_redirect!
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('redirects to viewing poll if poll has any responses by others') {
+      set_cookie(:email, poll.email)
+      member = group.add_member
+      choice = poll.add_choice
+      member.add_response(choice_id: choice.id)
+      get poll.edit_url
+      expect(last_response.redirect?).to(be(true))
+      expect_slim('poll/view',
+                  poll: poll,
+                  member: poll.creating_member,
+                  timezone: an_instance_of(TZInfo::DataTimezone))
+      follow_redirect!
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('redirects to viewing responded poll if user has responded') {
+      set_cookie(:email, poll.email)
+      choice = poll.add_choice
+      choice.add_response(member_id: poll.creating_member.id)
+      get poll.edit_url
+      expect(last_response.redirect?).to(be(true))
+      expect_slim('poll/responded',
+                  poll: poll,
+                  member: poll.creating_member,
+                  timezone: an_instance_of(TZInfo::DataTimezone))
+      follow_redirect!
       expect(last_response.ok?).to(be(true))
     }
   }

@@ -147,6 +147,10 @@ module Models
       return "/poll/view/#{hashid}"
     end
 
+    def edit_url
+      return "/poll/edit/#{hashid}"
+    end
+
     def to_s
       return title
     end

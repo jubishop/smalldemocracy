@@ -455,6 +455,13 @@ RSpec.describe(Models::Poll, type: :model) {
     }
   }
 
+  context('#edit_url') {
+    it('creates url') {
+      poll = create_poll
+      expect(poll.edit_url).to(eq("/poll/edit/#{poll.hashid}"))
+    }
+  }
+
   context('#add_choice') {
     it('adds a choice') {
       poll = create_poll
