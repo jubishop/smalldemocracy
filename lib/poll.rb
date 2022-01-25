@@ -63,6 +63,15 @@ class Poll < Base
                                                    timezone: req.timezone)
     })
 
+    get(%r{^/poll/edit/(?<hash_id>.+)$}, ->(req, resp) {
+      poll = catch(:response) { require_editable_poll(req) }
+
+      # If require_editable_poll() threw a response, we redirect to view.
+      resp.redirect(require_poll(req).url) unless poll.is_a?(Models::Poll)
+
+      return 200, @slim.render('poll/edit', poll: poll)
+    })
+
     post('/poll/title', ->(req, _) {
       poll = require_editable_poll(req)
       title = req.param(:title)
