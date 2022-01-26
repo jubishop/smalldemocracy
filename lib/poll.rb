@@ -144,6 +144,18 @@ class Poll < Base
       end
     })
 
+    post('/poll/destroy', ->(req, _) {
+      poll = require_creator(req)
+
+      begin
+        poll.destroy
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll destroyed'
+      end
+    })
+
     post('/poll/respond', ->(req, _) {
       poll = require_poll(req)
       email = require_session(req)

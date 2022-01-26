@@ -367,6 +367,20 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
+  context('post /destroy') {
+    let(:email) { poll.email }
+    let(:valid_params) { { hash_id: poll.hashid } }
+
+    it_has_behavior('poll mutability', 'destroy')
+
+    it('destroys a poll') {
+      post '/poll/destroy', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll destroyed'))
+      expect(poll.exists?).to(be(false))
+    }
+  }
+
   context('post /respond') {
     let(:email) { poll.email }
     let(:choice) { poll.add_choice }
