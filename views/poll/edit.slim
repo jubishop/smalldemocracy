@@ -8,34 +8,34 @@
 = content_for :banner
   =poll
 
-div#poll-title
+div#poll-title.editable-field
   h2 =poll
   - if any_response
-    div#immutable-title data-tooltip="This poll already has responses"
-      i.edit-title-icon.fa-duotone.fa-pencil-slash
+    div.immutable data-tooltip="This poll already has responses"
+      i.edit-icon.fa-duotone.fa-pencil-slash
   - else
-    div#edit-title-button
-      i.edit-title-icon.fa-duotone.fa-pencil
+    div#edit-title-button.mutable
+      i.edit-icon.fa-duotone.fa-pencil
 
-div#poll-question
+div#poll-question.editable-field
   h4 =poll.question
   - if any_response
-    div#immutable-question data-tooltip="This poll already has responses"
-      i.edit-question-icon.fa-duotone.fa-pencil-slash
+    div.immutable data-tooltip="This poll already has responses"
+      i.edit-icon.fa-duotone.fa-pencil-slash
   - else
-    div#edit-question-button
-      i.edit-question-icon.fa-duotone.fa-pencil
+    div#edit-question-button.mutable
+      i.edit-icon.fa-duotone.fa-pencil
 
 
 ul#choices data-id=poll.hashid
   - poll.choices.each do |choice|
-    li class=(any_response ? "editable" : "immutable")
+    li class=(any_response ? "immutable" : "editable")
       p.text #{choice}
       - if any_response
-        div#immutable-choice data-tooltip="This poll already has responses"
+        div.immutable data-tooltip="This poll already has responses"
           i.delete-icon.fa-duotone.fa-trash-can-xmark
       - else
-        div#delete-choice-button
+        div.mutable
           i.delete-icon.fa-duotone.fa-trash-can
 
 - unless any_response

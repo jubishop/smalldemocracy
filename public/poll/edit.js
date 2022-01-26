@@ -86,8 +86,8 @@ function post(path, params, successCallback, errorCallback = false, finallyCallb
 
 // src/lib/editable_list.js
 var EditableList = class {
-  constructor(listElement, elements, addButton, addPath, deletePath, addCallback, deleteCallback, options = {}) {
-    this.listElement = listElement;
+  constructor(listElement2, elements, addButton, addPath, deletePath, addCallback, deleteCallback, options = {}) {
+    this.listElement = listElement2;
     this.addButton = addButton;
     this.addButton.addEventListener("click", () => this.addInputElement());
     this.addPath = addPath;
@@ -240,8 +240,9 @@ var EditableField = class {
 // src/poll/edit.js
 var Poll = class {
   static domLoaded() {
-    const listElement = document.getElementById("member-list");
-    const hashID = listElement.getAttribute("data-id");
+    const choicesList = document.getElementById("choices");
+    const hashID = choicesList.getAttribute("data-id");
+    console.log(hashID);
     new EditableField(document.getElementById("group-name"), document.getElementById("edit-group-button"), "/group/name", (textContent) => {
       return {
         hash_id: hashID,

@@ -6,8 +6,9 @@ import { post } from '../lib/ajax'
 class Poll {
   static domLoaded() {
     // Extract poll `hashid` first.
-    const listElement = document.getElementById('member-list');
-    const hashID = listElement.getAttribute("data-id");
+    const choicesList = document.getElementById('choices');
+    const hashID = choicesList.getAttribute("data-id");
+    console.log(hashID);
 
     // Edit name.
     new EditableField(
