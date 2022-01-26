@@ -1,0 +1,26 @@
+= content_for :head
+  title =poll
+  ==stylesheet_link_tag 'poll/edit'
+  ==javascript_include_tag 'poll/edit'
+
+= content_for :banner
+  =poll
+
+div#poll-title
+  h2 =poll
+  div#edit-title-button
+    i.fa-duotone.fa-pencil
+
+div#poll-question
+  h4 =poll.question
+  div#edit-question-button
+    i.fa-duotone.fa-pencil
+
+ul#choices data-id=poll.hashid
+  - poll.choices.each do |choice|
+    li.editable
+      p.text #{choice}
+
+button#add-choice type="button" Add Choice
+
+button#delete-poll.contrast type="button" Delete Poll

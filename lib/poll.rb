@@ -53,6 +53,7 @@ class Poll < Base
       if poll.finished?
         breakdown, unresponded = poll.breakdown
         return 200, @slim.render('poll/finished', poll: poll,
+                                                  member: member,
                                                   breakdown: breakdown,
                                                   unresponded: unresponded)
       end

@@ -1,0 +1,14 @@
+@use "../layout";
+
+@use "../editable_list";
+
+#poll-title, #poll-question {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+#poll-title h2, #poll-question h4 {
+  margin: 0;
+}

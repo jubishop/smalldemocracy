@@ -137,6 +137,7 @@ RSpec.describe(Poll, type: :rack_test) {
       breakdown, unresponded = poll.breakdown
       expect_slim('poll/finished',
                   poll: poll,
+                  member: member,
                   breakdown: breakdown,
                   unresponded: unresponded)
       get poll.url

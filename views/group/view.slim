@@ -1,7 +1,7 @@
 - is_creator = member.email == group.email
 
 = content_for :head
-  title =group.name
+  title =group
   - if is_creator
     ==stylesheet_link_tag 'group/creator_view'
     ==javascript_include_tag 'group/creator_view'
@@ -10,26 +10,26 @@
     ==javascript_include_tag 'group/member_view'
 
 = content_for :banner
-  =group.name
+  =group
 
 - if is_creator
   div#group-name
-    h2 =group.name
+    h2 =group
     div#edit-group-button
-      i.edit-group-icon.fa-duotone.fa-pencil
+      i.fa-duotone.fa-pencil
 
 - else
-  h2 =group.name
+  h2 =group
   h3 Created by #{group.email}
 
 h4
   a#create-link href="/poll/create?group_id=#{group.id}"
-    | Create new poll for <em>#{group.name}</em>
+    | Create new poll for <em>#{group}</em>
 
 ul#member-list data-id=group.hashid
   - group.members.each do |member|
     li class=(is_creator ? "editable" : "viewable")
-      p.text #{member.email}
+      p.text #{member}
       - if is_creator && member.email == group.email
         div#creator-trash-can data-tooltip="Can't delete group's creator"
           i.delete-icon.fa-duotone.fa-trash-can-xmark

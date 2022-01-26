@@ -9,6 +9,15 @@ RSpec.describe(Poll, type: :feature) {
   let(:entity) { create_poll }
   it_has_behavior('entity flows')
 
+  def have_expiration_text
+    return have_content('This poll ends on Jun 06 1982, at ' \
+                        '11:25 PM +07 (55 minutes from now).')
+  end
+
+  def have_edit_link
+    return have_link('(Edit this poll)', href: poll.edit_url)
+  end
+
   before(:each) {
     # Need a fixed moment in time for consistent goldens.
     freeze_time(Time.new(1982, 6, 6, 11, 30, 0,
@@ -103,6 +112,14 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
+  shared_examples('editable guard') {
+    it('shows no edit link for normal member') {
+      set_cookie(:email, poll.group.add_member.email)
+      go(poll.url)
+      expect(page).to_not(have_edit_link)
+    }
+  }
+
   context(:view) {
     let(:email) { "#{type}@view.com" }
     let(:poll) {
@@ -119,11 +136,6 @@ RSpec.describe(Poll, type: :feature) {
           poll: poll,
           member: member,
           timezone: an_instance_of(TZInfo::DataTimezone))
-    end
-
-    def expect_expiration_text
-      expect(page).to(have_content('This poll ends on Jun 06 1982, ' \
-                                   'at 11:25 PM +07 (55 minutes from now).'))
     end
 
     before(:each) {
@@ -152,9 +164,12 @@ RSpec.describe(Poll, type: :feature) {
       context(:borda_single) {
         let(:type) { :borda_single }
 
+        it_has_behavior('editable guard')
+
         it('submits a poll response') {
           go(poll.url)
-          expect_expiration_text
+          expect(page).to(have_expiration_text)
+          expect(page).to(have_edit_link)
 
           # Rearrange our choices.
           rearrange_choices([1, 0, 6, 3, 2, 5, 4])
@@ -181,6 +196,8 @@ RSpec.describe(Poll, type: :feature) {
           choice_node.drag_to(find('ul#bottom-choices'))
         end
 
+        it_has_behavior('editable guard')
+
         it('shows an empty borda_split page') {
           go(poll.url)
           goldens.verify('view_borda_split_empty_bottom')
@@ -188,7 +205,8 @@ RSpec.describe(Poll, type: :feature) {
 
         it('submits a poll response') {
           go(poll.url)
-          expect_expiration_text
+          expect(page).to(have_expiration_text)
+          expect(page).to(have_edit_link)
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
@@ -212,9 +230,12 @@ RSpec.describe(Poll, type: :feature) {
     context(:choose) {
       let(:type) { :choose_one }
 
+      it_has_behavior('editable guard')
+
       it('submits a poll response') {
         go(poll.url)
-        expect_expiration_text
+        expect(page).to(have_expiration_text)
+        expect(page).to(have_edit_link)
 
         # Get a screenshot of all our choices.
         goldens.verify('view_choose')
@@ -243,6 +264,8 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     shared_examples('borda response') {
+      it_has_behavior('editable guard')
+
       it('shows a responded page') {
         choices.each_with_index { |position, rank|
           choice = poll.choices[position]
@@ -250,6 +273,8 @@ RSpec.describe(Poll, type: :feature) {
                               data: { score: score_calculation.call(rank) })
         }
         go(poll.url)
+        expect(page).to(have_expiration_text)
+        expect(page).to(have_edit_link)
         goldens.verify("responded_#{type}")
       }
     }
@@ -278,9 +303,13 @@ RSpec.describe(Poll, type: :feature) {
       let(:type) { :choose_one }
       let(:choice) { poll.choices[3] }
 
+      it_has_behavior('editable guard')
+
       it('shows a responded page') {
         member.add_response(choice_id: choice.id)
         go(poll.url)
+        expect(page).to(have_expiration_text)
+        expect(page).to(have_edit_link)
         goldens.verify('responded_choose')
       }
     }
@@ -307,6 +336,8 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     shared_examples('finish') {
+      it_has_behavior('editable guard')
+
       before(:each) {
         responses.each_with_index { |ranked_choices, index|
           member = members[index]
@@ -318,6 +349,7 @@ RSpec.describe(Poll, type: :feature) {
         }
         freeze_time(future + 1.day)
         go(poll.url)
+        expect(page).to(have_edit_link)
       }
 
       it('shows a finished page') {
