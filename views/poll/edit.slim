@@ -19,14 +19,26 @@ div#poll-title
 
 div#poll-question
   h4 =poll.question
-  div#edit-question-button
-    i.fa-duotone.fa-pencil
+  - if any_response
+    div#immutable-question data-tooltip="This poll already has responses"
+      i.edit-question-icon.fa-duotone.fa-pencil-slash
+  - else
+    div#edit-question-button
+      i.edit-question-icon.fa-duotone.fa-pencil
+
 
 ul#choices data-id=poll.hashid
   - poll.choices.each do |choice|
-    li.editable
+    li class=(any_response ? "editable" : "immutable")
       p.text #{choice}
+      - if any_response
+        div#immutable-choice data-tooltip="This poll already has responses"
+          i.delete-icon.fa-duotone.fa-trash-can-xmark
+      - else
+        div#delete-choice-button
+          i.delete-icon.fa-duotone.fa-trash-can
 
-button#add-choice type="button" Add Choice
+- unless any_response
+  button#add-choice type="button" Add Choice
 
 button#delete-poll.contrast type="button" Delete Poll

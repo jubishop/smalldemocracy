@@ -28,7 +28,7 @@ h4
 
 ul#member-list data-id=group.hashid
   - group.members.each do |member|
-    li class=(is_creator ? "editable" : "viewable")
+    li class=(is_creator ? "editable" : "immutable")
       p.text #{member}
       - if is_creator && member.email == group.email
         div#creator-trash-can data-tooltip="Can't delete group's creator"
