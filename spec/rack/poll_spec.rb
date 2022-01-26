@@ -149,7 +149,10 @@ RSpec.describe(Poll, type: :rack_test) {
   context('get /edit') {
     it('shows edit page') {
       set_cookie(:email, poll.email)
-      expect_slim('poll/edit', poll: poll)
+      expect_slim('poll/edit',
+                  poll: poll,
+                  expiration_time: poll.expiration,
+                  form_time: Time.now)
       get poll.edit_url
       expect(last_response.ok?).to(be(true))
     }
