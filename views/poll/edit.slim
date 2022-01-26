@@ -1,3 +1,5 @@
+- any_response = poll.any_response?
+
 = content_for :head
   title =poll
   ==stylesheet_link_tag 'poll/edit'
@@ -8,8 +10,12 @@
 
 div#poll-title
   h2 =poll
-  div#edit-title-button
-    i.fa-duotone.fa-pencil
+  - if any_response
+    div#immutable-title data-tooltip="This poll already has responses"
+      i.edit-title-icon.fa-duotone.fa-pencil-slash
+  - else
+    div#edit-title-button
+      i.edit-title-icon.fa-duotone.fa-pencil
 
 div#poll-question
   h4 =poll.question

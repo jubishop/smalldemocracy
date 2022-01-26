@@ -66,7 +66,7 @@ class Poll < Base
     })
 
     get(%r{^/poll/edit/(?<hash_id>.+)$}, ->(req, resp) {
-      poll = catch(:response) { require_editable_poll(req) }
+      poll = catch(:response) { require_creator(req) }
 
       if poll.is_a?(Models::Poll)
         return 200, @slim.render('poll/edit', poll: poll)

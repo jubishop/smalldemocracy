@@ -184,35 +184,6 @@ RSpec.describe(Poll, type: :rack_test) {
       follow_redirect!
       expect(last_response.ok?).to(be(true))
     }
-
-    it('redirects to viewing poll if there are responses by others') {
-      set_cookie(:email, poll.email)
-      member = group.add_member
-      choice = poll.add_choice
-      member.add_response(choice_id: choice.id)
-      get poll.edit_url
-      expect(last_response.redirect?).to(be(true))
-      expect_slim('poll/view',
-                  poll: poll,
-                  member: poll.creating_member,
-                  timezone: an_instance_of(TZInfo::DataTimezone))
-      follow_redirect!
-      expect(last_response.ok?).to(be(true))
-    }
-
-    it('redirects to viewing responded poll if session user has responded') {
-      set_cookie(:email, poll.email)
-      choice = poll.add_choice
-      choice.add_response(member_id: poll.creating_member.id)
-      get poll.edit_url
-      expect(last_response.redirect?).to(be(true))
-      expect_slim('poll/responded',
-                  poll: poll,
-                  member: poll.creating_member,
-                  timezone: an_instance_of(TZInfo::DataTimezone))
-      follow_redirect!
-      expect(last_response.ok?).to(be(true))
-    }
   }
 
   shared_examples('poll mutability') { |operation|

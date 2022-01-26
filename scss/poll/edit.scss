@@ -12,3 +12,16 @@
 #poll-title h2, #poll-question h4 {
   margin: 0;
 }
+
+#immutable-title {
+  border-bottom: none;
+  cursor: not-allowed;
+}
+#edit-title-button {
+  cursor: pointer;
+}
+
+.edit-title-icon {
+  --fa-primary-color: var(--ins-color);
+  --fa-secondary-color: var(--contrast);
+}
