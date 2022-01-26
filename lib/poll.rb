@@ -55,7 +55,8 @@ class Poll < Base
         return 200, @slim.render('poll/finished', poll: poll,
                                                   member: member,
                                                   breakdown: breakdown,
-                                                  unresponded: unresponded)
+                                                  unresponded: unresponded,
+                                                  timezone: req.timezone)
       end
 
       template = member.responded?(poll_id: poll.id) ? :responded : :view

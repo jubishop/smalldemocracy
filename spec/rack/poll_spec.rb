@@ -139,7 +139,8 @@ RSpec.describe(Poll, type: :rack_test) {
                   poll: poll,
                   member: member,
                   breakdown: breakdown,
-                  unresponded: unresponded)
+                  unresponded: unresponded,
+                  timezone: timezone)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }

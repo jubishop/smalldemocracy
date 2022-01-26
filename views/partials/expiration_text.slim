@@ -1,7 +1,10 @@
 - require 'duration'
 
 - expiration = Time.at(poll.expiration, in: timezone)
-- remaining = Duration.new(expiration - Time.now)
+- future = poll.expiration > Time.now
+- remaining = Duration.new(expiration - Time.now).abs
 p
-  | This poll ends on #{expiration.strftime('%b %d %Y, at %I:%M %p %Z')}
-  |  (#{remaining.format(precision: Duration::MINUTES)} from now).
+  | This poll end#{future ? 's' : 'ed'} on
+  |  #{expiration.strftime('%b %d %Y, at %I:%M %p %Z')}
+  |  (#{remaining.format(precision: Duration::MINUTES)}
+  |  #{future ? 'from now' : 'ago'}).

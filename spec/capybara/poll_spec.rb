@@ -10,8 +10,7 @@ RSpec.describe(Poll, type: :feature) {
   it_has_behavior('entity flows')
 
   def have_expiration_text
-    return have_content('This poll ends on Jun 06 1982, at ' \
-                        '11:25 PM +07 (55 minutes from now).')
+    return have_content('Jun 06 1982, at 11:25 PM +07')
   end
 
   def have_edit_link
@@ -349,6 +348,7 @@ RSpec.describe(Poll, type: :feature) {
         }
         freeze_time(future + 1.day)
         go(poll.url)
+        expect(page).to(have_expiration_text)
         expect(page).to(have_edit_link)
       }
 
