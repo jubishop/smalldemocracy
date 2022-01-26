@@ -69,7 +69,12 @@ class Poll < Base
       poll = catch(:response) { require_creator(req) }
 
       if poll.is_a?(Models::Poll)
-        return 200, @slim.render('poll/edit', poll: poll)
+        expiration_time = Time.at(poll.expiration, in: req.timezone)
+        form_time = Time.at(Time.now, in: req.timezone)
+
+        return 200, @slim.render('poll/edit', poll: poll,
+                                              expiration_time: expiration_time,
+                                              form_time: form_time)
       end
 
       resp.redirect(require_poll(req).url)

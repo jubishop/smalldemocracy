@@ -22,9 +22,9 @@ module RSpec
 end
 
 class Time
-  def form
-    # Asia/Bangkok => +07:00
-    return self.class.at(self, in: '+07:00').strftime('%Y-%m-%dT%H:%M')
+  # Asia/Bangkok => +07:00
+  def form(in_zone: '+07:00')
+    return self.class.at(self, in: in_zone).strftime('%Y-%m-%dT%H:%M')
   end
 
   def round_down

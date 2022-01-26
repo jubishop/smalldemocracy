@@ -41,4 +41,12 @@ ul#choices data-id=poll.hashid
 - unless any_response
   button#add-choice type="button" Add Choice
 
+label for="expiration" Expiration (in #{form_time.zone.abbr}):
+input[name="expiration"
+      type="datetime-local"
+      required=true
+      value=expiration_time.strftime('%Y-%m-%dT%H:%M')
+      min=form_time.strftime('%Y-%m-%dT%H:%M')
+      max=(form_time + 90.days).strftime('%Y-%m-%dT%H:%M')]
+
 button#delete-poll.contrast type="button" Delete Poll
