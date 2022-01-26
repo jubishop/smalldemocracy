@@ -7,10 +7,12 @@
 = content_for :banner
   | #{poll} Completed
 
-p Thanks #{member.email}!
-
-- if is_creator
-  a href=poll.edit_url (Edit this poll)
+p
+  | Thanks #{member.email}!
+  - if is_creator
+    =="&nbsp;"
+    em
+      a href=poll.edit_url (Edit this poll)
 
 ==partial(:expiration_text)
 

@@ -13,10 +13,12 @@
 = content_for :banner
   =poll
 
-p Hello #{member.email}
-
-- if is_creator
-  a href=poll.edit_url (Edit this poll)
+p
+  | Hello #{member.email}
+  - if is_creator
+    =="&nbsp;"
+    em
+      a href=poll.edit_url (Edit this poll)
 
 h2 =poll.question
 
