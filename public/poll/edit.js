@@ -50,6 +50,33 @@ var Modal = class {
   }
 };
 
+// src/lib/dom.js
+function getElementsByXPath(xpath) {
+  const elementXPath = document.evaluate(xpath, document);
+  const elements = [];
+  let element = elementXPath.iterateNext();
+  while (element) {
+    elements.push(element);
+    element = elementXPath.iterateNext();
+  }
+  return elements;
+}
+function eventEnter(element, callback) {
+  element.addEventListener("keydown", (event) => {
+    if (event.key == "Enter") {
+      event.preventDefault();
+      return false;
+    }
+  });
+  element.addEventListener("keyup", (event) => {
+    if (event.key == "Enter") {
+      event.preventDefault();
+      callback(event);
+      return false;
+    }
+  });
+}
+
 // src/lib/ajax.js
 function post(path, params, successCallback = () => {
 }, errorCallback = false, finallyCallback = () => {
@@ -162,19 +189,7 @@ var EditableList = class {
     inputElement.classList.add(...this.options["inputClasses"]);
     inputElement.setAttribute("type", this.options["inputType"]);
     inputElement.setAttribute("placeholder", this.options["placeholderText"]);
-    inputElement.addEventListener("keydown", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        return false;
-      }
-    });
-    inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        this.addItem();
-        return false;
-      }
-    });
+    eventEnter(inputElement, (event) => this.addItem());
     return inputElement;
   }
   buildDeleteButton() {
@@ -185,33 +200,6 @@ var EditableList = class {
     return deleteButton;
   }
 };
-
-// src/lib/dom.js
-function getElementsByXPath(xpath) {
-  const elementXPath = document.evaluate(xpath, document);
-  const elements = [];
-  let element = elementXPath.iterateNext();
-  while (element) {
-    elements.push(element);
-    element = elementXPath.iterateNext();
-  }
-  return elements;
-}
-function eventEnter(element, callback) {
-  element.addEventListener("keydown", (event) => {
-    if (event.key == "Enter") {
-      event.preventDefault();
-      return false;
-    }
-  });
-  element.addEventListener("keyup", (event) => {
-    if (event.key == "Enter") {
-      event.preventDefault();
-      callback(event);
-      return false;
-    }
-  });
-}
 
 // src/lib/editable_field.js
 var EditableField = class {

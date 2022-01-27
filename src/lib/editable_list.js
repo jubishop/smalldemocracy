@@ -1,6 +1,7 @@
 export { EditableList }
 
 import { Modal } from './modal'
+import { eventEnter } from './dom'
 import { post } from './ajax'
 
 class EditableList {
@@ -98,19 +99,7 @@ class EditableList {
     inputElement.classList.add(...this.options['inputClasses']);
     inputElement.setAttribute('type', this.options['inputType']);
     inputElement.setAttribute('placeholder', this.options['placeholderText']);
-    inputElement.addEventListener('keydown', (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        return false;
-      }
-    });
-    inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        this.addItem();
-        return false;
-      }
-    });
+    eventEnter(inputElement, (event) => this.addItem());
     return inputElement;
   }
 
