@@ -266,7 +266,7 @@ var Group = class {
     new EditableList(listElement, getElementsByXPath("//li[@class='editable' and not(./div)]"), document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
       return {
         hash_id: hashID,
-        email: memberEmailToAdd.trim()
+        email: memberEmailToAdd
       };
     }, (elementToDelete) => {
       return {

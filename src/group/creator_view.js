@@ -37,7 +37,7 @@ class Group {
       (memberEmailToAdd) => {
         return {
           hash_id: hashID,
-          email: memberEmailToAdd.trim(),
+          email: memberEmailToAdd,
         };
       },
       (elementToDelete) => {

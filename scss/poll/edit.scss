@@ -53,3 +53,7 @@ ul#choices .delete-icon {
   --fa-secondary-color: var(--contrast);
   margin: 0 0.5rem;
 }
+
+ul#choices li.editable .delete-icon {
+  cursor: pointer;
+}

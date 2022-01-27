@@ -86,8 +86,8 @@ function post(path, params, successCallback, errorCallback = false, finallyCallb
 
 // src/lib/editable_list.js
 var EditableList = class {
-  constructor(listElement2, elements, addButton, addPath, deletePath, addCallback, deleteCallback, options = {}) {
-    this.listElement = listElement2;
+  constructor(listElement, elements, addButton, addPath, deletePath, addCallback, deleteCallback, options = {}) {
+    this.listElement = listElement;
     this.addButton = addButton;
     this.addButton.addEventListener("click", () => this.addInputElement());
     this.addPath = addPath;
@@ -237,49 +237,60 @@ var EditableField = class {
   }
 };
 
+// src/lib/dom.js
+function getElementsByXPath(xpath) {
+  const elementXPath = document.evaluate(xpath, document);
+  const elements = [];
+  let element = elementXPath.iterateNext();
+  while (element) {
+    elements.push(element);
+    element = elementXPath.iterateNext();
+  }
+  return elements;
+}
+
 // src/poll/edit.js
 var Poll = class {
   static domLoaded() {
     const choicesList = document.getElementById("choices");
     const hashID = choicesList.getAttribute("data-id");
-    console.log(hashID);
-    new EditableField(document.getElementById("group-name"), document.getElementById("edit-group-button"), "/group/name", (textContent) => {
-      return {
-        hash_id: hashID,
-        name: textContent
-      };
-    }, (textContent) => {
-      const createLink = document.getElementById("create-link");
-      createLink.innerHTML = `Create new poll for <em>${textContent}</em>`;
-    });
-    new EditableList(listElement, getElementsByXPath("//li[@class='editable' and not(./div)]"), document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
-      return {
-        hash_id: hashID,
-        email: memberEmailToAdd.trim()
-      };
-    }, (elementToDelete) => {
-      return {
-        hash_id: hashID,
-        email: elementToDelete.firstElementChild.textContent.trim()
-      };
-    }, {
-      inputType: "email",
-      placeholderText: "Add member"
-    });
-    const deleteButton = document.getElementById("delete-group");
-    deleteButton.addEventListener("click", () => {
-      const modal = new Modal("Are you sure?", "Deleting this group will also delete all it's polls", {
-        "Cancel": {
-          classes: ["secondary"]
-        },
-        "Do It": {
-          callback: () => {
-            post("/group/destroy", { hash_id: hashID }, () => window.location.replace("/"), false, () => modal.close());
-          },
-          classes: ["primary"]
-        }
-      }).display();
-    });
+    const editTitleButton = document.getElementById("edit-title-button");
+    if (editTitleButton) {
+      new EditableField(document.getElementById("poll-title"), editTitleButton, "/poll/title", (textContent) => {
+        return {
+          hash_id: hashID,
+          title: textContent
+        };
+      });
+    }
+    const editQuestionButton = document.getElementById("edit-question-button");
+    if (editQuestionButton) {
+      new EditableField(document.getElementById("poll-question"), editQuestionButton, "/poll/question", (textContent) => {
+        return {
+          hash_id: hashID,
+          question: textContent
+        };
+      }, () => {
+      }, {
+        textElementType: "h4"
+      });
+    }
+    const addChoiceButton = document.getElementById("add-choice");
+    if (addChoiceButton) {
+      new EditableList(choicesList, getElementsByXPath("//li[@class='editable']"), addChoiceButton, "/poll/add_choice", "/poll/remove_choice", (choiceToAdd) => {
+        return {
+          hash_id: hashID,
+          choice: choiceToAdd
+        };
+      }, (elementToDelete) => {
+        return {
+          hash_id: hashID,
+          choice: elementToDelete.firstElementChild.textContent.trim()
+        };
+      }, {
+        placeholderText: "Add choice"
+      });
+    }
   }
 };
 document.addEventListener("DOMContentLoaded", () => Poll.domLoaded());

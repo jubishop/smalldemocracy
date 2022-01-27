@@ -1,6 +1,7 @@
 import { EditableList } from '../lib/editable_list'
 import { EditableField } from '../lib/editable_field'
 import { Modal } from '../lib/modal'
+import { getElementsByXPath } from '../lib/dom'
 import { post } from '../lib/ajax'
 
 class Poll {
@@ -8,70 +9,90 @@ class Poll {
     // Extract poll `hashid` first.
     const choicesList = document.getElementById('choices');
     const hashID = choicesList.getAttribute("data-id");
-    console.log(hashID);
 
-    // Edit name.
-    new EditableField(
-      document.getElementById('group-name'),
-      document.getElementById('edit-group-button'),
-      '/group/name',
-      (textContent) => { // editCallback
-        return {
-          hash_id: hashID,
-          name: textContent
-        };
-      },
-      (textContent) => { // successCallback
-        const createLink = document.getElementById('create-link');
-        createLink.innerHTML = `Create new poll for <em>${textContent}</em>`;
-      }
-    );
+    // Edit title.
+    const editTitleButton = document.getElementById('edit-title-button');
+    if (editTitleButton) {
+      new EditableField(
+        document.getElementById('poll-title'),
+        editTitleButton,
+        '/poll/title',
+        (textContent) => { // editCallback
+          return {
+            hash_id: hashID,
+            title: textContent
+          };
+        }
+      );
+    }
 
-    // Add and remove members.
-    new EditableList(
-      listElement,
-      getElementsByXPath("//li[@class='editable' and not(./div)]"),
-      document.getElementById('add-member'),
-      '/group/add_member',
-      '/group/remove_member',
-      (memberEmailToAdd) => {
-        return {
-          hash_id: hashID,
-          email: memberEmailToAdd.trim(),
-        };
-      },
-      (elementToDelete) => {
-        return {
-          hash_id: hashID,
-          email: elementToDelete.firstElementChild.textContent.trim()
-        };
-      },
-      {
-        inputType: 'email',
-        placeholderText: 'Add member'
-      });
+    // Edit question.
+    const editQuestionButton = document.getElementById('edit-question-button');
+    if (editQuestionButton) {
+      new EditableField(
+        document.getElementById('poll-question'),
+        editQuestionButton,
+        '/poll/question',
+        (textContent) => { // editCallback
+          return {
+            hash_id: hashID,
+            question: textContent
+          };
+        },
+        () => {}, // successCallback
+        {
+          textElementType: 'h4'
+        }
+      );
+    }
+
+    // Add and remove choices.
+    const addChoiceButton = document.getElementById('add-choice');
+    if (addChoiceButton) {
+      new EditableList(
+        choicesList,
+        getElementsByXPath("//li[@class='editable']"),
+        addChoiceButton,
+        '/poll/add_choice',
+        '/poll/remove_choice',
+        (choiceToAdd) => {
+          return {
+            hash_id: hashID,
+            choice: choiceToAdd,
+          };
+        },
+        (elementToDelete) => {
+          return {
+            hash_id: hashID,
+            choice: elementToDelete.firstElementChild.textContent.trim()
+          };
+        },
+        {
+          placeholderText: 'Add choice'
+        });
+    }
 
     // Delete group.
-    const deleteButton = document.getElementById('delete-group');
-    deleteButton.addEventListener('click', () => {
-      const modal = new Modal(
-        'Are you sure?',
-        "Deleting this group will also delete all it's polls", {
-        'Cancel': {
-          classes: ['secondary']
-        },
-        'Do It': {
-          callback: () => {
-            post('/group/destroy',
-              { hash_id: hashID },
-              () => window.location.replace('/'), // successCallback
-              false, // errorCallback
-              () => modal.close()); // finallyCallback
-          },
-          classes: ['primary']
-        }
-      }).display();
-    });
+    // const deleteButton = document.getElementById('delete-group');
+    // deleteButton.addEventListener('click', () => {
+    //   const modal = new Modal(
+    //     'Are you sure?',
+    //     "Deleting this group will also delete all it's polls", {
+    //     'Cancel': {
+    //       classes: ['secondary']
+    //     },
+    //     'Do It': {
+    //       callback: () => {
+    //         post('/group/destroy',
+    //           { hash_id: hashID },
+    //           () => window.location.replace('/'), // successCallback
+    //           false, // errorCallback
+    //           () => modal.close()); // finallyCallback
+    //       },
+    //       classes: ['primary']
+    //     }
+    //   }).display();
+    // });
   }
 }
 
