@@ -90,7 +90,7 @@ RSpec.describe(Group, type: :rack_test) {
     }
   }
 
-  shared_context('group mutability') {
+  shared_context('mutable group') {
     let(:member_email) { 'mutable_member@group.com' }
     let(:valid_params) {
       {
@@ -101,7 +101,7 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /add_member') {
-    include_context('group mutability')
+    include_context('mutable group')
 
     it_has_behavior('creator mutability', 'add_member')
 
@@ -124,7 +124,7 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /remove_member') {
-    include_context('group mutability')
+    include_context('mutable group')
 
     before(:each) {
       group.add_member(email: member_email)

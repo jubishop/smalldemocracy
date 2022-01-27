@@ -1,4 +1,4 @@
-export { getElementsByXPath }
+export { getElementsByXPath, eventEnter }
 
 function getElementsByXPath(xpath) {
   const elementXPath = document.evaluate(xpath, document);
@@ -9,4 +9,20 @@ function getElementsByXPath(xpath) {
     element = elementXPath.iterateNext()
   }
   return elements;
+}
+
+function eventEnter(element, callback) {
+  element.addEventListener('keydown', (event) => {
+    if (event.key == 'Enter') {
+      event.preventDefault();
+      return false;
+    }
+  });
+  element.addEventListener('keyup', (event) => {
+    if (event.key == 'Enter') {
+      event.preventDefault();
+      callback(event);
+      return false;
+    }
+  });
 }

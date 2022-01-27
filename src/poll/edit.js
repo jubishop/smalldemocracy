@@ -1,7 +1,7 @@
 import { EditableList } from '../lib/editable_list'
 import { EditableField } from '../lib/editable_field'
 import { Modal } from '../lib/modal'
-import { getElementsByXPath } from '../lib/dom'
+import { getElementsByXPath, eventEnter } from '../lib/dom'
 import { post } from '../lib/ajax'
 
 class Poll {
@@ -39,7 +39,7 @@ class Poll {
             question: textContent
           };
         },
-        () => {}, // successCallback
+        () => { }, // successCallback
         {
           textElementType: 'h4'
         }
@@ -71,6 +71,32 @@ class Poll {
           placeholderText: 'Add choice'
         });
     }
+
+    // Edit expiration.
+    const expirationButton = document.getElementById('update-expiration');
+    const expirationInput = document.getElementsByName('expiration')[0];
+    const postCallback = () => {
+      post('/poll/expiration',
+        {
+          hash_id: hashID,
+          expiration: expirationInput.value
+        },
+        () => { }, //successCallback
+        () => { // errorCallback
+          expirationButton.disabled = false;
+        });
+    }
+    expirationButton.addEventListener('click', (event) => {
+      expirationButton.disabled = true;
+      postCallback();
+    });
+    eventEnter(expirationInput, (event) => {
+      expirationButton.disabled = true;
+      postCallback();
+    });
+    expirationInput.addEventListener('change', (event) => {
+      expirationButton.disabled = false;
+    });
 
     // Delete group.
     // const deleteButton = document.getElementById('delete-group');

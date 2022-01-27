@@ -51,7 +51,8 @@ var Modal = class {
 };
 
 // src/lib/ajax.js
-function post(path, params, successCallback, errorCallback = false, finallyCallback = () => {
+function post(path, params, successCallback = () => {
+}, errorCallback = false, finallyCallback = () => {
 }) {
   fetch(path, {
     method: "POST",
@@ -248,6 +249,21 @@ function getElementsByXPath(xpath) {
   }
   return elements;
 }
+function eventEnter(element, callback) {
+  element.addEventListener("keydown", (event) => {
+    if (event.key == "Enter") {
+      event.preventDefault();
+      return false;
+    }
+  });
+  element.addEventListener("keyup", (event) => {
+    if (event.key == "Enter") {
+      event.preventDefault();
+      callback(event);
+      return false;
+    }
+  });
+}
 
 // src/poll/edit.js
 var Poll = class {
@@ -291,6 +307,28 @@ var Poll = class {
         placeholderText: "Add choice"
       });
     }
+    const expirationButton = document.getElementById("update-expiration");
+    const expirationInput = document.getElementsByName("expiration")[0];
+    const postCallback = () => {
+      post("/poll/expiration", {
+        hash_id: hashID,
+        expiration: expirationInput.value
+      }, () => {
+      }, () => {
+        expirationButton.disabled = false;
+      });
+    };
+    expirationButton.addEventListener("click", (event) => {
+      expirationButton.disabled = true;
+      postCallback();
+    });
+    eventEnter(expirationInput, (event) => {
+      expirationButton.disabled = true;
+      postCallback();
+    });
+    expirationInput.addEventListener("change", (event) => {
+      expirationButton.disabled = false;
+    });
   }
 };
 document.addEventListener("DOMContentLoaded", () => Poll.domLoaded());
