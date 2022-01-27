@@ -186,58 +186,6 @@ var EditableList = class {
   }
 };
 
-// src/lib/editable_field.js
-var EditableField = class {
-  constructor(fieldElement, editButton, editPath, editCallback, successCallback = () => {
-  }, options = {}) {
-    this.fieldElement = fieldElement;
-    this.editButton = editButton;
-    this.editPath = editPath;
-    this.editCallback = editCallback;
-    this.successCallback = successCallback;
-    this.options = Object.assign({
-      textElementType: "h2"
-    }, options);
-    this.editButton.addEventListener("click", () => this.showInputField());
-  }
-  showInputField() {
-    const textElement = this.fieldElement.firstElementChild;
-    textElement.remove();
-    this.editButton.remove();
-    const inputElement = document.createElement("input");
-    inputElement.value = textElement.textContent.trim();
-    this.fieldElement.appendChild(inputElement);
-    inputElement.focus();
-    inputElement.addEventListener("keydown", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        return false;
-      }
-    });
-    inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        inputElement.disabled = true;
-        post(this.editPath, this.editCallback(inputElement.value.trim()), () => {
-          inputElement.remove();
-          this.showTextField(inputElement.value.trim());
-        }, (error_message) => {
-          new Modal("Error", error_message).display();
-          inputElement.disabled = false;
-        });
-        return false;
-      }
-    });
-  }
-  showTextField(textContent) {
-    const textElement = document.createElement(this.options["textElementType"]);
-    textElement.textContent = textContent;
-    this.fieldElement.appendChild(textElement);
-    this.fieldElement.appendChild(this.editButton);
-    this.successCallback(textContent);
-  }
-};
-
 // src/lib/dom.js
 function getElementsByXPath(xpath) {
   const elementXPath = document.evaluate(xpath, document);
@@ -264,6 +212,48 @@ function eventEnter(element, callback) {
     }
   });
 }
+
+// src/lib/editable_field.js
+var EditableField = class {
+  constructor(fieldElement, editButton, editPath, editCallback, successCallback = () => {
+  }, options = {}) {
+    this.fieldElement = fieldElement;
+    this.editButton = editButton;
+    this.editPath = editPath;
+    this.editCallback = editCallback;
+    this.successCallback = successCallback;
+    this.options = Object.assign({
+      textElementType: "h2"
+    }, options);
+    this.editButton.addEventListener("click", () => this.showInputField());
+  }
+  showInputField() {
+    const textElement = this.fieldElement.firstElementChild;
+    textElement.remove();
+    this.editButton.remove();
+    const inputElement = document.createElement("input");
+    inputElement.value = textElement.textContent.trim();
+    this.fieldElement.appendChild(inputElement);
+    inputElement.focus();
+    eventEnter(inputElement, (event) => {
+      inputElement.disabled = true;
+      post(this.editPath, this.editCallback(inputElement.value.trim()), () => {
+        inputElement.remove();
+        this.showTextField(inputElement.value.trim());
+      }, (error_message) => {
+        new Modal("Error", error_message).display();
+        inputElement.disabled = false;
+      });
+    });
+  }
+  showTextField(textContent) {
+    const textElement = document.createElement(this.options["textElementType"]);
+    textElement.textContent = textContent;
+    this.fieldElement.appendChild(textElement);
+    this.fieldElement.appendChild(this.editButton);
+    this.successCallback(textContent);
+  }
+};
 
 // src/poll/edit.js
 var Poll = class {

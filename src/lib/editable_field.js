@@ -1,6 +1,7 @@
 export { EditableField }
 
 import { Modal } from './modal'
+import { eventEnter } from './dom'
 import { post } from './ajax'
 
 class EditableField {
@@ -8,7 +9,7 @@ class EditableField {
     editButton,
     editPath,
     editCallback,
-    successCallback = () => {},
+    successCallback = () => { },
     options = {}) {
     this.fieldElement = fieldElement;
     this.editButton = editButton;
@@ -29,26 +30,16 @@ class EditableField {
     inputElement.value = textElement.textContent.trim();
     this.fieldElement.appendChild(inputElement);
     inputElement.focus();
-    inputElement.addEventListener('keydown', (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        return false;
-      }
-    });
-    inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        inputElement.disabled = true;
-        post(this.editPath, this.editCallback(inputElement.value.trim()),
-          () => { // successCallback
-            inputElement.remove();
-            this.showTextField(inputElement.value.trim());
-          }, (error_message) => { // errorCallback
-            new Modal('Error', error_message).display();
-            inputElement.disabled = false;
-          });
-        return false;
-      }
+    eventEnter(inputElement, (event) => {
+      inputElement.disabled = true;
+      post(this.editPath, this.editCallback(inputElement.value.trim()),
+        () => { // successCallback
+          inputElement.remove();
+          this.showTextField(inputElement.value.trim());
+        }, (error_message) => { // errorCallback
+          new Modal('Error', error_message).display();
+          inputElement.disabled = false;
+        });
     });
   }
 

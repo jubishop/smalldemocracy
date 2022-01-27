@@ -186,6 +186,33 @@ var EditableList = class {
   }
 };
 
+// src/lib/dom.js
+function getElementsByXPath(xpath) {
+  const elementXPath = document.evaluate(xpath, document);
+  const elements = [];
+  let element = elementXPath.iterateNext();
+  while (element) {
+    elements.push(element);
+    element = elementXPath.iterateNext();
+  }
+  return elements;
+}
+function eventEnter(element, callback) {
+  element.addEventListener("keydown", (event) => {
+    if (event.key == "Enter") {
+      event.preventDefault();
+      return false;
+    }
+  });
+  element.addEventListener("keyup", (event) => {
+    if (event.key == "Enter") {
+      event.preventDefault();
+      callback(event);
+      return false;
+    }
+  });
+}
+
 // src/lib/editable_field.js
 var EditableField = class {
   constructor(fieldElement, editButton, editPath, editCallback, successCallback = () => {
@@ -208,25 +235,15 @@ var EditableField = class {
     inputElement.value = textElement.textContent.trim();
     this.fieldElement.appendChild(inputElement);
     inputElement.focus();
-    inputElement.addEventListener("keydown", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        return false;
-      }
-    });
-    inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        inputElement.disabled = true;
-        post(this.editPath, this.editCallback(inputElement.value.trim()), () => {
-          inputElement.remove();
-          this.showTextField(inputElement.value.trim());
-        }, (error_message) => {
-          new Modal("Error", error_message).display();
-          inputElement.disabled = false;
-        });
-        return false;
-      }
+    eventEnter(inputElement, (event) => {
+      inputElement.disabled = true;
+      post(this.editPath, this.editCallback(inputElement.value.trim()), () => {
+        inputElement.remove();
+        this.showTextField(inputElement.value.trim());
+      }, (error_message) => {
+        new Modal("Error", error_message).display();
+        inputElement.disabled = false;
+      });
     });
   }
   showTextField(textContent) {
@@ -237,18 +254,6 @@ var EditableField = class {
     this.successCallback(textContent);
   }
 };
-
-// src/lib/dom.js
-function getElementsByXPath(xpath) {
-  const elementXPath = document.evaluate(xpath, document);
-  const elements = [];
-  let element = elementXPath.iterateNext();
-  while (element) {
-    elements.push(element);
-    element = elementXPath.iterateNext();
-  }
-  return elements;
-}
 
 // src/group/creator_view.js
 var Group = class {
