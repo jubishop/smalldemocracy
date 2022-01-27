@@ -1,3 +1,20 @@
+// src/lib/dom.js
+function eventEnter(element, callback) {
+  element.addEventListener("keydown", (event) => {
+    if (event.key == "Enter") {
+      event.preventDefault();
+      return false;
+    }
+  });
+  element.addEventListener("keyup", (event) => {
+    if (event.key == "Enter") {
+      event.preventDefault();
+      callback(event);
+      return false;
+    }
+  });
+}
+
 // src/lib/listable.js
 var Listable = class {
   constructor(listElement, buttonElement, options = {}) {
@@ -49,19 +66,7 @@ var Listable = class {
     inputElement.setAttribute("name", this.options["inputName"]);
     inputElement.setAttribute("required", true);
     inputElement.setAttribute("placeholder", this.options["placeholderText"]);
-    inputElement.addEventListener("keydown", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        return false;
-      }
-    });
-    inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        this.addItem();
-        return false;
-      }
-    });
+    eventEnter(inputElement, (event) => this.addItem());
     return inputElement;
   }
   buildDeleteButton() {

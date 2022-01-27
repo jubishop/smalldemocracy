@@ -1,5 +1,7 @@
 export { Listable }
 
+import { eventEnter } from './dom'
+
 class Listable {
   constructor(listElement, buttonElement, options = {}) {
     this.listElement = listElement;
@@ -57,19 +59,7 @@ class Listable {
     inputElement.setAttribute('name', this.options['inputName']);
     inputElement.setAttribute('required', true);
     inputElement.setAttribute('placeholder', this.options['placeholderText']);
-    inputElement.addEventListener('keydown', (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        return false;
-      }
-    });
-    inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        this.addItem();
-        return false;
-      }
-    });
+    eventEnter(inputElement, (event) => this.addItem());
     return inputElement;
   }
 
