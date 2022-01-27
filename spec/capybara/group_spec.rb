@@ -110,6 +110,16 @@ RSpec.describe(Group, type: :feature) {
       it_has_behavior('displayable', 'creator')
 
       it('supports complex editing of group') {
+        # Rename group.
+        edit_group_button = find('#edit-group-button')
+        edit_group_button.click
+        expect(edit_group_button).to(be_gone)
+        input_field = find('#group-name input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "New group name\n")
+        expect(input_field).to(be_gone)
+        expect(edit_group_button).to(be_visible)
+
         # Add a member.
         add_button = find('#add-member')
         expect(add_button).to_not(be_disabled)
@@ -128,16 +138,6 @@ RSpec.describe(Group, type: :feature) {
         delete_member_2_button = all('.delete-icon')[2]
         delete_member_2_button.click
         expect(delete_member_2_button).to(be_gone)
-
-        # Rename group.
-        edit_group_button = find('#edit-group-button')
-        edit_group_button.click
-        expect(edit_group_button).to(be_gone)
-        input_field = find('#group-name input')
-        expect(input_field).to(have_focus)
-        input_field.fill_in(with: "New group name\n")
-        expect(input_field).to(be_gone)
-        expect(edit_group_button).to(be_visible)
 
         # Screenshot group's new state.
         goldens.verify('view_modified')

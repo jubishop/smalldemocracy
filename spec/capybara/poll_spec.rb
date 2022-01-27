@@ -419,4 +419,78 @@ RSpec.describe(Poll, type: :feature) {
       it_has_behavior('finish')
     }
   }
+
+  context(:edit) {
+    let(:email) { |context| context.full_description.to_email('poll.com') }
+    let(:poll) { |context|
+      create_poll(email: email,
+                  title: context.description,
+                  question: 'poll question')
+    }
+
+    before(:each) {
+      10.times { |i| poll.add_choice(text: "choice_#{i}") }
+    }
+
+    context('no responses') {
+      before(:each) { go(poll.edit_url) }
+
+      it('shows a poll fully free to edit') {
+        goldens.verify('edit_no_responses')
+      }
+
+      it('supports complex editing of poll') {
+        # Change title.
+        edit_title_button = find('#edit-title-button')
+        edit_title_button.click
+        expect(edit_title_button).to(be_gone)
+        input_field = find('#poll-title input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "New poll title\n")
+        sleep(10)
+        expect(input_field).to(be_gone)
+        expect(edit_title_button).to(be_visible)
+
+        # Change question
+        edit_question_button = find('#edit-question-button')
+        edit_question_button.click
+        expect(edit_question_button).to(be_gone)
+        input_field = find('#poll-question input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "New poll question\n")
+        expect(input_field).to(be_gone)
+        expect(edit_question_button).to(be_visible)
+
+        # Add a choice.
+        add_button = find('#add-choice')
+        expect(add_button).to_not(be_disabled)
+        add_button.click
+        expect(add_button).to(be_disabled)
+        input_field = find('input.input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "New poll choice\n")
+        expect(input_field).to(be_gone)
+        expect(add_button).to_not(be_disabled)
+
+        # Delete choice #2.
+        delete_choice_2_button = all('.delete-icon')[2]
+        delete_choice_2_button.click
+        expect(delete_choice_2_button).to(be_gone)
+
+        # Edit expiration
+        fill_in('expiration', with: Time.now + 5.days)
+        find('#update-expiration').click
+
+        # Screenshot group's new state.
+        goldens.verify('edit_no_responses_modified')
+
+        # Ensure actual changes made in DB.
+        expect(poll.reload.title).to(eq('New poll title'))
+        expect(poll.reload.question).to(eq('New poll question'))
+        poll_choices = poll.choices.map(&:text)
+        expect(poll_choices).to(include('New poll choice'))
+        expect(poll_choices).to_not(include('choice_2'))
+      }
+    }
+  }
 }
