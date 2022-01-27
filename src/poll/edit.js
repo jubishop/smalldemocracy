@@ -98,27 +98,27 @@ class Poll {
       expirationButton.disabled = false;
     });
 
-    // Delete group.
-    // const deleteButton = document.getElementById('delete-group');
-    // deleteButton.addEventListener('click', () => {
-    //   const modal = new Modal(
-    //     'Are you sure?',
-    //     "Deleting this group will also delete all it's polls", {
-    //     'Cancel': {
-    //       classes: ['secondary']
-    //     },
-    //     'Do It': {
-    //       callback: () => {
-    //         post('/group/destroy',
-    //           { hash_id: hashID },
-    //           () => window.location.replace('/'), // successCallback
-    //           false, // errorCallback
-    //           () => modal.close()); // finallyCallback
-    //       },
-    //       classes: ['primary']
-    //     }
-    //   }).display();
-    // });
+    // Delete poll.
+    const deleteButton = document.getElementById('delete-poll');
+    deleteButton.addEventListener('click', () => {
+      const modal = new Modal(
+        'Are you sure?',
+        "Deleting this poll will also delete all it's responses", {
+        'Cancel': {
+          classes: ['secondary']
+        },
+        'Do It': {
+          callback: () => {
+            post('/poll/destroy',
+              { hash_id: hashID },
+              () => window.location.replace('/'), // successCallback
+              false, // errorCallback
+              () => modal.close()); // finallyCallback
+          },
+          classes: ['primary']
+        }
+      }).display();
+    });
   }
 }
 

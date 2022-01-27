@@ -307,6 +307,20 @@ var Poll = class {
     expirationInput.addEventListener("change", (event) => {
       expirationButton.disabled = false;
     });
+    const deleteButton = document.getElementById("delete-poll");
+    deleteButton.addEventListener("click", () => {
+      const modal = new Modal("Are you sure?", "Deleting this poll will also delete all it's responses", {
+        "Cancel": {
+          classes: ["secondary"]
+        },
+        "Do It": {
+          callback: () => {
+            post("/poll/destroy", { hash_id: hashID }, () => window.location.replace("/"), false, () => modal.close());
+          },
+          classes: ["primary"]
+        }
+      }).display();
+    });
   }
 };
 document.addEventListener("DOMContentLoaded", () => Poll.domLoaded());
