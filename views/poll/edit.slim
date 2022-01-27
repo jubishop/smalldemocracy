@@ -8,6 +8,12 @@
 = content_for :banner
   =poll
 
+p
+  | Hello #{poll.email}
+  =="&nbsp;"
+  em
+    a href=poll.url (View this poll)
+
 div#poll-title.editable-field
   h2 =poll
   - if any_response
