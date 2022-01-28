@@ -52,6 +52,7 @@ module Models
     def url
       return "/group/view/#{hashid}"
     end
+    alias edit_url url
 
     def to_s
       return name

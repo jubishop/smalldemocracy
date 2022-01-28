@@ -1,17 +1,16 @@
-require_relative 'shared_examples/entity_flows'
+require_relative 'shared_examples/deletable'
+require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Group, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/group') }
 
   let(:entity) { create_group }
-  it_has_behavior('entity flows')
+  it_has_behavior('entity guards')
 
   context(:create) {
     let(:email) { 'group@create.com' }
 
-    before(:each) {
-      go('/group/create')
-    }
+    before(:each) { go('/group/create') }
 
     it('shows a group create page') {
       goldens.verify('create_empty')
@@ -109,6 +108,10 @@ RSpec.describe(Group, type: :feature) {
 
       it_has_behavior('displayable', 'creator')
 
+      let(:entity) { group }
+      let(:delete_button) { find('#delete-group') }
+      it_has_behavior('deletable')
+
       it('supports complex editing of group') {
         # Rename group.
         edit_group_button = find('#edit-group-button')
@@ -147,34 +150,6 @@ RSpec.describe(Group, type: :feature) {
         member_emails = group.members.map(&:email)
         expect(member_emails).to(include('group_adder@view.com'))
         expect(member_emails).to_not(include('group_creator_2@view.com'))
-      }
-
-      it('shows a deletion confirmation warning upon delete') {
-        # Click to delete the group.
-        delete_group_button = find('#delete-group')
-        delete_group_button.click
-        expect(page).to(have_modal)
-
-        # Screenshot group deletion modal.
-        goldens.verify('delete_modal')
-
-        # Click cancel and confirm modal goes away.
-        click_link('Cancel')
-        expect(page).to_not(have_modal)
-        expect(page).to(have_current_path(group.url))
-      }
-
-      it('supports deleting group') {
-        # Click and confirm deletion of group.
-        delete_group_button = find('#delete-group')
-        delete_group_button.click
-        expect(page).to(have_modal)
-        expect_any_slim(:logged_in)
-        click_link('Do It')
-
-        # Confirm redirection to home and group deleted.
-        expect(page).to(have_current_path('/'))
-        expect(group.exists?).to(be(false))
       }
     }
 

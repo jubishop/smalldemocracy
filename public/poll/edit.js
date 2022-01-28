@@ -309,7 +309,7 @@ var Poll = class {
     });
     const deleteButton = document.getElementById("delete-poll");
     deleteButton.addEventListener("click", () => {
-      const modal = new Modal("Are you sure?", "Deleting this poll will also delete all it's responses", {
+      const modal = new Modal("Are you sure?", "Deleting this poll will also delete all its responses", {
         "Cancel": {
           classes: ["secondary"]
         },

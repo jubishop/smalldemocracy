@@ -103,7 +103,7 @@ class Poll {
     deleteButton.addEventListener('click', () => {
       const modal = new Modal(
         'Are you sure?',
-        "Deleting this poll will also delete all it's responses", {
+        "Deleting this poll will also delete all its responses", {
         'Cancel': {
           classes: ['secondary']
         },

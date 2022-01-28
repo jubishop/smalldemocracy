@@ -1,13 +1,14 @@
 require 'duration'
 require 'tzinfo'
 
-require_relative 'shared_examples/entity_flows'
+require_relative 'shared_examples/deletable'
+require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
 
   let(:entity) { create_poll }
-  it_has_behavior('entity flows')
+  it_has_behavior('entity guards')
 
   def have_expiration_text
     return have_content('Jun 06 1982, at 11:25 PM +07')
@@ -434,6 +435,10 @@ RSpec.describe(Poll, type: :feature) {
 
     context('no responses') {
       before(:each) { go(poll.edit_url) }
+
+      let(:entity) { poll }
+      let(:delete_button) { find('#delete-poll') }
+      it_has_behavior('deletable')
 
       it('shows a poll fully free to edit') {
         goldens.verify('edit_no_responses')
