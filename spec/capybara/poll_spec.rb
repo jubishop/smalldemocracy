@@ -438,13 +438,13 @@ RSpec.describe(Poll, type: :feature) {
 
       let(:entity) { poll }
       let(:delete_button) { find('#delete-poll') }
-      it_has_behavior('deletable')
+      it_has_behavior('deletable', 'no_responses')
 
       it('shows a poll fully free to edit') {
         goldens.verify('edit_no_responses')
       }
 
-      it('supports complex editing of poll') {
+      it('supports complete editing of poll') {
         # Change title.
         edit_title_button = find('#edit-title-button')
         edit_title_button.click
@@ -483,10 +483,11 @@ RSpec.describe(Poll, type: :feature) {
         expect(delete_choice_2_button).to(be_gone)
 
         # Edit expiration
-        fill_in('expiration', with: Time.now + 5.days)
+        expiration_time = Time.at((Time.now + 5.days), in: '-07:00')
+        fill_in('expiration', with: expiration_time)
         find('#update-expiration').click
 
-        # Screenshot group's new state.
+        # Screenshot poll's new state.
         goldens.verify('edit_no_responses_modified')
 
         # Ensure actual changes made in DB.
@@ -495,6 +496,49 @@ RSpec.describe(Poll, type: :feature) {
         poll_choices = poll.choices.map(&:text)
         expect(poll_choices).to(include('New poll choice'))
         expect(poll_choices).to_not(include('choice_2'))
+        expect(poll.reload.expiration).to(eq(Time.now + 5.days))
+      }
+    }
+
+    context('with responses') {
+      before(:each) {
+        poll.choices.each { |choice|
+          choice.add_response(member_id: poll.members.sample.id)
+        }
+        go(poll.edit_url)
+      }
+
+      let(:entity) { poll }
+      let(:delete_button) { find('#delete-poll') }
+      it_has_behavior('deletable', 'with_responses')
+
+      it('shows a poll with limited editability') {
+        goldens.verify('edit_with_responses')
+      }
+
+      it('supports limited editing of poll') {
+        # Cannot change title.
+        expect(page).to_not(have_selector('#edit-title-button'))
+
+        # Cannot change question.
+        expect(page).to_not(have_selector('#edit-question-button'))
+
+        # Cannot add a choice.
+        expect(page).to_not(have_selector('#add-choice'))
+
+        # Cannot delete choice.
+        expect(page).to_not(have_selector('li .editable'))
+
+        # Edit expiration
+        expiration_time = Time.at((Time.now + 10.days), in: '-07:00')
+        fill_in('expiration', with: expiration_time)
+        find('#update-expiration').click
+
+        # Screenshot poll's new state.
+        goldens.verify('edit_with_responses_modified')
+
+        # Ensure expiration change made in DB
+        expect(poll.reload.expiration).to(eq(Time.now + 10.days))
       }
     }
   }

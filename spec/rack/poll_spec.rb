@@ -357,7 +357,7 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
       expect(last_response.body).to(
           eq('Poll expiration set to time in the past'))
-      expect(poll.expiration).to_not(eq(valid_params[:expiration]))
+      expect(poll.reload.expiration).to_not(eq(valid_params[:expiration]))
     }
 
     it('fails if new expiration is more than 90 days out') {
@@ -366,7 +366,7 @@ RSpec.describe(Poll, type: :rack_test) {
       expect(last_response.status).to(be(400))
       expect(last_response.body).to(
           eq('Poll expiration set to more than 90 days in the future'))
-      expect(poll.expiration).to_not(eq(valid_params[:expiration]))
+      expect(poll.reload.expiration).to_not(eq(valid_params[:expiration]))
     }
   }
 

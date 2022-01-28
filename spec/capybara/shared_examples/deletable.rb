@@ -1,11 +1,11 @@
-RSpec.shared_examples('deletable') {
+RSpec.shared_examples('deletable') { |context|
   it('shows a deletion confirmation warning upon delete') {
     # Click to delete the entity.
     delete_button.click
     expect(page).to(have_modal)
 
     # Screenshot deletion modal.
-    goldens.verify('delete_modal')
+    goldens.verify("#{context}_delete_modal")
 
     # Click cancel and confirm modal goes away.
     click_link('Cancel')

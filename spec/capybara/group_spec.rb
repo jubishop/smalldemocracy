@@ -110,7 +110,7 @@ RSpec.describe(Group, type: :feature) {
 
       let(:entity) { group }
       let(:delete_button) { find('#delete-group') }
-      it_has_behavior('deletable')
+      it_has_behavior('deletable', 'group')
 
       it('supports complex editing of group') {
         # Rename group.
