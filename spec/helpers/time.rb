@@ -1,4 +1,5 @@
 require 'duration'
+require 'tzinfo'
 
 module RSpec
   module Time
@@ -22,8 +23,7 @@ module RSpec
 end
 
 class Time
-  # Asia/Bangkok => +07:00
-  def form(in_zone: '+07:00')
+  def form(in_zone: TZInfo::Timezone.get('Asia/Bangkok'))
     return self.class.at(self, in: in_zone).strftime('%Y-%m-%dT%H:%M')
   end
 
