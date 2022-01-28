@@ -6,6 +6,10 @@ require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
+  let(:expiration_time) {
+    Time.at(Time.now + 5.days,
+            in: TZInfo::Timezone.get(page.driver.cookies['tz'].value))
+  }
 
   let(:entity) { create_poll }
   it_has_behavior('entity guards')
@@ -44,7 +48,7 @@ RSpec.describe(Poll, type: :feature) {
       go('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
-      fill_in('expiration', with: Time.now + 5.days)
+      fill_in('expiration', with: expiration_time)
       select('Borda Split', from: 'type')
 
       # Sometimes click Add button, sometimes press enter on input field, in
@@ -90,7 +94,15 @@ RSpec.describe(Poll, type: :feature) {
       click_button('Create Poll')
 
       # Ensure actual changes made in DB.
-      expect(group.polls.map(&:title)).to(include('this is my title'))
+      poll = group.polls.find { |current_poll|
+        current_poll.title == 'this is my title'
+      }
+      expect(poll.title).to(eq('this is my title'))
+      expect(poll.question).to(eq('what is life'))
+      expect(poll.choices.map(&:text)).to(
+          match_array(%w[zero three four five six seven]))
+      expect(poll.expiration).to(eq(expiration_time))
+      expect(poll.type).to(eq(:borda_split))
     }
 
     it('displays a modal and redirects you when you have no group') {
@@ -483,7 +495,6 @@ RSpec.describe(Poll, type: :feature) {
         expect(delete_choice_2_button).to(be_gone)
 
         # Edit expiration
-        expiration_time = Time.at((Time.now + 5.days), in: '-07:00')
         fill_in('expiration', with: expiration_time)
         find('#update-expiration').click
 
@@ -496,7 +507,7 @@ RSpec.describe(Poll, type: :feature) {
         poll_choices = poll.choices.map(&:text)
         expect(poll_choices).to(include('New poll choice'))
         expect(poll_choices).to_not(include('choice_2'))
-        expect(poll.reload.expiration).to(eq(Time.now + 5.days))
+        expect(poll.reload.expiration).to(eq(expiration_time))
       }
     }
 
@@ -530,7 +541,6 @@ RSpec.describe(Poll, type: :feature) {
         expect(page).to_not(have_selector('li .editable'))
 
         # Edit expiration
-        expiration_time = Time.at((Time.now + 10.days), in: '-07:00')
         fill_in('expiration', with: expiration_time)
         find('#update-expiration').click
 
@@ -538,7 +548,7 @@ RSpec.describe(Poll, type: :feature) {
         goldens.verify('edit_with_responses_modified')
 
         # Ensure expiration change made in DB
-        expect(poll.reload.expiration).to(eq(Time.now + 10.days))
+        expect(poll.reload.expiration).to(eq(expiration_time))
       }
     }
   }
