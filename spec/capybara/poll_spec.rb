@@ -22,6 +22,10 @@ RSpec.describe(Poll, type: :feature) {
     return have_link('(Edit this poll)', href: poll.edit_url)
   end
 
+  def have_view_link
+    return have_link('(View this poll)', href: poll.url)
+  end
+
   before(:each) {
     # Need a fixed moment in time for consistent goldens.
     freeze_time(Time.new(1982, 6, 6, 11, 30, 0,
@@ -453,6 +457,7 @@ RSpec.describe(Poll, type: :feature) {
       it_has_behavior('deletable', 'no_responses')
 
       it('shows a poll fully free to edit') {
+        expect(page).to(have_view_link)
         goldens.verify('edit_no_responses')
       }
 
@@ -524,6 +529,7 @@ RSpec.describe(Poll, type: :feature) {
       it_has_behavior('deletable', 'with_responses')
 
       it('shows a poll with limited editability') {
+        expect(page).to(have_view_link)
         goldens.verify('edit_with_responses')
       }
 
