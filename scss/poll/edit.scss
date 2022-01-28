@@ -1,0 +1,59 @@
+@use "../layout";
+
+.editable-field {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+h2, h4 {
+  margin: 0;
+}
+
+div.immutable {
+  border-bottom: none !important;
+  cursor: not-allowed !important;
+}
+div.mutable {
+  cursor: pointer;
+}
+
+div.immutable .edit-icon {
+  --fa-primary-color: var(--del-color);
+  --fa-secondary-color: var(--contrast);
+}
+div.mutable .edit-icon {
+  --fa-primary-color: var(--ins-color);
+  --fa-secondary-color: var(--contrast);
+}
+
+ul#choices {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+ul#choices li {
+  align-items: center;
+  display: flex;
+  list-style-type: none;
+  border: 1px solid var(--form-element-border-color);
+  border-radius: 0.2rem;
+  padding: 0.4rem;
+}
+
+ul#choices li p.text {
+  flex: 1 1 auto;
+  margin: 0 0.5rem;
+}
+
+ul#choices .delete-icon {
+  --fa-primary-color: var(--del-color);
+  --fa-secondary-color: var(--contrast);
+  margin: 0 0.5rem;
+}
+
+ul#choices li.editable .delete-icon {
+  cursor: pointer;
+}

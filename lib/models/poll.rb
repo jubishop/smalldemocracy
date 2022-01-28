@@ -84,6 +84,10 @@ module Models
       return expiration < Time.now
     end
 
+    def any_response?
+      return !responses_dataset.first.nil?
+    end
+
     def scores
       assert_finished
       assert_type(:borda_single, :borda_split)
@@ -141,6 +145,10 @@ module Models
 
     def url
       return "/poll/view/#{hashid}"
+    end
+
+    def edit_url
+      return "/poll/edit/#{hashid}"
     end
 
     def to_s

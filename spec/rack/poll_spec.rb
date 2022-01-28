@@ -1,14 +1,16 @@
+require 'duration'
 require 'tzinfo'
 
 require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :rack_test) {
   let(:group) { create_group }
+  let(:poll) { group.add_poll }
   let(:type) { :choose_one }
   let(:expiration) { future }
   let(:choices) { %w[one two three] }
   let(:member) { group.creating_member }
-  let(:email) { member.email }
+  let(:email) { group.email }
   let(:valid_params) {
     {
       title: 'title',
@@ -22,8 +24,6 @@ RSpec.describe(Poll, type: :rack_test) {
 
   let(:entity) { create_poll(email: email) }
   it_has_behavior('entity guards', 'poll')
-
-  before(:each) { set_cookie(:email, email) }
 
   context('get /create') {
     let(:user) { create_user }
@@ -110,7 +110,6 @@ RSpec.describe(Poll, type: :rack_test) {
   context('get /view') {
     let(:tz_name) { 'Africa/Djibouti' }
     let(:timezone) { TZInfo::Timezone.get(tz_name) }
-    let(:poll) { create_poll }
     let(:member) { poll.creating_member }
     let(:email) { member.email }
 
@@ -124,11 +123,10 @@ RSpec.describe(Poll, type: :rack_test) {
 
     it('shows your answers if you have responded') {
       member.add_response(choice_id: poll.add_choice.id)
-      expect_slim(
-          'poll/responded',
-          poll: poll,
-          member: member,
-          timezone: timezone)
+      expect_slim('poll/responded',
+                  poll: poll,
+                  member: member,
+                  timezone: timezone)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }
@@ -137,18 +135,256 @@ RSpec.describe(Poll, type: :rack_test) {
       member.add_response(choice_id: poll.add_choice.id)
       freeze_time(future + 1.day)
       breakdown, unresponded = poll.breakdown
-      expect_slim(
-          'poll/finished',
-          poll: poll,
-          breakdown: breakdown,
-          unresponded: unresponded)
+      expect_slim('poll/finished',
+                  poll: poll,
+                  member: member,
+                  breakdown: breakdown,
+                  unresponded: unresponded,
+                  timezone: timezone)
       get poll.url
       expect(last_response.ok?).to(be(true))
     }
   }
 
+  context('get /edit') {
+    it('shows edit page') {
+      set_cookie(:email, poll.email)
+      expect_slim('poll/edit',
+                  poll: poll,
+                  expiration_time: poll.expiration,
+                  form_time: Time.now)
+      get poll.edit_url
+      expect(last_response.ok?).to(be(true))
+    }
+
+    it('redirects and asks for email with no cookie') {
+      clear_cookies
+      get poll.edit_url
+      expect(last_response.redirect?).to(be(true))
+      expect_slim(:get_email, req: an_instance_of(Tony::Request))
+      follow_redirect!
+      expect(last_response.status).to(eq(401))
+    }
+
+    it('returns not found if user is not in poll') {
+      set_cookie(:email, random_email)
+      get poll.edit_url
+      expect(last_response.redirect?).to(be(true))
+      expect_slim('poll/not_found')
+      follow_redirect!
+      expect(last_response.status).to(eq(404))
+    }
+
+    it('redirects to viewing poll if user is not poll creator') {
+      member = poll.group.add_member
+      set_cookie(:email, member.email)
+      get poll.edit_url
+      expect(last_response.redirect?).to(be(true))
+      expect_slim('poll/view',
+                  poll: poll,
+                  member: member,
+                  timezone: an_instance_of(TZInfo::DataTimezone))
+      follow_redirect!
+      expect(last_response.ok?).to(be(true))
+    }
+  }
+
+  shared_examples('poll mutability') { |operation|
+    it('fails with no cookie') {
+      clear_cookies
+      post "poll/#{operation}", valid_params
+      expect(last_response.status).to(be(401))
+      expect(last_response.body).to(eq('No email found'))
+    }
+
+    it('fails if any field is missing or empty') {
+      valid_params.each_key { |key|
+        params = valid_params.clone
+        params[key] = ''
+        post "/poll/#{operation}", params
+        expect(last_response.status).to(be(400))
+        params.delete(key)
+        post "/poll/#{operation}", params
+        expect(last_response.status).to(be(400))
+      }
+    }
+
+    it('fails if user is not poll creator') {
+      email = poll.group.add_member.email
+      set_cookie(:email, email)
+      post "poll/#{operation}", valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq("#{email} is not the creator of #{poll.title}"))
+    }
+  }
+
+  shared_examples('poll content mutability') { |operation|
+    it_has_behavior('poll mutability', operation)
+
+    it('fails if poll has any responses') {
+      choice = poll.add_choice
+      choice.add_response
+      post "poll/#{operation}", valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq("#{poll.title} already has responses"))
+    }
+  }
+
+  context('post /title') {
+    let(:email) { poll.email }
+    let(:poll_title) { 'A title' }
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        title: poll_title
+      }
+    }
+
+    it_has_behavior('poll content mutability', 'title')
+
+    it('edits title of poll') {
+      expect(poll.title).to_not(eq(poll_title))
+      post 'poll/title', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll title changed'))
+      expect(poll.reload.title).to(eq(poll_title))
+    }
+  }
+
+  context('post /question') {
+    let(:email) { poll.email }
+    let(:poll_question) { 'A question' }
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        question: poll_question
+      }
+    }
+
+    it_has_behavior('poll content mutability', 'question')
+
+    it('edits question of poll') {
+      expect(poll.question).to_not(eq(poll_question))
+      post 'poll/question', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll question changed'))
+      expect(poll.reload.question).to(eq(poll_question))
+    }
+  }
+
+  shared_context('poll choice mutability') {
+    let(:email) { poll.email }
+    let(:choice_text) { 'A choice' }
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        choice: choice_text
+      }
+    }
+  }
+
+  context('post /add_choice') {
+    include_context('poll choice mutability')
+    it_has_behavior('poll content mutability', 'add_choice')
+
+    it('adds choice to poll') {
+      expect(poll.choices).to(be_empty)
+      post 'poll/add_choice', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll choice added'))
+      expect(poll.choices(reload: true).map(&:text)).to(eq([choice_text]))
+    }
+
+    it('rejects adding choice that is already in the poll') {
+      poll.add_choice(text: choice_text)
+      post 'poll/add_choice', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          match(/violates unique constraint "choice_unique"/))
+    }
+  }
+
+  context('post /remove_choice') {
+    include_context('poll choice mutability')
+
+    before(:each) {
+      poll.add_choice(text: choice_text)
+    }
+
+    it_has_behavior('poll content mutability', 'remove_choice')
+
+    it('removes choice from poll') {
+      expect(poll.choices.map(&:text)).to(eq([choice_text]))
+      post 'poll/remove_choice', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll choice removed'))
+      expect(poll.choices(reload: true)).to(be_empty)
+    }
+
+    it('rejects removing choice that is not in the poll') {
+      valid_params[:choice] = 'Not in poll'
+      post 'poll/remove_choice', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq("Not in poll is not a choice of #{poll.title}"))
+    }
+  }
+
+  context('post /expiration') {
+    let(:email) { poll.email }
+    let(:poll_expiration) { future + 10.days }
+    let(:valid_params) {
+      {
+        hash_id: poll.hashid,
+        expiration: poll_expiration.form
+      }
+    }
+
+    include_context('poll mutability', 'expiration')
+
+    it('updates poll expiration') {
+      expect(poll.expiration).to_not(eq(poll_expiration))
+      post 'poll/expiration', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll expiration updated'))
+      expect(poll.reload.expiration).to(eq(poll_expiration))
+    }
+
+    it('fails if new expiration is in the past') {
+      valid_params[:expiration] = past.form
+      post 'poll/expiration', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq('Poll expiration set to time in the past'))
+      expect(poll.reload.expiration).to_not(eq(valid_params[:expiration]))
+    }
+
+    it('fails if new expiration is more than 90 days out') {
+      valid_params[:expiration] = (Time.now + 91.days).form
+      post 'poll/expiration', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq('Poll expiration set to more than 90 days in the future'))
+      expect(poll.reload.expiration).to_not(eq(valid_params[:expiration]))
+    }
+  }
+
+  context('post /destroy') {
+    let(:email) { poll.email }
+    let(:valid_params) { { hash_id: poll.hashid } }
+
+    it_has_behavior('poll mutability', 'destroy')
+
+    it('destroys a poll') {
+      post '/poll/destroy', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll destroyed'))
+      expect(poll.exists?).to(be(false))
+    }
+  }
+
   context('post /respond') {
-    let(:poll) { create_poll }
     let(:email) { poll.email }
     let(:choice) { poll.add_choice }
     let(:member) { poll.creating_member }
@@ -299,7 +535,6 @@ RSpec.describe(Poll, type: :rack_test) {
       }
 
       context(':borda_single') {
-        let(:type) { :borda_single }
         let(:score_calculation) {
           ->(rank) { poll.choices.length - rank - 1 }
         }

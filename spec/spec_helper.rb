@@ -51,12 +51,17 @@ RSpec.shared_context(:model) {
   let(:email) { random_email }
 }
 
-RSpec.shared_context(:rack_test) {
-  include_context(:tony_rack_test)
-
-  let(:app) { Capybara.app }
+RSpec.shared_context(:web_test) {
   let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
   let(:email) { random_email }
+  before(:each) { set_cookie(:email, email) }
+}
+
+RSpec.shared_context(:rack_test) {
+  include_context(:tony_rack_test)
+  include_context(:web_test)
+
+  let(:app) { Capybara.app }
 
   # rubocop:disable Style/StringHashKeys
   def post_json(path, data = {})
@@ -67,17 +72,16 @@ RSpec.shared_context(:rack_test) {
 
 RSpec.shared_context(:capybara) {
   include_context(:tony_capybara)
-
-  let(:cookie_secret) { ENV.fetch('SMALLDEMOCRACY_COOKIE_SECRET') }
-  let(:email) { random_email }
+  include_context(:web_test)
 
   def go(path)
-    expect(page).to(have_timezone) if page.current_path
     page.driver.set_cookie(:tz, 'Asia/Bangkok')
     visit(path)
     expect(page).to(have_assets)
     expect(page).to(have_fonts)
     expect(page).to(have_fontawesome)
+    expect(page).to(have_timezone)
+    page.driver.set_cookie(:tz, 'Asia/Bangkok')
   end
 }
 

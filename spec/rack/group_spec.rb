@@ -1,6 +1,8 @@
 require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Group, type: :rack_test) {
+  let(:group) { create_group }
+  let(:email) { group.email }
   let(:members) { ['one@one', 'two@two', 'three@three'] }
   let(:valid_params) {
     {
@@ -12,8 +14,6 @@ RSpec.describe(Group, type: :rack_test) {
   let(:entity) { create_group(email: email) }
   it_has_behavior('entity guards', 'group')
 
-  before(:each) { set_cookie(:email, email) }
-
   context('get /create') {
     it('shows creation page if you have an email cookie') {
       expect_slim('group/create', email: email)
@@ -23,6 +23,8 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /create') {
+    let(:email) { random_email }
+
     it('creates a new group with members and redirects to view') {
       post '/group/create', valid_params
       expect(last_response.redirect?).to(be(true))
@@ -37,7 +39,6 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('get /view') {
-    let(:group) { create_group }
     let(:email) { member.email }
     let(:member) { group.add_member }
 
@@ -89,16 +90,18 @@ RSpec.describe(Group, type: :rack_test) {
     }
   }
 
-  context('post /add_member') {
-    let(:group) { create_group }
-    let(:email) { group.email }
-    let(:member_email) { 'add_member@group.com' }
+  shared_context('mutable group') {
+    let(:member_email) { 'mutable_member@group.com' }
     let(:valid_params) {
       {
         hash_id: group.hashid,
         email: member_email
       }
     }
+  }
+
+  context('post /add_member') {
+    include_context('mutable group')
 
     it_has_behavior('creator mutability', 'add_member')
 
@@ -121,21 +124,17 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /remove_member') {
-    let(:group) { create_group }
-    let(:email) { group.email }
-    let(:member) { group.add_member }
-    let(:valid_params) {
-      {
-        hash_id: group.hashid,
-        email: member.email
-      }
+    include_context('mutable group')
+
+    before(:each) {
+      group.add_member(email: member_email)
     }
 
     it_has_behavior('creator mutability', 'remove_member')
 
     it('removes member from group') {
-      expect(group.members).to(match_array([group.creating_member, member]))
-      valid_params
+      expect(group.members.map(&:email)).to(
+          match_array([group.creating_member.email, member_email]))
       post 'group/remove_member', valid_params
       expect(last_response.status).to(be(201))
       expect(last_response.body).to(eq('Group member removed'))
@@ -159,8 +158,6 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /name') {
-    let(:group) { create_group }
-    let(:email) { group.email }
     let(:group_name) { 'New Group Name' }
     let(:valid_params) {
       {
@@ -181,13 +178,7 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /destroy') {
-    let(:group) { create_group }
-    let(:email) { group.email }
-    let(:valid_params) {
-      {
-        hash_id: group.hashid
-      }
-    }
+    let(:valid_params) { { hash_id: group.hashid } }
 
     it_has_behavior('creator mutability', 'destroy')
 
@@ -200,12 +191,7 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   context('post /leave') {
-    let(:group) { create_group }
-    let(:valid_params) {
-      {
-        hash_id: group.hashid
-      }
-    }
+    let(:valid_params) { { hash_id: group.hashid } }
 
     it_has_behavior('group mutability', 'leave')
 
@@ -221,6 +207,8 @@ RSpec.describe(Group, type: :rack_test) {
     }
 
     it('rejects leaving a group you are not a part of') {
+      email = random_email
+      set_cookie(:email, email)
       post '/group/leave', valid_params
       expect(last_response.status).to(be(400))
       expect(last_response.body).to(
@@ -228,7 +216,6 @@ RSpec.describe(Group, type: :rack_test) {
     }
 
     it('rejects leaving a group you created') {
-      set_cookie(:email, group.email)
       post '/group/leave', valid_params
       expect(last_response.status).to(be(400))
       expect(last_response.body).to(eq('Creators cannot leave their own group'))

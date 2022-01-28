@@ -243,43 +243,79 @@ var EditableField = class {
   }
 };
 
-// src/group/creator_view.js
-var Group = class {
+// src/poll/edit.js
+var Poll = class {
   static domLoaded() {
-    const listElement = document.getElementById("member-list");
-    const hashID = listElement.getAttribute("data-id");
-    new EditableField(document.getElementById("group-name"), document.getElementById("edit-group-button"), "/group/name", (textContent) => {
-      return {
+    const choicesList = document.getElementById("choices");
+    const hashID = choicesList.getAttribute("data-id");
+    const editTitleButton = document.getElementById("edit-title-button");
+    if (editTitleButton) {
+      new EditableField(document.getElementById("poll-title"), editTitleButton, "/poll/title", (textContent) => {
+        return {
+          hash_id: hashID,
+          title: textContent
+        };
+      });
+    }
+    const editQuestionButton = document.getElementById("edit-question-button");
+    if (editQuestionButton) {
+      new EditableField(document.getElementById("poll-question"), editQuestionButton, "/poll/question", (textContent) => {
+        return {
+          hash_id: hashID,
+          question: textContent
+        };
+      }, () => {
+      }, {
+        textElementType: "h4"
+      });
+    }
+    const addChoiceButton = document.getElementById("add-choice");
+    if (addChoiceButton) {
+      new EditableList(choicesList, getElementsByXPath("//li[@class='editable']"), addChoiceButton, "/poll/add_choice", "/poll/remove_choice", (choiceToAdd) => {
+        return {
+          hash_id: hashID,
+          choice: choiceToAdd
+        };
+      }, (elementToDelete) => {
+        return {
+          hash_id: hashID,
+          choice: elementToDelete.firstElementChild.textContent.trim()
+        };
+      }, {
+        placeholderText: "Add choice"
+      });
+    }
+    const expirationButton = document.getElementById("update-expiration");
+    const expirationInput = document.getElementsByName("expiration")[0];
+    const postCallback = () => {
+      post("/poll/expiration", {
         hash_id: hashID,
-        name: textContent
-      };
-    }, (textContent) => {
-      const createLink = document.getElementById("create-link");
-      createLink.innerHTML = `Create new poll for <em>${textContent}</em>`;
+        expiration: expirationInput.value
+      }, () => {
+      }, () => {
+        expirationButton.disabled = false;
+      });
+    };
+    expirationButton.addEventListener("click", (event) => {
+      expirationButton.disabled = true;
+      postCallback();
     });
-    new EditableList(listElement, getElementsByXPath("//li[@class='editable' and not(./div)]"), document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
-      return {
-        hash_id: hashID,
-        email: memberEmailToAdd
-      };
-    }, (elementToDelete) => {
-      return {
-        hash_id: hashID,
-        email: elementToDelete.firstElementChild.textContent.trim()
-      };
-    }, {
-      inputType: "email",
-      placeholderText: "Add member"
+    eventEnter(expirationInput, (event) => {
+      expirationButton.disabled = true;
+      postCallback();
     });
-    const deleteButton = document.getElementById("delete-group");
+    expirationInput.addEventListener("change", (event) => {
+      expirationButton.disabled = false;
+    });
+    const deleteButton = document.getElementById("delete-poll");
     deleteButton.addEventListener("click", () => {
-      const modal = new Modal("Are you sure?", "Deleting this group will also delete all it's polls", {
+      const modal = new Modal("Are you sure?", "Deleting this poll will also delete all its responses", {
         "Cancel": {
           classes: ["secondary"]
         },
         "Do It": {
           callback: () => {
-            post("/group/destroy", { hash_id: hashID }, () => window.location.replace("/"), false, () => modal.close());
+            post("/poll/destroy", { hash_id: hashID }, () => window.location.replace("/"), false, () => modal.close());
           },
           classes: ["primary"]
         }
@@ -287,4 +323,4 @@ var Group = class {
     });
   }
 };
-document.addEventListener("DOMContentLoaded", () => Group.domLoaded());
+document.addEventListener("DOMContentLoaded", () => Poll.domLoaded());

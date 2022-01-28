@@ -3,7 +3,7 @@ export { post }
 
 function post(path,
   params,
-  successCallback,
+  successCallback = () => {},
   errorCallback = false,
   finallyCallback = () => {}) {
   fetch(path, {

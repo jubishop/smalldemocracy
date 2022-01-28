@@ -31,13 +31,7 @@ class Poll < Base
       choices = req.list_param(:choices, [])
       req.params.delete(:choices)
 
-      begin
-        req.params[:expiration] = Time.strptime(
-            "#{req.param(:expiration)} UTC",
-            '%Y-%m-%dT%H:%M %Z') - req.timezone.current_period.utc_total_offset
-      rescue ArgumentError
-        return 400, "#{req.param(:expiration)} is invalid date"
-      end
+      req.params[:expiration] = require_expiration(req)
 
       begin
         poll = Models::Poll.create(**req.params.symbolize_keys)
@@ -59,14 +53,112 @@ class Poll < Base
       if poll.finished?
         breakdown, unresponded = poll.breakdown
         return 200, @slim.render('poll/finished', poll: poll,
+                                                  member: member,
                                                   breakdown: breakdown,
-                                                  unresponded: unresponded)
+                                                  unresponded: unresponded,
+                                                  timezone: req.timezone)
       end
 
       template = member.responded?(poll_id: poll.id) ? :responded : :view
       return 200, @slim.render("poll/#{template}", poll: poll,
                                                    member: member,
                                                    timezone: req.timezone)
+    })
+
+    get(%r{^/poll/edit/(?<hash_id>.+)$}, ->(req, resp) {
+      poll = catch(:response) { require_creator(req) }
+
+      if poll.is_a?(Models::Poll)
+        expiration_time = Time.at(poll.expiration, in: req.timezone)
+        form_time = Time.at(Time.now, in: req.timezone)
+
+        return 200, @slim.render('poll/edit', poll: poll,
+                                              expiration_time: expiration_time,
+                                              form_time: form_time)
+      end
+
+      resp.redirect(require_poll(req).url)
+    })
+
+    post('/poll/title', ->(req, _) {
+      poll = require_editable_poll(req)
+      title = req.param(:title)
+
+      begin
+        poll.update(title: title)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll title changed'
+      end
+    })
+
+    post('/poll/question', ->(req, _) {
+      poll = require_editable_poll(req)
+      question = req.param(:question)
+
+      begin
+        poll.update(question: question)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll question changed'
+      end
+    })
+
+    post('/poll/add_choice', ->(req, _) {
+      poll = require_editable_poll(req)
+      choice_text = req.param(:choice)
+
+      begin
+        poll.add_choice(text: choice_text)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll choice added'
+      end
+    })
+
+    post('/poll/remove_choice', ->(req, _) {
+      poll = require_editable_poll(req)
+      choice_text = req.param(:choice)
+
+      choice = poll.choice(text: choice_text)
+      unless choice
+        return 400, "#{choice_text} is not a choice of #{poll.title}"
+      end
+
+      begin
+        poll.remove_choice(choice)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll choice removed'
+      end
+    })
+
+    post('/poll/expiration', ->(req, _) {
+      poll = require_creator(req)
+
+      begin
+        poll.update(expiration: require_expiration(req))
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll expiration updated'
+      end
+    })
+
+    post('/poll/destroy', ->(req, _) {
+      poll = require_creator(req)
+
+      begin
+        poll.destroy
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll destroyed'
+      end
     })
 
     post('/poll/respond', ->(req, _) {
@@ -98,6 +190,38 @@ class Poll < Base
   end
 
   private
+
+  def require_expiration(req)
+    utc_time = Time.strptime("#{req.param(:expiration)} UTC",
+                             '%Y-%m-%dT%H:%M %Z')
+    current_offset = req.timezone.current_period.utc_total_offset
+    period_time = utc_time - current_offset
+    period_offset = req.timezone.period_for(period_time).utc_total_offset
+    return period_time - (period_offset - current_offset)
+  rescue ArgumentError
+    throw(:response, [400, "#{req.param(:expiration)} is invalid date"])
+  end
+
+  def require_editable_poll(req)
+    poll = require_creator(req)
+
+    if poll.any_response?
+      throw(:response, [400, "#{poll.title} already has responses"])
+    end
+
+    return poll
+  end
+
+  def require_creator(req)
+    email = require_session(req)
+    poll = require_poll(req)
+
+    unless email == poll.email
+      throw(:response, [400, "#{email} is not the creator of #{poll.title}"])
+    end
+
+    return poll
+  end
 
   def save_choose_one_poll_response(req, member)
     member.add_response(choice_id: req.param(:choice_id))

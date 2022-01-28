@@ -1,3 +1,5 @@
+- is_creator = member.email == poll.email
+
 = content_for :head
   title =poll
   - case poll.type
@@ -11,7 +13,12 @@
 = content_for :banner
   =poll
 
-p Hello #{member.email}
+p
+  | Hello #{member.email}
+  - if is_creator
+    =="&nbsp;"
+    em
+      a href=poll.edit_url (Edit this poll)
 
 h2 =poll.question
 

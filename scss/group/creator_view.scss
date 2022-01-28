@@ -1,7 +1,5 @@
 @use "view";
 
-@use "../editable";
-
 #group-name {
   align-items: center;
   display: flex;
@@ -22,4 +20,25 @@
 #creator-trash-can, #creator-trash-can .delete-icon {
   border-bottom: none;
   cursor: not-allowed;
+}
+
+li.editable {
+  align-items: center;
+  display: flex;
+}
+
+li.editable .text {
+  flex: 1 1 auto;
+  margin: 0 0.5rem;
+}
+
+li.editable .delete-icon {
+  --fa-primary-color: var(--del-color);
+  --fa-secondary-color: var(--contrast);
+  cursor: pointer;
+  margin: 0 0.5rem;
+}
+
+li.editable .input {
+  margin: 0;
 }

@@ -1,6 +1,4 @@
 RSpec.shared_examples('entity guards') { |path|
-  before(:each) { set_cookie(:email, email) }
-
   context('get /create') {
     it('requests email if you have no cookie') {
       clear_cookies

@@ -126,6 +126,13 @@ RSpec.describe(Models::Group, type: :model) {
     }
   }
 
+  context('#edit_url') {
+    it('creates url') {
+      group = create_group
+      expect(group.edit_url).to(eq("/group/view/#{group.hashid}"))
+    }
+  }
+
   context('#add_member') {
     let(:group) { create_group }
 

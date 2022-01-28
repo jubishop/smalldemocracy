@@ -1,9 +1,16 @@
+- is_creator = member.email == poll.email
+
 = content_for :head
   title Poll Finished
   ==stylesheet_link_tag :base
 
 = content_for :banner
   | #{poll} Finished
+
+- if is_creator
+  a href=poll.edit_url (Edit this poll)
+
+==partial(:expiration_text)
 
 h2 Results:
 

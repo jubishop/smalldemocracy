@@ -2123,7 +2123,8 @@ var Modal = class {
 };
 
 // src/lib/ajax.js
-function post(path, params, successCallback, errorCallback = false, finallyCallback = () => {
+function post(path, params, successCallback = () => {
+}, errorCallback = false, finallyCallback = () => {
 }) {
   fetch(path, {
     method: "POST",

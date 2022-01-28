@@ -1,0 +1,56 @@
+- any_response = poll.any_response?
+
+= content_for :head
+  title =poll
+  ==stylesheet_link_tag 'poll/edit'
+  ==javascript_include_tag 'poll/edit'
+
+= content_for :banner
+  =poll
+
+p
+  | Hello #{poll.email}
+  =="&nbsp;"
+  em
+    a href=poll.url (View this poll)
+
+div#poll-title.editable-field
+  h2 =poll
+  - if any_response
+    div.immutable data-tooltip="This poll already has responses"
+      i.edit-icon.fa-duotone.fa-pencil-slash
+  - else
+    div#edit-title-button.mutable
+      i.edit-icon.fa-duotone.fa-pencil
+
+div#poll-question.editable-field
+  h4 =poll.question
+  - if any_response
+    div.immutable data-tooltip="This poll already has responses"
+      i.edit-icon.fa-duotone.fa-pencil-slash
+  - else
+    div#edit-question-button.mutable
+      i.edit-icon.fa-duotone.fa-pencil
+
+
+ul#choices data-id=poll.hashid
+  - poll.choices.each do |choice|
+    li class=(any_response ? "immutable" : "editable")
+      p.text #{choice}
+      - if any_response
+        div.immutable data-tooltip="This poll already has responses"
+          i.delete-icon.fa-duotone.fa-trash-can-xmark
+
+- unless any_response
+  button#add-choice type="button" Add Choice
+
+label for="expiration" Expiration (in #{form_time.zone.abbr}):
+input[name="expiration"
+      type="datetime-local"
+      required=true
+      value=expiration_time.strftime('%Y-%m-%dT%H:%M')
+      min=form_time.strftime('%Y-%m-%dT%H:%M')
+      max=(form_time + 90.days).strftime('%Y-%m-%dT%H:%M')]
+button#update-expiration type="button" disabled=true Update Expiration
+
+button#delete-poll.contrast type="button" Delete Poll

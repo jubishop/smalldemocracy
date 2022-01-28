@@ -1,7 +1,23 @@
 @use "../layout";
 
-@use "../listable";
-
 ul#choice-list {
   padding: 0;
+}
+
+li.listable {
+  align-items: center;
+  display: flex;
+}
+
+li.listable .text {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+li.listable .delete-icon {
+  --fa-primary-color: var(--del-color);
+  --fa-secondary-color: var(--contrast);
+  cursor: pointer;
+  font-size: 2rem;
+  margin: 0 0.5rem;
 }

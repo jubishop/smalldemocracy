@@ -1,13 +1,26 @@
 require 'duration'
 require 'tzinfo'
 
-require_relative 'shared_examples/entity_flows'
+require_relative 'shared_examples/deletable'
+require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :feature) {
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
+  let(:expiration_time) {
+    Time.at(Time.now + 5.days,
+            in: TZInfo::Timezone.get(page.driver.cookies['tz'].value))
+  }
 
   let(:entity) { create_poll }
-  it_has_behavior('entity flows')
+  it_has_behavior('entity guards')
+
+  def have_expiration_text
+    return have_content('Jun 06 1982, at 11:25 PM +07')
+  end
+
+  def have_edit_link
+    return have_link('(Edit this poll)', href: poll.edit_url)
+  end
 
   before(:each) {
     # Need a fixed moment in time for consistent goldens.
@@ -35,7 +48,7 @@ RSpec.describe(Poll, type: :feature) {
       go('/poll/create')
       fill_in('title', with: 'this is my title')
       fill_in('question', with: 'what is life')
-      fill_in('expiration', with: Time.now + 5.days)
+      fill_in('expiration', with: expiration_time)
       select('Borda Split', from: 'type')
 
       # Sometimes click Add button, sometimes press enter on input field, in
@@ -81,7 +94,15 @@ RSpec.describe(Poll, type: :feature) {
       click_button('Create Poll')
 
       # Ensure actual changes made in DB.
-      expect(group.polls.map(&:title)).to(include('this is my title'))
+      poll = group.polls.find { |current_poll|
+        current_poll.title == 'this is my title'
+      }
+      expect(poll.title).to(eq('this is my title'))
+      expect(poll.question).to(eq('what is life'))
+      expect(poll.choices.map(&:text)).to(
+          match_array(%w[zero three four five six seven]))
+      expect(poll.expiration).to(eq(expiration_time))
+      expect(poll.type).to(eq(:borda_split))
     }
 
     it('displays a modal and redirects you when you have no group') {
@@ -103,9 +124,18 @@ RSpec.describe(Poll, type: :feature) {
     }
   }
 
+  shared_examples('editable guard') {
+    it('shows no edit link for normal member') {
+      set_cookie(:email, poll.group.add_member.email)
+      go(poll.url)
+      expect(page).to_not(have_edit_link)
+    }
+  }
+
   context(:view) {
+    let(:email) { "#{type}@view.com" }
     let(:poll) {
-      create_poll(email: "#{type}@view.com",
+      create_poll(email: email,
                   title: "#{type}_title",
                   question: "#{type}_question",
                   type: type)
@@ -120,14 +150,8 @@ RSpec.describe(Poll, type: :feature) {
           timezone: an_instance_of(TZInfo::DataTimezone))
     end
 
-    def expect_expiration_text
-      expect(page).to(have_content('This poll ends on Jun 06 1982, ' \
-                                   'at 11:25 PM +07 (55 minutes from now).'))
-    end
-
     before(:each) {
       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
-      set_cookie(:email, poll.email)
       %w[zero one two three four five six].each { |choice|
         poll.add_choice(text: choice)
       }
@@ -152,9 +176,12 @@ RSpec.describe(Poll, type: :feature) {
       context(:borda_single) {
         let(:type) { :borda_single }
 
+        it_has_behavior('editable guard')
+
         it('submits a poll response') {
           go(poll.url)
-          expect_expiration_text
+          expect(page).to(have_expiration_text)
+          expect(page).to(have_edit_link)
 
           # Rearrange our choices.
           rearrange_choices([1, 0, 6, 3, 2, 5, 4])
@@ -181,6 +208,8 @@ RSpec.describe(Poll, type: :feature) {
           choice_node.drag_to(find('ul#bottom-choices'))
         end
 
+        it_has_behavior('editable guard')
+
         it('shows an empty borda_split page') {
           go(poll.url)
           goldens.verify('view_borda_split_empty_bottom')
@@ -188,7 +217,8 @@ RSpec.describe(Poll, type: :feature) {
 
         it('submits a poll response') {
           go(poll.url)
-          expect_expiration_text
+          expect(page).to(have_expiration_text)
+          expect(page).to(have_edit_link)
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
@@ -212,9 +242,12 @@ RSpec.describe(Poll, type: :feature) {
     context(:choose) {
       let(:type) { :choose_one }
 
+      it_has_behavior('editable guard')
+
       it('submits a poll response') {
         go(poll.url)
-        expect_expiration_text
+        expect(page).to(have_expiration_text)
+        expect(page).to(have_edit_link)
 
         # Get a screenshot of all our choices.
         goldens.verify('view_choose')
@@ -227,8 +260,9 @@ RSpec.describe(Poll, type: :feature) {
   }
 
   context(:responded) {
+    let(:email) { "#{type}@responded.com" }
     let(:poll) {
-      create_poll(email: "#{type}@responded.com",
+      create_poll(email: email,
                   title: "#{type}_title",
                   question: "#{type}_question",
                   type: type)
@@ -236,13 +270,14 @@ RSpec.describe(Poll, type: :feature) {
     let(:member) { poll.creating_member }
 
     before(:each) {
-      set_cookie(:email, poll.email)
       %w[zero one two three four five six].each { |choice|
         poll.add_choice(text: choice)
       }
     }
 
     shared_examples('borda response') {
+      it_has_behavior('editable guard')
+
       it('shows a responded page') {
         choices.each_with_index { |position, rank|
           choice = poll.choices[position]
@@ -250,6 +285,8 @@ RSpec.describe(Poll, type: :feature) {
                               data: { score: score_calculation.call(rank) })
         }
         go(poll.url)
+        expect(page).to(have_expiration_text)
+        expect(page).to(have_edit_link)
         goldens.verify("responded_#{type}")
       }
     }
@@ -278,17 +315,22 @@ RSpec.describe(Poll, type: :feature) {
       let(:type) { :choose_one }
       let(:choice) { poll.choices[3] }
 
+      it_has_behavior('editable guard')
+
       it('shows a responded page') {
         member.add_response(choice_id: choice.id)
         go(poll.url)
+        expect(page).to(have_expiration_text)
+        expect(page).to(have_edit_link)
         goldens.verify('responded_choose')
       }
     }
   }
 
   context(:finished) {
+    let(:email) { "#{type}@finished.com" }
     let(:poll) {
-      create_poll(email: "#{type}@finished.com",
+      create_poll(email: email,
                   title: "#{type}_title",
                   question: "#{type}_question",
                   type: type)
@@ -305,11 +347,9 @@ RSpec.describe(Poll, type: :feature) {
       }
     }
 
-    before(:each) {
-      set_cookie(:email, poll.email)
-    }
-
     shared_examples('finish') {
+      it_has_behavior('editable guard')
+
       before(:each) {
         responses.each_with_index { |ranked_choices, index|
           member = members[index]
@@ -321,6 +361,8 @@ RSpec.describe(Poll, type: :feature) {
         }
         freeze_time(future + 1.day)
         go(poll.url)
+        expect(page).to(have_expiration_text)
+        expect(page).to(have_edit_link)
       }
 
       it('shows a finished page') {
@@ -388,6 +430,126 @@ RSpec.describe(Poll, type: :feature) {
       let(:summary_expansions) { [1] }
 
       it_has_behavior('finish')
+    }
+  }
+
+  context(:edit) {
+    let(:email) { |context| context.full_description.to_email('poll.com') }
+    let(:poll) { |context|
+      create_poll(email: email,
+                  title: context.description,
+                  question: 'poll question')
+    }
+
+    before(:each) {
+      10.times { |i| poll.add_choice(text: "choice_#{i}") }
+    }
+
+    context('no responses') {
+      before(:each) { go(poll.edit_url) }
+
+      let(:entity) { poll }
+      let(:delete_button) { find('#delete-poll') }
+      it_has_behavior('deletable', 'no_responses')
+
+      it('shows a poll fully free to edit') {
+        goldens.verify('edit_no_responses')
+      }
+
+      it('supports complete editing of poll') {
+        # Change title.
+        edit_title_button = find('#edit-title-button')
+        edit_title_button.click
+        expect(edit_title_button).to(be_gone)
+        input_field = find('#poll-title input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "New poll title\n")
+        sleep(10)
+        expect(input_field).to(be_gone)
+        expect(edit_title_button).to(be_visible)
+
+        # Change question
+        edit_question_button = find('#edit-question-button')
+        edit_question_button.click
+        expect(edit_question_button).to(be_gone)
+        input_field = find('#poll-question input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "New poll question\n")
+        expect(input_field).to(be_gone)
+        expect(edit_question_button).to(be_visible)
+
+        # Add a choice.
+        add_button = find('#add-choice')
+        expect(add_button).to_not(be_disabled)
+        add_button.click
+        expect(add_button).to(be_disabled)
+        input_field = find('input.input')
+        expect(input_field).to(have_focus)
+        input_field.fill_in(with: "New poll choice\n")
+        expect(input_field).to(be_gone)
+        expect(add_button).to_not(be_disabled)
+
+        # Delete choice #2.
+        delete_choice_2_button = all('.delete-icon')[2]
+        delete_choice_2_button.click
+        expect(delete_choice_2_button).to(be_gone)
+
+        # Edit expiration
+        fill_in('expiration', with: expiration_time)
+        find('#update-expiration').click
+
+        # Screenshot poll's new state.
+        goldens.verify('edit_no_responses_modified')
+
+        # Ensure actual changes made in DB.
+        expect(poll.reload.title).to(eq('New poll title'))
+        expect(poll.reload.question).to(eq('New poll question'))
+        poll_choices = poll.choices.map(&:text)
+        expect(poll_choices).to(include('New poll choice'))
+        expect(poll_choices).to_not(include('choice_2'))
+        expect(poll.reload.expiration).to(eq(expiration_time))
+      }
+    }
+
+    context('with responses') {
+      before(:each) {
+        poll.choices.each { |choice|
+          choice.add_response(member_id: poll.members.sample.id)
+        }
+        go(poll.edit_url)
+      }
+
+      let(:entity) { poll }
+      let(:delete_button) { find('#delete-poll') }
+      it_has_behavior('deletable', 'with_responses')
+
+      it('shows a poll with limited editability') {
+        goldens.verify('edit_with_responses')
+      }
+
+      it('supports limited editing of poll') {
+        # Cannot change title.
+        expect(page).to_not(have_selector('#edit-title-button'))
+
+        # Cannot change question.
+        expect(page).to_not(have_selector('#edit-question-button'))
+
+        # Cannot add a choice.
+        expect(page).to_not(have_selector('#add-choice'))
+
+        # Cannot delete choice.
+        expect(page).to_not(have_selector('li .editable'))
+
+        # Edit expiration
+        fill_in('expiration', with: expiration_time)
+        find('#update-expiration').click
+
+        # Screenshot poll's new state.
+        goldens.verify('edit_with_responses_modified')
+
+        # Ensure expiration change made in DB
+        expect(poll.reload.expiration).to(eq(expiration_time))
+      }
     }
   }
 }

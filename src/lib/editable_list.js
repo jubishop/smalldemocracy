@@ -1,9 +1,10 @@
-export { Editable }
+export { EditableList }
 
 import { Modal } from './modal'
+import { eventEnter } from './dom'
 import { post } from './ajax'
 
-class Editable {
+class EditableList {
   constructor(listElement,
     elements,
     addButton,
@@ -41,10 +42,10 @@ class Editable {
     }
 
     this.inputElement.disabled = true;
-    post(this.addPath, this.addCallback(this.inputElement.value),
+    post(this.addPath, this.addCallback(this.inputElement.value.trim()),
       () => { // successCallback
         const textElement = this.buildTextElement();
-        textElement.textContent = this.inputElement.value;
+        textElement.textContent = this.inputElement.value.trim();
         this.listItem.removeChild(this.inputElement);
         this.listItem.appendChild(textElement);
         this.addDeleteButtonToElement(this.listItem);
@@ -98,19 +99,7 @@ class Editable {
     inputElement.classList.add(...this.options['inputClasses']);
     inputElement.setAttribute('type', this.options['inputType']);
     inputElement.setAttribute('placeholder', this.options['placeholderText']);
-    inputElement.addEventListener('keydown', (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        return false;
-      }
-    });
-    inputElement.addEventListener("keyup", (event) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-        this.addItem();
-        return false;
-      }
-    });
+    eventEnter(inputElement, (event) => this.addItem());
     return inputElement;
   }
 

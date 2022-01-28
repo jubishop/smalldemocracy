@@ -26,7 +26,7 @@ form action="create" method="post"
   label for="group_id" Group:
   select name="group_id"
     - user.groups.each do |group|
-      option value=group.id selected=(group.id == group_id) #{group.name}
+      option value=group.id selected=(group.id == group_id) =group
 
   label for="expiration" Expiration (in #{form_time.zone.abbr}):
   input[name="expiration"

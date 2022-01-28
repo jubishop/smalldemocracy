@@ -211,6 +211,11 @@ RSpec.describe(Models::Poll, type: :model) {
       choice = poll.add_choice
       expect(poll.choice(text: choice.text)).to(eq(choice))
     }
+
+    it('returns nil when choice does not exist') {
+      poll = create_poll
+      expect(poll.choice(text: 'does not exist')).to(be_nil)
+    }
   }
 
   context('#finished?') {
@@ -223,6 +228,28 @@ RSpec.describe(Models::Poll, type: :model) {
       poll = create_poll
       freeze_time(future + 1.day)
       expect(poll.finished?).to(be(true))
+    }
+  }
+
+  context('#any_response?') {
+    it('returns false when no responses given') {
+      poll = create_poll
+      expect(poll.any_response?).to(be(false))
+    }
+
+    it('returns false when a response has been given but then destroyed') {
+      poll = create_poll
+      choice = poll.add_choice
+      response = choice.add_response(member_id: poll.creating_member.id)
+      response.destroy
+      expect(poll.any_response?).to(be(false))
+    }
+
+    it('returns true when a response has been given') {
+      poll = create_poll
+      choice = poll.add_choice
+      choice.add_response(member_id: poll.creating_member.id)
+      expect(poll.any_response?).to(be(true))
     }
   }
 
@@ -425,6 +452,13 @@ RSpec.describe(Models::Poll, type: :model) {
     it('creates url') {
       poll = create_poll
       expect(poll.url).to(eq("/poll/view/#{poll.hashid}"))
+    }
+  }
+
+  context('#edit_url') {
+    it('creates url') {
+      poll = create_poll
+      expect(poll.edit_url).to(eq("/poll/edit/#{poll.hashid}"))
     }
   }
 
