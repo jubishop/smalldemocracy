@@ -42,6 +42,14 @@ RSpec.describe(Models::Response, type: :model) {
     }
   }
 
+  context('#update') {
+    it('rejects any updates') {
+      response = create_response
+      expect { response.update(data: { score: 1 }) }.to(
+          raise_error(Sequel::HookFailed, 'Responses are immutable'))
+    }
+  }
+
   context('#choice') {
     it('finds its choice') {
       choice = create_choice

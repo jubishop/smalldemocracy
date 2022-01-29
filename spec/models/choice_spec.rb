@@ -31,24 +31,12 @@ RSpec.describe(Models::Choice, type: :model) {
       expect(choice.exists?).to(be(false))
     }
 
-    it('rejects destroying from an expired poll') {
+    it('rejects destroying from poll with responses') {
       choice = create_choice
-      freeze_time(future + 1.day)
+      choice.add_response(member_id: choice.poll.creating_member.id)
       expect { choice.destroy }.to(
           raise_error(Sequel::HookFailed,
-                      'Choice removed from expired poll'))
-    }
-
-    it('cascades destroy to responses') {
-      choice = create_choice
-      poll = choice.poll
-      member = poll.group.add_member
-      response = choice.add_response(member_id: member.id)
-      expect(poll.responses).to_not(be_empty)
-      expect(response.exists?).to(be(true))
-      choice.destroy
-      expect(poll.responses(reload: true)).to(be_empty)
-      expect(response.exists?).to(be(false))
+                      'Choice removed in poll with responses'))
     }
   }
 

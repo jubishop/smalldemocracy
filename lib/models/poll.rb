@@ -34,6 +34,8 @@ BreakdownResult = KVStruct.new(:member, :score)
 
 module Models
   class Poll < Sequel::Model
+    plugin :dirty
+
     include ::Helpers::Email
 
     many_to_one :creator, class: 'Models::User', key: :email
@@ -60,6 +62,15 @@ module Models
       cancel_action('Poll expiration set to time in the past') if finished?
       if (expiration - 90.days) > Time.now
         cancel_action('Poll expiration set to more than 90 days in the future')
+      end
+      super
+    end
+
+    def before_update
+      cancel_action('Poll type is immutable') if column_changed?(:type)
+      if any_response? &&
+         (column_changed?(:title) || column_changed?(:question))
+        cancel_action('Poll already has responses')
       end
       super
     end
@@ -140,7 +151,7 @@ module Models
     end
 
     def type
-      return super.to_sym
+      return super&.to_sym
     end
 
     def url

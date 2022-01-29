@@ -117,6 +117,26 @@ RSpec.describe(Models::Poll, type: :model) {
           raise_error(Sequel::HookFailed,
                       'Poll expiration set to more than 90 days in the future'))
     }
+
+    it('rejects updating poll type') {
+      poll = create_poll
+      expect { poll.update(type: :borda_split) }.to(
+          raise_error(Sequel::HookFailed, 'Poll type is immutable'))
+    }
+
+    it('rejects updating title if poll has responses') {
+      poll = create_poll
+      poll.add_choice.add_response(member_id: poll.creating_member.id)
+      expect { poll.update(title: 'title') }.to(
+          raise_error(Sequel::HookFailed, 'Poll already has responses'))
+    }
+
+    it('rejects updating question if poll has responses') {
+      poll = create_poll
+      poll.add_choice.add_response(member_id: poll.creating_member.id)
+      expect { poll.update(question: 'question') }.to(
+          raise_error(Sequel::HookFailed, 'Poll already has responses'))
+    }
   }
 
   context('#creator') {
@@ -147,8 +167,10 @@ RSpec.describe(Models::Poll, type: :model) {
   context('#responses') {
     it('finds all responses through join table') {
       poll = create_poll
-      response_one = poll.add_choice.add_response
-      response_two = poll.add_choice.add_response
+      choice_one = poll.add_choice
+      choice_two = poll.add_choice
+      response_one = choice_one.add_response
+      response_two = choice_two.add_response
       expect(poll.responses).to(match_array([response_one, response_two]))
     }
   }
@@ -469,11 +491,12 @@ RSpec.describe(Models::Poll, type: :model) {
       expect(poll.choices).to(match_array(choice))
     }
 
-    it('rejects adding a choice to an expired poll') {
+    it('rejects adding a choice to a poll with responses') {
       poll = create_poll
-      freeze_time(future + 1.day)
+      poll.add_choice.add_response(member_id: poll.creating_member.id)
       expect { poll.add_choice }.to(
-          raise_error(Sequel::HookFailed, 'Choice modified in expired poll'))
+          raise_error(Sequel::HookFailed,
+                      'Choice modified in poll with responses'))
     }
 
     it('rejects creating two choices with the same text') {

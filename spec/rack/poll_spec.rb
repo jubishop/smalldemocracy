@@ -443,8 +443,8 @@ RSpec.describe(Poll, type: :rack_test) {
 
       it('rejects posting to an already responded poll') {
         choice = poll.add_choice
-        member.add_response(choice_id: choice.id)
         another_choice = poll.add_choice
+        member.add_response(choice_id: choice.id)
 
         post_json('/poll/respond',
                   { hash_id: poll.hashid, choice_id: another_choice.id })

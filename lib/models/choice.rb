@@ -27,7 +27,9 @@ module Models
 
     def before_validation
       cancel_action('Choice has no poll') unless poll
-      cancel_action('Choice modified in expired poll') if poll.finished?
+      if poll.any_response?
+        cancel_action('Choice modified in poll with responses')
+      end
       super
     end
 
@@ -37,7 +39,9 @@ module Models
     end
 
     def before_destroy
-      cancel_action('Choice removed from expired poll') if poll.finished?
+      if poll.any_response?
+        cancel_action('Choice removed in poll with responses')
+      end
       super
     end
 

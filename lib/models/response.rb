@@ -32,6 +32,11 @@ module Models
       super
     end
 
+    def before_update
+      cancel_action('Responses are immutable')
+      super
+    end
+
     def before_destroy
       cancel_action('Response removed from expired poll') if poll.finished?
       super
