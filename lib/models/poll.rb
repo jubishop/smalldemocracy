@@ -99,6 +99,10 @@ module Models
       return !responses_dataset.first.nil?
     end
 
+    def remove_responses(member_id:)
+      responses_dataset.where(member_id: member_id).destroy
+    end
+
     def scores
       assert_finished
       assert_type(:borda_single, :borda_split)

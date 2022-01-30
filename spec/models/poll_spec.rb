@@ -275,6 +275,24 @@ RSpec.describe(Models::Poll, type: :model) {
     }
   }
 
+  context('#remove_responses') {
+    it('removes responses from a specific member') {
+      member = create_member
+      poll = member.group.add_poll
+      choices = Array.new(10).fill { poll.add_choice }
+      responses = choices.map { |choice|
+        choice.add_response(member_id: member.id)
+      }
+      remaining_response = member.group.add_poll.add_choice.add_response
+      expect(member.responses(poll_id: poll.id).length).to(eq(10))
+      responses.each { |response| expect(response.exists?).to(be(true)) }
+      poll.remove_responses(member_id: member.id)
+      expect(member.responses(poll_id: poll.id)).to(be_empty)
+      responses.each { |response| expect(response.exists?).to(be(false)) }
+      expect(remaining_response.exists?).to(be(true))
+    }
+  }
+
   context(:results) {
     it('raises error if using scores on choose_* types') {
       poll = create_poll(type: :choose_one)

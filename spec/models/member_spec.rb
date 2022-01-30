@@ -110,6 +110,24 @@ RSpec.describe(Models::Member, type: :model) {
     }
   }
 
+  context('#remove_responses') {
+    it('removes responses to a specific poll') {
+      member = create_member
+      poll = member.group.add_poll
+      choices = Array.new(10).fill { poll.add_choice }
+      responses = choices.map { |choice|
+        choice.add_response(member_id: member.id)
+      }
+      remaining_response = member.group.add_poll.add_choice.add_response
+      expect(member.responses(poll_id: poll.id).length).to(eq(10))
+      responses.each { |response| expect(response.exists?).to(be(true)) }
+      member.remove_responses(poll_id: poll.id)
+      expect(member.responses(poll_id: poll.id)).to(be_empty)
+      responses.each { |response| expect(response.exists?).to(be(false)) }
+      expect(remaining_response.exists?).to(be(true))
+    }
+  }
+
   context('#add_response') {
     it('adds a response to a member') {
       member = create_member

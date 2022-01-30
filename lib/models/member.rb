@@ -61,6 +61,10 @@ module Models
       return poll_id ? poll_responses_dataset(poll_id: poll_id).all : super
     end
 
+    def remove_responses(poll_id:)
+      poll_responses_dataset(poll_id: poll_id).destroy
+    end
+
     def to_s
       return email
     end

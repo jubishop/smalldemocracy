@@ -137,6 +137,22 @@ class Poll < Base
       end
     })
 
+    post('/poll/remove_responses', ->(req, _) {
+      email = require_session(req)
+      poll = require_poll(req)
+
+      member = poll.member(email: email)
+      return 400, "#{email} is not a member of #{poll}" unless member
+
+      begin
+        poll.remove_responses(member_id: member.id)
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, 'Poll member responses removed'
+      end
+    })
+
     post('/poll/expiration', ->(req, _) {
       poll = require_creator(req)
 
@@ -162,8 +178,8 @@ class Poll < Base
     })
 
     post('/poll/respond', ->(req, _) {
-      poll = require_poll(req)
       email = require_session(req)
+      poll = require_poll(req)
 
       return 405, 'Poll has already finished' if poll.finished?
 
