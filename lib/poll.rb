@@ -142,7 +142,7 @@ class Poll < Base
       poll = require_poll(req)
 
       member = poll.member(email: email)
-      return 400, "#{email} is not a member of #{poll}" unless member
+      return 401, "#{email} is not a responder of #{poll}" unless member
 
       begin
         poll.remove_responses(member_id: member.id)
@@ -233,7 +233,7 @@ class Poll < Base
     poll = require_poll(req)
 
     unless email == poll.email
-      throw(:response, [400, "#{email} is not the creator of #{poll.title}"])
+      throw(:response, [401, "#{email} is not the creator of #{poll.title}"])
     end
 
     return poll

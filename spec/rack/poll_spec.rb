@@ -213,7 +213,7 @@ RSpec.describe(Poll, type: :rack_test) {
       email = poll.group.add_member.email
       set_cookie(:email, email)
       post "poll/#{operation}", valid_params
-      expect(last_response.status).to(be(400))
+      expect(last_response.status).to(be(401))
       expect(last_response.body).to(
           eq("#{email} is not the creator of #{poll.title}"))
     }
@@ -331,6 +331,45 @@ RSpec.describe(Poll, type: :rack_test) {
     }
   }
 
+  context('post /remove_responses') {
+    let(:email) { poll.email }
+    let(:valid_params) { { hash_id: poll.hashid } }
+
+    it('removes responses') {
+      choices = Array.new(10).fill { poll.add_choice }
+      responses = choices.map { |choice|
+        choice.add_response(member_id: poll.creating_member.id)
+      }
+      post 'poll/remove_responses', valid_params
+      expect(last_response.status).to(be(201))
+      expect(last_response.body).to(eq('Poll member responses removed'))
+      expect(poll.creating_member.responses(poll_id: poll.id)).to(be_empty)
+      responses.each { |response| expect(response.exists?).to(be(false)) }
+    }
+
+    it('fails with no cookie') {
+      clear_cookies
+      post 'poll/remove_responses', valid_params
+      expect(last_response.status).to(be(401))
+      expect(last_response.body).to(eq('No email found'))
+    }
+
+    it('fails with no hashid') {
+      post 'poll/remove_responses'
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq('No hash_id given'))
+    }
+
+    it('fails if user is not in poll') {
+      email = random_email
+      set_cookie(:email, email)
+      post 'poll/remove_responses', valid_params
+      expect(last_response.status).to(be(401))
+      expect(last_response.body).to(
+          eq("#{email} is not a responder of #{poll}"))
+    }
+  }
+
   context('post /expiration') {
     let(:email) { poll.email }
     let(:poll_expiration) { future + 10.days }
@@ -341,7 +380,7 @@ RSpec.describe(Poll, type: :rack_test) {
       }
     }
 
-    include_context('poll mutability', 'expiration')
+    it_has_behavior('poll mutability', 'expiration')
 
     it('updates poll expiration') {
       expect(poll.expiration).to_not(eq(poll_expiration))
