@@ -2071,8 +2071,9 @@ _extends(Remove, {
 });
 
 // src/lib/modal.js
-var Modal = class {
+var Modal = class extends EventTarget {
   constructor(title, body, buttons = false) {
+    super();
     this.dialog = document.createElement("dialog");
     const article = document.createElement("article");
     const header = document.createElement("header");
@@ -2112,12 +2113,14 @@ var Modal = class {
     this.dialog.setAttribute("open", true);
     document.body.prepend(this.dialog);
     document.documentElement.classList.add("modal-is-open");
+    this.dispatchEvent(new Event("modalOpen"));
     return this;
   }
   close() {
     this.dialog.setAttribute("open", false);
     this.dialog.remove();
     document.documentElement.classList.remove("modal-is-open");
+    this.dispatchEvent(new Event("modalClosed"));
     return this;
   }
 };

@@ -1,10 +1,11 @@
 export { Modal }
 
-class Modal {
+class Modal extends EventTarget {
   constructor(
     title,
     body,
     buttons = false) {
+    super();
     this.dialog = document.createElement('dialog');
     const article = document.createElement('article');
     const header = document.createElement('header');
@@ -45,6 +46,7 @@ class Modal {
     this.dialog.setAttribute('open', true);
     document.body.prepend(this.dialog);
     document.documentElement.classList.add('modal-is-open');
+    this.dispatchEvent(new Event('modalOpen'));
     return this;
   }
 
@@ -52,6 +54,7 @@ class Modal {
     this.dialog.setAttribute('open', false);
     this.dialog.remove();
     document.documentElement.classList.remove('modal-is-open');
+    this.dispatchEvent(new Event('modalClosed'));
     return this;
   }
 }
