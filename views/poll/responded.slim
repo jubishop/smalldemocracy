@@ -1,11 +1,12 @@
-- is_creator = member.email == poll.email
-
 = content_for :head
   title Poll Completed
   ==stylesheet_link_tag :base
+  ==javascript_include_tag 'poll/responded'
 
 = content_for :banner
   | #{poll} Completed
+
+- is_creator = member.email == poll.email
 
 p
   | Thanks #{member.email}!
@@ -46,3 +47,5 @@ p
 
 - when :choose_one
   p You responded: #{member.responses(poll_id: poll.id).first.choice.text}
+
+button#delete-response data-id=poll.hashid Delete Response

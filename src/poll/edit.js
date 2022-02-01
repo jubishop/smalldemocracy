@@ -8,7 +8,7 @@ class Poll {
   static domLoaded() {
     // Extract poll `hashid` first.
     const choicesList = document.getElementById('choices');
-    const hashID = choicesList.getAttribute("data-id");
+    const hashID = choicesList.getAttribute('data-id');
 
     // Edit title.
     const editTitleButton = document.getElementById('edit-title-button');

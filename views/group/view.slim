@@ -1,8 +1,6 @@
-- is_creator = member.email == group.email
-
 = content_for :head
   title =group
-  - if is_creator
+  - if member.email == group.email
     ==stylesheet_link_tag 'group/creator_view'
     ==javascript_include_tag 'group/creator_view'
   - else
@@ -11,6 +9,8 @@
 
 = content_for :banner
   =group
+
+- is_creator = member.email == group.email
 
 - if is_creator
   div#group-name
