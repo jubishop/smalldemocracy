@@ -99,6 +99,12 @@ module Models
       return !responses_dataset.first.nil?
     end
 
+    def responses(member_id: nil, reload: false)
+      return super(reload: reload) unless member_id
+
+      return responses_dataset.where(member_id: member_id).all
+    end
+
     def remove_responses(member_id:)
       responses_dataset.where(member_id: member_id).destroy
     end

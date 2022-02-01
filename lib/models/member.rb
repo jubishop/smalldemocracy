@@ -57,8 +57,10 @@ module Models
       return poll_responses_dataset(poll_id: poll_id).count.positive?
     end
 
-    def responses(poll_id: nil)
-      return poll_id ? poll_responses_dataset(poll_id: poll_id).all : super
+    def responses(poll_id: nil, reload: false)
+      return super(reload: reload) unless poll_id
+
+      return poll_responses_dataset(poll_id: poll_id).all
     end
 
     def remove_responses(poll_id:)

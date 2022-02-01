@@ -275,6 +275,25 @@ RSpec.describe(Models::Poll, type: :model) {
     }
   }
 
+  context('#responses') {
+    it('returns responses from a specific member or all responses') {
+      group = create_group
+      member = group.add_member
+      other_member = group.add_member
+      poll = group.add_poll
+      choices = Array.new(10).fill { poll.add_choice }
+      responses = choices.map { |choice|
+        choice.add_response(member_id: member.id)
+      }
+      other_responses = choices.map { |choice|
+        choice.add_response(member_id: other_member.id)
+      }
+      expect(poll.responses(member_id: member.id)).to(match_array(responses))
+      expect(poll.responses(reload: true)).to(
+          match_array(responses + other_responses))
+    }
+  }
+
   context('#remove_responses') {
     it('removes responses from a specific member') {
       member = create_member

@@ -279,16 +279,51 @@ RSpec.describe(Poll, type: :feature) {
       }
     }
 
+    shared_examples('deletable response') {
+      let(:delete_button) { find('#delete-response') }
+
+      it('shows a deletion confirmation warning upon delete') {
+        # Click to delete the poll.
+        delete_button.click
+        expect(page).to(have_modal)
+
+        # Screenshot deletion modal.
+        goldens.verify("#{type}_delete_modal")
+
+        # Click cancel and confirm modal goes away.
+        click_link('Cancel')
+        expect(page).to_not(have_modal)
+        expect(page).to(have_current_path(poll.url))
+      }
+
+      it('supports deleting poll') {
+        # Click and confirm deletion of poll.
+        delete_button.click
+        expect(page).to(have_modal)
+        expect_any_slim('poll/view')
+        click_link('Do It')
+
+        # Confirm redirection to view poll and responses deleted.
+        expect(page).to(have_current_path(poll.url))
+        member = poll.member(email: email)
+        expect(poll.responses(member_id: member.id)).to(be_empty)
+      }
+    }
+
     shared_examples('borda response') {
       it_has_behavior('editable guard')
+      it_has_behavior('deletable response')
 
-      it('shows a responded page') {
+      before(:each) {
         choices.each_with_index { |position, rank|
           choice = poll.choices[position]
           member.add_response(choice_id: choice.id,
                               data: { score: score_calculation.call(rank) })
         }
         go(poll.url)
+      }
+
+      it('shows a responded page') {
         expect(page).to(have_expiration_text)
         expect(page).to(have_edit_link)
         goldens.verify("responded_#{type}")
@@ -320,10 +355,14 @@ RSpec.describe(Poll, type: :feature) {
       let(:choice) { poll.choices[3] }
 
       it_has_behavior('editable guard')
+      it_has_behavior('deletable response')
 
-      it('shows a responded page') {
+      before(:each) {
         member.add_response(choice_id: choice.id)
         go(poll.url)
+      }
+
+      it('shows a responded page') {
         expect(page).to(have_expiration_text)
         expect(page).to(have_edit_link)
         goldens.verify('responded_choose')
