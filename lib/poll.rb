@@ -16,12 +16,18 @@ class Poll < Base
     get('/poll/create', ->(req, _) {
       email = require_session(req)
       user = Models::User.find_or_create(email: email)
+      begin
+        from = Models::Poll.with_hashid(req.param(:from, nil))
+      rescue Hashids::InputError
+        # Ignore
+      end
 
       form_time = Time.at(Time.now, in: req.timezone)
       return 200, @slim.render('poll/create',
                                user: user,
                                form_time: form_time,
-                               group_id: req.params.fetch(:group_id, 0).to_i)
+                               group_id: req.params.fetch(:group_id, 0).to_i,
+                               from: from)
     })
 
     post('/poll/create', ->(req, resp) {
