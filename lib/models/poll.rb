@@ -172,6 +172,10 @@ module Models
       return "/poll/edit/#{hashid}"
     end
 
+    def duplicate_url
+      return "/poll/create?from=#{hashid}"
+    end
+
     def to_s
       return title
     end

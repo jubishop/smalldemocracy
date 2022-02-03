@@ -508,16 +508,23 @@ RSpec.describe(Models::Poll, type: :model) {
   }
 
   context('#url') {
-    it('creates url') {
+    it('creates url for viewing') {
       poll = create_poll
       expect(poll.url).to(eq("/poll/view/#{poll.hashid}"))
     }
   }
 
   context('#edit_url') {
-    it('creates url') {
+    it('creates url for editing') {
       poll = create_poll
       expect(poll.edit_url).to(eq("/poll/edit/#{poll.hashid}"))
+    }
+  }
+
+  context('#duplicate_url') {
+    it('creates url for duplicating') {
+      poll = create_poll
+      expect(poll.duplicate_url).to(eq("/poll/create?from=#{poll.hashid}"))
     }
   }
 
