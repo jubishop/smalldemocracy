@@ -33,6 +33,7 @@ RSpec.describe(Poll, type: :rack_test) {
     it('shows creation page') {
       expect_slim('poll/create', user: user,
                                  form_time: an_instance_of(Time),
+                                 expiration_time: an_instance_of(Time),
                                  group_id: 0,
                                  from: nil)
       get 'poll/create'
@@ -42,6 +43,7 @@ RSpec.describe(Poll, type: :rack_test) {
     it('shows creation page and propagates :group_id parameter') {
       expect_slim('poll/create', user: user,
                                  form_time: an_instance_of(Time),
+                                 expiration_time: an_instance_of(Time),
                                  group_id: group.id,
                                  from: nil)
       get 'poll/create', group_id: group.id
@@ -52,6 +54,7 @@ RSpec.describe(Poll, type: :rack_test) {
       from_poll = create_poll
       expect_slim('poll/create', user: user,
                                  form_time: an_instance_of(Time),
+                                 expiration_time: from_poll.expiration,
                                  group_id: 0,
                                  from: from_poll)
       get from_poll.duplicate_url
@@ -61,6 +64,7 @@ RSpec.describe(Poll, type: :rack_test) {
     it('shows creation page without error even if :from parameter is invalid') {
       expect_slim('poll/create', user: user,
                                  form_time: an_instance_of(Time),
+                                 expiration_time: an_instance_of(Time),
                                  group_id: 0,
                                  from: nil)
       get 'poll/create?from=primordial_ooze'

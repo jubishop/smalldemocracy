@@ -16,16 +16,22 @@ class Poll < Base
     get('/poll/create', ->(req, _) {
       email = require_session(req)
       user = Models::User.find_or_create(email: email)
+
+      form_time = Time.at(Time.now, in: req.timezone)
+      expiration_time = form_time + 7.days
       begin
         from = Models::Poll.with_hashid(req.param(:from, nil))
+        if from && from.expiration > form_time
+          expiration_time = Time.at(from.expiration, in: req.timezone)
+        end
       rescue Hashids::InputError
         # Ignore
       end
 
-      form_time = Time.at(Time.now, in: req.timezone)
       return 200, @slim.render('poll/create',
                                user: user,
                                form_time: form_time,
+                               expiration_time: expiration_time,
                                group_id: req.params.fetch(:group_id, 0).to_i,
                                from: from)
     })
