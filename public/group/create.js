@@ -31,7 +31,7 @@ var Listable = class {
     this.items = [];
     this.buttonElement.addEventListener("click", () => this.addItem());
   }
-  addItem() {
+  addItem(value = "", focusField = true) {
     const emptyOrInvalidItem = this.items.find((item2) => {
       return !item2.inputElement.value || !item2.inputElement.reportValidity();
     });
@@ -40,7 +40,7 @@ var Listable = class {
       return;
     }
     const listItem = this.buildListItem();
-    const inputElement = this.buildInputElement();
+    const inputElement = this.buildInputElement(value);
     const deleteButton = this.buildDeleteButton();
     listItem.appendChild(inputElement);
     listItem.appendChild(deleteButton);
@@ -48,7 +48,9 @@ var Listable = class {
     const item = { listItem, inputElement };
     this.items.push(item);
     deleteButton.addEventListener("click", () => this.deleteItem(item));
-    inputElement.focus();
+    if (focusField) {
+      inputElement.focus();
+    }
   }
   deleteItem(item) {
     this.items.splice(this.items.indexOf(item), 1);
@@ -59,13 +61,14 @@ var Listable = class {
     listItem.classList.add(...this.options["listItemClasses"]);
     return listItem;
   }
-  buildInputElement() {
+  buildInputElement(value = "") {
     const inputElement = document.createElement("input");
     inputElement.classList.add(...this.options["textClasses"]);
     inputElement.setAttribute("type", this.options["inputType"]);
     inputElement.setAttribute("name", this.options["inputName"]);
     inputElement.setAttribute("required", true);
     inputElement.setAttribute("placeholder", this.options["placeholderText"]);
+    inputElement.value = value;
     eventEnter(inputElement, (event) => this.addItem());
     return inputElement;
   }

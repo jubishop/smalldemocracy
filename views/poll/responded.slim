@@ -49,3 +49,5 @@ p
   p You responded: #{member.responses(poll_id: poll.id).first.choice.text}
 
 button#delete-response data-id=poll.hashid Delete Response
+
+a href=poll.duplicate_url Duplicate This Poll

@@ -1,6 +1,8 @@
 = content_for :head
   title Create Poll
   ==stylesheet_link_tag 'poll/create'
+  javascript:
+    const choices = #{{(from.nil? ? [] : from.choices.map(&:text))}};
   ==javascript_include_tag 'poll/create'
 
 = content_for :banner
@@ -14,10 +16,10 @@
 
 form action="create" method="post"
   label for="title" Title:
-  input name="title" type="text" required=true autofocus=true
+  input name="title" type="text" value=from&.title required=true autofocus=true
 
   label for="question" Question:
-  input name="question" type="text" required=true
+  input name="question" type="text" value=from&.question required=true
 
   label for="choices" Choices:
   ul#choice-list
@@ -26,7 +28,8 @@ form action="create" method="post"
   label for="group_id" Group:
   select name="group_id"
     - user.groups.each do |group|
-      option value=group.id selected=(group.id == group_id) =group
+      option[value=group.id \
+             selected=[group_id, from&.group_id].include?(group.id)] =group
 
   label for="expiration" Expiration (in #{form_time.zone.abbr}):
   input[name="expiration"
@@ -38,8 +41,11 @@ form action="create" method="post"
 
   label for="type" Type:
   select name="type"
-    option value='borda_single' selected=true Borda Single
-    option value='borda_split' Borda Split
-    option value='choose_one' Choose One
+    option[value='borda_single'
+           selected=(from.nil? || from&.type == :borda_single)] Borda Single
+    option[value='borda_split'
+           selected=(from&.type == :borda_split)] Borda Split
+    option[value='choose_one'
+           selected=(from&.type == :choose_one)] Choose One
 
   button type="submit" Create Poll
