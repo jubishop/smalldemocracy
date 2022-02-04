@@ -97,5 +97,11 @@ RSpec.describe(Main, type: :rack_test) {
       expect(last_response.redirect?).to(be(true))
       expect(last_response.location).to(eq('/'))
     }
+
+    it('redirects to / when there is no login_info') {
+      auth_google(nil)
+      expect(last_response.redirect?).to(be(true))
+      expect(last_response.location).to(eq('/'))
+    }
   }
 }
