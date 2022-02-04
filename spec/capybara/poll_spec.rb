@@ -90,11 +90,10 @@ RSpec.describe(Poll, type: :feature) {
       goldens.verify('create_filled_in')
 
       # Confirm redirect to viewing poll after creation.
-      expect_slim(
-          'poll/view',
-          poll: an_instance_of(Models::Poll),
-          member: group.creating_member,
-          timezone: an_instance_of(TZInfo::DataTimezone))
+      expect_slim('poll/view',
+                  poll: an_instance_of(Models::Poll),
+                  member: group.creating_member,
+                  timezone: an_instance_of(TZInfo::DataTimezone))
       click_button('Create Poll')
 
       # Ensure actual changes made in DB.
@@ -147,11 +146,10 @@ RSpec.describe(Poll, type: :feature) {
     let(:member) { poll.creating_member }
 
     def expect_responded_slim
-      expect_slim(
-          'poll/responded',
-          poll: poll,
-          member: member,
-          timezone: an_instance_of(TZInfo::DataTimezone))
+      expect_slim('poll/responded',
+                  poll: poll,
+                  member: member,
+                  timezone: an_instance_of(TZInfo::DataTimezone))
     end
 
     before(:each) {
