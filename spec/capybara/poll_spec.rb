@@ -26,6 +26,10 @@ RSpec.describe(Poll, type: :feature) {
     return have_link('(View this poll)', href: poll.url)
   end
 
+  def have_duplicate_link
+    return have_link('Duplicate This Poll', href: poll.duplicate_url)
+  end
+
   before(:each) {
     # Need a fixed moment in time for consistent goldens.
     freeze_time(Time.new(1982, 6, 6, 11, 30, 0,
@@ -44,6 +48,28 @@ RSpec.describe(Poll, type: :feature) {
 
       expect(page).to(have_field('expiration', with: (Time.now + 7.days).form))
       goldens.verify('create_empty')
+    }
+
+    it('shows a poll form prefilled with data from another poll') {
+      set_cookie(:email, group.email)
+      existing_poll = create_poll(title: 'Existing title',
+                                  question: 'Existing question',
+                                  expiration: Time.now + 30.days,
+                                  type: :borda_split)
+      5.times { |i|
+        existing_poll.add_choice(text: "Existing choice: #{i + 1}")
+      }
+      go(existing_poll.duplicate_url)
+
+      expect(page).to(have_field('title', with: existing_poll.title))
+      expect(page).to(have_field('question', with: existing_poll.question))
+      expect(page).to(
+          have_field('expiration', with: existing_poll.expiration.form))
+      existing_poll.choices.each { |choice|
+        expect(page).to(have_field('choices[]', with: choice.text))
+      }
+      expect(page).to(have_field('type', with: existing_poll.type))
+      goldens.verify('create_duplicate')
     }
 
     it('creates a poll with complex :choices creation') {
@@ -184,6 +210,7 @@ RSpec.describe(Poll, type: :feature) {
           go(poll.url)
           expect(page).to(have_expiration_text)
           expect(page).to(have_edit_link)
+          expect(page).to(have_duplicate_link)
 
           # Rearrange our choices.
           rearrange_choices([1, 0, 6, 3, 2, 5, 4])
@@ -221,6 +248,7 @@ RSpec.describe(Poll, type: :feature) {
           go(poll.url)
           expect(page).to(have_expiration_text)
           expect(page).to(have_edit_link)
+          expect(page).to(have_duplicate_link)
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
@@ -250,6 +278,7 @@ RSpec.describe(Poll, type: :feature) {
         go(poll.url)
         expect(page).to(have_expiration_text)
         expect(page).to(have_edit_link)
+        expect(page).to(have_duplicate_link)
 
         # Get a screenshot of all our choices.
         goldens.verify('view_choose')
@@ -324,6 +353,7 @@ RSpec.describe(Poll, type: :feature) {
       it('shows a responded page') {
         expect(page).to(have_expiration_text)
         expect(page).to(have_edit_link)
+        expect(page).to(have_duplicate_link)
         goldens.verify("responded_#{type}")
       }
     }
@@ -363,6 +393,7 @@ RSpec.describe(Poll, type: :feature) {
       it('shows a responded page') {
         expect(page).to(have_expiration_text)
         expect(page).to(have_edit_link)
+        expect(page).to(have_duplicate_link)
         goldens.verify('responded_choose')
       }
     }
@@ -404,6 +435,7 @@ RSpec.describe(Poll, type: :feature) {
         go(poll.url)
         expect(page).to(have_expiration_text)
         expect(page).to(have_edit_link)
+        expect(page).to(have_duplicate_link)
       }
 
       it('shows a finished page') {
