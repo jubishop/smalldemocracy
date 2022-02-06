@@ -28,5 +28,11 @@ class Main < Base
       resp.set_cookie(:email, login_info.email) if login_info&.email
       resp.redirect(login_info&.state&.fetch(:r, '/') || '/')
     })
+
+    get('/auth/github', ->(req, resp) {
+      login_info = req.env.fetch('login_info', nil)
+      resp.set_cookie(:email, login_info.email) if login_info&.email
+      resp.redirect(login_info&.state&.fetch(:r, '/') || '/')
+    })
   end
 end

@@ -1,5 +1,7 @@
 require 'duration'
 
+require_relative 'shared_examples/auth_flow'
+
 RSpec.describe(Main, type: :rack_test) {
   context('get /') {
     it('renders logged out page when there is no email cookie') {
@@ -67,41 +69,12 @@ RSpec.describe(Main, type: :rack_test) {
   }
 
   context('get /auth/google') {
-    def auth_google(login_info)
-      # rubocop:disable Style/StringHashKeys
-      get('/auth/google', {}, { 'login_info' => login_info })
-      # rubocop:enable Style/StringHashKeys
-    end
+    let(:path) { '/auth/google' }
+    it_has_behavior('auth flow')
+  }
 
-    it('sets the email address') {
-      set_cookie(:email, random_email)
-      auth_google(Tony::Auth::LoginInfo.new(email: email))
-      expect(get_cookie(:email)).to(eq(email))
-    }
-
-    it('redirects to / by default') {
-      auth_google(Tony::Auth::LoginInfo.new(email: email))
-      expect(last_response.redirect?).to(be(true))
-      expect(last_response.location).to(eq('/'))
-    }
-
-    it('redirects to :r in state') {
-      auth_google(Tony::Auth::LoginInfo.new(email: email,
-                                            state: { r: '/onward' }))
-      expect(last_response.redirect?).to(be(true))
-      expect(last_response.location).to(eq('/onward'))
-    }
-
-    it('defaults to / when there is no :r in state') {
-      auth_google(Tony::Auth::LoginInfo.new(email: email, state: {}))
-      expect(last_response.redirect?).to(be(true))
-      expect(last_response.location).to(eq('/'))
-    }
-
-    it('redirects to / when there is no login_info') {
-      auth_google(nil)
-      expect(last_response.redirect?).to(be(true))
-      expect(last_response.location).to(eq('/'))
-    }
+  context('get /auth/github') {
+    let(:path) { '/auth/github' }
+    it_has_behavior('auth flow')
   }
 }
