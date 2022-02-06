@@ -24,15 +24,19 @@ class Main < Base
     })
 
     get('/auth/google', ->(req, resp) {
-      login_info = req.env.fetch('login_info', nil)
-      resp.set_cookie(:email, login_info.email) if login_info&.email
-      resp.redirect(login_info&.state&.fetch(:r, '/') || '/')
+      login_and_redirect(req, resp)
     })
 
     get('/auth/github', ->(req, resp) {
-      login_info = req.env.fetch('login_info', nil)
-      resp.set_cookie(:email, login_info.email) if login_info&.email
-      resp.redirect(login_info&.state&.fetch(:r, '/') || '/')
+      login_and_redirect(req, resp)
     })
+  end
+
+  private
+
+  def login_and_redirect(req, resp)
+    login_info = req.env.fetch('login_info', nil)
+    resp.set_cookie(:email, login_info.email) if login_info&.email
+    resp.redirect(login_info&.state&.fetch(:r, '/') || '/')
   end
 end
