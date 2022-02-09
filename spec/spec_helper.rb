@@ -16,6 +16,8 @@ ENV['GITHUB_CLIENT_ID'] = 'clientid'
 ENV['GITHUB_SECRET'] = 'secret'
 ENV['GOOGLE_CLIENT_ID'] = 'clientid'
 ENV['GOOGLE_SECRET'] = 'secret'
+ENV['FACEBOOK_CLIENT_ID'] = 'clientid'
+ENV['FACEBOOK_SECRET'] = 'secret'
 ENV['RESET_DB_ON_SETUP'] = '1' # NEVER SET THIS ANYWHERE ELSE
 
 require_relative '../setup'
