@@ -118,6 +118,7 @@ RSpec.configure do |config|
     freeze_time(Time.at(Time.now, in: TZInfo::Timezone.get('America/New_York')))
     allow(Tony::Auth::Google).to(receive(:url)) { |_, r: '/'| r }
     allow(Tony::Auth::Github).to(receive(:url)) { |_, r: '/'| r }
+    allow(Tony::Auth::Facebook).to(receive(:url)) { |_, r: '/'| r }
   }
 
   config.after(:each) {

@@ -77,4 +77,9 @@ RSpec.describe(Main, type: :rack_test) {
     let(:path) { '/auth/github' }
     it_has_behavior('auth flow')
   }
+
+  context('get /auth/facebook') {
+    let(:path) { '/auth/facebook' }
+    it_has_behavior('auth flow')
+  }
 }

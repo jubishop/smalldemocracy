@@ -14,6 +14,8 @@ use Tony::Auth::Google, client_id: ENV.fetch('GOOGLE_CLIENT_ID'),
                         secret: ENV.fetch('GOOGLE_SECRET')
 use Tony::Auth::Github, client_id: ENV.fetch('GITHUB_CLIENT_ID'),
                         secret: ENV.fetch('GITHUB_SECRET')
+use Tony::Auth::Facebook, client_id: ENV.fetch('FACEBOOK_CLIENT_ID'),
+                          secret: ENV.fetch('FACEBOOK_SECRET')
 
 use Tony::Static
 run Rack::URLMap.new(Setup.url_map)

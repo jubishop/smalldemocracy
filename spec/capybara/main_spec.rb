@@ -20,6 +20,7 @@ RSpec.describe(Main, type: :feature) {
       expect_header_links
       expect(page).to(have_link('Sign in with Google', href: '/'))
       expect(page).to(have_link('Sign in with Github', href: '/'))
+      expect(page).to(have_link('Sign in with Facebook', href: '/'))
       goldens.verify('logged_out')
     }
 

@@ -30,6 +30,10 @@ class Main < Base
     get('/auth/github', ->(req, resp) {
       login_and_redirect(req, resp)
     })
+
+    get('/auth/facebook', ->(req, resp) {
+      login_and_redirect(req, resp)
+    })
   end
 
   private
