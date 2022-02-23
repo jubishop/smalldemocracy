@@ -128,7 +128,7 @@ RSpec.configure do |config|
     ENV['RACK_ENV'] = 'test'
   }
 
-  if Test::ENV.github_actions?
+  if Test::Env.github_actions?
     require 'rspec/retry'
     require 'sequel'
 
