@@ -127,4 +127,19 @@ RSpec.configure do |config|
     ENV['APP_ENV'] = 'test'
     ENV['RACK_ENV'] = 'test'
   }
+
+  if Test::ENV.github_actions?
+    require 'rspec/retry'
+    require 'sequel'
+
+    config.around(:each, :feature, &:run_with_retry)
+    config.default_retry_count = 4
+    config.display_try_failure_messages = true
+    config.verbose_retry = true
+    config.retry_callback = proc {
+      Capybara.reset!
+      Sequel::Migrator.run(DB, 'db/migrations', target: 0)
+      Sequel::Migrator.run(DB, 'db/migrations')
+    }
+  end
 end
