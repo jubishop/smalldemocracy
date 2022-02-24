@@ -1,3 +1,5 @@
+- require 'rinku'
+
 = content_for :head
   title Poll Finished
   ==stylesheet_link_tag :base
@@ -11,6 +13,8 @@
   a href=poll.edit_url (Edit this poll)
 
 ==partial(:expiration_text)
+
+h2 ==Rinku.auto_link(poll.question)
 
 h2 Results:
 
@@ -27,12 +31,12 @@ ruby:
         - count = "#{result.to_i} #{'time'.en.plural(result.to_i)}"
         li
           details
-            summary ="#{result} (#{count})"
+            summary =="#{Rinku.auto_link(result.text)} (#{count})"
             ul
               - breakdown[result.choice].each do |br|
                 li =br.member
       - rejected_choices.each do |choice|
-        li ="#{choice} (0 times)"
+        li =="#{Rinku.auto_link(choice.text)} (0 times)"
 
 - if [:borda_split, :borda_single].include?(poll.type)
   section
@@ -42,13 +46,13 @@ ruby:
         - score = "#{result.to_i} #{'point'.en.plural(result.to_i)}"
         li
           details
-            summary ="#{result} (#{score})"
+            summary =="#{Rinku.auto_link(result.text)} (#{score})"
             ul
               - breakdown[result.choice].each do |br|
                 - points = 'point'.en.plural(br.score)
                 li ="#{br.member} (#{br.score} #{points})"
       - rejected_choices.each do |choice|
-        li ="#{choice} (0 points)"
+        li =="#{Rinku.auto_link(choice.text)} (0 points)"
 
 section
   h3 Unresponded

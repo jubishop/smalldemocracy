@@ -8,7 +8,10 @@ class Poll {
     this.choicesArray = Array.from(
       choicesElement.getElementsByClassName('choice'));
     this.choicesArray.forEach((choice) => {
-      choice.addEventListener('click', () => this.choiceClicked(choice));
+      choice.addEventListener('click', (event) => {
+        if (event.target.tagName === 'A') return;
+        this.choiceClicked(choice);
+      });
       choice.disabled = false;
     });
   }

@@ -1,3 +1,5 @@
+- require 'rinku'
+
 = content_for :head
   title Poll Completed
   ==stylesheet_link_tag :base
@@ -15,38 +17,39 @@ p
     em
       a href=poll.edit_url (Edit this poll)
 
+h2 ==Rinku.auto_link(poll.question)
+
 ==partial(:expiration_text)
 
+ruby:
+  positive_responses = member.responses(poll_id: poll.id)
+  rejected_choices = poll.choices.reject { |choice|
+    positive_responses.find { |response| response.choice == choice }
+  }
+  positive_responses.sort_by! { |response| -response.data.fetch(:score, 0) }
+
 - case poll.type
-- when :borda_single
-  ruby:
-    all_responses = member.responses(poll_id: poll.id)
-
-  p Here's your recorded responses.
+- when :borda_single, :borda_split
+  p Here's your recorded responses:
   ol
-    - all_responses.sort_by! { |response| -response.data[:score] }
-    - all_responses.each do |response|
-      - points = 'point'.en.plural(response.data[:score])
-      li ="#{response.choice} (#{response.data[:score]} #{points})"
-
-- when :borda_split
-  ruby:
-    positive_responses = member.responses(poll_id: poll.id)
-    rejected_choices = poll.choices.reject { |choice|
-      positive_responses.find { |response| response.choice == choice }
-    }
-
-  p Here's your recorded responses.
-  ol
-    - positive_responses.sort_by! { |response| -response.data[:score] }
     - positive_responses.each do |response|
       - points = 'point'.en.plural(response.data[:score])
-      li ="#{response.choice} ✅ (#{response.data[:score]} #{points})"
+      li
+        =="#{Rinku.auto_link(response.choice.text)} ✅ " \
+          "(#{response.data[:score]} #{points})"
     - rejected_choices.each do |choice|
-      li ="#{choice} ❌ (0 points)"
+      li =="#{Rinku.auto_link(choice.text)} ❌ (0 points)"
 
 - when :choose_one
-  p You responded: #{member.responses(poll_id: poll.id).first.choice.text}
+  ruby:
+  p
+    =="You responded: " \
+      "#{Rinku.auto_link(positive_responses.first.choice.text)} ✅"
+
+  p You did not choose:
+  ul
+    - rejected_choices.each do |choice|
+      li =="#{Rinku.auto_link(choice.text)} ❌"
 
 button#delete-response data-id=poll.hashid Delete Response
 

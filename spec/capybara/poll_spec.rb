@@ -5,6 +5,8 @@ require_relative 'shared_examples/deletable'
 require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :feature) {
+  POLL_CHOICES = %w[zero www.one.com two http://three.org four five six].freeze
+
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
   let(:expiration_time) {
     Time.at(Time.now + 5.days,
@@ -28,6 +30,17 @@ RSpec.describe(Poll, type: :feature) {
 
   def have_duplicate_link
     return have_link('Duplicate This Poll', href: poll.duplicate_url)
+  end
+
+  def go_to_poll
+    go(poll.url)
+    expect(page).to(have_expiration_text)
+    expect(page).to(have_edit_link)
+    expect(page).to(have_duplicate_link)
+    expect(page).to(
+        have_link('www.question.com', href: 'http://www.question.com'))
+    expect(page).to(have_link('www.one.com', href: 'http://www.one.com'))
+    expect(page).to(have_link('http://three.org', href: 'http://three.org'))
   end
 
   before(:each) {
@@ -166,7 +179,7 @@ RSpec.describe(Poll, type: :feature) {
     let(:poll) {
       create_poll(email: email,
                   title: "#{type}_title",
-                  question: "#{type}_question",
+                  question: "#{type} www.question.com",
                   type: type)
     }
     let(:member) { poll.creating_member }
@@ -180,7 +193,7 @@ RSpec.describe(Poll, type: :feature) {
 
     before(:each) {
       allow_any_instance_of(Array).to(receive(:shuffle, &:to_a))
-      %w[zero one two three four five six].each { |choice|
+      POLL_CHOICES.each { |choice|
         poll.add_choice(text: choice)
       }
     }
@@ -207,10 +220,7 @@ RSpec.describe(Poll, type: :feature) {
         it_has_behavior('editable guard')
 
         it('submits a poll response') {
-          go(poll.url)
-          expect(page).to(have_expiration_text)
-          expect(page).to(have_edit_link)
-          expect(page).to(have_duplicate_link)
+          go_to_poll
 
           # Rearrange our choices.
           rearrange_choices([1, 0, 6, 3, 2, 5, 4])
@@ -240,19 +250,16 @@ RSpec.describe(Poll, type: :feature) {
         it_has_behavior('editable guard')
 
         it('shows an empty borda_split page') {
-          go(poll.url)
+          go_to_poll
           goldens.verify('view_borda_split_empty_bottom')
         }
 
         it('submits a poll response') {
-          go(poll.url)
-          expect(page).to(have_expiration_text)
-          expect(page).to(have_edit_link)
-          expect(page).to(have_duplicate_link)
+          go_to_poll
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
-          drag_to_bottom('three')
+          drag_to_bottom('http://three.org')
 
           # Rearrange our remaining selected choices.
           rearrange_choices([1, 4, 0, 3, 2])
@@ -275,17 +282,19 @@ RSpec.describe(Poll, type: :feature) {
       it_has_behavior('editable guard')
 
       it('submits a poll response') {
-        go(poll.url)
-        expect(page).to(have_expiration_text)
-        expect(page).to(have_edit_link)
-        expect(page).to(have_duplicate_link)
+        go_to_poll
 
         # Get a screenshot of all our choices.
         goldens.verify('view_choose')
 
+        # Confirm if we click a link, it just goes to that page.
+        click_link('http://three.org')
+        expect(page).to(have_current_path('http://three.org'))
+
         # Confirm reload to viewing poll after responding.
+        go_to_poll
         expect_responded_slim
-        click_button('three')
+        click_button('four')
       }
     }
   }
@@ -295,15 +304,13 @@ RSpec.describe(Poll, type: :feature) {
     let(:poll) {
       create_poll(email: email,
                   title: "#{type}_title",
-                  question: "#{type}_question",
+                  question: "#{type} www.question.com",
                   type: type)
     }
     let(:member) { poll.creating_member }
 
     before(:each) {
-      %w[zero one two three four five six].each { |choice|
-        poll.add_choice(text: choice)
-      }
+      POLL_CHOICES.each { |choice| poll.add_choice(text: choice) }
     }
 
     shared_examples('deletable response') {
@@ -347,13 +354,10 @@ RSpec.describe(Poll, type: :feature) {
           member.add_response(choice_id: choice.id,
                               data: { score: score_calculation.call(rank) })
         }
-        go(poll.url)
+        go_to_poll
       }
 
       it('shows a responded page') {
-        expect(page).to(have_expiration_text)
-        expect(page).to(have_edit_link)
-        expect(page).to(have_duplicate_link)
         goldens.verify("responded_#{type}")
       }
     }
@@ -387,13 +391,10 @@ RSpec.describe(Poll, type: :feature) {
 
       before(:each) {
         member.add_response(choice_id: choice.id)
-        go(poll.url)
+        go_to_poll
       }
 
       it('shows a responded page') {
-        expect(page).to(have_expiration_text)
-        expect(page).to(have_edit_link)
-        expect(page).to(have_duplicate_link)
         goldens.verify('responded_choose')
       }
     }
@@ -404,7 +405,7 @@ RSpec.describe(Poll, type: :feature) {
     let(:poll) {
       create_poll(email: email,
                   title: "#{type}_title",
-                  question: "#{type}_question",
+                  question: "#{type} www.question.com",
                   type: type)
     }
     let(:group) { poll.group }
@@ -414,7 +415,7 @@ RSpec.describe(Poll, type: :feature) {
       }
     }
     let(:choices) {
-      %w[zero one two three four five six].to_h { |choice|
+      POLL_CHOICES.to_h { |choice|
         [choice, poll.add_choice(text: choice)]
       }
     }
@@ -432,10 +433,7 @@ RSpec.describe(Poll, type: :feature) {
           }
         }
         freeze_time(future + 1.day)
-        go(poll.url)
-        expect(page).to(have_expiration_text)
-        expect(page).to(have_edit_link)
-        expect(page).to(have_duplicate_link)
+        go_to_poll
       }
 
       it('shows a finished page') {
@@ -454,11 +452,11 @@ RSpec.describe(Poll, type: :feature) {
       let(:type) { :borda_single }
       let(:responses) {
         [
-          %w[zero one two three four five six],
-          %w[five six zero one two three four],
-          %w[five six zero three four one two],
-          %w[five three four six zero one two],
-          %w[two five three four six zero one]
+          %w[zero www.one.com two http://three.org four five six],
+          %w[five six zero www.one.com two http://three.org four],
+          %w[five six zero http://three.org four www.one.com two],
+          %w[five http://three.org four six zero www.one.com two],
+          %w[two five http://three.org four six zero www.one.com]
         ]
       }
       let(:score_calculation) {
@@ -473,11 +471,11 @@ RSpec.describe(Poll, type: :feature) {
       let(:type) { :borda_split }
       let(:responses) {
         [
-          %w[zero one two three],
-          %w[five six zero one two],
+          %w[zero www.one.com two http://three.org],
+          %w[five six zero www.one.com two],
           %w[five six zero],
-          %w[five three four six zero one],
-          %w[zero one]
+          %w[five http://three.org four six zero www.one.com],
+          %w[zero www.one.com]
         ]
       }
       let(:score_calculation) {

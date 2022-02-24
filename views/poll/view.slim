@@ -1,3 +1,5 @@
+- require 'rinku'
+
 = content_for :head
   title =poll
   - case poll.type
@@ -20,7 +22,7 @@ p
     em
       a href=poll.edit_url (Edit this poll)
 
-h2 =poll.question
+h2 ==Rinku.auto_link(poll.question)
 
 ==partial(:expiration_text)
 
@@ -36,7 +38,7 @@ h2 =poll.question
       - poll.choices.shuffle.each do |choice|
         li.choice data-id=choice.id
           i.grip.fas.fa-grip-lines
-          p.text =choice.text
+          p.text ==Rinku.auto_link(choice.text)
           p.score
 
   - if poll.type == :borda_split
@@ -50,6 +52,7 @@ h2 =poll.question
 
   #choices data-id=poll.hashid
     - poll.choices.shuffle.each do |choice|
-      button.choice data-id=choice.id disabled=true =choice.text
+      button.contrast.choice[data-id=choice.id
+                             disabled=true] ==Rinku.auto_link(choice.text)
 
 a href=poll.duplicate_url Duplicate This Poll
