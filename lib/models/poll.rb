@@ -21,6 +21,7 @@
 # Referenced By:
 #  choices | choices_poll_id_fkey | (poll_id) REFERENCES polls(id) ON DELETE CASCADE
 
+require 'core'
 require 'rstruct'
 require 'sequel'
 
@@ -175,6 +176,10 @@ module Models
 
     def duplicate_url
       return "/poll/create?from=#{hashid}"
+    end
+
+    def data
+      return (super || {}).symbolize_keys!
     end
 
     def to_s
