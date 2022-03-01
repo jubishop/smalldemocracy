@@ -9,6 +9,7 @@
 #  question   | text                        | NOT NULL
 #  expiration | timestamp without time zone | NOT NULL
 #  type       | poll_type                   | NOT NULL
+#  data       | json                        |
 # Indexes:
 #  polls_pkey | PRIMARY KEY btree (id)
 # Check constraints:
