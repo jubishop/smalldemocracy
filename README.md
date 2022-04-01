@@ -13,6 +13,56 @@ Small Democracy currently supports:
 - Ranked Choice Voting ([Borda Count][borda-count]).
 - Choose One.
 
+## Developing Small Democracy
+
+### Basic Setup
+
+1. Install two local postgres databases:
+
+   ```shell
+   createdb smalldemocracy_test
+   createdb smalldemocracy_dev
+   ```
+
+1. From the root directory of your copy of `smalldemocracy`:
+
+    ```shell
+    bundle install
+    bundle exec rake db:migrate
+    ```
+
+    This will install all necessary dependencies and migrate the schema for the `smalldemocracy_dev` database.  `smalldemocracy_test` will be automatically set up and torn down during each test run.
+
+### Launching SmallDemocracy
+
+1. From the root directory of your copy of `smalldemocracy`:
+
+    ```shell
+    bundle exec rake run
+    ```
+
+### Testing SmallDemocracy
+
+- To run all tests:
+
+    ```shell
+    bundle exec rake
+    ```
+
+- To run all tests except the slow UI tests:
+
+    ```shell
+    bundle exec rake fast
+    ```
+
+### Other Commands
+
+To see everything you can do:
+
+```shell
+bundle exec rake --tasks
+```
+
 ## License
 
 This work is licensed under the [Fair Source License](https://fair.io) as [Fair Source 10][license].
