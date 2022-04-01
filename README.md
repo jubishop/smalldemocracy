@@ -41,6 +41,8 @@ Small Democracy currently supports:
     bundle exec rake run
     ```
 
+    You will now be able to load `smalldemocracy` at http://localhost:8989
+
 ### Testing SmallDemocracy
 
 - To run all tests:
