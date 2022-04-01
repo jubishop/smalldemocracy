@@ -53,6 +53,8 @@ Small Democracy currently supports:
 
 ### Testing SmallDemocracy
 
+Note: You will need [Chrome](https://www.google.com/chrome/) installed, since the UI tests use the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
+
 - To run all tests:
 
     ```shell
