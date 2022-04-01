@@ -17,12 +17,20 @@ Small Democracy currently supports:
 
 ### Basic Setup
 
-1. Install two local postgres databases:
+1. Install [ruby](https://www.ruby-lang.org/en/documentation/installation/) and [postgres](https://www.postgresguide.com/setup/install/).
+
+1. Create two local postgres databases:
 
    ```shell
    createdb smalldemocracy_test
    createdb smalldemocracy_dev
    ```
+
+1. Install [bundler](https://bundler.io):
+
+    ```shell
+    gem install bundler
+    ```
 
 1. From the root directory of your copy of `smalldemocracy`:
 
@@ -35,7 +43,7 @@ Small Democracy currently supports:
 
 ### Launching SmallDemocracy
 
-1. From the root directory of your copy of `smalldemocracy`:
+- From the root directory of your copy of `smalldemocracy`:
 
     ```shell
     bundle exec rake run
