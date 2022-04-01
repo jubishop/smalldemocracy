@@ -133,7 +133,7 @@ RSpec.configure do |config|
     require 'sequel'
 
     config.around(:each, :feature, &:run_with_retry)
-    config.default_retry_count = 4
+    config.default_retry_count = 5
     config.display_try_failure_messages = true
     config.verbose_retry = true
     config.retry_callback = proc {
