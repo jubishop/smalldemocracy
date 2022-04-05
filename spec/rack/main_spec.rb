@@ -84,19 +84,20 @@ RSpec.describe(Main, type: :rack_test) {
   }
 
   context('post /fake_login') {
-    let(:email) { 'hello@world.com' }
+    before(:each) {
+      clear_cookies
+    }
 
     it('rejects logging in when in production') {
       ENV['APP_ENV'] = 'production'
       post 'fake_login', email: email
-      follow_redirect!
-      expect(get_cookie(:email)).to(be_nil)
+      expect(get_cookie(:email)).to(be_empty)
     }
 
     it('logs in when in development') {
+      expect(get_cookie(:email)).to(be_empty)
       ENV['APP_ENV'] = 'development'
       post 'fake_login', email: email
-      follow_redirect!
       expect(get_cookie(:email)).to(eq(email))
     }
   }

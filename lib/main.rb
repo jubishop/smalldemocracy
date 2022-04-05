@@ -37,7 +37,6 @@ class Main < Base
 
     post('/fake_login', ->(req, resp) {
       if ENV.fetch('APP_ENV') != 'development'
-        resp.delete_cookie(:email)
         resp.redirect('/')
         return
       end
