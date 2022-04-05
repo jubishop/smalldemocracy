@@ -5,19 +5,8 @@ require 'sequel'
 require 'tony/test'
 require 'tzinfo'
 
-ENV['APP_ENV'] = 'test'
-ENV['RACK_ENV'] = 'test'
-ENV['SMALLDEMOCRACY_HASHED_PASSWORD'] =
-  'MMlS+rEiw/l1nwKm2Vw3WLJGtP7iOZV7LU/uRuJhcMQ='
-ENV['SMALLDEMOCRACY_COOKIE_SECRET'] = 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
-ENV['POLL_ID_SALT'] = 'pollsalt'
-ENV['GROUP_ID_SALT'] = 'groupsalt'
-ENV['GITHUB_CLIENT_ID'] = 'clientid'
-ENV['GITHUB_SECRET'] = 'secret'
-ENV['GOOGLE_CLIENT_ID'] = 'clientid'
-ENV['GOOGLE_SECRET'] = 'secret'
-ENV['FACEBOOK_CLIENT_ID'] = 'clientid'
-ENV['FACEBOOK_SECRET'] = 'secret'
+require_relative '../development_helpers'
+stub_environment_vars('test')
 ENV['RESET_DB_ON_SETUP'] = '1' # NEVER SET THIS ANYWHERE ELSE
 
 require_relative '../setup'

@@ -34,6 +34,17 @@ class Main < Base
     get('/auth/facebook', ->(req, resp) {
       login_and_redirect(req, resp)
     })
+
+    post('/fake_login', ->(req, resp) {
+      if ENV.fetch('APP_ENV') != 'development'
+        resp.delete_cookie(:email)
+        resp.redirect('/')
+        return
+      end
+
+      resp.set_cookie(:email, req.param(:email))
+      resp.redirect('/')
+    })
   end
 
   private

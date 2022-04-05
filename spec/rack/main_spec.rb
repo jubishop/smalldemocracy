@@ -82,4 +82,22 @@ RSpec.describe(Main, type: :rack_test) {
     let(:path) { '/auth/facebook' }
     it_has_behavior('auth flow')
   }
+
+  context('post /fake_login') {
+    let(:email) { 'hello@world.com' }
+
+    it('rejects logging in when in production') {
+      ENV['APP_ENV'] = 'production'
+      post 'fake_login', email: email
+      follow_redirect!
+      expect(get_cookie(:email)).to(be_nil)
+    }
+
+    it('logs in when in development') {
+      ENV['APP_ENV'] = 'development'
+      post 'fake_login', email: email
+      follow_redirect!
+      expect(get_cookie(:email)).to(eq(email))
+    }
+  }
 }

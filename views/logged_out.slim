@@ -10,3 +10,12 @@ br
 a href=Tony::Auth::Github.url(req) Sign in with Github
 br
 a href=Tony::Auth::Facebook.url(req) Sign in with Facebook
+
+- if ENV.fetch('APP_ENV') == 'development'
+  br
+  br
+  form action="/fake_login" method="post"
+    label for="email" Email:
+    input name="email" type="text" required=true
+
+    input type="submit" value="Submit"

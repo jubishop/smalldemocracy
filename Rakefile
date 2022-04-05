@@ -1,11 +1,4 @@
-def connect_sequel_db # rubocop:disable Style/TopLevelMethodDefinition
-  case ENV.fetch('APP_ENV')
-  when 'production'
-    return Sequel.postgres(ENV.fetch('DATABASE_URL'))
-  when 'development'
-    return Sequel.postgres(database: 'smalldemocracy_dev')
-  end
-end
+require_relative 'development_helpers'
 
 namespace :db do
   desc 'Run sequel migrations'
@@ -119,7 +112,6 @@ task(:cspec_n, [:count]) { |_, args|
 
 desc('Annotate sequel classes')
 task(:annotate) {
-  require 'sequel/core'
   connect_sequel_db
   Dir['lib/models/*.rb'].each { |file| require_relative file }
   require 'sequel/annotate'
@@ -158,6 +150,8 @@ desc('Rebuild, watch, and launch localhost:8989')
 task(:run, [:port]) { |_, args|
   port = args[:port]
   port ||= 8989
+
+  stub_environment_vars('development')
 
   Rake::Task[:clear].invoke
   Thread.new { Rake::Task[:sass].invoke('--watch') }
