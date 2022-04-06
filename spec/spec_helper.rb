@@ -117,7 +117,7 @@ RSpec.configure do |config|
     ENV['RACK_ENV'] = 'test'
   }
 
-  if Test::Env.github_actions?
+  if ENV.fetch('FAIL_ON_GOLDEN', false) || Test::Env.github_actions?
     require 'rspec/retry'
     require 'sequel'
 
