@@ -2,9 +2,7 @@ require 'securerandom'
 
 Sequel.migration {
   up {
-    alter_table(:users) {
-      add_column :api_key, String, unique: true, index: true
-    }
+    add_column :users, :api_key, String, unique: true, index: true
     self[:users].select(:email).each { |user|
       self[:users].where(email: user[:email]).update(
           api_key: SecureRandom.alphanumeric(24))
