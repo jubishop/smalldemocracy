@@ -100,6 +100,7 @@ GEM
     rubocop-sequel (0.3.3)
       rubocop (~> 1.0)
     ruby-progressbar (1.11.0)
+    securerandom (0.1.1)
     sequel (5.55.0)
     sequel-annotate (1.7.0)
       sequel (>= 4)
@@ -182,6 +183,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-rspec
   rubocop-sequel
+  securerandom
   sequel
   sequel-annotate
   sequel-hash_id

@@ -8,6 +8,7 @@
 #  members | members_email_fkey | (email) REFERENCES users(email)
 #  polls   | polls_email_fkey   | (email) REFERENCES users(email)
 
+require 'securerandom'
 require 'sequel'
 
 require_relative '../helpers/email'
@@ -41,6 +42,11 @@ module Models
         cancel_action(message)
       end
       super
+    end
+
+    def before_create
+      super
+      self.api_key = SecureRandom.alphanumeric(24)
     end
 
     def before_update

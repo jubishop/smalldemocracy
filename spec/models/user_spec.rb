@@ -1,12 +1,16 @@
 require 'duration'
+require 'securerandom'
 
 require_relative '../../lib/models/user'
 
 RSpec.describe(Models::User, type: :model) {
   context('.find_or_create') {
     it('creates a user') {
+      allow(SecureRandom).to(
+          receive(:alphanumeric).with(24).and_return('abc123'))
       user = create_user(email: email)
       expect(user.email).to(eq(email))
+      expect(user.api_key).to(eq('abc123'))
     }
 
     it('creates a user only once') {
@@ -28,6 +32,14 @@ RSpec.describe(Models::User, type: :model) {
     it('rejects creating user with invalid email') {
       expect { create_user(email: 'invalid@') }.to(
           raise_error(Sequel::HookFailed, 'User has invalid email invalid@'))
+    }
+  }
+
+  context('find(api_key:)') {
+    it('finds a user by api_key') {
+      user = create_user(email: email)
+      api_user = Models::User.find(api_key: user.api_key)
+      expect(api_user).to(eq(user))
     }
   }
 
