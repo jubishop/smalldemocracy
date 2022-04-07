@@ -1,8 +1,10 @@
 # Table: users
 # Columns:
-#  email | text | PRIMARY KEY
+#  email   | text | PRIMARY KEY
+#  api_key | text | NOT NULL
 # Indexes:
-#  users_pkey | PRIMARY KEY btree (email)
+#  users_pkey        | PRIMARY KEY btree (email)
+#  users_api_key_key | UNIQUE btree (api_key)
 # Referenced By:
 #  groups  | groups_email_fkey  | (email) REFERENCES users(email)
 #  members | members_email_fkey | (email) REFERENCES users(email)
