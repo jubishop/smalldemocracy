@@ -12,8 +12,8 @@ def connect_sequel_db
 end
 
 def stub_environment_vars(environment)
-  ENV['APP_ENV'] ||= environment
-  ENV['RACK_ENV'] ||= environment
+  ENV['APP_ENV'] = environment
+  ENV['RACK_ENV'] = environment
   ENV['SMALLDEMOCRACY_HASHED_PASSWORD'] ||= # smalldemocracy
     'NSEP7WaLUZYPopbrOvl4sokJ5eUVr6iae+qpr78vYyA='
   ENV['SMALLDEMOCRACY_COOKIE_SECRET'] ||= 'gYUHA6sIrfFQaFePp0Srt3JVTnCHJBKT'
