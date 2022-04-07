@@ -35,9 +35,7 @@ RSpec.describe('002_move_score_to_json', type: :migration) {
               responses[response_id] = score
             }
             # One with no score
-            DB[:responses].insert(
-              choice_id: choice_id,
-              member_id: members[2])
+            DB[:responses].insert(choice_id: choice_id, member_id: members[2])
           }
         }
       }
@@ -86,9 +84,7 @@ RSpec.describe('002_move_score_to_json', type: :migration) {
               responses[response_id] = score
             }
             # One with no data
-            response_id = DB[:responses].insert(
-                choice_id: choice_id,
-                member_id: members[2])
+            DB[:responses].insert(choice_id: choice_id, member_id: members[2])
           }
         }
       }
