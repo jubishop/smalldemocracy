@@ -38,6 +38,7 @@ end
 Sequel::Migrator.run(DB, 'db/migrations')
 
 require_relative 'lib/admin'
+require_relative 'lib/api'
 require_relative 'lib/group'
 require_relative 'lib/main'
 require_relative 'lib/poll'
@@ -47,6 +48,7 @@ module Setup
     # rubocop:disable Style/StringHashKeys
     return {
       '/' => Main.new,
+      '/api' => API.new,
       '/group' => Group.new,
       '/poll' => Poll.new,
       '/admin' => Rack::Builder.app {
