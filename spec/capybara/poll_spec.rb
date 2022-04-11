@@ -5,7 +5,15 @@ require_relative 'shared_examples/deletable'
 require_relative 'shared_examples/entity_guards'
 
 RSpec.describe(Poll, type: :feature) {
-  POLL_CHOICES = %w[zero www.one.com two http://three.org four five six].freeze
+  POLL_CHOICES = %w[
+    zero
+    www.one.com
+    two
+    https://jubishop.com
+    four
+    five
+    six
+  ].freeze
 
   let(:goldens) { Tony::Test::Goldens::Page.new(page, 'spec/goldens/poll') }
   let(:expiration_time) {
@@ -40,7 +48,7 @@ RSpec.describe(Poll, type: :feature) {
     expect(page).to(
         have_link('www.question.com', href: 'http://www.question.com'))
     expect(page).to(have_link('www.one.com', href: 'http://www.one.com'))
-    expect(page).to(have_link('http://three.org', href: 'http://three.org'))
+    expect(page).to(have_link('https://jubishop.com', href: 'https://jubishop.com'))
   end
 
   before(:each) {
@@ -259,7 +267,7 @@ RSpec.describe(Poll, type: :feature) {
 
           # Drag a couple choices to the bottom red section.
           drag_to_bottom('two')
-          drag_to_bottom('http://three.org')
+          drag_to_bottom('https://jubishop.com')
 
           # Rearrange our remaining selected choices.
           rearrange_choices([1, 4, 0, 3, 2])
@@ -288,8 +296,8 @@ RSpec.describe(Poll, type: :feature) {
         goldens.verify('view_choose')
 
         # Confirm if we click a link, it just goes to that page.
-        click_link('http://three.org')
-        expect(page).to(have_current_path('http://three.org'))
+        click_link('https://jubishop.com')
+        expect(page).to(have_current_path('https://jubishop.com'))
 
         # Confirm reload to viewing poll after responding.
         go_to_poll
@@ -452,11 +460,11 @@ RSpec.describe(Poll, type: :feature) {
       let(:type) { :borda_single }
       let(:responses) {
         [
-          %w[zero www.one.com two http://three.org four five six],
-          %w[five six zero www.one.com two http://three.org four],
-          %w[five six zero http://three.org four www.one.com two],
-          %w[five http://three.org four six zero www.one.com two],
-          %w[two five http://three.org four six zero www.one.com]
+          %w[zero www.one.com two https://jubishop.com four five six],
+          %w[five six zero www.one.com two https://jubishop.com four],
+          %w[five six zero https://jubishop.com four www.one.com two],
+          %w[five https://jubishop.com four six zero www.one.com two],
+          %w[two five https://jubishop.com four six zero www.one.com]
         ]
       }
       let(:score_calculation) {
@@ -471,10 +479,10 @@ RSpec.describe(Poll, type: :feature) {
       let(:type) { :borda_split }
       let(:responses) {
         [
-          %w[zero www.one.com two http://three.org],
+          %w[zero www.one.com two https://jubishop.com],
           %w[five six zero www.one.com two],
           %w[five six zero],
-          %w[five http://three.org four six zero www.one.com],
+          %w[five https://jubishop.com four six zero www.one.com],
           %w[zero www.one.com]
         ]
       }
