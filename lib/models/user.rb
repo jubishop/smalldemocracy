@@ -20,6 +20,8 @@ require_relative 'poll'
 
 module Models
   class User < Sequel::Model
+    plugin :dirty
+
     include ::Helpers::Email
 
     unrestrict_primary_key
@@ -39,6 +41,10 @@ module Models
     alias add_poll add_created_poll
     alias remove_poll remove_created_poll
 
+    def self.create_api_key
+      return SecureRandom.alphanumeric(24)
+    end
+
     def before_validation
       if (message = invalid_email(email: email, name: 'User'))
         cancel_action(message)
@@ -48,11 +54,14 @@ module Models
 
     def before_create
       super
-      self.api_key = SecureRandom.alphanumeric(24)
+      self.api_key = self.class.create_api_key
     end
 
     def before_update
-      cancel_action('Users are immutable')
+      cancel_action('User emails are immutable') if column_changed?(:email)
+      unless api_key.nil? || api_key.length == 24
+        cancel_action('User api_keys must be 24 characters')
+      end
       super
     end
 

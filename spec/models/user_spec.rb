@@ -60,10 +60,25 @@ RSpec.describe(Models::User, type: :model) {
   }
 
   context('#update') {
-    it('rejects any updates') {
+    it('rejects any updates to email') {
       user = create_user
-      expect { user.save }.to(
-          raise_error(Sequel::HookFailed, 'Users are immutable'))
+      expect { user.update(email: random_email) }.to(
+          raise_error(Sequel::HookFailed, 'User emails are immutable'))
+    }
+
+    it('allows updates to api_key') {
+      user = create_user
+      new_key = Models::User.create_api_key
+      user.update(api_key: new_key)
+      expect(user.api_key).to(eq(new_key))
+    }
+
+    it('rejects updating user with invalid api_key') {
+      user = create_user
+      new_key = 'bad_key'
+      expect { user.update(api_key: new_key) }.to(
+          raise_error(Sequel::HookFailed,
+                      'User api_keys must be 24 characters'))
     }
   }
 
