@@ -55,16 +55,22 @@ Small Democracy currently supports:
 
 Note: You will need [Chrome](https://www.google.com/chrome/) installed, since the UI tests use the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
 
-- To run all tests:
-
-    ```shell
-    bundle exec rake
-    ```
-
 - To run all tests except the slow UI tests:
 
     ```shell
     bundle exec rake fast
+    ```
+
+- To run the slow UI tests:
+
+    ```shell
+    bundle exec rake capybara
+    ```
+
+- To run the slow UI tests and create new goldens on failures (necessary if you've intentionally modified the UI):
+
+    ```shell
+    bundle exec rake goldens
     ```
 
 ### Other Commands

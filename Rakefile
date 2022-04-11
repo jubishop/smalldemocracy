@@ -27,6 +27,7 @@ RuboCop::RakeTask.new(:rubocop)
 
 desc('Run all tests')
 RSpec::Core::RakeTask.new(:spec) { |t|
+  ENV['FAIL_ON_GOLDEN'] = '1'
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.verbose
 }
@@ -61,6 +62,15 @@ RSpec::Core::RakeTask.new(:fspec) { |t|
 
 desc('Run spec on capybara tests')
 RSpec::Core::RakeTask.new(:cspec) { |t|
+  ENV['FAIL_ON_GOLDEN'] = '1'
+  t.pattern = Dir.glob('spec/**/*_spec.rb')
+  t.rspec_opts = '-t type:feature'
+  t.verbose
+}
+
+desc('Run spec on capybara tests and create new goldens for failures')
+RSpec::Core::RakeTask.new(:gspec) { |t|
+  ENV.delete('FAIL_ON_GOLDEN')
   t.pattern = Dir.glob('spec/**/*_spec.rb')
   t.rspec_opts = '-t type:feature'
   t.verbose
@@ -171,4 +181,5 @@ task models: %w[mspec]
 task rack: %w[rspec]
 task fast: %w[fspec]
 task capybara: %w[rebuild cspec]
+task goldens: %w[gspec]
 task default: %w[rubocop:auto_correct rebuild spec]
