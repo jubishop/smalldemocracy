@@ -1,8 +1,7 @@
 RSpec.describe(API, type: :rack_test) {
   context('get /api') {
     it('shows api page') {
-      user = Models::User.find_or_create(email: email)
-      expect_slim(:api, user: user)
+      expect_slim(:api, user: create_user(email: email))
       get '/api'
       expect(last_response.ok?).to(be(true))
     }
