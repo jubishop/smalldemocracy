@@ -8,7 +8,7 @@ class Poll {
     deleteButton.addEventListener('click', () => {
       const modal = new Modal(
         'Are you sure?',
-        "You can still enter a new response after deleting.", {
+        'You can still enter a new response after deleting.', {
         'Cancel': {
           classes: ['secondary']
         },

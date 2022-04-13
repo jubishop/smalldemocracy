@@ -56,7 +56,7 @@ class Group {
     deleteButton.addEventListener('click', () => {
       const modal = new Modal(
         'Are you sure?',
-        "Deleting this group will also delete all it's polls", {
+        'Deleting this group will also delete all its polls.', {
         'Cancel': {
           classes: ['secondary']
         },

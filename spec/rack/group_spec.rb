@@ -12,7 +12,7 @@ RSpec.describe(Group, type: :rack_test) {
   }
 
   let(:entity) { create_group(email: email) }
-  it_has_behavior('entity guards', 'group')
+  it_has_behavior('rack entity guards', 'group')
 
   context('get /create') {
     it('shows creation page if you have an email cookie') {

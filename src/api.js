@@ -7,7 +7,7 @@ class API {
     newAPIKeyButton.addEventListener('click', () => {
       const modal = new Modal(
         'Are you sure?',
-        "Your old key will no longer be usable", {
+        'Your old key will no longer be usable.', {
         'Cancel': {
           classes: ['secondary']
         },

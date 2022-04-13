@@ -1,4 +1,4 @@
-RSpec.shared_examples('entity guards') {
+RSpec.shared_examples('web entity guards') {
   context('logged out') {
     it('asks for email') {
       clear_cookies

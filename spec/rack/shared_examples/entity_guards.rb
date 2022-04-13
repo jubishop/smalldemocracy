@@ -1,4 +1,4 @@
-RSpec.shared_examples('entity guards') { |path|
+RSpec.shared_examples('rack entity guards') { |path|
   context('get /create') {
     it('requests email if you have no cookie') {
       clear_cookies

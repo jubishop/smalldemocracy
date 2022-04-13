@@ -23,7 +23,7 @@ RSpec.describe(Poll, type: :rack_test) {
   }
 
   let(:entity) { create_poll(email: email) }
-  it_has_behavior('entity guards', 'poll')
+  it_has_behavior('rack entity guards', 'poll')
 
   context('get /create') {
     let(:user) { create_user }

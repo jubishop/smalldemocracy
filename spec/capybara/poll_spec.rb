@@ -22,7 +22,7 @@ RSpec.describe(Poll, type: :feature) {
   }
 
   let(:entity) { create_poll }
-  it_has_behavior('entity guards')
+  it_has_behavior('web entity guards')
 
   def have_expiration_text
     return have_content('Jun 06 1982, at 11:25 PM +07')
