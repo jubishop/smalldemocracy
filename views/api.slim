@@ -1,6 +1,7 @@
 = content_for :head
   title Small Democracy API
   ==stylesheet_link_tag :base
+  ==javascript_include_tag 'api'
 
 = content_for :banner
   | Small Democracy API
@@ -10,5 +11,7 @@ h2 Small Democracy API Guide
 h3 Welcome, #{user.email}.
 
 h4
-  | Your api_key is
+  | Your API key is
   code =user.api_key
+  =="&nbsp;&nbsp;"
+  a#new-api-key href="#" role="button" Generate New Key

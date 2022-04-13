@@ -17,5 +17,12 @@ class API < Base
 
       resp.redirect('/')
     })
+
+    post('/api/new_api_key', ->(req, _) {
+      email = require_session(req)
+      user = Models::User.find_or_create(email: email)
+      user.update(api_key: Models::User.create_api_key)
+      return 201, user.api_key
+    })
   end
 end
