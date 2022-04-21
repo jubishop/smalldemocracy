@@ -13,7 +13,7 @@ class API {
         },
         'Do It': {
           callback: () => {
-            post('/api/new_api_key',
+            post('/api/key/new',
               {}, // params
               () => window.location.reload(), // successCallback
               false, // errorCallback

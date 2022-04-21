@@ -276,7 +276,7 @@ var Group = class {
     });
     const deleteButton = document.getElementById("delete-group");
     deleteButton.addEventListener("click", () => {
-      const modal = new Modal("Are you sure?", "Deleting this group will also delete all it's polls", {
+      const modal = new Modal("Are you sure?", "Deleting this group will also delete all its polls.", {
         "Cancel": {
           classes: ["secondary"]
         },

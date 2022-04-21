@@ -93,13 +93,13 @@ var API = class {
   static domLoaded() {
     const newAPIKeyButton = document.getElementById("new-api-key");
     newAPIKeyButton.addEventListener("click", () => {
-      const modal = new Modal("Are you sure?", "Your old key will no longer be usable", {
+      const modal = new Modal("Are you sure?", "Your old key will no longer be usable.", {
         "Cancel": {
           classes: ["secondary"]
         },
         "Do It": {
           callback: () => {
-            post("/api/new_api_key", {}, () => window.location.reload(), false, () => modal.close());
+            post("/api/key/new", {}, () => window.location.reload(), false, () => modal.close());
           },
           classes: ["primary"]
         }
