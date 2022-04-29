@@ -10,6 +10,10 @@ $body-font: "Fira Sans", sans-serif;
   --block-spacing-vertical: calc(var(--spacing) * 1.5);
 }
 
+h1 {
+  margin-bottom: 0;
+}
+
 a.github,
 a.home {
   font-size: 2em;
