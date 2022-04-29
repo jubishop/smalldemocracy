@@ -7,8 +7,8 @@ require_relative 'helpers/guard'
 
 class Base < Tony::App
   include Helpers::Cookie
-  include Helpers::Guard
   include Helpers::Env
+  include Helpers::Guard
 
   def initialize(slim = Tony::Slim.new(views: 'views',
                                        partials: 'views/partials',

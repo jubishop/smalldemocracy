@@ -38,8 +38,9 @@ Slim::Engine.set_options(
     tabsize: 2,
     pretty: ENV.fetch('APP_ENV') != 'production')
 
-require_relative 'lib/helpers/env'
-Tony::Slim::Env.include(Helpers::Env)
+require_relative 'lib/helpers/slim'
+Tony::Slim.include(Helpers::Slim)
+Tony::Slim::Env.include(Helpers::Slim)
 
 require_relative 'lib/admin'
 require_relative 'lib/api'
