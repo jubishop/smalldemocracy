@@ -192,11 +192,8 @@ RSpec.describe(Poll, type: :feature) {
     }
     let(:member) { poll.creating_member }
 
-    def expect_responded_slim
-      expect_slim('poll/responded',
-                  poll: poll,
-                  member: member,
-                  timezone: an_instance_of(TZInfo::DataTimezone))
+    def expect_responded_page
+      expect(page).to(have_title('Poll Responded'))
     end
 
     before(:each) {
@@ -239,8 +236,8 @@ RSpec.describe(Poll, type: :feature) {
           goldens.verify('view_borda_single')
 
           # Confirm reload to viewing poll after responding.
-          expect_responded_slim
           click_button('Submit Choices')
+          expect_responded_page
         }
       }
 
@@ -278,8 +275,8 @@ RSpec.describe(Poll, type: :feature) {
           goldens.verify('view_borda_split')
 
           # Confirm reload to viewing poll after responding.
-          expect_responded_slim
           click_button('Submit Choices')
+          expect_responded_page
         }
       }
     }
@@ -301,8 +298,8 @@ RSpec.describe(Poll, type: :feature) {
 
         # Confirm reload to viewing poll after responding.
         go_to_poll
-        expect_responded_slim
         click_button('four')
+        expect_responded_page
       }
     }
   }
