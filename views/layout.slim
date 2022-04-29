@@ -8,7 +8,7 @@ html lang="en"
     ==favicon_link_tag
     ==yield_content :head
     ==timezone_script
-    - unless ENV.fetch('ON_PROD', false)
+    - unless on_prod?
       javascript:
         window.addEventListener('load', (event) => {
           document.documentElement.classList.add('page-fully-loaded');

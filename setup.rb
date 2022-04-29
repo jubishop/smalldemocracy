@@ -3,13 +3,8 @@ require 'linguistics'
 require 'openssl'
 require 'sequel'
 require 'slim'
+require 'tony'
 require 'honeybadger'  # Always last
-
-Linguistics.use(:en)
-
-Slim::Engine.set_options(
-    tabsize: 2,
-    pretty: ENV.fetch('APP_ENV') != 'production')
 
 Sequel.application_timezone = :utc
 Sequel.database_timezone = :utc
@@ -36,6 +31,15 @@ if ENV.fetch('RESET_DB_ON_SETUP', false)
   Sequel::Migrator.run(DB, 'db/migrations', target: 0)
 end
 Sequel::Migrator.run(DB, 'db/migrations')
+
+Linguistics.use(:en)
+
+Slim::Engine.set_options(
+    tabsize: 2,
+    pretty: ENV.fetch('APP_ENV') != 'production')
+
+require_relative 'lib/helpers/env'
+Tony::Slim::Env.include(Helpers::Env)
 
 require_relative 'lib/admin'
 require_relative 'lib/api'

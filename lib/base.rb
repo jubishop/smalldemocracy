@@ -2,11 +2,13 @@ require 'honeybadger'
 require 'tony'
 
 require_relative 'helpers/cookie'
+require_relative 'helpers/env'
 require_relative 'helpers/guard'
 
 class Base < Tony::App
   include Helpers::Cookie
   include Helpers::Guard
+  include Helpers::Env
 
   def initialize(slim = Tony::Slim.new(views: 'views',
                                        partials: 'views/partials',
@@ -43,11 +45,5 @@ class Base < Tony::App
 
       raise(ZeroDivisionError, 'Fuck you')
     })
-  end
-
-  private
-
-  def on_prod?
-    return ENV.fetch('ON_PROD', false)
   end
 end
