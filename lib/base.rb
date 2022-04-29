@@ -23,7 +23,8 @@ class Base < Tony::App
 
       if on_prod?
         puts resp.error.full_message(highlight: true, order: :top)
-        Honeybadger.notify(resp.error)
+        Honeybadger.notify(resp.error,
+                           context: { user_email: fetch_email(req) })
       end
 
       stack_trace = nil
