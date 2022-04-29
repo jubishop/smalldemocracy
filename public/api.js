@@ -105,6 +105,11 @@ var API = class {
         }
       }).display();
     });
+    const apiKey = document.getElementById("api-key").textContent;
+    const copyKeyButton = document.getElementById("copy-api-key");
+    copyKeyButton.addEventListener("click", () => {
+      navigator.clipboard.writeText(apiKey);
+    });
   }
 };
 document.addEventListener("DOMContentLoaded", () => API.domLoaded());

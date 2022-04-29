@@ -1,7 +1,7 @@
 = content_for :head
   title Small Democracy API
-  ==stylesheet_link_tag :base
-  ==javascript_include_tag 'api'
+  ==stylesheet_link_tag :api
+  ==javascript_include_tag :api
 
 = content_for :banner
   | Small Democracy API
@@ -12,6 +12,8 @@ h3 Welcome, #{user.email}.
 
 h4
   | Your API key is
-  code =user.api_key
+  code#api-key =user.api_key
+  div#copy-api-key data-tooltip="Copy key to clipboard"
+      i.copy-icon.fa-duotone.fa-copy
   =="&nbsp;&nbsp;"
   a#new-api-key href="#" role="button" Generate New Key

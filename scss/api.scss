@@ -1,0 +1,12 @@
+@use "base";
+
+#copy-api-key {
+  border-bottom: none !important;
+  cursor: copy;
+  display: inline;
+}
+
+#copy-api-key .copy-icon {
+  --fa-primary-color: var(--ins-color);
+  --fa-secondary-color: var(--contrast);
+}
