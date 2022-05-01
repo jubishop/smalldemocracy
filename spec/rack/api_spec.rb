@@ -1,4 +1,18 @@
 RSpec.describe(API, type: :rack_test) {
+  shared_examples('api authentication') { |endpoint|
+    it('rejects any post without an api key') {
+      post endpoint
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq('No key given'))
+    }
+
+    it('rejects any post with an invalid api key') {
+      post endpoint, key: 'my_key'
+      expect(last_response.status).to(be(401))
+      expect(last_response.body).to(eq('Invalid key given: "my_key"'))
+    }
+  }
+
   context('get /api') {
     it('shows api page') {
       expect_slim(:api, user: create_user(email: email))
@@ -33,5 +47,9 @@ RSpec.describe(API, type: :rack_test) {
       expect(new_api_key.length).to(be(24))
       expect(new_api_key).not_to(eq(old_api_key))
     }
+  }
+
+  context('post /api/poll/new') {
+    it_has_behavior('api authentication', '/api/poll/new')
   }
 }

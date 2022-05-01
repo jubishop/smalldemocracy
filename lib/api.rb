@@ -36,7 +36,7 @@ class API < Base
   def require_key(req)
     key = req.param(:key)
     user = Models::User.find(api_key: key)
-    throw(:response, [401, 'Invalid key']) unless user
+    throw(:response, [401, %(Invalid key given: "#{key}")]) unless user
     return user
   end
 end
