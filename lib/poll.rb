@@ -219,17 +219,6 @@ class Poll < Base
 
   private
 
-  def require_expiration(req)
-    utc_time = Time.strptime("#{req.param(:expiration)} UTC",
-                             '%Y-%m-%dT%H:%M %Z')
-    current_offset = req.timezone.current_period.utc_total_offset
-    period_time = utc_time - current_offset
-    period_offset = req.timezone.period_for(period_time).utc_total_offset
-    return period_time - (period_offset - current_offset)
-  rescue ArgumentError
-    throw(:response, [400, "#{req.param(:expiration)} is invalid date"])
-  end
-
   def require_editable_poll(req)
     poll = require_creator(req)
 

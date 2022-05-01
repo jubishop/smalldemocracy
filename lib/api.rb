@@ -25,9 +25,24 @@ class API < Base
       return 201, user.api_key
     })
 
-    post('/api/poll/new', ->(req, _resp) {
+    post('/api/poll/new', ->(req, _) {
       user = require_key(req)
-      return 201, user.email
+
+      req.params[:email] = user.email
+
+      choices = req.list_param(:choices, [])
+      req.params.delete(:choices)
+
+      req.params[:expiration] = require_expiration(req)
+
+      begin
+        poll = Models::Poll.create(**req.params.symbolize_keys)
+        choices.each { |choice| poll.add_choice(text: choice) }
+      rescue Sequel::Error => error
+        return 400, error.message
+      else
+        return 201, poll.url
+      end
     })
   end
 

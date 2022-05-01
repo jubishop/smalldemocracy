@@ -14,6 +14,18 @@ module Helpers
       return PRIVILEGED_USERS.include?(fetch_email(req))
     end
 
+    def require_session(req)
+      email = fetch_email(req)
+      unless email
+        if req.get?
+          throw(:response, [401, @slim.render(:get_email, req: req)])
+        else
+          throw(:response, [401, 'No email found'])
+        end
+      end
+      return email
+    end
+
     def require_group(req)
       begin
         group = Models::Group.with_hashid(req.param(:hash_id))
@@ -46,16 +58,15 @@ module Helpers
       return poll
     end
 
-    def require_session(req)
-      email = fetch_email(req)
-      unless email
-        if req.get?
-          throw(:response, [401, @slim.render(:get_email, req: req)])
-        else
-          throw(:response, [401, 'No email found'])
-        end
-      end
-      return email
+    def require_expiration(req)
+      utc_time = Time.strptime("#{req.param(:expiration)} UTC",
+                               '%Y-%m-%dT%H:%M %Z')
+      current_offset = req.timezone.current_period.utc_total_offset
+      period_time = utc_time - current_offset
+      period_offset = req.timezone.period_for(period_time).utc_total_offset
+      return period_time - (period_offset - current_offset)
+    rescue ArgumentError
+      throw(:response, [400, "#{req.param(:expiration)} is invalid date"])
     end
   end
 end
