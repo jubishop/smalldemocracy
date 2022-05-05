@@ -27,7 +27,6 @@ class API < Base
 
     post('/api/poll/new', ->(req, _) {
       user = require_key(req)
-
       req.params[:email] = user.email
 
       choices = req.list_param(:choices, [])

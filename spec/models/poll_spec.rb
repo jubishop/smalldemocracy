@@ -420,6 +420,17 @@ RSpec.describe(Models::Poll, type: :model) {
           six: { 'a@a': 0, 'b@b': 0, 'c@c': 0, 'd@d': 0, 'e@e': 0 }
         }
         @expected_unresponded = ['f@f', group.creator.email]
+
+        # Random other polls that should affect nothing.
+        borda_split_poll = group.add_poll(type: :borda_split)
+        borda_split_choice = borda_split_poll.add_choice(
+            text: 'borda split choice')
+        borda_split_poll.member(email: 'f@f').add_response(
+            choice_id: borda_split_choice.id, data: { score: 1 })
+        choose_one_poll = group.add_poll(type: :choose_one)
+        choose_one_choice = choose_one_poll.add_choice(
+            text: 'choose one choice')
+        group.creating_member.add_response(choice_id: choose_one_choice.id)
       }
 
       it_has_behavior('#breakdown')
@@ -462,6 +473,17 @@ RSpec.describe(Models::Poll, type: :model) {
           five: { 'b@b': 5, 'c@c': 4, 'd@d': 6, 'e@e': 5 }
         }
         @expected_unresponded = ['f@f', group.creator.email]
+
+        # Random other polls that should affect nothing.
+        borda_single_poll = group.add_poll(type: :borda_single)
+        borda_single_choice = borda_single_poll.add_choice(
+            text: 'borda single choice')
+        borda_single_poll.member(email: 'f@f').add_response(
+            choice_id: borda_single_choice.id, data: { score: 1 })
+        choose_one_poll = group.add_poll(type: :choose_one)
+        choose_one_choice = choose_one_poll.add_choice(
+            text: 'choose one choice')
+        group.creating_member.add_response(choice_id: choose_one_choice.id)
       }
 
       it_has_behavior('#breakdown')
@@ -500,6 +522,19 @@ RSpec.describe(Models::Poll, type: :model) {
           no: { 'b@b': nil }
         }
         @expected_unresponded = ['g@g', group.creator.email]
+
+        # Random other polls that should affect nothing.
+        borda_single_poll = group.add_poll(type: :borda_single)
+        borda_single_choice = borda_single_poll.add_choice(
+            text: 'borda single choice')
+        borda_single_poll.member(email: 'f@f').add_response(
+            choice_id: borda_single_choice.id, data: { score: 1 })
+        # Random other polls that should affect nothing.
+        borda_split_poll = group.add_poll(type: :borda_split)
+        borda_split_choice = borda_split_poll.add_choice(
+            text: 'borda split choice')
+        borda_split_poll.member(email: 'f@f').add_response(
+            choice_id: borda_split_choice.id, data: { score: 1 })
       }
 
       it_has_behavior('#breakdown')
