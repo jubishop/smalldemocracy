@@ -327,6 +327,18 @@ RSpec.describe(Models::Poll, type: :model) {
           raise_error(TypeError, /must be one of borda_split or choose_one/))
     }
 
+    def fill_polls_for_unresponded(group, poll_types)
+      poll_types.each { |poll_type|
+        poll = group.add_poll(type: poll_type)
+        choice = poll.add_choice(text: "#{poll_type} choice")
+        @expected_unresponded.each { |unresponder|
+          poll.member(email: unresponder).add_response(
+              choice_id: choice.id,
+              data: { score: 1 })
+        }
+      }
+    end
+
     shared_examples('#scores') {
       it('computes scores properly') {
         @poll.expiration = past
@@ -422,15 +434,7 @@ RSpec.describe(Models::Poll, type: :model) {
         @expected_unresponded = ['f@f', group.creator.email]
 
         # Random other polls that should affect nothing.
-        borda_split_poll = group.add_poll(type: :borda_split)
-        borda_split_choice = borda_split_poll.add_choice(
-            text: 'borda split choice')
-        borda_split_poll.member(email: 'f@f').add_response(
-            choice_id: borda_split_choice.id, data: { score: 1 })
-        choose_one_poll = group.add_poll(type: :choose_one)
-        choose_one_choice = choose_one_poll.add_choice(
-            text: 'choose one choice')
-        group.creating_member.add_response(choice_id: choose_one_choice.id)
+        fill_polls_for_unresponded(group, %i[borda_split choose_one])
       }
 
       it_has_behavior('#breakdown')
@@ -475,15 +479,7 @@ RSpec.describe(Models::Poll, type: :model) {
         @expected_unresponded = ['f@f', group.creator.email]
 
         # Random other polls that should affect nothing.
-        borda_single_poll = group.add_poll(type: :borda_single)
-        borda_single_choice = borda_single_poll.add_choice(
-            text: 'borda single choice')
-        borda_single_poll.member(email: 'f@f').add_response(
-            choice_id: borda_single_choice.id, data: { score: 1 })
-        choose_one_poll = group.add_poll(type: :choose_one)
-        choose_one_choice = choose_one_poll.add_choice(
-            text: 'choose one choice')
-        group.creating_member.add_response(choice_id: choose_one_choice.id)
+        fill_polls_for_unresponded(group, %i[borda_single choose_one])
       }
 
       it_has_behavior('#breakdown')
@@ -524,17 +520,7 @@ RSpec.describe(Models::Poll, type: :model) {
         @expected_unresponded = ['g@g', group.creator.email]
 
         # Random other polls that should affect nothing.
-        borda_single_poll = group.add_poll(type: :borda_single)
-        borda_single_choice = borda_single_poll.add_choice(
-            text: 'borda single choice')
-        borda_single_poll.member(email: 'f@f').add_response(
-            choice_id: borda_single_choice.id, data: { score: 1 })
-        # Random other polls that should affect nothing.
-        borda_split_poll = group.add_poll(type: :borda_split)
-        borda_split_choice = borda_split_poll.add_choice(
-            text: 'borda split choice')
-        borda_split_poll.member(email: 'f@f').add_response(
-            choice_id: borda_split_choice.id, data: { score: 1 })
+        fill_polls_for_unresponded(group, %i[borda_single borda_split])
       }
 
       it_has_behavior('#breakdown')

@@ -149,11 +149,10 @@ module Models
       results = Hash.new { |hash, key| hash[key] = [] }
       unresponded = []
       members.each { |member|
-        responses = member.responses(poll_id: id)
-        if responses.empty?
+        if member.responses(poll_id: id).empty?
           unresponded.push(member)
         else
-          responses.each { |response|
+          member.responses(poll_id: id).each { |response|
             results[response.choice].push(
                 BreakdownResult.new(member: member,
                                     score: response.data[:score]))
