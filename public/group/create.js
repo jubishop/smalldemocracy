@@ -84,11 +84,15 @@ var Listable = class {
 // src/group/create.js
 var Group = class {
   static domLoaded() {
-    new Listable(document.getElementById("member-list"), document.getElementById("add-member"), {
-      placeholderText: "Email address...",
-      inputType: "email",
-      inputName: "members[]"
-    });
+    new Listable(
+      document.getElementById("member-list"),
+      document.getElementById("add-member"),
+      {
+        placeholderText: "Email address...",
+        inputType: "email",
+        inputName: "members[]"
+      }
+    );
   }
 };
 document.addEventListener("DOMContentLoaded", () => Group.domLoaded());

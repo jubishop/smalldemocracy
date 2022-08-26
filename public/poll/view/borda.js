@@ -2168,7 +2168,9 @@ var Poll = class {
     this.hashID = choicesElement.getAttribute("data-id");
     this.submitButton = document.getElementById("submit");
     this.submitButton.addEventListener("click", () => this.submitClicked());
-    const choicesArray = Array.from(choicesElement.getElementsByClassName("choice"));
+    const choicesArray = Array.from(
+      choicesElement.getElementsByClassName("choice")
+    );
     this.choiceElements = Object.fromEntries(choicesArray.map((choice) => {
       return [
         choice.getAttribute("data-id"),
@@ -2214,7 +2216,11 @@ var Poll = class {
   }
   static async submitClicked() {
     this.submitButton.disabled = true;
-    post("/poll/respond", { hash_id: this.hashID, responses: this.sortable.toArray() }, () => location.reload());
+    post(
+      "/poll/respond",
+      { hash_id: this.hashID, responses: this.sortable.toArray() },
+      () => location.reload()
+    );
   }
 };
 document.addEventListener("DOMContentLoaded", () => Poll.domLoaded());

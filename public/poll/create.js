@@ -84,10 +84,14 @@ var Listable = class {
 // src/poll/create.js
 var Poll = class {
   static domLoaded() {
-    const listable = new Listable(document.getElementById("choice-list"), document.getElementById("add-choice"), {
-      placeholderText: "Enter choice...",
-      inputName: "choices[]"
-    });
+    const listable = new Listable(
+      document.getElementById("choice-list"),
+      document.getElementById("add-choice"),
+      {
+        placeholderText: "Enter choice...",
+        inputName: "choices[]"
+      }
+    );
     choices.forEach((choice) => {
       listable.addItem(choice, false);
     });

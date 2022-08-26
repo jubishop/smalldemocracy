@@ -95,17 +95,27 @@ var Group = class {
     const hashID = listElement.getAttribute("data-id");
     const leaveButton = document.getElementById("leave-group");
     leaveButton.addEventListener("click", () => {
-      const modal = new Modal("Leave Group", "Are you sure you want to leave this group?", {
-        "Cancel": {
-          classes: ["secondary"]
-        },
-        "Do It": {
-          callback() {
-            post("/group/leave", { hash_id: hashID }, () => window.location.replace("/"), false, () => modal.close());
+      const modal = new Modal(
+        "Leave Group",
+        "Are you sure you want to leave this group?",
+        {
+          "Cancel": {
+            classes: ["secondary"]
           },
-          classes: ["primary"]
+          "Do It": {
+            callback() {
+              post(
+                "/group/leave",
+                { hash_id: hashID },
+                () => window.location.replace("/"),
+                false,
+                () => modal.close()
+              );
+            },
+            classes: ["primary"]
+          }
         }
-      }).display();
+      ).display();
     });
   }
 };

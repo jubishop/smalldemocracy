@@ -145,22 +145,31 @@ var EditableList = class {
       return;
     }
     this.inputElement.disabled = true;
-    post(this.addPath, this.addCallback(this.inputElement.value.trim()), () => {
-      const textElement = this.buildTextElement();
-      textElement.textContent = this.inputElement.value.trim();
-      this.listItem.removeChild(this.inputElement);
-      this.listItem.appendChild(textElement);
-      this.addDeleteButtonToElement(this.listItem);
-      this.listItem = null;
-      this.inputElement = null;
-      this.addButton.disabled = false;
-    }, (error_message) => {
-      new Modal("Error", error_message).display();
-      this.inputElement.disabled = false;
-    });
+    post(
+      this.addPath,
+      this.addCallback(this.inputElement.value.trim()),
+      () => {
+        const textElement = this.buildTextElement();
+        textElement.textContent = this.inputElement.value.trim();
+        this.listItem.removeChild(this.inputElement);
+        this.listItem.appendChild(textElement);
+        this.addDeleteButtonToElement(this.listItem);
+        this.listItem = null;
+        this.inputElement = null;
+        this.addButton.disabled = false;
+      },
+      (error_message) => {
+        new Modal("Error", error_message).display();
+        this.inputElement.disabled = false;
+      }
+    );
   }
   deleteItem(element) {
-    post(this.deletePath, this.deleteCallback(element), () => this.listElement.removeChild(element));
+    post(
+      this.deletePath,
+      this.deleteCallback(element),
+      () => this.listElement.removeChild(element)
+    );
   }
   addInputElement() {
     const listItem = this.buildListItem();
@@ -228,17 +237,24 @@ var EditableField = class {
     inputElement.focus();
     eventEnter(inputElement, (event) => {
       inputElement.disabled = true;
-      post(this.editPath, this.editCallback(inputElement.value.trim()), () => {
-        inputElement.remove();
-        this.showTextField(inputElement.value.trim());
-      }, (error_message) => {
-        new Modal("Error", error_message).display();
-        inputElement.disabled = false;
-      });
+      post(
+        this.editPath,
+        this.editCallback(inputElement.value.trim()),
+        () => {
+          inputElement.remove();
+          this.showTextField(inputElement.value.trim());
+        },
+        (error_message) => {
+          new Modal("Error", error_message).display();
+          inputElement.disabled = false;
+        }
+      );
     });
   }
   showTextField(textContent) {
-    const textElement = document.createElement(this.options["textElementType"]);
+    const textElement = document.createElement(
+      this.options["textElementType"]
+    );
     textElement.textContent = textContent;
     this.fieldElement.appendChild(textElement);
     this.fieldElement.appendChild(this.editButton);
@@ -253,51 +269,77 @@ var Poll = class {
     const hashID = choicesList.getAttribute("data-id");
     const editTitleButton = document.getElementById("edit-title-button");
     if (editTitleButton) {
-      new EditableField(document.getElementById("poll-title"), editTitleButton, "/poll/title", (textContent) => {
-        return {
-          hash_id: hashID,
-          title: textContent
-        };
-      });
+      new EditableField(
+        document.getElementById("poll-title"),
+        editTitleButton,
+        "/poll/title",
+        (textContent) => {
+          return {
+            hash_id: hashID,
+            title: textContent
+          };
+        }
+      );
     }
     const editQuestionButton = document.getElementById("edit-question-button");
     if (editQuestionButton) {
-      new EditableField(document.getElementById("poll-question"), editQuestionButton, "/poll/question", (textContent) => {
-        return {
-          hash_id: hashID,
-          question: textContent
-        };
-      }, () => {
-      }, {
-        textElementType: "h4"
-      });
+      new EditableField(
+        document.getElementById("poll-question"),
+        editQuestionButton,
+        "/poll/question",
+        (textContent) => {
+          return {
+            hash_id: hashID,
+            question: textContent
+          };
+        },
+        () => {
+        },
+        {
+          textElementType: "h4"
+        }
+      );
     }
     const addChoiceButton = document.getElementById("add-choice");
     if (addChoiceButton) {
-      new EditableList(choicesList, getElementsByXPath("//li[@class='editable']"), addChoiceButton, "/poll/add_choice", "/poll/remove_choice", (choiceToAdd) => {
-        return {
-          hash_id: hashID,
-          choice: choiceToAdd
-        };
-      }, (elementToDelete) => {
-        return {
-          hash_id: hashID,
-          choice: elementToDelete.firstElementChild.textContent.trim()
-        };
-      }, {
-        placeholderText: "Add choice"
-      });
+      new EditableList(
+        choicesList,
+        getElementsByXPath("//li[@class='editable']"),
+        addChoiceButton,
+        "/poll/add_choice",
+        "/poll/remove_choice",
+        (choiceToAdd) => {
+          return {
+            hash_id: hashID,
+            choice: choiceToAdd
+          };
+        },
+        (elementToDelete) => {
+          return {
+            hash_id: hashID,
+            choice: elementToDelete.firstElementChild.textContent.trim()
+          };
+        },
+        {
+          placeholderText: "Add choice"
+        }
+      );
     }
     const expirationButton = document.getElementById("update-expiration");
     const expirationInput = document.getElementsByName("expiration")[0];
     const postCallback = () => {
-      post("/poll/expiration", {
-        hash_id: hashID,
-        expiration: expirationInput.value
-      }, () => {
-      }, () => {
-        expirationButton.disabled = false;
-      });
+      post(
+        "/poll/expiration",
+        {
+          hash_id: hashID,
+          expiration: expirationInput.value
+        },
+        () => {
+        },
+        () => {
+          expirationButton.disabled = false;
+        }
+      );
     };
     expirationButton.addEventListener("click", (event) => {
       expirationButton.disabled = true;
@@ -312,17 +354,27 @@ var Poll = class {
     });
     const deleteButton = document.getElementById("delete-poll");
     deleteButton.addEventListener("click", () => {
-      const modal = new Modal("Are you sure?", "Deleting this poll will also delete all its responses.", {
-        "Cancel": {
-          classes: ["secondary"]
-        },
-        "Do It": {
-          callback: () => {
-            post("/poll/destroy", { hash_id: hashID }, () => window.location.replace("/"), false, () => modal.close());
+      const modal = new Modal(
+        "Are you sure?",
+        "Deleting this poll will also delete all its responses.",
+        {
+          "Cancel": {
+            classes: ["secondary"]
           },
-          classes: ["primary"]
+          "Do It": {
+            callback: () => {
+              post(
+                "/poll/destroy",
+                { hash_id: hashID },
+                () => window.location.replace("/"),
+                false,
+                () => modal.close()
+              );
+            },
+            classes: ["primary"]
+          }
         }
-      }).display();
+      ).display();
     });
   }
 };

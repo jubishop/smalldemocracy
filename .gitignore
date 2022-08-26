@@ -3,5 +3,8 @@
 rspec_n_iteration*
 tmp/
 
+spec/goldens/**/diffs
+spec/goldens/**/failures
+
 *.DS_Store
 .rake_tasks

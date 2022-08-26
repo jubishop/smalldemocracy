@@ -145,22 +145,31 @@ var EditableList = class {
       return;
     }
     this.inputElement.disabled = true;
-    post(this.addPath, this.addCallback(this.inputElement.value.trim()), () => {
-      const textElement = this.buildTextElement();
-      textElement.textContent = this.inputElement.value.trim();
-      this.listItem.removeChild(this.inputElement);
-      this.listItem.appendChild(textElement);
-      this.addDeleteButtonToElement(this.listItem);
-      this.listItem = null;
-      this.inputElement = null;
-      this.addButton.disabled = false;
-    }, (error_message) => {
-      new Modal("Error", error_message).display();
-      this.inputElement.disabled = false;
-    });
+    post(
+      this.addPath,
+      this.addCallback(this.inputElement.value.trim()),
+      () => {
+        const textElement = this.buildTextElement();
+        textElement.textContent = this.inputElement.value.trim();
+        this.listItem.removeChild(this.inputElement);
+        this.listItem.appendChild(textElement);
+        this.addDeleteButtonToElement(this.listItem);
+        this.listItem = null;
+        this.inputElement = null;
+        this.addButton.disabled = false;
+      },
+      (error_message) => {
+        new Modal("Error", error_message).display();
+        this.inputElement.disabled = false;
+      }
+    );
   }
   deleteItem(element) {
-    post(this.deletePath, this.deleteCallback(element), () => this.listElement.removeChild(element));
+    post(
+      this.deletePath,
+      this.deleteCallback(element),
+      () => this.listElement.removeChild(element)
+    );
   }
   addInputElement() {
     const listItem = this.buildListItem();
@@ -228,17 +237,24 @@ var EditableField = class {
     inputElement.focus();
     eventEnter(inputElement, (event) => {
       inputElement.disabled = true;
-      post(this.editPath, this.editCallback(inputElement.value.trim()), () => {
-        inputElement.remove();
-        this.showTextField(inputElement.value.trim());
-      }, (error_message) => {
-        new Modal("Error", error_message).display();
-        inputElement.disabled = false;
-      });
+      post(
+        this.editPath,
+        this.editCallback(inputElement.value.trim()),
+        () => {
+          inputElement.remove();
+          this.showTextField(inputElement.value.trim());
+        },
+        (error_message) => {
+          new Modal("Error", error_message).display();
+          inputElement.disabled = false;
+        }
+      );
     });
   }
   showTextField(textContent) {
-    const textElement = document.createElement(this.options["textElementType"]);
+    const textElement = document.createElement(
+      this.options["textElementType"]
+    );
     textElement.textContent = textContent;
     this.fieldElement.appendChild(textElement);
     this.fieldElement.appendChild(this.editButton);
@@ -251,42 +267,67 @@ var Group = class {
   static domLoaded() {
     const listElement = document.getElementById("member-list");
     const hashID = listElement.getAttribute("data-id");
-    new EditableField(document.getElementById("group-name"), document.getElementById("edit-group-button"), "/group/name", (textContent) => {
-      return {
-        hash_id: hashID,
-        name: textContent
-      };
-    }, (textContent) => {
-      const createLink = document.getElementById("create-link");
-      createLink.innerHTML = `Create new poll for <em>${textContent}</em>`;
-    });
-    new EditableList(listElement, getElementsByXPath("//li[@class='editable' and not(./div)]"), document.getElementById("add-member"), "/group/add_member", "/group/remove_member", (memberEmailToAdd) => {
-      return {
-        hash_id: hashID,
-        email: memberEmailToAdd
-      };
-    }, (elementToDelete) => {
-      return {
-        hash_id: hashID,
-        email: elementToDelete.firstElementChild.textContent.trim()
-      };
-    }, {
-      inputType: "email",
-      placeholderText: "Add member"
-    });
+    new EditableField(
+      document.getElementById("group-name"),
+      document.getElementById("edit-group-button"),
+      "/group/name",
+      (textContent) => {
+        return {
+          hash_id: hashID,
+          name: textContent
+        };
+      },
+      (textContent) => {
+        const createLink = document.getElementById("create-link");
+        createLink.innerHTML = `Create new poll for <em>${textContent}</em>`;
+      }
+    );
+    new EditableList(
+      listElement,
+      getElementsByXPath("//li[@class='editable' and not(./div)]"),
+      document.getElementById("add-member"),
+      "/group/add_member",
+      "/group/remove_member",
+      (memberEmailToAdd) => {
+        return {
+          hash_id: hashID,
+          email: memberEmailToAdd
+        };
+      },
+      (elementToDelete) => {
+        return {
+          hash_id: hashID,
+          email: elementToDelete.firstElementChild.textContent.trim()
+        };
+      },
+      {
+        inputType: "email",
+        placeholderText: "Add member"
+      }
+    );
     const deleteButton = document.getElementById("delete-group");
     deleteButton.addEventListener("click", () => {
-      const modal = new Modal("Are you sure?", "Deleting this group will also delete all its polls.", {
-        "Cancel": {
-          classes: ["secondary"]
-        },
-        "Do It": {
-          callback: () => {
-            post("/group/destroy", { hash_id: hashID }, () => window.location.replace("/"), false, () => modal.close());
+      const modal = new Modal(
+        "Are you sure?",
+        "Deleting this group will also delete all its polls.",
+        {
+          "Cancel": {
+            classes: ["secondary"]
           },
-          classes: ["primary"]
+          "Do It": {
+            callback: () => {
+              post(
+                "/group/destroy",
+                { hash_id: hashID },
+                () => window.location.replace("/"),
+                false,
+                () => modal.close()
+              );
+            },
+            classes: ["primary"]
+          }
         }
-      }).display();
+      ).display();
     });
   }
 };

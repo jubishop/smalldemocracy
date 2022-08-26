@@ -93,7 +93,9 @@ var Poll = class {
   static domLoaded() {
     const choicesElement = document.getElementById("choices");
     this.hashID = choicesElement.getAttribute("data-id");
-    this.choicesArray = Array.from(choicesElement.getElementsByClassName("choice"));
+    this.choicesArray = Array.from(
+      choicesElement.getElementsByClassName("choice")
+    );
     this.choicesArray.forEach((choice) => {
       choice.addEventListener("click", (event) => {
         if (event.target.tagName === "A")
@@ -107,7 +109,11 @@ var Poll = class {
     this.choicesArray.forEach((choice2) => {
       choice2.disabled = true;
     });
-    post("/poll/respond", { hash_id: this.hashID, choice_id: choice.getAttribute("data-id") }, () => location.reload());
+    post(
+      "/poll/respond",
+      { hash_id: this.hashID, choice_id: choice.getAttribute("data-id") },
+      () => location.reload()
+    );
   }
 };
 document.addEventListener("DOMContentLoaded", () => Poll.domLoaded());
