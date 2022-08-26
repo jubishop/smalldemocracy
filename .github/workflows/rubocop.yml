@@ -18,7 +18,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1.87.0
       with:
-        ruby-version: 3.0.2
+        ruby-version: 3.0.3
     - name: Install dependencies
       run: bundle install
     - name: Run rubocop
