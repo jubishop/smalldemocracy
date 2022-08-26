@@ -17,7 +17,7 @@ gem 'sequel-hash_id'
 gem 'slim'
 gem 'tzinfo'
 
-source 'https://www.jubigems.org' do
+source 'http://www.jubigems.org' do
   gem 'core'
   gem 'duration'
   gem 'rstruct'
@@ -41,7 +41,7 @@ group :development do
   gem 'rubocop-sequel'
   gem 'sequel-annotate'
 
-  source 'https://www.jubigems.org' do
+  source 'http://www.jubigems.org' do
     gem 'core-test'
     gem 'tony-test'
   end

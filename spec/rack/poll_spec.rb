@@ -580,7 +580,7 @@ RSpec.describe(Poll, type: :rack_test) {
           expect(last_response.status).to(be(201))
           expect(last_response.body).to(eq('Poll response added'))
           poll_responses = member.responses(poll_id: poll.id)
-          expect((poll_responses).map(&:choice_id)).to(match_array(responses))
+          expect(poll_responses.map(&:choice_id)).to(match_array(responses))
           responses.each_with_index { |choice_id, rank|
             poll_response = poll_responses.find { |response|
               response.choice_id == choice_id

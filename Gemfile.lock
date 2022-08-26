@@ -7,6 +7,34 @@ GIT
       websocket-driver (>= 0.6.5)
 
 GEM
+  remote: http://www.jubigems.org/
+  specs:
+    core (1.22)
+    core-test (0.5)
+    duration (1.7)
+      core
+      linguistics
+    rstruct (1.5)
+      core
+    tony (0.63)
+      base64
+      rack
+      rack-contrib
+      slim
+      tzinfo
+    tony-auth (0.20)
+      base64
+    tony-test (0.88)
+      capybara
+      chunky_png
+      colorize
+      puma
+      rack
+      rack-contrib
+      rack-test
+      rspec
+
+GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.8.1)
@@ -122,34 +150,6 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-
-GEM
-  remote: https://www.jubigems.org/
-  specs:
-    core (1.18)
-    core-test (0.5)
-    duration (1.7)
-      core
-      linguistics
-    rstruct (1.5)
-      core
-    tony (0.63)
-      base64
-      rack
-      rack-contrib
-      slim
-      tzinfo
-    tony-auth (0.20)
-      base64
-    tony-test (0.85)
-      capybara
-      chunky_png
-      colorize
-      puma
-      rack
-      rack-contrib
-      rack-test
-      rspec
 
 PLATFORMS
   x86_64-darwin-19

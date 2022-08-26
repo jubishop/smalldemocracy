@@ -143,7 +143,7 @@ RSpec.describe(Models::User, type: :model) {
           eq([@my_poll, @other_poll]))
     }
 
-    it('finds all active polls with start_expiration sorted ascending') {
+    it('finds all active polls with start_expiration sorted descending') {
       expect(@user.polls(start_expiration: Time.now, order: :desc)).to(
           eq([@other_poll, @my_poll]))
     }

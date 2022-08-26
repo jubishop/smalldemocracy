@@ -186,7 +186,7 @@ RSpec.describe(Group, type: :feature) {
 
         # Confirm redirection to home and group left.
         expect(page).to(have_current_path('/'))
-        expect(group.member(email: email)).to(be(nil))
+        expect(group.member(email: email)).to(be_nil)
         expect(member.exists?).to(be(false))
       }
     }

@@ -1,5 +1,11 @@
+require:
+  - rubocop-sequel
+
 inherit_from:
   - https://raw.githubusercontent.com/jubishop/core/master/.rubocop.yml
 
 Layout/LineLength:
   AllowedPatterns: ['\A\s*#']
+
+Sequel/JSONColumn:
+  Enabled: false

@@ -25,6 +25,7 @@ RSpec.describe(Models::Poll, type: :model) {
           raise_error(Sequel::HookFailed,
                       "Creator #{user.email} is not a member of #{group.name}"))
     }
+
     it('rejects creating poll with no title') {
       expect { create_poll(title: nil) }.to(
           raise_error(Sequel::NotNullConstraintViolation,
@@ -164,17 +165,6 @@ RSpec.describe(Models::Poll, type: :model) {
     }
   }
 
-  context('#responses') {
-    it('finds all responses through join table') {
-      poll = create_poll
-      choice_one = poll.add_choice
-      choice_two = poll.add_choice
-      response_one = choice_one.add_response
-      response_two = choice_two.add_response
-      expect(poll.responses).to(match_array([response_one, response_two]))
-    }
-  }
-
   context(:timestamps) {
     it('sets updated_at and created_at upon creation') {
       poll = create_poll
@@ -276,6 +266,15 @@ RSpec.describe(Models::Poll, type: :model) {
   }
 
   context('#responses') {
+    it('finds all responses through join table') {
+      poll = create_poll
+      choice_one = poll.add_choice
+      choice_two = poll.add_choice
+      response_one = choice_one.add_response
+      response_two = choice_two.add_response
+      expect(poll.responses).to(match_array([response_one, response_two]))
+    }
+
     it('returns responses from a specific member or all responses') {
       group = create_group
       member = group.add_member
