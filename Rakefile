@@ -156,7 +156,7 @@ task(:rebuild) {
   Rake::Task[:esbuild].invoke
 }
 
-desc('Rebuild, watch, and launch localhost:8989')
+desc('Rebuild, watch, and launch localhost:[port=8989]')
 task(:run, [:port]) { |_, args|
   port = args[:port]
   port ||= 8989
