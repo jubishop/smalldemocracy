@@ -3,8 +3,10 @@ RSpec.describe(API, type: :feature) {
   let(:email) { 'user@api.com' }
 
   it('shows the API page') {
-    allow(Models::User).to(receive(:create_api_key).and_return('Test API Key'))
+    api_key = 'Test API Key'
+    allow(Models::User).to(receive(:create_api_key).and_return(api_key))
     go('/api')
+    expect(page).to(have_css('#api-key', text: api_key))
     goldens.verify('api_page')
   }
 }
