@@ -49,7 +49,78 @@ RSpec.describe(API, type: :rack_test) {
     }
   }
 
-  context('post /api/poll/new') {
-    it_has_behavior('api authentication', '/api/poll/new')
+  context('post /api/poll/create') {
+    let(:user) { create_user(email: email) }
+    let(:group) { create_group }
+    let(:type) { :choose_one }
+    let(:expiration) { future }
+    let(:choices) { %w[one two three] }
+    let(:email) { group.email }
+    let(:title) { 'title' }
+    let(:question) { 'question' }
+    let(:valid_params) {
+      {
+        key: user.api_key,
+        title: title,
+        question: question,
+        choices: choices,
+        group_id: group.id,
+        expiration: expiration.to_i,
+        type: type
+      }
+    }
+
+    it_has_behavior('api authentication', '/api/poll/create')
+
+    it('creates a new poll with choices and returns poll id') {
+      post '/api/poll/create', valid_params
+      expect(last_response.status).to(be(201))
+
+      poll = Models::Poll.with_hashid(last_response.body)
+      expect(poll.email).to(eq(user.email))
+      expect(poll.group).to(eq(group))
+      expect(poll.title).to(eq(title))
+      expect(poll.question).to(eq(question))
+      expect(poll.expiration).to(eq(expiration))
+      puts expiration.form
+    }
+
+    it('fails if type is invalid') {
+      valid_params[:type] = :invalid_type
+      post '/api/poll/create', valid_params
+      expect(last_response.status).to(be(400))
+    }
+
+    it('fails if poll expiration is invalid string') {
+      valid_params[:expiration] = 'Sometime tomorrow'
+      post '/api/poll/create', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(eq('Sometime tomorrow is invalid date'))
+    }
+
+    it('fails if poll expiration is in the past') {
+      valid_params[:expiration] = past.to_i
+      post '/api/poll/create', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq('Poll expiration set to time in the past'))
+    }
+
+    it('fails if poll expiration is more than 90 days out') {
+      valid_params[:expiration] = (Time.now + 91.days).to_i
+      post '/api/poll/create', valid_params
+      expect(last_response.status).to(be(400))
+      expect(last_response.body).to(
+          eq('Poll expiration set to more than 90 days in the future'))
+    }
+
+    it('fails if user is not part of poll group') {
+      user = create_user
+      valid_params[:key] = user.api_key
+      post '/api/poll/create', valid_params
+      expect(last_response.body).to(
+          eq("Creator #{user.email} is not a member of #{group.name}"))
+      expect(last_response.status).to(be(400))
+    }
   }
 }

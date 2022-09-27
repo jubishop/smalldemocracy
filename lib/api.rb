@@ -25,14 +25,19 @@ class API < Base
       return 201, user.api_key
     })
 
-    post('/api/poll/new', ->(req, _) {
+    post('/api/poll/create', ->(req, _) {
       user = require_key(req)
+
       req.params[:email] = user.email
 
       choices = req.list_param(:choices, [])
       req.params.delete(:choices)
 
-      req.params[:expiration] = require_expiration(req)
+      if req.param(:expiration).to_i.zero?
+        return 400, "#{req.param(:expiration)} is invalid date"
+      end
+
+      req.params[:expiration] = Time.at(req.param(:expiration).to_i)
 
       begin
         poll = Models::Poll.create(**req.params.symbolize_keys)
@@ -40,7 +45,7 @@ class API < Base
       rescue Sequel::Error => error
         return 400, error.message
       else
-        return 201, poll.url
+        return 201, poll.hashid
       end
     })
   end
@@ -49,6 +54,7 @@ class API < Base
 
   def require_key(req)
     key = req.param(:key)
+    req.params.delete(:key)
     user = Models::User.find(api_key: key)
     throw(:response, [401, %(Invalid key given: "#{key}")]) unless user
     return user
