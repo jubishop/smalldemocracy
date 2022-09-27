@@ -109,12 +109,12 @@ RSpec.describe(Group, type: :feature) {
       it_has_behavior('displayable', 'creator')
 
       let(:entity) { group }
-      let(:delete_button) { find('#delete-group') }
+      let(:delete_button) { find_by_id('delete-group') }
       it_has_behavior('deletable', 'group')
 
       it('supports complex editing of group') {
         # Rename group.
-        edit_group_button = find('#edit-group-button')
+        edit_group_button = find_by_id('edit-group-button')
         edit_group_button.click
         expect(edit_group_button).to(be_gone)
         input_field = find('#group-name input')
@@ -124,7 +124,7 @@ RSpec.describe(Group, type: :feature) {
         expect(edit_group_button).to(be_visible)
 
         # Add a member.
-        add_button = find('#add-member')
+        add_button = find_by_id('add-member')
         expect(add_button).to_not(be_disabled)
         add_button.click
         expect(add_button).to(be_disabled)
@@ -160,7 +160,7 @@ RSpec.describe(Group, type: :feature) {
 
       it('shows a confirmation warning upon leaving') {
         # Click to leave the group.
-        leave_group_button = find('#leave-group')
+        leave_group_button = find_by_id('leave-group')
         leave_group_button.click
         expect(page).to(have_modal)
 
@@ -178,7 +178,7 @@ RSpec.describe(Group, type: :feature) {
         expect(member.exists?).to(be(true))
 
         # Click and confirm leaving group.
-        leave_group_button = find('#leave-group')
+        leave_group_button = find_by_id('leave-group')
         leave_group_button.click
         expect(page).to(have_modal)
         expect_any_slim(:logged_in)

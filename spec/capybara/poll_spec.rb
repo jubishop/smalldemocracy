@@ -158,7 +158,7 @@ RSpec.describe(Poll, type: :feature) {
     it('displays a modal and redirects you when you have no group') {
       set_cookie(:email, email)
       go('/poll/create')
-      expect(find('#group-modal')).to(
+      expect(find_by_id('group-modal')).to(
           have_link('Create Group', href: '/group/create'))
       expect(page).to(have_modal)
       goldens.verify('create_no_group_modal')
@@ -319,7 +319,7 @@ RSpec.describe(Poll, type: :feature) {
     }
 
     shared_examples('deletable response') {
-      let(:delete_button) { find('#delete-response') }
+      let(:delete_button) { find_by_id('delete-response') }
 
       it('shows a deletion confirmation warning upon delete') {
         # Click to delete the poll.
@@ -525,7 +525,7 @@ RSpec.describe(Poll, type: :feature) {
       before(:each) { go(poll.edit_url) }
 
       let(:entity) { poll }
-      let(:delete_button) { find('#delete-poll') }
+      let(:delete_button) { find_by_id('delete-poll') }
       it_has_behavior('deletable', 'no_responses')
 
       it('shows a poll fully free to edit') {
@@ -535,7 +535,7 @@ RSpec.describe(Poll, type: :feature) {
 
       it('supports complete editing of poll') {
         # Change title.
-        edit_title_button = find('#edit-title-button')
+        edit_title_button = find_by_id('edit-title-button')
         edit_title_button.click
         expect(edit_title_button).to(be_gone)
         input_field = find('#poll-title input')
@@ -546,7 +546,7 @@ RSpec.describe(Poll, type: :feature) {
         expect(edit_title_button).to(be_visible)
 
         # Change question
-        edit_question_button = find('#edit-question-button')
+        edit_question_button = find_by_id('edit-question-button')
         edit_question_button.click
         expect(edit_question_button).to(be_gone)
         input_field = find('#poll-question input')
@@ -556,7 +556,7 @@ RSpec.describe(Poll, type: :feature) {
         expect(edit_question_button).to(be_visible)
 
         # Add a choice.
-        add_button = find('#add-choice')
+        add_button = find_by_id('add-choice')
         expect(add_button).to_not(be_disabled)
         add_button.click
         expect(add_button).to(be_disabled)
@@ -573,7 +573,7 @@ RSpec.describe(Poll, type: :feature) {
 
         # Edit expiration
         fill_in('expiration', with: expiration_time)
-        find('#update-expiration').click
+        find_by_id('update-expiration').click
 
         # Screenshot poll's new state.
         goldens.verify('edit_no_responses_modified')
@@ -597,7 +597,7 @@ RSpec.describe(Poll, type: :feature) {
       }
 
       let(:entity) { poll }
-      let(:delete_button) { find('#delete-poll') }
+      let(:delete_button) { find_by_id('delete-poll') }
       it_has_behavior('deletable', 'with_responses')
 
       it('shows a poll with limited editability') {
@@ -620,7 +620,7 @@ RSpec.describe(Poll, type: :feature) {
 
         # Edit expiration
         fill_in('expiration', with: expiration_time)
-        find('#update-expiration').click
+        find_by_id('update-expiration').click
 
         # Screenshot poll's new state.
         goldens.verify('edit_with_responses_modified')
