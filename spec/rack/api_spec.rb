@@ -82,7 +82,7 @@ RSpec.describe(API, type: :rack_test) {
       expect(poll.title).to(eq(title))
       expect(poll.question).to(eq(question))
       expect(poll.expiration).to(eq(expiration))
-      puts expiration.form
+      expect(poll.type).to(eq(type))
     }
 
     it('fails if type is invalid') {
